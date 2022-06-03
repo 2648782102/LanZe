@@ -6,10 +6,10 @@
           <el-affix :offset="0">
             <el-menu router default-active="/zhailu"
               class="el-menu-demo" mode="horizontal" @select="handleSelect">
-              <el-col :span="2" style="text-align: center;" :offset="0">
+              <el-col :span="2" :offset="0" class="log-col">
                 <el-image @click="$router.push({name:'productdisplay'})" class="logo-img" :src="logoUrl" fit="fill" lazy></el-image>
               </el-col>
-              <el-col :span="15" :offset="0">
+              <el-col :span="15" :offset="0" class="input-col">
                 <!-- 搜索框 -->
                 <el-input @focus="elinput1focus = true" @blur="elinput1focus = false" class="me-2 elinput1"
                   :class="elinput1focus?'elinput1focus':''" v-model="inputS" placeholder="搜索诗词" prefix-icon="Search"
@@ -81,6 +81,17 @@
   section {
     width: 100%;
     overflow: hidden;
+  }
+
+  .log-col {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .input-col {
+    display: flex;
+    align-items: center;
   }
 
   .logo-img {
