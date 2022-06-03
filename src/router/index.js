@@ -1,5 +1,5 @@
 // 引入vuerouter
-import { createRouter,createWebHashHistory } from 'vue-router'
+import { createRouter,createWebHistory } from 'vue-router'
 
 // 路由懒加载
 const ProductDisplay = import('../pages/ProductDisplay.vue')  
@@ -24,7 +24,7 @@ const Complaint = import('../pages/Personal/Complaint.vue')  //投诉意见
 
 const router = createRouter({
     // 路由模式
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     routes: [
         // 配置默认页面
     {
