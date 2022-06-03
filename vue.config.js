@@ -32,8 +32,6 @@ module.exports = {
       modules: false
     }, // use thread-loader for babel & TS in production build // enabled by default if the machine has more than 1 cores
   
-    parallel: require("os").cpus().length > 1, // PWA 插件相关配置 // see https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-pwa
-  
     pwa: {}, // configure webpack-dev-server behavior
     devServer: {
       open: process.platform === "darwin",
