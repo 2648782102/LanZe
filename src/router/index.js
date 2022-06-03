@@ -29,7 +29,7 @@ const router = createRouter({
         // 配置默认页面
     {
         path:'/',
-        redirect:'/home',
+        redirect:'/productdisplay',
     },
     {
         name: 'productdisplay',
