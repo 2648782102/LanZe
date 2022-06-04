@@ -4,6 +4,7 @@
         <el-row :gutter="20" justify="center">
             <div class="col-10">
                 <div class="top">
+                    <!-- 上部头像，用户名等信息 -->
                     <main></main>
                     <footer>
                         <div class="col-12 col-md-6 footer-1">
@@ -19,7 +20,7 @@
                             </router-link>
                             <!-- 收藏 -->
                             <router-link :to="{name:'favorite'}">
-                                <i class="fas fa-star" style="color: rgb(237, 208, 41);"></i>
+                                <i class="fas fa-star" style="color: rgb(255, 226, 62);"></i>
                                 <span>收藏</span>
                             </router-link>
                             <!-- 作品 -->
@@ -38,19 +39,20 @@
                                 <span>设置</span>
                             </router-link>
                         </div>
+                        <!-- 右侧信息展示 -->
                         <div class="col-12 col-md-3 footer-2">
-                            <a href="">
+                            <router-link :to="{name:'shezhi'}">
                                 <span>{{ attentionNum }}</span>
                                 <span class="text-secondary">关注</span>
-                            </a>
-                            <a href="">
+                            </router-link>
+                            <router-link :to="{name:'samplereels'}">
                                 <span>{{ productionNum }}</span>
                                 <span class="text-secondary">作品</span>
-                            </a>
-                            <a href="">
+                            </router-link>
+                            <router-link :to="{name:'favorite'}">
                                 <span>{{ collectNum }}</span>
                                 <span class="text-secondary">收藏</span>
-                            </a>
+                            </router-link>
                             <a href="">
                                 <span>{{ clockInNum }}</span>
                                 <span class="text-secondary">打卡</span>
@@ -58,6 +60,7 @@
                         </div>
                     </footer>
                 </div>
+                <!-- 主体部分 -->
                 <div class="roubox mt-2 border-re2">
                     <router-view></router-view>
                 </div>
@@ -65,9 +68,9 @@
         </el-row>
     </section>
 </template>
-    
-    <script>
-        import {ref} from 'vue'
+
+<script>
+    import { ref } from 'vue'
 
     export default {
         name: 'Personal',
@@ -78,6 +81,7 @@
             let collectNum = ref(0)
             let clockInNum = ref(0)
 
+            // 输出内容
             return {
                 modelLis,
                 attentionNum,
@@ -87,64 +91,73 @@
             }
         }
     }
-    </script>
-    
-    <style scoped>
-        .top {
-            min-height: 14rem;
-            background-color: white;
-            border-radius: 0 0 0.2rem 0.2rem;
-            overflow: hidden;
-        }
-        .roubox {
-            background-color: rgb(255, 255, 255);
-        }
-        main {
-            width: 100%;
-            min-height: 10rem;
-            background-color: rebeccapurple;
-        }
-        footer {
-            width: 100%;
-            min-height: 4rem;
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.5rem;
-            background-color: white;
-        }
-        footer>div {
-            display: flex;
-            align-items: center;
-        }
-        .footer-1 {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-around;
-        }
-        .footer-1>a {
-            text-decoration: none;
-        }
-        .footer-1>a>span {
-            margin-left: 0.1rem;
-            font-size: 0.8rem;
-            color: black;
-        }
-        .footer-2 {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-around;
-        }
-        .footer-2>a {
-            display: flex;
-            flex-direction: column;
-            text-align: center;
-            text-decoration: none;
-            font-size: 0.6rem;  
-            color: black;
-        }
-    </style>
+</script>
+
+<style scoped>
+    .top {
+        min-height: 14rem;
+        background-color: white;
+        border-radius: 0 0 0.2rem 0.2rem;
+        overflow: hidden;
+    }
+
+    .roubox {
+        background-color: rgb(255, 255, 255);
+    }
+
+    main {
+        width: 100%;
+        min-height: 10rem;
+        background-color: rebeccapurple;
+    }
+
+    footer {
+        width: 100%;
+        min-height: 4rem;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem;
+        background-color: white;
+    }
+
+    footer>div {
+        display: flex;
+        align-items: center;
+    }
+
+    .footer-1 {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-around;
+    }
+
+    .footer-1>a {
+        text-decoration: none;
+    }
+
+    .footer-1>a>span {
+        margin-left: 0.1rem;
+        font-size: 0.8rem;
+        color: black;
+    }
+
+    .footer-2 {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-around;
+    }
+
+    .footer-2>a {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        text-decoration: none;
+        font-size: 0.6rem;
+        color: black;
+    }
+</style>

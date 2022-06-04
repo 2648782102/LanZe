@@ -5,7 +5,8 @@
         <el-header style="padding: 0;">
           <el-affix :offset="0">
             <el-menu router default-active="/zhailu"
-              class="el-menu-demo" mode="horizontal" @select="handleSelect">
+              class="el-menu-demo" mode="horizontal">
+              <!-- 网站logo -->
               <el-col :span="2" :offset="0" class="log-col">
                 <el-image @click="$router.push({name:'productdisplay'})" class="logo-img" :src="logoUrl" fit="fill" lazy></el-image>
               </el-col>
@@ -15,10 +16,12 @@
                   :class="elinput1focus?'elinput1focus':''" v-model="inputS" placeholder="搜索诗词" prefix-icon="Search"
                   clearable />
               </el-col>
+              <!-- 右侧导航 -->
               <el-menu-item index="/zhailu">摘录</el-menu-item>
               <el-menu-item index="/wenku">文库</el-menu-item>
               <el-menu-item index="/chashe">茶社</el-menu-item>
               <el-menu-item index="/duxue">笃学</el-menu-item>
+              <!-- 个人中心下拉菜单 -->
               <el-sub-menu index="4">
                 <template #title>个人中心</template>
                 <el-menu-item index="personalziLiao">个人资料</el-menu-item>
@@ -29,9 +32,11 @@
             </el-menu>
           </el-affix>
         </el-header>
+        <!-- 主体部分 -->
         <main>
           <router-view></router-view>
         </main>
+        <!-- 底部 -->
         <el-footer class="footer">
           <el-row justify="center">
             <el-col :span="24" :offset="0">

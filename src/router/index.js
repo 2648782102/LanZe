@@ -1,30 +1,9 @@
 // 引入vuerouter
-import { createRouter,createWebHistory } from 'vue-router'
-
-// 路由懒加载
-const ProductDisplay = import('../pages/ProductDisplay.vue')  
-const Home = import('../pages/Home.vue' )    //home
-const DuXue = import('../pages/DuXue/DuXue.vue')  //笃学
-const ZhaiLu = import('../pages/ZhaiLu/ZhaiLu.vue')  //摘录
-const WenKu = import('../pages/WenKu/WenKu.vue' )  // 文库
-const ChaShe = import('../pages/ChaShe/ChaShe.vue')  //茶社
-const PersonalZiLiao = import('../pages/Personal/PersonalZiLiao.vue')  //  个人资料
-const SampleReels = import('../pages/Personal/SampleReels.vue')  //  作品
-const Favorite = import('../pages/Personal/Favorite.vue')  // 收藏
-const GuShi = import('../pages/WenKu/GuShi.vue')  //  文库子组件，古诗类
-const GuCi = import('../pages/WenKu/GuCi.vue')  //文库子组件，古词类
-const FengYa = import('../pages/ChaShe/FengYa.vue' )  // 茶社子组件，风俗雅文
-const FeiHua = import('../pages/ChaShe/FeiHua.vue')  // 茶社子组件，飞花接龙
-const JingXuan = import('../pages/ChaShe/JingXuan.vue')  //茶社子组件，精选诗文
-const XianDai = import('../pages/ChaShe/XianDai.vue')  //茶社子组件，现代诗文
-const SheZhi = import('../pages/Personal/SheZhi.vue')  //设置界面
-const Personal = import('../pages/Personal/Personal.vue')  //个人中心
-const PersonalHome = import('../pages/Personal/PersonalHome.vue')  // 个人中心首页
-const Complaint = import('../pages/Personal/Complaint.vue')  //投诉意见
+import { createRouter,createWebHashHistory } from 'vue-router'
 
 const router = createRouter({
     // 路由模式
-    history: createWebHistory(),
+    history: createWebHashHistory(),
     routes: [
         // 配置默认页面
     {
@@ -32,126 +11,126 @@ const router = createRouter({
         redirect:'/productdisplay',
     },
     {
-        name: 'productdisplay',
+        name: 'productdisplay',  //产品介绍
         path: '/productdisplay',
-        component: ProductDisplay,
+        component:() => import('../pages/ProductDisplay.vue'),
         meta:{title: '产品介绍',isAush:false}
     },
     {
-        name: 'home',
+        name: 'home',  //首页/摘录
         path: '/home',
-        component: Home,
+        component:() => import('../pages/Home.vue'),
         meta:{title: '首页/摘录',isAush:false},
         redirect:'/zhailu',
         children:[
             {
-                name: 'zhailu',
+                name: 'zhailu',  //摘录
                 path: '/zhailu',
-                component: ZhaiLu,
+                component:() => import('../pages/ZhaiLu/ZhaiLu.vue'),
                 meta: {title: '摘录',isAush: false}
             },
             {
-                name: 'wenku',
+                name: 'wenku',  //文库
                 path: '/wenku',
-                component: WenKu,
+                component:() => import('../pages/WenKu/WenKu.vue'),
                 meta: {title: '文库',isAush: false},
                 redirect: '/gushi',
                 children:[
                     {
-                        name: 'gushi',
+                        name: 'gushi',  //古诗类
                         path: '/gushi',
-                        component: GuShi,
+                        component:() => import('../pages/WenKu/GuShi.vue'),
                         meta: {title: '古诗类',isAush: false}
                     },
                     {
-                        name: "guci",
+                        name: "guci",  //古词类
                         path: '/guci',
-                        component: GuCi,
+                        component:() => import('../pages/WenKu/GuCi.vue'),
                         meta: {title: '古词类',isAush: false}
                     }
                 ]
             },
             {
-                name: 'chashe',
+                name: 'chashe',  //茶社
                 path: '/chashe',
-                component: ChaShe,
+                component:() => import('../pages/ChaShe/ChaShe.vue'),
                 meta: {title: '茶社',isAush: false},
                 redirect: '/jingxuan',
                 children:[
                     {
-                        name: 'feihua',
+                        name: 'feihua',  //飞花接龙
                         path: '/feihua',
-                        component: FeiHua,
+                        component:() => import('../pages/ChaShe/FeiHua.vue'),
                         meta: {title: '飞花接龙',isAush: false}
                     },
-                    {
-                        name: 'fengya',
+                    { 
+                        name: 'fengya',  //风俗雅文
                         path: '/fengya',
-                        component: FengYa,
+                        component:() => import('../pages/ChaShe/FengYa.vue'),
                         meta: {title: '风俗雅文',isAush: false}
                     },
                     {
-                        name: 'jingxuan',
+                        name: 'jingxuan',  //精选诗文
                         path: '/jingxuan',
-                        component: JingXuan,
+                        component:() => import('../pages/ChaShe/JingXuan.vue'),
                         meta: {title: '精选诗文',isAush: false}
                     },
                     {
-                        name: 'xiandai',
+                        name: 'xiandai',  //现代诗歌
                         path: '/xiandai',
-                        component: XianDai,
+                        component:() => import('../pages/ChaShe/XianDai.vue'),
                         meta: {title: '现代诗歌',isAush: false}
                     },
                     
                 ]
             },
             {
-                name: 'duxue',
+                name: 'duxue',  //笃学
                 path: '/duxue',
-                component: DuXue,
+                component:() => import('../pages/DuXue/DuXue.vue'),
                 meta: {title: '笃学',isAush: false}
             },
             {
-                name: 'personal',
+                name: 'personal',  //个人中心
                 path: '/personal',
-                component: Personal,
+                component:() => import('../pages/Personal/Personal.vue'),
                 meta: {title: '个人中心',isAush: false},
                 redirect: '/personalziLiao',
                 children:[
                     {
-                        name: 'personalhome',
+                        name: 'personalhome',  //个人中心首页
                         path: '/personalhome',
-                        component: PersonalHome,
+                        component:() => import('../pages/Personal/PersonalHome.vue'),
                         meta: {title: '个人中心首页',isAush: false}
                     },
                     {
-                        name: 'personalziLiao',
+                        name: 'personalziLiao',  //个人资料
                         path: '/personalziLiao',
-                        component: PersonalZiLiao,
+                        component:() => import('../pages/Personal/PersonalZiLiao.vue'),
                         meta: {title: '个人资料',isAush: false}
                     },
                     {
-                        name: 'samplereels',
+                        name: 'samplereels',  //作品
                         path: '/samplereels',
-                        component: SampleReels,
+                        component:() => import('../pages/Personal/SampleReels.vue'),
                         meta: {title: '作品',isAush: false}
                     },
                     {
-                        name: 'favorite',
+                        name: 'favorite',  //收藏
                         path: '/favorite',
-                        component: Favorite,
+                        component:() => import('../pages/Personal/Favorite.vue'),
                         meta: {title: '收藏',isAush: false}
                     },
                     {
-                        name: 'complaint',
+                        name: 'complaint',  //投诉意见
                         path: '/complaint',
-                        component: Complaint,
+                        component:() => import('../pages/Personal/Complaint.vue'),
                         meta: {title: '投诉意见',isAush: false}
                     },
                     {
-                        name: 'shezhi',
+                        name: 'shezhi',  //设置
                         path: '/shezhi',
-                        component: SheZhi,
+                        component:() => import('../pages/Personal/SheZhi.vue'),
                         meta: {title: '设置',isAush: false}
                     }
                 ]

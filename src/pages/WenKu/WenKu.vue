@@ -4,10 +4,12 @@
     <el-main>
     <el-row justify="center">
     <el-col class="bgwhite elcol1" :span="24" :offset="0">
+      <!-- 左侧古诗/古词卡片，具有切换功能 -->
       <div class="tab-left">
         <router-link :to="{name: 'gushi'}">古诗</router-link>
         <router-link :to="{name: 'guci'}">古词</router-link>
       </div>
+      <!-- 主体 -->
       <div class="col-9 col-md-10"> 
         <router-view></router-view>
       </div>
