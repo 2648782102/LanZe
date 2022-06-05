@@ -132,6 +132,12 @@ const router = createRouter({
                         path: '/shezhi',
                         component:() => import('../pages/Personal/SheZhi.vue'),
                         meta: {title: '设置',isAush: false}
+                    },
+                    {
+                        name: 'attention',  //设置
+                        path: '/attention',
+                        component:() => import('../pages/Personal/Attention.vue'),
+                        meta: {title: '关注',isAush: false}
                     }
                 ]
             },

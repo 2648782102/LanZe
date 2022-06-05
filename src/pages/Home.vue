@@ -32,18 +32,24 @@
             </el-menu>
           </el-affix>
         </el-header>
-        <!-- 主体部分 -->
-        <main>
-          <router-view></router-view>
-        </main>
-        <!-- 底部 -->
-        <el-footer class="footer">
-          <el-row justify="center">
-            <el-col :span="24" :offset="0">
-              <h1>底部</h1>
-            </el-col>
-          </el-row>
-        </el-footer>
+        <section class="section-main">
+          <el-scrollbar height="100vh">
+          <!-- 主体部分 -->
+          <main>
+            <el-scrollbar>
+              <router-view></router-view>
+            </el-scrollbar>
+          </main>
+          <!-- 底部 -->
+          <el-footer class="footer mt-2">
+            <el-row justify="center">
+              <el-col :span="24" :offset="0">
+                <h1>底部</h1>
+              </el-col>
+            </el-row>
+          </el-footer>
+          </el-scrollbar>
+        </section>
       </el-container>
     </section>
   </article>
@@ -80,12 +86,12 @@
   article {
     display: flex;
     justify-content: center;
-    background-image: url(../assets/beijing/home1.jpg);
+    /* background-image: url(../assets/beijing/home1.jpg); */
+    background-color: aliceblue;
   }
 
   section {
     width: 100%;
-    overflow: hidden;
   }
 
   .log-col {
@@ -120,7 +126,7 @@
 
   .footer {
     min-height: 20vh;
-    background-color: rgba(37, 37, 42, 0.95);
+    background-color: rgba(37, 37, 42, 0.98);
     color: white;
   }
 </style>

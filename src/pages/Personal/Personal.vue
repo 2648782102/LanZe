@@ -41,7 +41,7 @@
                         </div>
                         <!-- 右侧信息展示 -->
                         <div class="col-12 col-md-3 footer-2">
-                            <router-link :to="{name:'shezhi'}">
+                            <router-link :to="{name:'attention'}">
                                 <span>{{ attentionNum }}</span>
                                 <span class="text-secondary">关注</span>
                             </router-link>
@@ -53,7 +53,7 @@
                                 <span>{{ collectNum }}</span>
                                 <span class="text-secondary">收藏</span>
                             </router-link>
-                            <a href="">
+                            <a>
                                 <span>{{ clockInNum }}</span>
                                 <span class="text-secondary">打卡</span>
                             </a>
@@ -79,7 +79,7 @@
             let attentionNum = ref(0)
             let productionNum = ref(0)
             let collectNum = ref(0)
-            let clockInNum = ref(0)
+            let clockInNum = ref(1)
 
             // 输出内容
             return {
@@ -108,7 +108,8 @@
     main {
         width: 100%;
         min-height: 10rem;
-        background-color: rebeccapurple;
+        background-image: url(../../assets/beijing/shuimo.png);
+        background-size: 100%;
     }
 
     footer {
@@ -140,9 +141,12 @@
     }
 
     .footer-1>a>span {
-        margin-left: 0.1rem;
+        margin-left: 0.2rem;
         font-size: 0.8rem;
         color: black;
+    }
+    .footer-1>a>i {
+        font-size: 1rem;
     }
 
     .footer-2 {

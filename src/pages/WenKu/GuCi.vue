@@ -2,7 +2,7 @@
     <!-- 古词类 -->
     <article>
         <el-tabs style="height: 100%" class="gushi-tabs">
-        <el-tab-pane label="四 季">四季</el-tab-pane>
+        <el-tab-pane label="四 季">古词</el-tab-pane>
         <el-tab-pane label="山 水">山水</el-tab-pane>
         <el-tab-pane label="天 气">天气</el-tab-pane>
         <el-tab-pane label="人 物">人物</el-tab-pane>

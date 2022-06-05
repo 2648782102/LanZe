@@ -1,7 +1,7 @@
 <template>
 <!-- 茶社 -->
   <article class="mt-3 mb-3">
-  <el-row style="width:100%;" justify="center">
+  <el-row class="elrow" justify="center">
     <!-- 走马灯轮播图 -->
     <el-carousel height="15rem" class="col-11 col-md-9" :interval="4000" type="card">
         <el-carousel-item v-for="item in 3" :key="item">
@@ -55,6 +55,10 @@
 
   .el-carousel__item:nth-child(2n + 1) {
     background-color: #d3dce6;
+  }
+
+  .elrow {
+    width: 100%;
   }
 
   .el-menu {
