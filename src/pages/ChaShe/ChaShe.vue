@@ -4,8 +4,8 @@
   <el-row class="elrow" justify="center">
     <!-- 走马灯轮播图 -->
     <el-carousel height="15rem" class="col-11 col-md-9" :interval="4000" type="card">
-        <el-carousel-item v-for="item in 3" :key="item">
-          <el-image class="carousel-image" src="" fit="fill" :lazy="true">
+        <el-carousel-item v-for="item in imgArr" :key="item">
+          <el-image class="carousel-image" :src="item" fit="fill" :lazy="true">
             <template #error>
               <div class="d-flex justify-content-center align-items-center w-100 h-100">
                 <el-icon size="5rem" color="white"><Picture /></el-icon>
@@ -28,14 +28,30 @@
         <router-view></router-view>
       </div>
     </div>
+    <div class="paginationBox">
+      <el-pagination background layout="prev, pager, next" :total="100" />
+    </div>
     </div>
   </el-row>
   </article>
 </template>
 
 <script>
+  import {ref} from 'vue'
+
   export default {
-    name: 'ChaShe'
+    name: 'ChaShe',
+    setup() {
+      let imgArr = ref([
+        '',
+        '',
+        ''
+      ])
+
+      return{
+        imgArr
+      }
+    }
   }
 </script>
 
@@ -68,5 +84,11 @@
 
   .dox-box {
     min-height: 100vh;
+  }
+  .paginationBox {
+    display: flex;
+    justify-content: right;
+    padding-bottom: 0.4rem;
+    padding-right: 0.4rem;
   }
 </style>

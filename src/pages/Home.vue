@@ -43,8 +43,8 @@
           <!-- 底部 -->
           <el-footer class="footer mt-2">
             <el-row justify="center">
-              <el-col :span="24" :offset="0">
-                <h1>底部</h1>
+              <el-col class="footerCol" :span="24" :offset="0">
+                <h4>本站仅供学习交流使用，不得用于一切商业盈利活动</h4>
               </el-col>
             </el-row>
           </el-footer>
@@ -128,5 +128,10 @@
     min-height: 20vh;
     background-color: rgba(37, 37, 42, 0.98);
     color: white;
+  }
+  .footerCol {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 </style>

@@ -1,11 +1,15 @@
 <template>
     <!-- 个人中心 -->
-    <section class="mb-3">
-        <el-row :gutter="20" justify="center">
+    <article class="mb-3">
+        <el-row class="elrow1" justify="center">
             <div class="col-10">
                 <div class="top">
                     <!-- 上部头像，用户名等信息 -->
-                    <main></main>
+                    <main>
+                        <div class="avatar">
+                            <el-avatar :size="size"  />
+                        </div>
+                    </main>
                     <footer>
                         <div class="col-12 col-md-6 footer-1">
                             <!-- 主页 -->
@@ -66,7 +70,7 @@
                 </div>
             </div>
         </el-row>
-    </section>
+    </article>
 </template>
 
 <script>
@@ -94,6 +98,10 @@
 </script>
 
 <style scoped>
+    article {
+        width: 100%;    
+    }
+
     .top {
         min-height: 14rem;
         background-color: white;
@@ -101,15 +109,34 @@
         overflow: hidden;
     }
 
+
     .roubox {
         background-color: rgb(255, 255, 255);
     }
 
     main {
+        position: relative;
         width: 100%;
         min-height: 10rem;
         background-image: url(../../assets/beijing/shuimo.png);
         background-size: 100%;
+    }
+
+    /* 头像 */
+    .avatar {
+        width: 4.2rem;
+        height: 4.2rem;
+        position: absolute;
+        bottom: 3%;
+        left: 5%;
+        background-color: red;
+    }
+
+    .avatar>el-avatar
+
+    .elrow1 {
+        width: 100%;
+        height: 100%;
     }
 
     footer {

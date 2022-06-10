@@ -8,11 +8,11 @@
       <div class="tab-left">
         <router-link style="position: relative;" :to="{name: 'gushi'}">
           <h1>古 诗</h1>
-          <img src="../../assets/beijing/yulong.png" alt="">
+          <!-- <img class="imgshi" src="../../assets/beijing/yulong.png" alt=""> -->
         </router-link>
         <router-link style="position: relative;" :to="{name: 'guci'}">
           <h1>古 词</h1>
-          <img src="../../assets/beijing/yulong.png" alt="">
+          <!-- <img class="imgci" src="../../assets/beijing/yulong.png" alt=""> -->
         </router-link>
       </div>
       <!-- 主体 -->
@@ -39,35 +39,50 @@ export default {
       width: 7rem;
       display: flex;
       flex-direction: column;
-      justify-content: space-around;
       margin-right: 1rem;
       margin-left: 1rem;
     }
     .tab-left>a {
+      position: relative;
       width: 7rem;
-      height: 45%;
-      border-radius: 1rem;
-      background: #ffffff;
-      box-shadow:  5px 5px 10px #b2cbd73b,
-             -5px -5px 10px #c4e1ed51;
-             display: flex;
-             flex-direction: column;
-             align-items: center;
-             text-decoration: none;
+      height: 18rem;
+    }
+
+    .tab-left>a:hover h1{
+      transform: rotateY(26deg);
+      transition: 0.7s;
+      text-shadow: -8px 3px 3px rgba(0, 0, 0, 0.304);
+    }
+
+    .tab-left>a::after {
+      content: '';
+      width: 200%;
+      height: 18rem;
+      background-image: url(../../assets/beijing/huabian.png);
+      background-size: 100% 100%;
+      position: absolute;
+      top: -4%;
+      left: -44%;
     }
     .tab-left img {
       width: 80%;
       position: absolute;
       bottom: 0;
     }
+
     .tab-left h1 {
       writing-mode: vertical-lr;
       color: black;
-      margin-top: 20%;
       font-size: 2.4rem;
+      position: absolute;
+      top: 5rem;
+      left: -3.2rem;
+      transition: 1.5s;
+      z-index: 8;
     }
     .elcol1 {
       display:flex;
       min-height:100vh;
+      padding-top: 2rem;
     }
 </style>
