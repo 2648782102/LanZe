@@ -132,8 +132,6 @@
         background-color: red;
     }
 
-    .avatar>el-avatar
-
     .elrow1 {
         width: 100%;
         height: 100%;
