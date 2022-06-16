@@ -7,7 +7,11 @@
                     <!-- 上部头像，用户名等信息 -->
                     <main>
                         <div class="avatar">
-                            <el-avatar :size="size"  />
+                            <el-avatar class="elavatar" icon="UserFilled" />
+                            <span class="ps-2">用户名<img class="huizhang" src="../../assets/hunzhang/3.png" alt=""></span>
+                        </div>
+                        <div class="text1">
+                            <h3>天行健，君子以自强不息</h3>
                         </div>
                     </main>
                     <footer>
@@ -124,12 +128,26 @@
 
     /* 头像 */
     .avatar {
-        width: 4.2rem;
-        height: 4.2rem;
         position: absolute;
         bottom: 3%;
         left: 5%;
-        background-color: red;
+    }
+
+    .elavatar {
+        width: 3.8rem;
+        height: 3.8rem;
+        font-size: 40px;
+    }
+
+    .huizhang {
+        width: 1.2rem;
+        height: 1.2rem;
+    }
+
+    .text1 {
+        position: absolute;
+        right: 1rem;
+        bottom: 0;
     }
 
     .elrow1 {
@@ -163,6 +181,7 @@
 
     .footer-1>a {
         text-decoration: none;
+        transition: 0.5s;
     }
 
     .footer-1>a>span {
@@ -172,6 +191,11 @@
     }
     .footer-1>a>i {
         font-size: 1rem;
+    }
+
+    .footer-1>a:hover {
+        text-shadow: 3px 3px 3px rgba(152, 152, 152, 0.322);
+        transition: 0.2s;
     }
 
     .footer-2 {

@@ -141,6 +141,12 @@ const router = createRouter({
                     }
                 ]
             },
+            {
+                name:'details',
+                path:'/details',
+                component:() => import('../pages/details.vue'),
+                meta: {title: '详情',isAush: false}
+            }
         ]
     }
     ]
