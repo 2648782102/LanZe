@@ -14,7 +14,7 @@
                 <!-- 搜索框 -->
                 <el-input @focus="elinput1focus = true" @blur="elinput1focus = false" class="me-2 elinput1"
                   :class="elinput1focus?'elinput1focus':''" v-model="inputS" placeholder="搜索诗词" prefix-icon="Search"
-                  clearable />
+                  clearable @keyup.enter="inputEnter"/>
               </el-col>
               <!-- 右侧导航 -->
               <el-menu-item index="/zhailu">摘录</el-menu-item>
@@ -58,12 +58,26 @@
 <script>
   import { ref } from 'vue'
   import logo from '../assets/logo.png'
+import axios from 'axios'
 
   export default {
     name: 'Home',
     setup() {
       // 搜索框model
       let inputS = ref('')
+      // 发送请求返回根据输入框内容搜索到的内容
+      function inputEnter() {
+        axios.get(`http://192.168.44.1:3000/api/GuShiCiApi/SongCiSanBai.php?author=${inputS.value}`)
+        .then(response => {
+          // author:词人姓名 paragraphs：内容 rhythmic：词牌名 tags：类型
+          console.log(response.data[0]);  
+          inputS.value = '';
+        })
+        .catch(function(error) {
+          console.log(error);
+        })
+      }
+
       // logo图片
       let logoUrl = logo
       // 搜索框状态，聚焦/失焦
@@ -73,6 +87,7 @@
         inputS,
         logoUrl,
         elinput1focus,
+        inputEnter
       }
     }
   }

@@ -8,7 +8,8 @@
       </div>
       <div class="col-10 col-lg-9 dox bgwhite">
         <section class="section1 col-10 col-md-7 col-lg-3">
-          <div v-loading='loding' element-loading-text="加载中..." class="box" :class="{'animationC':anima1,'animationD':anima2}" @click="xiangqing">
+          <div v-loading='loding' element-loading-text="加载中..." class="box"
+            :class="{'animationC':anima1,'animationD':anima2}" @click="xiangqing(scArr1)">
             <span @click="shouchang(1)" :class="shouchang1?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
             <p>{{ scArr1.content }}</p>
             <h5>— {{ scArr1.author }}</h5>
@@ -16,7 +17,8 @@
           </div>
         </section>
         <section class="section2 col-10 col-md-8 col-lg-3 hidden-md-and-down">
-          <div v-loading='loding' element-loading-text="加载中..." class="box" :class="{'animationC':anima1,'animationD':anima2}">
+          <div v-loading='loding' element-loading-text="加载中..." class="box"
+            :class="{'animationC':anima1,'animationD':anima2}" @click="xiangqing(scArr2)">
             <span @click="shouchang(2)" :class="shouchang2?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
             <p>{{ scArr2.content }}</p>
             <h5>— {{ scArr2.author }}</h5>
@@ -24,7 +26,8 @@
           </div>
         </section>
         <section class="section3 col-10 col-md-8 col-lg-3 hidden-md-and-down">
-          <div v-loading='loding' element-loading-text="加载中..." class="box" :class="{'animationC':anima1,'animationD':anima2}">
+          <div v-loading='loding' element-loading-text="加载中..." class="box"
+            :class="{'animationC':anima1,'animationD':anima2}" @click="xiangqing(scArr3)">
             <span @click="shouchang(3)" :class="shouchang3?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
             <p>{{ scArr3.content }}</p>
             <h5>— {{ scArr3.author }}</h5>
@@ -41,25 +44,17 @@
 
 <script>
   import 'element-plus/theme-chalk/display.css'
-  import {ref,onMounted} from 'vue'
+  import { ref, onMounted } from 'vue'
   import axios from "axios"
   import { ElMessage } from 'element-plus'
-  import {useRouter,useRoute} from 'vue-router'
+  import { useRouter } from 'vue-router'
 
   export default {
     name: 'ZhaiLu',
     setup() {
-      // 点击收藏切换样式
-      let shouchang1 = ref(false),shouchang2 = ref(false),shouchang3 = ref(false)
-      // 诗词数组
-      let scArr1 = ref({}),scArr2 = ref({}),scArr3 = ref({})
-      // 点击切换诗词
-      let anima1 = ref(false),anima2 = ref(false)
-      // 加载动画
-      let loding = ref(false)
       // 编程路由
       const $router = useRouter()
-      const $route = useRoute()
+      // const $route = useRoute()
 
       // 切换古诗词内容，函数
       function skiip() {
@@ -70,19 +65,21 @@
           .then(response => {
             scArr1.value = response.data;
           })
-          axios.get('https://v1.jinrishici.com/all.json')
+        axios.get('https://v1.jinrishici.com/all.json')
           .then(response => {
             scArr2.value = response.data;
           })
-          axios.get('https://v1.jinrishici.com/all.json')
+        axios.get('https://v1.jinrishici.com/all.json')
           .then(response => {
             scArr3.value = response.data;
           })
       }
 
+      // 点击收藏切换样式
+      let shouchang1 = ref(false), shouchang2 = ref(false), shouchang3 = ref(false)
       // 点击收藏
       function shouchang(value) {
-        switch(value) {
+        switch (value) {
           case 1:
             shouchang1.value = !shouchang1.value
             break;
@@ -95,21 +92,27 @@
         }
       }
 
+      // 诗词数组
+      let scArr1 = ref({}), scArr2 = ref({}), scArr3 = ref({})
+      // 点击切换诗词
+      let anima1 = ref(false), anima2 = ref(false)
+      // 加载动画
+      let loding = ref(false)
       // 点击切换(左)随机诗词内容
       function skip1() {
         loding.value = true
         anima1.value = true
         setTimeout(() => {
           anima1.value = false
-        },2000)
+        }, 2000)
         setTimeout(() => {
           ElMessage({
-            message:'切换成功！',
-            type:'success'
+            message: '切换成功！',
+            type: 'success'
           })
           skiip()
           loding.value = false
-        },1000)
+        }, 1000)
       }
 
       // 点击切换(右)随机诗词内容
@@ -118,20 +121,27 @@
         anima2.value = true
         setTimeout(() => {
           anima2.value = false
-        },2000)
+        }, 2000)
         setTimeout(() => {
           ElMessage({
-            message:'切换成功！',
-            type:'success'
+            message: '切换成功！',
+            type: 'success'
           })
           skiip()
           loding.value = false
-        },1000)
+        }, 1000)
       }
 
-      function xiangqing() {
+      // 点击诗词卡片,切换到详情页
+      function xiangqing(uid) {
         $router.push({
-          name:'details'
+          name: 'details',
+          query:{
+            author:uid.author,
+            category:uid.category,
+            content:uid.content,
+            origin:uid.origin
+          }
         })
       }
 
@@ -142,22 +152,15 @@
       })
 
       return {
-        shouchang,
-        shouchang1,
-        shouchang2,
-        shouchang3,
-        scArr1,
-        scArr2,
-        scArr3,
-        anima1,
-        anima2,
-        skip1,
-        skip2,
+        shouchang, shouchang1, shouchang2, shouchang3,
+        scArr1, scArr2, scArr3,
+        anima1, anima2,
+        skip1, skip2,
         loding,
         xiangqing
       }
     }
-    
+
   }
 </script>
 
@@ -308,10 +311,12 @@
     right: 4%;
     cursor: pointer;
   }
+
   .chevron>i {
     font-size: 120px;
     color: rgba(110, 110, 110, 0.662);
   }
+
   .chevron>i:hover {
     color: black;
   }
@@ -320,30 +325,36 @@
   .animationC {
     animation: animationc 2s ease-in-out;
   }
+
   @keyframes animationc {
-    0%{
+    0% {
       transform: rotateY(0);
     }
-    50%{
+
+    50% {
       transform: rotateY(-45deg) skewY(-10deg);
     }
-    100%{
+
+    100% {
       transform: rotateY(0);
     }
   }
-  
+
   /* 点击切换诗词随机诗词动画效果(右) */
   .animationD {
     animation: animationd 2s ease-in-out;
   }
+
   @keyframes animationd {
-    0%{
+    0% {
       transform: rotateY(0);
     }
-    50%{
+
+    50% {
       transform: rotateY(45deg) skewY(10deg);
     }
-    100%{
+
+    100% {
       transform: rotateY(0);
     }
   }
