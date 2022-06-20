@@ -71,7 +71,7 @@ import { useRouter,useRoute } from "vue-router";
       let inputS = ref('')
       // 发送请求返回根据输入框内容搜索到的内容
       function inputEnter() {
-        axios.get(`http://192.168.44.1:3000/api/GuShiCiApi/ChaXun.php?author=${inputS.value}`)
+        axios.get(`http://localhost:801/GuShiCiApi/ChaXun.php?author=${inputS.value}`)
         .then(response => {
           // author:词人姓名 paragraphs：内容 rhythmic：词牌名 tags：类型
           // console.log(response.data[0]);
