@@ -134,7 +134,7 @@ const router = createRouter({
                         meta: {title: '设置',isAush: false}
                     },
                     {
-                        name: 'attention',  //设置
+                        name: 'attention',  //关注
                         path: '/attention',
                         component:() => import('../pages/Personal/Attention.vue'),
                         meta: {title: '关注',isAush: false}
@@ -146,11 +146,18 @@ const router = createRouter({
                 path:'/details',
                 component:() => import('../pages/details.vue'),
                 meta: {title: '详情',isAush: false}
+            },
+            {
+                name:'searchul',
+                path:'/searchul',
+                component:() => import('../pages/searchUl.vue'),
+                meta: {title: '搜索结果',isAush: false}
             }
         ]
     }
     ]
 })
+
 
 // 后置路由守卫
 router.afterEach((to) => {

@@ -1,5 +1,5 @@
 <template>
-<!-- 茶社 -->
+<!-- 茶楼 -->
   <article class="mt-3 mb-3">
   <el-row class="elrow" justify="center">
     <!-- 走马灯轮播图 -->

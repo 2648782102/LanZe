@@ -3,39 +3,39 @@
   <article class="mt-3 mb-3">
     <el-row class="elrow" justify="center">
       <!-- 中间主体部分 -->
-      <div class="chevron1 chevron" @click="skip1">
+      <div class="chevron1 chevron hidden-sm-and-down" @click="skip1">
         <i class="fas fa-chevron-left"></i>
       </div>
-      <div class="col-10 col-lg-9 dox bgwhite">
+      <div class="col-10 col-md-8 col-lg-9 dox bgwhite">
         <section class="section1 col-10 col-md-7 col-lg-3">
           <div v-loading='loding' element-loading-text="加载中..." class="box"
-            :class="{'animationC':anima1,'animationD':anima2}" @click="xiangqing(scArr1)">
+            :class="{'animationC':anima1,'animationD':anima2}">
             <span @click="shouchang(1)" :class="shouchang1?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
             <p>{{ scArr1.content }}</p>
             <h5>— {{ scArr1.author }}</h5>
-            <img src="../../assets/beijing/fanzou.png" alt="">
+            <img src="../../assets/beijing/fanzou.png" @click="xiangqing(scArr1)" alt="">
           </div>
         </section>
-        <section class="section2 col-10 col-md-8 col-lg-3 hidden-md-and-down">
+        <section class="section2 col-10 col-md-8 col-lg-3 hidden-sm-and-down">
           <div v-loading='loding' element-loading-text="加载中..." class="box"
-            :class="{'animationC':anima1,'animationD':anima2}" @click="xiangqing(scArr2)">
+            :class="{'animationC':anima1,'animationD':anima2}">
             <span @click="shouchang(2)" :class="shouchang2?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
             <p>{{ scArr2.content }}</p>
             <h5>— {{ scArr2.author }}</h5>
-            <img src="../../assets/beijing/fanzou.png" alt="">
+            <img src="../../assets/beijing/fanzou.png" @click="xiangqing(scArr2)" alt="">
           </div>
         </section>
-        <section class="section3 col-10 col-md-8 col-lg-3 hidden-md-and-down">
+        <section class="section3 col-10 col-md-8 col-lg-3 hidden-sm-and-down">
           <div v-loading='loding' element-loading-text="加载中..." class="box"
-            :class="{'animationC':anima1,'animationD':anima2}" @click="xiangqing(scArr3)">
+            :class="{'animationC':anima1,'animationD':anima2}">
             <span @click="shouchang(3)" :class="shouchang3?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
             <p>{{ scArr3.content }}</p>
             <h5>— {{ scArr3.author }}</h5>
-            <img src="../../assets/beijing/fanzou.png" alt="">
+            <img src="../../assets/beijing/fanzou.png" @click="xiangqing(scArr3)" alt="">
           </div>
         </section>
       </div>
-      <div class="chevron2 chevron" @click="skip2">
+      <div class="chevron2 chevron hidden-sm-and-down" @click="skip2">
         <i class="fas fa-chevron-right"></i>
       </div>
     </el-row>
@@ -137,10 +137,7 @@
         $router.push({
           name: 'details',
           query:{
-            author:uid.author,
-            category:uid.category,
-            content:uid.content,
-            origin:uid.origin
+            shici:JSON.stringify(uid)
           }
         })
       }
@@ -205,7 +202,6 @@
     transform-style: top center;
     /* 设置过渡 */
     transition: 0.45s ease-in-out;
-    cursor: pointer;
   }
 
   .shouchang {
@@ -282,6 +278,7 @@
     width: 80%;
     position: absolute;
     bottom: 5%;
+    cursor: pointer;
   }
 
   section>.box>p {
@@ -313,7 +310,7 @@
   }
 
   .chevron>i {
-    font-size: 120px;
+    font-size: 5rem;
     color: rgba(110, 110, 110, 0.662);
   }
 
@@ -324,6 +321,7 @@
   /* 点击切换诗词随机诗词动画效果(左) */
   .animationC {
     animation: animationc 2s ease-in-out;
+    box-shadow: 8px 8px 8px rgba(120, 120, 120, 0.126);
   }
 
   @keyframes animationc {
@@ -343,6 +341,7 @@
   /* 点击切换诗词随机诗词动画效果(右) */
   .animationD {
     animation: animationd 2s ease-in-out;
+    box-shadow: -8px 4px 8px rgba(120, 120, 120, 0.126);
   }
 
   @keyframes animationd {

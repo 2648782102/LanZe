@@ -8,7 +8,7 @@
               class="el-menu-demo" mode="horizontal">
               <!-- 网站logo -->
               <el-col :span="2" :offset="0" class="log-col">
-                <el-image @click="$router.push({name:'productdisplay'})" class="logo-img" :src="logoUrl" fit="fill" lazy></el-image>
+                <el-image @click="$router.push({name:'home'})" class="logo-img" :src="logoUrl" fit="fill" lazy></el-image>
               </el-col>
               <el-col :span="15" :offset="0" class="input-col">
                 <!-- 搜索框 -->
@@ -17,9 +17,9 @@
                   clearable @keyup.enter="inputEnter"/>
               </el-col>
               <!-- 右侧导航 -->
-              <el-menu-item index="/zhailu">摘录</el-menu-item>
+              <el-menu-item index="/zhailu">涉猎</el-menu-item>
               <el-menu-item index="/wenku">文库</el-menu-item>
-              <el-menu-item index="/chashe">茶社</el-menu-item>
+              <el-menu-item index="/chashe">茶楼</el-menu-item>
               <el-menu-item index="/duxue">笃学</el-menu-item>
               <!-- 个人中心下拉菜单 -->
               <el-sub-menu index="4">
@@ -37,7 +37,7 @@
           <!-- 主体部分 -->
           <main>
             <el-scrollbar>
-              <router-view></router-view>
+                <router-view></router-view>
             </el-scrollbar>
           </main>
           <!-- 底部 -->
@@ -56,27 +56,46 @@
 </template>
 
 <script>
-  import { ref } from 'vue'
+  import { ref,watch } from 'vue'
   import logo from '../assets/logo.png'
 import axios from 'axios'
+import { useRouter,useRoute } from "vue-router";
 
   export default {
     name: 'Home',
     setup() {
+      // 路由器
+      const $router = useRouter()
+      const $route = useRoute()
       // 搜索框model
       let inputS = ref('')
       // 发送请求返回根据输入框内容搜索到的内容
       function inputEnter() {
-        axios.get(`http://192.168.44.1:3000/api/GuShiCiApi/SongCiSanBai.php?author=${inputS.value}`)
+        axios.get(`http://192.168.44.1:3000/api/GuShiCiApi/ChaXun.php?author=${inputS.value}`)
         .then(response => {
           // author:词人姓名 paragraphs：内容 rhythmic：词牌名 tags：类型
-          console.log(response.data[0]);  
+          // console.log(response.data[0]);
+          let dataArr = JSON.stringify(response.data[0])    
           inputS.value = '';
+          // 路由切换，query传参
+          $router.push({
+            name: 'searchul',
+            query:{
+              ulArr:dataArr
+            }
+        })
         })
         .catch(function(error) {
           console.log(error);
         })
       }
+
+      // 解决路由切换后滚动条不重置问题
+      // watch($route,(newvalue,oldvalue) => {
+        // document.getElementById("main").scrollIntoView()
+        // document.getElementById('main').scrollTop = 0
+        // console.log(document.getElementById('main').scrollTop);
+      // })
 
       // logo图片
       let logoUrl = logo

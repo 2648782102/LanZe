@@ -1,10 +1,10 @@
 <template>
   <section class="section1">
-    <div class="chun">
-      <h1>春</h1>
+    <div class="chun" @click="chuciClick">
+      <h1>楚辞</h1>
     </div>
-    <div class="xia">
-      <h1>夏</h1>
+    <div class="xia" @click="shijingClick">
+      <h1>诗经</h1>
     </div>
     <div class="qiu">
       <h1>秋</h1>
@@ -16,8 +16,56 @@
 </template>
 
 <script>
+import axios from 'axios';
+import { useRouter } from "vue-router";
+
 export default {
-    name: 'GuShiSiJi'
+    name: 'GuShiJingXuan',
+    setup() {
+      const $router = useRouter()
+
+      function chuciClick() {
+        axios.get('http://192.168.44.1:3000/api/GuShiCiApi/ChuCi.php')
+        .then(response => {
+          // response.data[0][0].author:诗名   response.data[0][0].paragraphs:诗集   response.data[0][0].rhythmic:作者
+          // response.data[0][0].tags:正文
+          let chuciArr = JSON.stringify(response.data[0])
+          $router.push({
+            name:'searchul',
+            query:{
+              ulArr:chuciArr
+            }
+          })
+        })
+        .catch(function(error) {
+          console.log(error);
+        })
+      }
+
+      function shijingClick() {
+        axios.get('http://192.168.44.1:3000/api/GuShiCiApi/ShiJing.php')
+        .then(response => {
+          // response.data[0][0].author:诗名   response.data[0][0].paragraphs:诗集   response.data[0][0].rhythmic:作者
+          // response.data[0][0].tags:正文
+          let chuciArr = JSON.stringify(response.data[0])
+          $router.push({
+            name:'searchul',
+            query:{
+              ulArr:chuciArr
+            }
+          })
+        })
+        .catch(function(error) {
+          console.log(error);
+        })
+      }
+
+      return {
+        $router,
+        chuciClick,
+        shijingClick
+      }
+    }
 }
 </script>
 

@@ -1,0 +1,116 @@
+<template>
+<!-- 搜索列表 -->
+  <article>
+        <el-row class="elrow pt-2" :gutter="20" justify="center">
+            <el-col class="bgwhite" :xs="22" :sm="20" :md="16" :lg="16" :xl="16" :offset="0">
+                <ul>
+                    <li @click="xiangQing(item)" v-for="(item,index) in ulArrD[ulNext-1]" :key="index">
+                        <Li :title="item.author" :name="item.rhythmic" :details="JSON.parse(item.paragraphs)[0]" />
+                    </li>
+                </ul>
+                <div class="paginationBox">
+                    <el-pagination background layout="prev, pager, next" :current-page="ulNext" @update:current-page="currentPageClick" :page-count="ulArrD.length" />
+                </div>
+            </el-col>
+        </el-row>
+    </article>
+</template>
+
+<script>
+import { useRoute,useRouter } from "vue-router";
+import { ref,watch,onMounted,computed } from "vue";
+import Li from "../components/Li.vue";
+
+export default {
+    name: 'searchUl',
+    components:{
+        Li
+    },
+    setup() {
+        const $route = useRoute()
+        const $router = useRouter()
+
+        // 接收路由传参
+
+        // 分页
+        // 存放已经分好的数据
+        let ulArrD = computed(() => {
+            let ulArr = computed(() => JSON.parse($route.query.ulArr))
+            let Arr = []
+            while (ulArr.value.length) {
+                Arr.push(ulArr.value.splice(0,10))
+            }
+            return Arr
+        })
+
+        // 切换路由到详情页
+        function xiangQing(value) {
+            $router.push({
+                name: 'details',
+                query:{
+                    shici:JSON.stringify(value)
+                }
+            })
+        }
+
+
+        // 存放当前页数
+        let ulNext = ref(1)
+
+        // 点击页数变更事件
+        function currentPageClick(value) {
+            ulNext.value = value
+        }
+
+        // 添加监视路由参数改变，解决路由参数改变页面不更新问题
+        // watch($route,(newvalue,oldvalue) => {
+        //             // 判断路由切换情况，改变搜索内容时执行
+        //             if(oldvalue.path=='/searchul') {
+        //                 ulArr.value = JSON.parse($route.query.ulArr)
+        //                         ulNext.value = 1
+        //                         // fen(ulArr.value)
+        //             }
+        //         })
+
+        return{
+            ulArrD,
+            xiangQing,
+            ulNext,
+            currentPageClick
+        }
+    }
+}
+</script>
+
+<style scoped>
+ article {
+        width: 100%;
+        min-height: 100vh;
+    }
+    .elrow {
+    position: relative;
+    width: 100%;
+    margin: 0;
+  }
+  ul {
+    min-height: 72rem;
+    list-style-type: none;
+    margin: 0;
+    padding: 1rem 1rem 0 1rem;
+  }
+  li {
+    height: 7rem;
+    padding: 1rem 1rem 0 1rem;
+    border-radius: 0.4rem;
+    cursor: pointer;
+  }
+  li:hover {
+    background-color: rgba(240, 248, 255, 0.781);
+  }
+  .paginationBox {
+    display: flex;
+    justify-content: end;
+    margin-bottom: 0.5rem;
+    margin-top: 0.5rem;
+  }
+</style>
