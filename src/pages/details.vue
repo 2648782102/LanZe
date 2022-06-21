@@ -7,7 +7,11 @@
                 <p>作者：{{ author }}</p>
                 <p>标签：{{ category }}</p>
                 <p>正文：</p>
-                <p class="content" v-for="(item,index) in content" :key="index">{{ item }}</p>
+                <p v-for="(item,index) in content" :key="index">{{ item }}</p>
+                <div class="title" v-show="title">
+                    <p>注释:</p>
+                    <p v-for="(item,index) in title" :key="index">{{ item }}</p>
+                </div>
             </el-col>
             <button @click="back" class="btn btn-primary fanhui">返回</button>
         </el-row>
@@ -26,6 +30,7 @@ export default {
         let category = [];
         let content = [];
         let origin = '无';
+        let title = null;
 
         // 接收传参
         let shici = JSON.parse($route.query.shici)
@@ -36,6 +41,9 @@ export default {
             category = shici.tags  //  类型
             content = JSON.parse(shici.paragraphs)  // 正文
             origin = shici.rhythmic  //  诗名
+            if(shici.title) {
+                title = JSON.parse(shici.title)
+            }
         } else {
             // 接收传值
             author = shici.author  // 作者
@@ -49,7 +57,7 @@ export default {
         }
 
         return {
-            author,category,content,origin,
+            author,category,content,origin,title,
             back,
         }
     }
@@ -71,5 +79,9 @@ export default {
     position: fixed;
     top: 3  0%;
     right: 10%;
+  }
+  .title {
+    text-align: left;
+    color: rgb(104, 107, 110);
   }
 </style>

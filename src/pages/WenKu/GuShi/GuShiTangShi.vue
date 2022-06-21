@@ -1,10 +1,10 @@
 <template>
-    <h1>古诗生活</h1>
+    <h1>全唐诗</h1>
   </template>
   
   <script>
   export default {
-      name: 'GuShiShengHuo'
+      name: 'GuShiTangShi'
   }
   </script>
   

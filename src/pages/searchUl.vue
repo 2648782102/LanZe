@@ -103,6 +103,7 @@ export default {
     padding: 1rem 1rem 0 1rem;
     border-radius: 0.4rem;
     cursor: pointer;
+    overflow: hidden;
   }
   li:hover {
     background-color: rgba(240, 248, 255, 0.781);

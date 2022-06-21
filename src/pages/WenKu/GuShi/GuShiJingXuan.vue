@@ -7,10 +7,10 @@
       <h1>诗经</h1>
     </div>
     <div class="qiu">
-      <h1>秋</h1>
+      <h1>曹操诗集</h1>
     </div>
     <div class="dong">
-      <h1>冬</h1>
+      <h1>幽梦影</h1>
     </div>
   </section>
 </template>
