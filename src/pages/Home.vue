@@ -76,7 +76,7 @@ import { ElMessage } from 'element-plus'
       // 发送请求返回根据输入框内容搜索到的内容
       function inputEnter() {
         loading.value = true
-        axios.get(`http://lanze-node.vercel.app/api/search?sear=${inputS.value}`)
+        axios.get(`https://lanze-node.vercel.app/api/search?sear=${inputS.value}`)
         .then(response => {
           // author:词人姓名 paragraphs：内容 rhythmic：词牌名 tags：类型
           // console.log(response.data[0]);
