@@ -42,6 +42,7 @@ export default {
 <style scoped>
     .gushi-tabs {
         width: 100%;
+        height: 100vh;
         padding-right: 20px;
     }
 </style>

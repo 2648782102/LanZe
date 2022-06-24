@@ -1,5 +1,5 @@
 <template>
-  <section class="section1">
+  <section v-loading="loading" class="section1">
     <div class="chun" @click="chuciClick">
       <h1>楚辞</h1>
     </div>
@@ -18,18 +18,24 @@
 <script>
 import axios from 'axios';
 import { useRouter } from "vue-router";
+import { ref } from 'vue'
 
 export default {
     name: 'GuShiJingXuan',
     setup() {
       const $router = useRouter()
 
+      // 加载控制
+      let loading = ref(false)
+
       function chuciClick() {
-        axios.get('http://192.168.44.1:3000/api/GuShiCiApi/ChuCi.php')
+        loading.value = true
+        axios.get('https://lanze-node.vercel.app/api/chuci')
         .then(response => {
-          // response.data[0][0].author:诗名   response.data[0][0].paragraphs:诗集   response.data[0][0].rhythmic:作者
-          // response.data[0][0].tags:正文
-          let chuciArr = JSON.stringify(response.data[0])
+          loading.value = false
+          // response.data[0].author:诗名   response.data[0].paragraphs:诗集   response.data[0].rhythmic:作者
+          // response.data[0].tags:正文
+          let chuciArr = JSON.stringify(response.data)
           $router.push({
             name:'searchul',
             query:{
@@ -43,11 +49,13 @@ export default {
       }
 
       function shijingClick() {
-        axios.get('http://192.168.44.1:3000/api/GuShiCiApi/ShiJing.php')
+        loading.value = true
+        axios.get('https://lanze-node.vercel.app/api/shijing')
         .then(response => {
-          // response.data[0][0].author:诗名   response.data[0][0].paragraphs:诗集   response.data[0][0].rhythmic:作者
-          // response.data[0][0].tags:正文
-          let chuciArr = JSON.stringify(response.data[0])
+          loading.value = false
+          // response.data[0].author:诗名   response.data[0].paragraphs:诗集   response.data[0].rhythmic:作者
+          // response.data[0].tags:正文
+          let chuciArr = JSON.stringify(response.data)
           $router.push({
             name:'searchul',
             query:{
@@ -63,7 +71,8 @@ export default {
       return {
         $router,
         chuciClick,
-        shijingClick
+        shijingClick,
+        loading
       }
     }
 }

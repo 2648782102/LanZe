@@ -1,19 +1,28 @@
 <template>
-    <button class="btn btn-info" @click="nantangClick">南唐二主词</button>
+    <div v-loading="loading" class="body">
+        <button class="btn btn-info" @click="nantangClick">南唐二主词</button>
+    </div>
   </template>
   
   <script>
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import { ref } from 'vue'
+
   export default {
       name: 'GuShiNanTang',
       setup() {
         const $router = useRouter()
 
+        // 加载控制
+        let loading = ref(false)
+
             function nantangClick() {
-            axios.get('http://192.168.44.1:3000/api/GuShiCiApi/NanTang.php')
+            loading.value = true
+            axios.get('https://lanze-node.vercel.app/api/nantang')
             .then(response => {
-                let chuciArr = JSON.stringify(response.data[0])
+                loading.value = false
+                let chuciArr = JSON.stringify(response.data)
                 $router.push({
                     name: 'searchul',
                     query:{
@@ -27,12 +36,16 @@ import { useRouter } from 'vue-router'
             }
 
             return {
-                nantangClick
+                nantangClick,
+                loading
             }
       }
   }
   </script>
   
   <style scoped>
-  
+  .body {
+        width: 100%;
+        min-height: 80vh;
+    }
   </style>

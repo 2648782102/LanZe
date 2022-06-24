@@ -35,7 +35,7 @@
         <section class="section-main">
           <el-scrollbar height="100vh">
           <!-- 主体部分 -->
-          <main>
+          <main v-loading="loading">
             <el-scrollbar>
                 <router-view></router-view>
             </el-scrollbar>
@@ -60,6 +60,7 @@
   import logo from '../assets/logo.png'
 import axios from 'axios'
 import { useRouter,useRoute } from "vue-router";
+import { ElMessage } from 'element-plus'
 
   export default {
     name: 'Home',
@@ -69,14 +70,23 @@ import { useRouter,useRoute } from "vue-router";
       const $route = useRoute()
       // 搜索框model
       let inputS = ref('')
+
+      // 加载控制
+      let loading = ref(false)
       // 发送请求返回根据输入框内容搜索到的内容
       function inputEnter() {
-        axios.get(`http://192.168.44.1:3000/api/GuShiCiApi/ChaXun.php?author=${inputS.value}`)
+        loading.value = true
+        axios.get(`https://lanze-node.vercel.app/api/search?sear=${inputS.value}`)
         .then(response => {
           // author:词人姓名 paragraphs：内容 rhythmic：词牌名 tags：类型
           // console.log(response.data[0]);
-          let dataArr = JSON.stringify(response.data[0])    
+          let dataArr = JSON.stringify(response.data)    
           inputS.value = '';
+          ElMessage({
+            message: '搜索成功!',
+            type: 'success',
+          })
+          loading.value = false
           // 路由切换，query传参
           $router.push({
             name: 'searchul',
@@ -106,7 +116,8 @@ import { useRouter,useRoute } from "vue-router";
         inputS,
         logoUrl,
         elinput1focus,
-        inputEnter
+        inputEnter,
+        loading
       }
     }
   }

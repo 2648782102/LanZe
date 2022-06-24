@@ -1,19 +1,28 @@
 <template>
-    <button class="btn btn-warning" @click="yuanquClick">元曲</button>
+    <div v-loading="loading" class="body">
+        <button class="btn btn-warning" @click="yuanquClick">元曲</button>
+    </div>
   </template>
   
   <script>
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import { ref } from 'vue'
+
   export default {
       name: 'GuShiYuanQu',
       setup() {
         const $router = useRouter()
 
+        // 加载控制
+        let loading = ref(false)
+
         function yuanquClick() {
-            axios.get('http://192.168.44.1:3000/api/GuShiCiApi/YuanQu.php')
+            loading.value = true
+            axios.get('https://lanze-node.vercel.app/api/yuanqu')
             .then(response => {
-                let chuciArr = JSON.stringify(response.data[0].splice(0,1100))
+                loading.value = false
+                let chuciArr = JSON.stringify(response.data.splice(0,1100))
                 $router.push({
                     name: 'searchul',
                     query:{
@@ -27,12 +36,16 @@ import { useRouter } from 'vue-router'
         }
 
         return {
-            yuanquClick
+            yuanquClick,
+            loading
         }
       }
   }
   </script>
   
   <style scoped>
-  
+   .body {
+        width: 100%;
+        min-height: 80vh;
+    }
   </style>
