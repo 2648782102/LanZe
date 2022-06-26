@@ -56,7 +56,7 @@
 </template>
 
 <script>
-  import { ref,watch } from 'vue'
+  import { ref } from 'vue'
   import logo from '../assets/logo.png'
 import axios from 'axios'
 import { useRouter,useRoute } from "vue-router";

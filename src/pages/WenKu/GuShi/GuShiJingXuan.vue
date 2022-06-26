@@ -69,7 +69,6 @@ export default {
       }
 
       return {
-        $router,
         chuciClick,
         shijingClick,
         loading
