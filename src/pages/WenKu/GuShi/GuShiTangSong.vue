@@ -75,7 +75,6 @@ export default {
         /* padding: 0 5rem; */
         justify-content: space-around;
         align-items: center;
-        perspective: 2000px;
         position: relative;
     }
     .img-bg {

@@ -17,6 +17,39 @@ const router = createRouter({
         meta:{title: '产品介绍',isAush:false}
     },
     {
+        name: 'loginindex',  //登录页面父组件
+        path: '/loginindex',
+        component:() => import('../pages/login/loginIndex.vue'),
+        meta:{title: '登录页面',isAush:false},
+        redirect: '/login',
+        children:[
+            {
+                name: 'login',  //登录
+                path: '/login',
+                component:() => import('../pages/login/login.vue'),
+                meta:{title: '登录',isAush:false},
+            },
+            {
+                name: 'adduser',  //注册
+                path: '/adduser',
+                component:() => import('../pages/login/addUser.vue'),
+                meta:{title: '注册',isAush:false},
+            },
+            {
+                name: 'datauser',  //修改
+                path: '/datauser',
+                component:() => import('../pages/login/dataUser.vue'),
+                meta:{title: '修改',isAush:false},
+            },
+            {
+                name: 'deleteuser',  //注销
+                path: '/deleteuser',
+                component:() => import('../pages/login/deleteUser.vue'),
+                meta:{title: '注销',isAush:false},
+            },
+        ]
+    },
+    {
         name: 'home',  //首页/摘录
         path: '/home',
         component:() => import('../pages/Home.vue'),

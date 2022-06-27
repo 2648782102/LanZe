@@ -3,13 +3,15 @@
   <article>
         <el-row class="elrow pt-2" :gutter="20" justify="center">
             <el-col class="bgwhite" :xs="22" :sm="20" :md="16" :lg="16" :xl="16" :offset="0">
+                <el-page-header title="返回" icon="ArrowLeft" class="mt-4 ms-4" content="搜索内容" @back="goBack" />
                 <ul>
                     <li @click="xiangQing(item)" v-for="(item,index) in ulArrD[ulNext-1]" :key="index">
                         <Li :title="item.author" :name="item.rhythmic" :details="JSON.parse(item.paragraphs)[0]" />
                     </li>
                 </ul>
                 <div class="paginationBox">
-                    <el-pagination background layout="prev, pager, next" :current-page="ulNext" @update:current-page="currentPageClick" :page-count="ulArrD.length" />
+                    <el-pagination small="true" class="pagination hidden-md-and-up" background layout="prev, pager, next" :current-page="ulNext" @update:current-page="currentPageClick" :page-count="ulArrD.length" hide-on-single-page="true" />
+                    <el-pagination class="pagination hidden-sm-and-down" background layout="prev, pager, next" :current-page="ulNext" @update:current-page="currentPageClick" :page-count="ulArrD.length" hide-on-single-page="true" />
                 </div>
             </el-col>
         </el-row>
@@ -20,6 +22,8 @@
 import { useRoute,useRouter } from "vue-router";
 import { ref,watch,onMounted,computed } from "vue";
 import Li from "../components/Li.vue";
+// 引入element的响应式布局，断点
+import 'element-plus/theme-chalk/display.css'
 
 export default {
     name: 'searchUl',
@@ -30,7 +34,11 @@ export default {
         const $route = useRoute()
         const $router = useRouter()
 
-        // 接收路由传参
+        // 返回上一页
+        function goBack() {
+            $router.back()
+        }
+
 
         // 分页
         // 存放已经分好的数据
@@ -62,21 +70,12 @@ export default {
             ulNext.value = value
         }
 
-        // 添加监视路由参数改变，解决路由参数改变页面不更新问题
-        // watch($route,(newvalue,oldvalue) => {
-        //             // 判断路由切换情况，改变搜索内容时执行
-        //             if(oldvalue.path=='/searchul') {
-        //                 ulArr.value = JSON.parse($route.query.ulArr)
-        //                         ulNext.value = 1
-        //                         // fen(ulArr.value)
-        //             }
-        //         })
-
         return{
             ulArrD,
             xiangQing,
             ulNext,
-            currentPageClick
+            currentPageClick,
+            goBack
         }
     }
 }
@@ -110,7 +109,7 @@ export default {
   }
   .paginationBox {
     display: flex;
-    justify-content: end;
+    justify-content: center;
     margin-bottom: 0.5rem;
     margin-top: 0.5rem;
   }

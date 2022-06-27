@@ -219,11 +219,6 @@
     transition: 0.3s;
   }
 
-  .shouchang:hover {
-    color: rgba(43, 43, 43, 0.804);
-    transition: 0.3s;
-  }
-
   .shouchang-yes {
     background-color: red;
     color: white;

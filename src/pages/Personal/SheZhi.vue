@@ -1,7 +1,7 @@
 <template>
     <!-- 设置 -->
     <article class="box">
-        <h1>设置</h1>
+        <router-link :to="{name:'loginindex'}" class="btn btn-primary">登录</router-link>
     </article>
 </template>
 
