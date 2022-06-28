@@ -119,6 +119,7 @@ export default {
               message: '请先验证',
               type: 'warning',
             })
+            VcodeShow.value = true
           }
         }
 

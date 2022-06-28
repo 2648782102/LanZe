@@ -119,6 +119,8 @@
               message: '请先验证',
               type: 'warning',
             })
+            // 弹出验证码模态框
+            VcodeShow.value = true
           }
         }
   
