@@ -5,13 +5,18 @@
             <div class="col-10">
                 <div class="top">
                     <!-- 上部头像，用户名等信息 -->
-                    <main>
-                        <div class="avatar">
+                    <main v-loading="loading">
+                        <div v-if="!cookieUpload" class="avatar">
                             <el-avatar class="elavatar" icon="UserFilled" />
-                            <span class="ps-2">用户名<img class="huizhang" src="../../assets/hunzhang/3.png" alt=""></span>
+                            <span v-if="!cookieUpload" class="ps-2">请先登录</span>
+                        </div>
+                        <div v-if="cookieUpload" class="avatar">
+                            <el-avatar class="elavatar" :src="imgsrc" icon="UserFilled" />
+                            <span v-if="cookieUpload" class="ps-2">{{ cookieUpload.user_name }}</span>
                         </div>
                         <div class="text1">
-                            <h3>天行健，君子以自强不息</h3>
+                            <h3 v-if="!cookieUpload">简介</h3>
+                            <h3 v-if="cookieUpload">{{ cookieUpload.intro }}</h3>
                         </div>
                     </main>
                     <footer>
@@ -78,7 +83,17 @@
 </template>
 
 <script>
-    import { ref } from 'vue'
+    import { ref,onMounted } from 'vue'
+import axios from 'axios'
+import hoad1 from '../../assets/hoad/hoad1.jpg'
+import hoad2 from '../../assets/hoad/hoad2.jpg'
+import hoad3 from '../../assets/hoad/hoad3.jpg'
+import hoad4 from '../../assets/hoad/hoad4.jpg'
+import hoad5 from '../../assets/hoad/hoad5.jpg'
+import hoad6 from '../../assets/hoad/hoad6.jpg'
+import hoad7 from '../../assets/hoad/hoad7.jpg'
+import hoad8 from '../../assets/hoad/hoad8.jpg'
+import hoad9 from '../../assets/hoad/hoad9.jpg'
 
     export default {
         name: 'Personal',
@@ -89,6 +104,61 @@
             let collectNum = ref(0)
             let clockInNum = ref(1)
 
+
+            // 声明变量接收
+            let cookieUpload = ref(null)
+            // 加载
+            let loading = ref(false)
+            // 头像的地址
+            let imgsrc = ref(null)
+            onMounted(() => {
+                let upload = $cookies.get('lanze_user')
+                if(upload) {
+                    loading.value = true
+                    axios.get(`https://lan-ze-user.vercel.app/api/user/getUpload?id=${upload.id}`)
+                    .then(response => {
+                        loading.value = false
+                        cookieUpload.value = response.data
+                        switch(cookieUpload.value.head_img) {
+                            case 'home1':
+                                imgsrc.value = hoad1
+                                break;
+                            case 'home2':
+                                imgsrc.value = hoad2
+                                break;
+                            case 'home3':
+                                imgsrc.value = hoad3
+                                break;
+                            case 'home4':
+                                imgsrc.value = hoad4
+                                break;
+                            case 'home5':
+                                imgsrc.value = hoad5
+                                break;
+                            case 'home6':
+                                imgsrc.value = hoad6
+                                break;
+                            case 'home7':
+                                imgsrc.value = hoad7
+                                break;
+                            case 'home8':
+                                imgsrc.value = hoad8
+                                break;
+                            case 'home9':
+                                imgsrc.value = hoad9
+                                break;
+                            default: 
+                            imgsrc.value = hoad1
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+                } else {
+
+                }
+            })
+
             // 输出内容
             return {
                 modelLis,
@@ -96,6 +166,9 @@
                 productionNum,
                 collectNum,
                 clockInNum,
+                cookieUpload,
+                loading,
+                imgsrc
             }
         }
     }

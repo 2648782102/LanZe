@@ -1,13 +1,37 @@
 <template>
     <!-- 资料 -->
     <article class="box">
-        <h1>资料</h1>
+        <button @click="xiugai" class="btn btn-primary">
+            修改资料
+        </button>
     </article>
 </template>
 
 <script>
+    import { useRouter } from "vue-router";
+    import { ElMessage } from 'element-plus'
+
     export default {
-        name: 'PersonalZiLiao'
+        name: 'PersonalZiLiao',
+        setup() {
+            const $router = useRouter()
+            function xiugai() {
+                if($cookies.get('lanze_user')) {
+                    $router.push({
+                    name: 'datamessage'
+                })
+                } else {
+                    ElMessage({
+                        type: 'error',
+                        message: '请先登录！'
+                    })
+                }
+            }
+
+            return {
+                    xiugai
+                }
+        }
     }
 </script>
 

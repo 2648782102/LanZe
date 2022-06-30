@@ -143,6 +143,12 @@ const router = createRouter({
                         meta: {title: '个人资料',isAush: false}
                     },
                     {
+                        name: 'datamessage',  //修改资料
+                        path: '/datamessage',
+                        component:() => import('../pages/Personal/dataMessage.vue'),
+                        meta: {title: '修改资料',isAush: false}
+                    },
+                    {
                         name: 'samplereels',  //作品
                         path: '/samplereels',
                         component:() => import('../pages/Personal/SampleReels.vue'),
@@ -185,6 +191,12 @@ const router = createRouter({
                 path:'/searchul',
                 component:() => import('../pages/searchUl.vue'),
                 meta: {title: '搜索结果',isAush: false}
+            },
+            {
+                name:'kongbai',
+                path:'/kongbai',
+                component:() => import('../pages/kongbai.vue'),
+                meta: {title: '空白页',isAush: false}
             }
         ]
     }

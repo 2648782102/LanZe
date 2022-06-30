@@ -1,6 +1,6 @@
 <template>
   <!-- 注销账号 -->
-  <section class="card">
+  <section v-loading='loading' element-loading-text="注销中..." class="card">
     <el-form :model="form" :rules="rules" class="p-5" label-position="left">
       <div class="text-center mb-4">
         <h1 style="color: rgb(53, 228, 170);">兰泽诗词<i class="fas fa-feather-alt"></i></h1>
@@ -41,6 +41,7 @@
   import { useRouter } from "vue-router";
   import Vcode from "vue3-puzzle-vcode";
   import { ElMessage, ElMessageBox } from 'element-plus'
+  import axios from "axios";
 
   export default {
     name: 'deleteuser',
@@ -108,8 +109,15 @@
       }
 
       // 定义弹出确认框表单双向绑定值
+      let loading = ref(false)    //加载
       let queRen = ref('')
       function deleteClick() {
+        if(form.user==''||form.password=='') {
+          ElMessage({
+                        type: 'warning',
+                        message: '账号或密码为空!'
+                      })
+        } else {
         // 判断是否已经验证过
         if (VcodeOK.value) {
           // 弹出输入确认框
@@ -123,10 +131,28 @@
           })
             .then(({ value }) => {   //单击确认
               if (value == '确认注销') {
-                ElMessage({
-                  type: 'success',
-                  message: `您的账户：${form.user}, 注销成功！`,
-                })
+                loading.value = true
+                axios.get(`https://lan-ze-user.vercel.app/api/user/deleteUser?user=${form.user}&password=${form.password}`)
+                  .then(response => {
+                    loading.value = false
+                    if (response.data == 'OK') {
+                      $router.push({
+                        name: 'login'
+                      })
+                      ElMessage({
+                        type: 'success',
+                        message: '账户注销成功!'
+                      })
+                    } else {
+                      ElMessage({
+                        type: 'warning',
+                        message: `${response.data}`
+                      })
+                    }
+                  })
+                  .catch(error => {
+                    console.log(error);
+                  })
               }
             })
             .catch(() => {   //单击取消
@@ -144,6 +170,7 @@
           VcodeShow.value = true
         }
       }
+      }
 
       return {
         form,
@@ -153,7 +180,8 @@
         VcodeShow,
         deleteClick,
         queRen,
-        back
+        back,
+        loading
       }
     }
   }
