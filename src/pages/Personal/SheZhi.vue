@@ -24,7 +24,6 @@
 
             //页面挂载时执行 
             onMounted(() => {
-                console.log($cookies.get('lanze_user'));
             })
 
             return {

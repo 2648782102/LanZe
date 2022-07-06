@@ -1,13 +1,36 @@
 <template>
     <!-- 作品 -->
     <article class="box">
-        <h1>作品</h1>
+        <button @click="publishClick" type="button" class="btn btn-primary">发布作品</button>
     </article>
 </template>
 
 <script>
+    import { useRouter } from "vue-router";
+    import { ElMessage } from "element-plus";
+
     export default {
-        name: 'SampleReels'
+        name: 'SampleReels',
+        setup() {
+            const $router = useRouter()
+
+            function publishClick() {
+                if($cookies.get('lanze_user')) {
+                    $router.push({
+                    name:'publishpoem'
+                })
+                } else {
+                    ElMessage({
+                        type:'warning',
+                        message:'请先登录！'
+                    })
+                }
+            }
+
+            return {
+                publishClick
+            }
+        }
     }
 </script>
 

@@ -9,7 +9,7 @@
 <script>
 export default {
     name:'Li',
-    props: ['title','name','details'],
+    props: ['title','name','details','id'],
 }
 </script>
 

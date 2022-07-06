@@ -84,34 +84,34 @@ const router = createRouter({
                 ]
             },
             {
-                name: 'chashe',  //茶社
-                path: '/chashe',
-                component:() => import('../pages/ChaShe/ChaShe.vue'),
+                name: 'chalou',  //茶社
+                path: '/chalou',
+                component:() => import('../pages/ChaLou/ChaLou.vue'),
                 meta: {title: '茶社',isAush: false},
                 redirect: '/jingxuan',
                 children:[
                     {
                         name: 'feihua',  //飞花接龙
                         path: '/feihua',
-                        component:() => import('../pages/ChaShe/FeiHua.vue'),
+                        component:() => import('../pages/ChaLou/FeiHua.vue'),
                         meta: {title: '飞花接龙',isAush: false}
                     },
                     { 
                         name: 'fengya',  //风俗雅文
                         path: '/fengya',
-                        component:() => import('../pages/ChaShe/FengYa.vue'),
+                        component:() => import('../pages/ChaLou/FengYa.vue'),
                         meta: {title: '风俗雅文',isAush: false}
                     },
                     {
                         name: 'jingxuan',  //精选诗文
                         path: '/jingxuan',
-                        component:() => import('../pages/ChaShe/JingXuan.vue'),
+                        component:() => import('../pages/ChaLou/JingXuan.vue'),
                         meta: {title: '精选诗文',isAush: false}
                     },
                     {
                         name: 'xiandai',  //现代诗歌
                         path: '/xiandai',
-                        component:() => import('../pages/ChaShe/XianDai.vue'),
+                        component:() => import('../pages/ChaLou/XianDai.vue'),
                         meta: {title: '现代诗歌',isAush: false}
                     },
                     
@@ -145,7 +145,7 @@ const router = createRouter({
                     {
                         name: 'datamessage',  //修改资料
                         path: '/datamessage',
-                        component:() => import('../pages/Personal/dataMessage.vue'),
+                        component:() => import('../pages/Personal/son/dataMessage.vue'),
                         meta: {title: '修改资料',isAush: false}
                     },
                     {
@@ -153,6 +153,12 @@ const router = createRouter({
                         path: '/samplereels',
                         component:() => import('../pages/Personal/SampleReels.vue'),
                         meta: {title: '作品',isAush: false}
+                    },
+                    {
+                        name: 'publishpoem',  //作品
+                        path: '/publishpoem',
+                        component:() => import('../pages/Personal/son/publishPoem.vue'),
+                        meta: {title: '发布作品',isAush: false}
                     },
                     {
                         name: 'favorite',  //收藏

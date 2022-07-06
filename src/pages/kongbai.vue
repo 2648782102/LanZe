@@ -1,5 +1,7 @@
 <template>
-  
+  <article>
+    
+  </article>
 </template>
 
 <script>
@@ -18,6 +20,15 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+* {
+    box-sizing: border-box;
+  }
 
+  article {
+    width: 100%;
+    min-height: 700px;
+    display: flex;
+    justify-content: center;
+  }
 </style>

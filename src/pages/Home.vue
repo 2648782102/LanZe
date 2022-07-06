@@ -1,25 +1,26 @@
 <template>
+<Vue3Lottie v-show="isLottie" class="lottie" ref="demoRefHua" :animationData="qieHuan" :loop='1' height="240vh" width="240vh" :autoPlay='false' />
   <article>
     <section>
       <el-container>
         <el-header style="padding: 0;">
           <el-affix :offset="0">
-            <el-menu router default-active="/zhailu"
-              class="el-menu-demo" mode="horizontal">
+            <el-menu router default-active="/zhailu" class="el-menu-demo" mode="horizontal">
               <!-- 网站logo -->
               <el-col :span="2" :offset="0" class="log-col">
-                <el-image @click="$router.push({name:'home'})" class="logo-img" :src="logoUrl" fit="fill" lazy></el-image>
+                <el-image @click="$router.push({name:'home'})" class="logo-img" :src="logoUrl" fit="fill" lazy>
+                </el-image>
               </el-col>
               <el-col :span="15" :offset="0" class="input-col">
                 <!-- 搜索框 -->
                 <el-input @focus="elinput1focus = true" @blur="elinput1focus = false" class="me-2 elinput1"
                   :class="elinput1focus?'elinput1focus':''" v-model="inputS" placeholder="搜索诗词" prefix-icon="Search"
-                  clearable @keyup.enter="inputEnter"/>
+                  clearable @keyup.enter="inputEnter" />
               </el-col>
               <!-- 右侧导航 -->
               <el-menu-item index="/zhailu">涉猎</el-menu-item>
               <el-menu-item index="/wenku">文库</el-menu-item>
-              <el-menu-item index="/chashe">茶楼</el-menu-item>
+              <el-menu-item index="/chalou">茶楼</el-menu-item>
               <el-menu-item index="/duxue">笃学</el-menu-item>
               <!-- 个人中心下拉菜单 -->
               <el-sub-menu index="4">
@@ -34,20 +35,24 @@
         </el-header>
         <section class="section-main">
           <el-scrollbar height="100vh">
-          <!-- 主体部分 -->
-          <main v-loading="loading">
-            <el-scrollbar>
+            <!-- 主体部分 -->
+            <main id="main" v-loading="loading">
+              <el-scrollbar>
                 <router-view></router-view>
-            </el-scrollbar>
-          </main>
-          <!-- 底部 -->
-          <el-footer class="footer mt-2">
-            <el-row justify="center">
-              <el-col class="footerCol" :span="24" :offset="0">
-                <h4>本站仅供学习交流使用，不得用于一切商业盈利活动</h4>
-              </el-col>
-            </el-row>
-          </el-footer>
+              </el-scrollbar>
+            </main>
+            <!-- 底部 -->
+            <el-footer class="footer mt-2">
+              <el-row justify="center">
+                <el-col class="footerCol" :span="24" :offset="0">
+                  <div class="foot-h5 pt-2">
+                    <h5>Copyright &copy; 2022 lan-ze.vercel.app</h5>
+                    <h5>All Rights Reserved</h5>
+                  </div>
+                  <p>个人网站，仅供学习交流使用</p>
+                </el-col>
+              </el-row>
+            </el-footer>
           </el-scrollbar>
         </section>
       </el-container>
@@ -56,14 +61,20 @@
 </template>
 
 <script>
-  import { ref } from 'vue'
+  import { ref, watch } from 'vue'
   import logo from '../assets/logo.png'
-import axios from 'axios'
-import { useRouter,useRoute } from "vue-router";
-import { ElMessage } from 'element-plus'
+  import axios from 'axios'
+  import { useRouter, useRoute } from "vue-router";
+  import { ElMessage } from 'element-plus'
+  import 'vue3-lottie/dist/style.css'
+  import qieHuan from "../assets/lottieJSON/qieHuan.json";
+  import { Vue3Lottie } from "vue3-lottie";
 
   export default {
     name: 'Home',
+    components:{
+        Vue3Lottie
+    },
     setup() {
       // 路由器
       const $router = useRouter()
@@ -77,34 +88,34 @@ import { ElMessage } from 'element-plus'
       function inputEnter() {
         loading.value = true
         axios.get(`https://lanze-node.vercel.app/api/search?sear=${inputS.value}`)
-        .then(response => {
-          // author:词人姓名 paragraphs：内容 rhythmic：词牌名 tags：类型
-          // console.log(response.data[0]);
-          let dataArr = JSON.stringify(response.data)    
-          inputS.value = '';
-          ElMessage({
-            message: '搜索成功!',
-            type: 'success',
+          .then(response => {
+            // author:词人姓名 paragraphs：内容 rhythmic：词牌名 tags：类型
+            // console.log(response.data[0]);
+            let dataArr = JSON.stringify(response.data)
+            inputS.value = '';
+            ElMessage({
+              message: '搜索成功!',
+              type: 'success',
+            })
+            loading.value = false
+            // 路由切换，query传参
+            $router.push({
+              name: 'searchul',
+              query: {
+                ulArr: dataArr
+              }
+            })
           })
-          loading.value = false
-          // 路由切换，query传参
-          $router.push({
-            name: 'searchul',
-            query:{
-              ulArr:dataArr
-            }
-        })
-        })
-        .catch(function(error) {
-          console.log(error);
-        })
+          .catch(function (error) {
+            console.log(error);
+          })
       }
 
       // 解决路由切换后滚动条不重置问题
       // watch($route,(newvalue,oldvalue) => {
-        // document.getElementById("main").scrollIntoView()
-        // document.getElementById('main').scrollTop = 0
-        // console.log(document.getElementById('main').scrollTop);
+      // document.getElementById("main").scrollIntoView()
+      // document.getElementById('main').scrollTop = 0
+      // console.log(document.getElementById('main').scrollTop);
       // })
 
       // logo图片
@@ -112,12 +123,43 @@ import { ElMessage } from 'element-plus'
       // 搜索框状态，聚焦/失焦
       let elinput1focus = ref(false)
 
+      // 页面切换动画效果
+      let isLottie = ref(false)
+      let demoRefHua = ref(null)
+      // 监听路由切换事件
+      // watch($route,(newvalue,oldvalue) => {
+        
+      // })
+
+      $router.beforeEach((to,from,next) => {
+        if(from.name=='login'||to.name=='login') {
+          next()
+        } else {
+          isLottie.value = true
+            demoRefHua.value.play()
+              setTimeout(() => {
+                next()
+              },800)
+        }
+        })
+        $router.afterEach((to,from) => {
+          if(from.name=='login'||to.name=='login') {
+
+          } else {
+            setTimeout(() => {
+                  isLottie.value = false
+                demoRefHua.value.stop()
+                },400)
+          }
+        })
+
       return {
         inputS,
         logoUrl,
         elinput1focus,
         inputEnter,
-        loading
+        loading,
+        qieHuan,demoRefHua,isLottie
       }
     }
   }
@@ -128,11 +170,20 @@ import { ElMessage } from 'element-plus'
     box-sizing: border-box;
   }
 
+  #main {
+    position: relative;
+  }
+
+  .lottie {
+    position: absolute;
+    top: 0;
+    z-index: 10;
+  }
+
   article {
     display: flex;
     justify-content: center;
-    /* background-image: url(../assets/beijing/home1.jpg); */
-    background-color: aliceblue;
+    background-color: #5b99af;
   }
 
   section {
@@ -166,17 +217,35 @@ import { ElMessage } from 'element-plus'
   }
 
   .el-menu-demo {
-    box-shadow: 0 5px 8px rgba(205, 219, 221, 0.392);
+    /* box-shadow: 0 5px 8px rgba(205, 219, 221, 0.392); */
+    background-color: rgba(255, 255, 255, 0.95);
+    border: none;
   }
 
   .footer {
-    min-height: 20vh;
-    background-color: rgba(37, 37, 42, 0.98);
+    min-height: 140px;
+    /* background-color: #2C3A47; */
+    background-image: linear-gradient(#5b99af, #000000);
     color: white;
   }
+
   .footerCol {
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+  }
+
+  .foot-h5 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .foot-h5>h5 {
+    font-size: 0.8rem;
   }
 </style>

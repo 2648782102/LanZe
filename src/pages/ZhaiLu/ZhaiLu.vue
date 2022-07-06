@@ -154,7 +154,7 @@
         anima1, anima2,
         skip1, skip2,
         loding,
-        xiangqing
+        xiangqing,
       }
     }
 
@@ -166,6 +166,13 @@
     position: relative;
     width: 100%;
     margin: 0;
+  }
+
+  .lottie {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 4;
   }
 
   .dox {
@@ -193,6 +200,7 @@
     flex-direction: column;
     align-items: center;
     padding-top: 30%;
+    background-color: white;
     position: relative;
     /* 溢出隐藏 */
     overflow: hidden;

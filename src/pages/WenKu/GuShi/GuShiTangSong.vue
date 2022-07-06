@@ -1,7 +1,7 @@
 <template>
   <div v-loading="loading" class="body">
-    <section class="img-bg img-bg2" @click="TangShi"><p>唐诗三百首</p></section>
-    <section class="img-bg img-bg1" @click="SongCi"><p>宋词三百首</p></section>
+    <section class="sec col-10 col-xl-4" @click="TangShi"><p>唐诗三百首</p></section>
+    <section class="sec col-10 col-xl-4" @click="SongCi"><p>宋词三百首</p></section>
   </div>
 </template>
 
@@ -70,40 +70,33 @@ export default {
 <style scoped>
  .body {
         width: 100%;
-        min-height: 80vh;
+        height: 90vh;
         display: flex;
-        /* padding: 0 5rem; */
+        flex-direction: row;
+        flex-wrap: wrap;
         justify-content: space-around;
         align-items: center;
-        position: relative;
     }
-    .img-bg {
-      position: relative;
-      width: 25rem;
-      height: 34rem;
-      background-image: url(../../../assets/beijing/huabian.png);
-      background-size: 100% 100%;
+    .sec {
+      height: 30rem;
+      background-color: #5b99af;
       display: flex;
       align-items: center;
       justify-content: center;
       writing-mode: vertical-lr;
       letter-spacing: 0.4rem;
-      font-size: 2rem;
+      font-size: 3rem;
+      color: white;
       cursor: pointer;
-      transition: 0.6s;
+      border-radius: 0.5rem;
+      text-shadow: 8px 8px 5px rgba(0, 0, 0, 0.3);
+      transition: 0.8s;
       /* transform: rotateY(14deg) rotateX(-60deg) translateY(-1.4rem); */
       /* box-shadow: 5px 5px 5px rgba(174, 174, 174, 0.51); */
     }
-    .img-bg:hover {
-      text-shadow: 8px 8px 5px rgba(0, 0, 0, 0.3);
-      transition: 0.5s;
-    }
-    @keyframes imgbg {
-      from {
-        transform: translateY(0);
-      }
-      to {
-        transform: translateY(-1.6rem);
-      }
+    .sec:hover {
+      transition: 0.6s;
+      box-shadow:  1rem 1rem 1.6rem #c3c3c3b4,
+                1rem 1rem 1.6rem #ffffff;
     }
 </style>

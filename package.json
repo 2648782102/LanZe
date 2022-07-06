@@ -9,9 +9,11 @@
     "@element-plus/icons-vue": "^2.0.1",
     "axios": "^0.27.2",
     "element-plus": "^2.2.2",
+    "lottie-web": "^5.9.6",
     "vue": "^3.2.36",
     "vue-cookies": "^1.8.1",
     "vue-router": "^4.0.15",
+    "vue3-lottie": "^2.2.4",
     "vue3-puzzle-vcode": "^1.0.6"
   },
   "devDependencies": {

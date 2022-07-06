@@ -16,7 +16,7 @@ export default {
 <style>
   /* 公用属性 */
   .bgwhite {
-      background-color: rgb(255, 255, 255);
+      background-color: rgba(255, 255, 255, 0.8);
       border-radius: 0.2rem;
       box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.05);
   }

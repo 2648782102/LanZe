@@ -22,7 +22,7 @@
                 })
                 } else {
                     ElMessage({
-                        type: 'error',
+                        type: 'warning',
                         message: '请先登录！'
                     })
                 }
