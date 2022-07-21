@@ -30,5 +30,6 @@
     min-height: 100vh;
     padding-top: 2rem;
     padding: 0;
+    font-family: FangZhengSong;
   }
 </style>

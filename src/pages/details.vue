@@ -68,6 +68,7 @@ export default {
     article {
         width: 100%;
         min-height: 700px;
+        font-family: HongLei;
     }
     .elrow {
     width: 100%;

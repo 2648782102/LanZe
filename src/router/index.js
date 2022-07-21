@@ -74,12 +74,6 @@ const router = createRouter({
                         path: '/gushi',
                         component:() => import('../pages/WenKu/GuShi.vue'),
                         meta: {title: '古诗类',isAush: false}
-                    },
-                    {
-                        name: "guci",  //古词类
-                        path: '/guci',
-                        component:() => import('../pages/WenKu/GuCi.vue'),
-                        meta: {title: '古词类',isAush: false}
                     }
                 ]
             },
@@ -203,6 +197,12 @@ const router = createRouter({
                 path:'/kongbai',
                 component:() => import('../pages/kongbai.vue'),
                 meta: {title: '空白页',isAush: false}
+            },
+            {
+                name:'audio',
+                path: '/audio',
+                component:() => import('../pages/Audio.vue'),
+                meta: {title: '音乐播放器',isAush: false}
             }
         ]
     }

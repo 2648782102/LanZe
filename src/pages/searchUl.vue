@@ -85,6 +85,7 @@ export default {
  article {
         width: 100%;
         min-height: 100vh;
+        font-family: FangZhengSong;
     }
     .elrow {
     position: relative;

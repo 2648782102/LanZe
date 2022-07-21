@@ -4,14 +4,9 @@
     <el-main>
     <div class="car">
       <!-- 轮播图 -->
-      <el-carousel indicator-position="none">
-        <el-carousel-item v-for="item in 3" :key="item">
-          <el-image class="carousel-image" src="" fit="fill" :lazy="true">
-            <template #error>
-              <div class="d-flex justify-content-center align-items-center w-100 h-100">
-                <el-icon size="5rem" color="white"><Picture /></el-icon>
-              </div>
-            </template>
+      <el-carousel height='24rem' indicator-position="none">
+        <el-carousel-item v-for="item in imgArr" :key="item">
+          <el-image class="carousel-image" :src="item">
           </el-image>
         </el-carousel-item>
       </el-carousel>
@@ -34,13 +29,28 @@
 </template>
 
 <script>
+  import { ref } from "vue";
+  import webpa from "../../assets/LunBo/1.webp";
+  import webpb from "../../assets/LunBo/2.webp";
+  import webpc from "../../assets/LunBo/4.webp";
+
 export default {
-    name: 'DuXue'
+    name: 'DuXue',
+    setup() {
+      let imgArr = ref([
+        webpa,
+        webpb,
+        webpc
+      ])
+
+      return {
+        imgArr
+      }
+    }
 }
 </script>
 
 <style scoped>
-
   .carousel-image {
     width: 100%;
     height: 100%;

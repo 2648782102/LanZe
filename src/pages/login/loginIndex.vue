@@ -38,6 +38,7 @@
     flex-wrap: wrap-reverse;
     perspective: 1000px;
     overflow: hidden;
+    font-family: HongLei;
   }
 
   .at2 {
@@ -50,6 +51,4 @@
     transform: rotateX(60deg) rotateY(0) rotateZ(0);
   }
 
-  /* .routerView {
-  } */
 </style>

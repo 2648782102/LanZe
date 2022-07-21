@@ -90,13 +90,13 @@ export default {
       cursor: pointer;
       border-radius: 0.5rem;
       text-shadow: 8px 8px 5px rgba(0, 0, 0, 0.3);
-      transition: 0.8s;
+      transition: 0.6s;
       /* transform: rotateY(14deg) rotateX(-60deg) translateY(-1.4rem); */
       /* box-shadow: 5px 5px 5px rgba(174, 174, 174, 0.51); */
     }
     .sec:hover {
-      transition: 0.6s;
-      box-shadow:  1rem 1rem 1.6rem #c3c3c3b4,
-                1rem 1rem 1.6rem #ffffff;
+      transition: 0.4s;
+      box-shadow: 1px 1px #3e3e3e, 4px 4px #3e3e3e, 3px 3px #3e3e3e, 4px 4px #3e3e3e, 5px 5px #3e3e3e, 6px 6px #3e3e3e, 7px 7px #3e3e3e, 8px 8px #3e3e3e;
+    transform: translateX(-8px) translateY(-8px);
     }
 </style>

@@ -23,4 +23,16 @@ export default {
   .border-re2 {
     border-radius: 0.2rem;
   }
+  @font-face {
+    font-family: maoken;
+    src: url(./assets/ZiTi/maoken.ttf);
+  }
+  @font-face {
+    font-family: HongLei;
+    src: url(./assets/ZiTi/HongLei.ttf);
+  }
+  @font-face {
+    font-family: FangZhengSong;
+    src: url(./assets/ZiTi/FangZhengSong.ttf);
+  }
 </style>

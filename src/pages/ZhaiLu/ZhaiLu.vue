@@ -166,6 +166,8 @@
     position: relative;
     width: 100%;
     margin: 0;
+    font-family: FangZhengSong;
+    font-weight: 600;
   }
 
   .lottie {
@@ -294,6 +296,7 @@
   section>.box>h5 {
     writing-mode: vertical-rl;
     font-size: 22px;
+    font-family: PingXian;
   }
 
   .chevron1 {

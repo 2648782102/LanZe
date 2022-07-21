@@ -164,6 +164,7 @@
 <style scoped>
     article {
         width: 100%;
+        font-family: HongLei;
     }
 
     .top {
@@ -172,7 +173,6 @@
         border-radius: 0 0 0.2rem 0.2rem;
         overflow: hidden;
     }
-
 
     .roubox {
         background-color: rgb(255, 255, 255);

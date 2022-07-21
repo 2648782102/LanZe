@@ -17,7 +17,7 @@
         </el-carousel-item>
       </el-carousel>
       <!-- 下方分栏 -->
-      <div class="col-11 col-md-9 bgwhite">
+      <div class="col-11 col-md-9 bgwhite box-fenlan">
         <el-menu default-active="jingxuan" mode="horizontal" @select="handleSelect" router>
           <el-menu-item class="col-2" index="jingxuan">精选诗文</el-menu-item>
           <el-menu-item class="col-2" index="fengya">风俗雅文</el-menu-item>
@@ -37,14 +37,17 @@
 
 <script>
   import { ref } from 'vue'
+  import webpa from "../../assets/LunBo/1.webp";
+  import webpb from "../../assets/LunBo/2.webp";
+  import webpc from "../../assets/LunBo/4.webp";
 
   export default {
     name: 'ChaLou',
     setup() {
       let imgArr = ref([
-        '',
-        '',
-        ''
+      webpa,
+      webpb,
+      webpc
       ])
 
       return {
@@ -81,6 +84,12 @@
     font-size: 1rem;
   }
 
-  .dox-box {
+  .dox-box  {
+    font-family: HongLei;
   }
+
+  .box-fenlan {
+    font-family: maoken;
+  }
+
 </style>
