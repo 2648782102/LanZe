@@ -164,18 +164,20 @@
 <style scoped>
     article {
         width: 100%;
-        font-family: HongLei;
+        font-family: FangZhengSong;
     }
 
     .top {
         min-height: 14rem;
-        background-color: white;
+        background-color: rgb(255, 255, 255);
         border-radius: 0 0 0.2rem 0.2rem;
         overflow: hidden;
+        box-shadow: 5px 5px 5px rgba(169, 176, 176, 0.615);
     }
 
     .roubox {
         background-color: rgb(255, 255, 255);
+        box-shadow: 5px 5px 5px rgba(169, 176, 176, 0.615);
     }
 
     main {

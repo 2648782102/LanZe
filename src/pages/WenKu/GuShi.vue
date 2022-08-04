@@ -55,7 +55,7 @@
                 <template #label>
                     <div class="gushi-tabs-span">
                         <i style="font-weight: 800;">唐</i>
-                        全唐诗
+                        &nbsp全唐诗
                     </div>
                 </template>
                 <GuShiTangShi />
@@ -64,7 +64,7 @@
                 <template #label>
                     <div class="gushi-tabs-span">
                         <i style="font-weight: 800;">宋</i>
-                        全宋词
+                        &nbsp全宋词
                     </div>
                 </template>
                 <GuShiSongCi />
@@ -124,7 +124,7 @@
                 <template #label>
                     <div>
                         <i style="font-weight: 800;">唐</i>
-                        全唐诗
+                        &nbsp全唐诗
                     </div>
                 </template>
                 <GuShiTangShi />
@@ -133,7 +133,7 @@
                 <template #label>
                     <div>
                         <i style="font-weight: 800;">宋</i>
-                        全宋词
+                        &nbsp全宋词
                     </div>
                 </template>
                 <GuShiSongCi />
@@ -170,19 +170,17 @@
 
 <style>
     .gushi-tabs {
-        height: 100vh;
-    }
-    .el-tabs__item {
-        height: 100%;
         width: 100%;
-        padding: 1rem;
-        align-items: center;
-        justify-content: center;
+        height: 100%;
     }
-    .el-tabs__nav-prev,.el-tabs__nav-next {
+    .el-tabs__nav>div>div {
         height: 100%;
         display: flex;
-        justify-content: center;
         align-items: center;
+        justify-content: center;
+    }
+    .el-tabs__item {
+        height: 4rem;
+        width: 100%;
     }
 </style>

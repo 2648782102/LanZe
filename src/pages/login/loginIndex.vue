@@ -38,7 +38,7 @@
     flex-wrap: wrap-reverse;
     perspective: 1000px;
     overflow: hidden;
-    font-family: HongLei;
+    font-family: FangZhengSong;
   }
 
   .at2 {

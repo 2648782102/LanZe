@@ -4,7 +4,7 @@
     <el-main>
     <div class="car">
       <!-- 轮播图 -->
-      <el-carousel height='24rem' indicator-position="none">
+      <el-carousel height='20rem' indicator-position="none">
         <el-carousel-item v-for="item in imgArr" :key="item">
           <el-image class="carousel-image" :src="item">
           </el-image>

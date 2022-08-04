@@ -296,7 +296,7 @@
   section>.box>h5 {
     writing-mode: vertical-rl;
     font-size: 22px;
-    font-family: PingXian;
+    font-family: FangZhengSong;
   }
 
   .chevron1 {
@@ -317,11 +317,13 @@
 
   .chevron>i {
     font-size: 5rem;
-    color: rgba(110, 110, 110, 0.662);
+    color: #5b99af57;
+    transition: 0.4s;
   }
 
   .chevron>i:hover {
-    color: black;
+    color: #5b99af;
+    transition: 0.3s;
   }
 
   /* 点击切换诗词随机诗词动画效果(左) */

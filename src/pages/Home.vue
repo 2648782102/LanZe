@@ -107,10 +107,10 @@
               <el-row justify="center">
                 <el-col class="footerCol" :span="24" :offset="0">
                   <div class="foot-h5 pt-2">
-                    <h5>Copyright &copy; 2022 lan-ze.vercel.app</h5>
+                    <h5>Copyright &copy; 2022 lan-ze.vercel.app&nbsp;</h5>
                     <h5>All Rights Reserved</h5>
                   </div>
-                  <p>个人网站，仅供学习交流使用</p>
+                  <p>本站仅供学习交流使用</p>
                 </el-col>
               </el-row>
             </el-footer>
@@ -251,7 +251,7 @@ export default {
 article {
   display: flex;
   justify-content: center;
-  background-color: #5b99af;
+  /* background-color: #5b99af; */
 }
 
 section {
@@ -296,11 +296,12 @@ section {
 }
 
 .tab-bottom-box>div {
-  width: 62px;
-  height: 62px;
+  width: 56px;
+  height: 56px;
   display: flex;
   justify-content: center;
   align-items: center;
+  font-family: FangZhengSong;
 }
 
 .tab-bottom-box a {
@@ -316,7 +317,7 @@ section {
   align-items: center;
   width: 54px;
   height: 54px;
-  color:rgba(36, 36, 38, 0.9);
+  color:rgba(36, 36, 38, 0.7);
   border-radius: 50%;
   border-radius: 50px;
              transition: 0.4s;
@@ -325,26 +326,17 @@ section {
 .bottom-active {
   width: 100%;
   height: 100%;
-  color: white;
-  font-weight: 600;
+  color: black;
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 50%;
-  border-radius: 50px;
-background: linear-gradient(145deg, #5b99af, #5b99af7f);
-box-shadow:  3px 3px 5px #d9d9d9,
-             -3px -3px 5px #ffffff;
+background: linear-gradient(145deg, #ffffff, #e6e6e6);
+box-shadow:  6px 6px 12px #dedede,
+             -6px -6px 12px #ffffff;
   transition: 0.3s;
 }
 
-.bottom-active i {
-  font-size: 28px;
-}
-
-.bottom-active i p {
-  font-size: 12px;
-}
 .box-i {
   width: 80%;
   height: 80%;
@@ -379,7 +371,7 @@ box-shadow:  3px 3px 5px #d9d9d9,
 
 .elinput1 {
   transition: width 0.5s ease-in-out;
-  width: 5rem;
+  width: 8.4rem;
 }
 
 .elinput1focus {
@@ -390,15 +382,19 @@ box-shadow:  3px 3px 5px #d9d9d9,
   /* box-shadow: 0 5px 8px rgba(205, 219, 221, 0.392); */
   background-color: rgba(255, 255, 255, 0.95);
   border: none;
-  font-family: maoken;
+  font-family: FangZhengSong;
+  font-weight: 600;
 }
 
 .footer {
+  box-shadow: 0 -2px 3px 0 rgba(162, 169, 169, 0.3);
   min-height: 140px;
+  padding: 10px;
   /* background-color: #2C3A47; */
-  background-image: linear-gradient(#5b99af, #000000);
-  color: white;
-  margin-bottom: 24px;
+  /* background-image: linear-gradient(#5b99af, #000000); */
+  background-color: rgba(255, 255, 255, 0.9);
+  /* color: white; */
+  margin-bottom: 18px;
 }
 
 .footerCol {

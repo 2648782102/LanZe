@@ -1,67 +1,52 @@
 <template>
-    <div v-loading="loading" class="body">
-        <button class="btnYuan" @click="nantangClick">南唐二主词</button>
-    </div>
-  </template>
-  
-  <script>
-import axios from 'axios'
-import { useRouter } from 'vue-router'
-import { ref } from 'vue'
+    <section>
+        <el-carousel height="92vh" direction="vertical" :autoplay="false">
+            <el-carousel-item>
+                <GuShiDiv :address="'nantang'" :title="book[0].title" :author="book[0].author" :age="book[0].age"
+                    :synopsis="book[0].synopsis" />
+            </el-carousel-item>
+        </el-carousel>
+    </section>
+</template>
 
-  export default {
-      name: 'GuShiNanTang',
-      setup() {
-        const $router = useRouter()
+<script>
+    import GuShiDiv from "../../../components/GuShiDiv.vue";
 
-        // 加载控制
-        let loading = ref(false)
-
-            function nantangClick() {
-            loading.value = true
-            axios.get('https://lanze-node.vercel.app/api/nantang')
-            .then(response => {
-                loading.value = false
-                let chuciArr = JSON.stringify(response.data)
-                $router.push({
-                    name: 'searchul',
-                    query:{
-                        ulArr:chuciArr
-                    }
-                })
-            })
-            .catch(function(error) {
-                console.log(error)
-            })
-            }
+    export default {
+        name: "GuShiNanTang",
+        components: {
+            GuShiDiv,
+        },
+        setup() {
+            // 封面固定组件传值数组
+            const book = [
+                {
+                    title: "南唐主二词",
+                    author: "杨敏如",
+                    age: "南宋",
+                    synopsis:
+                        "《南唐二主词》，系南唐中主李璟、后主李煜撰。约成书于南宋，后世续有辑补，又有后人编写了各种版本；现在流行的则为《南唐二主词校订》。",
+                },
+            ];
 
             return {
-                nantangClick,
-                loading
-            }
-      }
-  }
-  </script>
-  
-  <style scoped>
-  .body {
+                book,
+            };
+        },
+    };
+</script>
+
+<style scoped>
+    * {
+        box-sizing: border-box;
+    }
+
+    section {
         width: 100%;
-        min-height: 80vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        height: 100%;
     }
-    .btnYuan {
-        width: 400px;
-        height: 200px;
-        border: none;
-        color: #5b99af;
-        font-weight: 600;
-        font-size: 3rem;
-        border-radius: 50px;
-        background-color: white;
-        background: linear-gradient(145deg, #e6e6e6, #ffffff);
-        box-shadow: 20px 20px 60px #d9d9d9,
-            -20px -20px 60px #ffffff;
+
+    .el-carousel {
+        border-radius: 10px;
     }
-  </style>
+</style>

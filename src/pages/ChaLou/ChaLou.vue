@@ -85,11 +85,11 @@
   }
 
   .dox-box  {
-    font-family: HongLei;
+    font-family: FangZhengSong;
   }
 
   .box-fenlan {
-    font-family: maoken;
+    font-family: FangZhengSong;
   }
 
 </style>

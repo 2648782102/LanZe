@@ -1,80 +1,73 @@
 <template>
-  <section v-loading="loading" class="section1">
-    <div class="chun" @click="chuciClick">
-      <h1>楚辞</h1>
-    </div>
-    <div class="xia" @click="shijingClick">
-      <h1>诗经</h1>
-    </div>
-    <div class="qiu">
-      <h1>曹操<br/><span class="ps-5">诗集</span></h1>
-    </div>
-    <div class="dong">
-      <h1>论语</h1>
-    </div>
+  <section>
+    <el-carousel height="92vh" direction="vertical" :autoplay="false">
+      <el-carousel-item>
+        <GuShiDiv :address="'chuci'" :title="book[0].title" :author="book[0].author" :age="book[0].age"
+          :synopsis="book[0].synopsis" />
+      </el-carousel-item>
+      <el-carousel-item>
+        <GuShiDiv :address="'shijing'" :title="book[1].title" :author="book[1].author" :age="book[1].age"
+          :synopsis="book[1].synopsis" />
+      </el-carousel-item>
+      <el-carousel-item>
+        <GuShiDiv :address="''" :title="book[2].title" :author="book[2].author" :age="book[2].age"
+          :synopsis="book[2].synopsis" />
+      </el-carousel-item>
+      <el-carousel-item>
+        <GuShiDiv :address="''" :title="book[3].title" :author="book[3].author" :age="book[3].age"
+          :synopsis="book[3].synopsis" />
+      </el-carousel-item>
+    </el-carousel>
   </section>
 </template>
 
 <script>
-  import axios from 'axios';
-  import { useRouter } from "vue-router";
-  import { ref } from 'vue'
+  import GuShiDiv from "../../../components/GuShiDiv.vue";
 
   export default {
-    name: 'GuShiJingXuan',
+    name: "GuShiJingXuan",
+    components: {
+      GuShiDiv,
+    },
     setup() {
-      const $router = useRouter()
 
-      // 加载控制
-      let loading = ref(false)
-
-      function chuciClick() {
-        loading.value = true
-        axios.get('https://lanze-node.vercel.app/api/chuci')
-          .then(response => {
-            loading.value = false
-            // response.data[0].author:诗名   response.data[0].paragraphs:诗集   response.data[0].rhythmic:作者
-            // response.data[0].tags:正文
-            let chuciArr = JSON.stringify(response.data)
-            $router.push({
-              name: 'searchul',
-              query: {
-                ulArr: chuciArr
-              }
-            })
-          })
-          .catch(function (error) {
-            console.log(error);
-          })
-      }
-
-      function shijingClick() {
-        loading.value = true
-        axios.get('https://lanze-node.vercel.app/api/shijing')
-          .then(response => {
-            loading.value = false
-            // response.data[0].author:诗名   response.data[0].paragraphs:诗集   response.data[0].rhythmic:作者
-            // response.data[0].tags:正文
-            let chuciArr = JSON.stringify(response.data)
-            $router.push({
-              name: 'searchul',
-              query: {
-                ulArr: chuciArr
-              }
-            })
-          })
-          .catch(function (error) {
-            console.log(error);
-          })
-      }
+      // 封面固定组件传值数组
+      const book = [
+        {
+          title: "楚辞",
+          author: "屈原",
+          age: "战国",
+          synopsis:
+            "楚辞，也作“楚词”，是战国时期楚国诗人屈原创作的一种新的诗歌体裁。屈原的抒情长诗《离骚》，具有浪漫主义风格，是楚辞的代表作，楚辞因此又称为“骚体”。",
+        },
+        {
+          title: "诗经",
+          author: "佚名",
+          age: "西周初至春秋中叶",
+          synopsis:
+            "《诗经》，是中国古代诗歌的开端，最早的一部诗歌总集，收集了西周初年至春秋中叶（前11世纪至前6世纪）的诗歌，共311篇，其中6篇为笙诗，即只有标题，没有内容，称为笙诗六篇（《南陔》《白华》《华黍》《由庚》《崇丘》《由仪》），反映了周初至周晚期约五百年间的社会面貌。",
+        },
+        {
+          title: "曹操诗集",
+          author: "曹操",
+          age: "东汉末",
+          synopsis:
+            "魏武帝曹操（155年 [1]  —220年3月15日 [2]  ），字孟德，一名吉利，小字阿瞒 [164]  ，一说本姓夏侯 [169]  ，沛国谯县（今安徽省亳州市）人 [3-4]  。中国古代杰出的政治家、军事家、文学家、书法家、诗人 [5-6]  。东汉末年权相，太尉曹嵩之子，曹魏的奠基者。",
+        },
+        {
+          title: "论语",
+          author: "孔子及其弟子",
+          age: "春秋战国",
+          synopsis:
+            "《论语》（lún yǔ），是春秋时期思想家、教育家孔子的弟子及再传弟子记录孔子及其弟子言行而编成的语录文集，成书于战国前期。全书共20篇492章，以语录体为主，叙事体为辅，较为集中地体现了孔子及儒家学派的政治主张、伦理思想、道德观念、教育原则等。作品多为语录，但辞约义富，有些语句、篇章形象生动。",
+        },
+      ];
 
       return {
-        chuciClick,
-        shijingClick,
-        loading
-      }
-    }
-  }
+        book,
+      };
+    },
+  };
 </script>
 
 <style scoped>
@@ -82,41 +75,12 @@
     box-sizing: border-box;
   }
 
-  .section1 {
+  section {
     width: 100%;
-    min-height: 90vh;
-    display: flex;
-    justify-content: space-around;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
+    height: 100%;
   }
-
-  .section1>div {
-    width: 42%;
-    height: 36vh;
-    background-color: #5b99af;
-    color: white;
-    border-radius: 0.4rem;
-    background-position: 0 bottom;
-    /* background-image: url(../../../assets/beijing/diwen.png); */
-    background-repeat: no-repeat;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: 0.6s;
-    overflow: hidden;
+  .el-carousel {
+    border-radius: 10px;
+    height: 100%;
   }
-
-  .section1>div:hover {
-    transition: 0.4s;
-    box-shadow: 1px 1px #3e3e3e, 2px 2px #3e3e3e, 3px 3px #3e3e3e, 4px 4px #3e3e3e, 5px 5px #3e3e3e, 6px 6px #3e3e3e, 7px 7px #3e3e3e, 8px 8px #3e3e3e;
-    transform: translateX(-8px) translateY(-8px);
-  }
-
-  .section1>div>h1 {
-    font-size: 4rem;
-  }
-
 </style>
