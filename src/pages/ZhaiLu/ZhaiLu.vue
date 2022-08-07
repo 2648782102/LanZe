@@ -7,7 +7,7 @@
         <i class="fas fa-chevron-left"></i>
       </div>
       <div class="col-10 col-md-8 col-lg-9 dox bgwhite">
-        <section class="section1 col-10 col-md-7 col-lg-3">
+        <section draggable="true" class="section1 col-10 col-md-7 col-lg-3">
           <div v-loading='loding' element-loading-text="加载中..." class="box"
             :class="{'animationC':anima1,'animationD':anima2}">
             <span @click="shouchang(1)" :class="shouchang1?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
@@ -16,7 +16,7 @@
             <img src="../../assets/beijing/fanzou.png" @click="xiangqing(scArr1)" alt="">
           </div>
         </section>
-        <section class="section2 col-10 col-md-8 col-lg-3 hidden-sm-and-down">
+        <section draggable="true" class="section2 col-10 col-md-8 col-lg-3 hidden-sm-and-down">
           <div v-loading='loding' element-loading-text="加载中..." class="box"
             :class="{'animationC':anima1,'animationD':anima2}">
             <span @click="shouchang(2)" :class="shouchang2?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
@@ -25,7 +25,7 @@
             <img src="../../assets/beijing/fanzou.png" @click="xiangqing(scArr2)" alt="">
           </div>
         </section>
-        <section class="section3 col-10 col-md-8 col-lg-3 hidden-sm-and-down">
+        <section draggable="true" class="section3 col-10 col-md-8 col-lg-3 hidden-sm-and-down">
           <div v-loading='loding' element-loading-text="加载中..." class="box"
             :class="{'animationC':anima1,'animationD':anima2}">
             <span @click="shouchang(3)" :class="shouchang3?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>

@@ -6,7 +6,7 @@
                 <div class="top">
                     <!-- 上部头像，用户名等信息 -->
                     <main>
-                        <div v-if="!lanze_upload" class="avatar">
+                        <div @click="dengluClick" v-if="!lanze_upload" class="avatar denglu">
                             <el-avatar class="elavatar" icon="UserFilled" />
                             <span v-if="!lanze_upload" class="ps-2">请先登录</span>
                         </div>
@@ -84,6 +84,7 @@
 
 <script>
     import { ref, onMounted, computed } from 'vue'
+    import { useRouter } from "vue-router";
     import hoad1 from '../../assets/hoad/hoad1.jpg'
     import hoad2 from '../../assets/hoad/hoad2.jpg'
     import hoad3 from '../../assets/hoad/hoad3.jpg'
@@ -97,6 +98,8 @@
     export default {
         name: 'Personal',
         setup() {
+            const $router = useRouter()
+
             let modelLis = ref('')
             let attentionNum = ref(0)
             let productionNum = ref(0)
@@ -147,6 +150,13 @@
                 }
             })
 
+            // 登录
+            function dengluClick() {
+                $router.push({
+                    name: 'loginindex'
+                })
+            }
+
             // 输出内容
             return {
                 modelLis,
@@ -155,7 +165,8 @@
                 collectNum,
                 clockInNum,
                 imgsrc,
-                lanze_upload
+                lanze_upload,
+                dengluClick
             }
         }
     }
@@ -275,5 +286,10 @@
         text-decoration: none;
         font-size: 0.6rem;
         color: black;
+    }
+
+    .denglu:hover {
+        cursor: pointer;
+        text-decoration: underline;
     }
 </style>
