@@ -13,7 +13,7 @@
     <section>
       <el-container>
         <!-- 大屏幕显示为顶部导航栏 -->
-        <el-header style="padding: 0" class="hidden-sm-and-down">
+        <el-header style="padding: 0" class="hidden-sm-and-down tab-top">
           <el-affix :offset="0">
             <el-menu
               router
@@ -380,20 +380,20 @@ box-shadow:  6px 6px 12px #dedede,
 
 .el-menu-demo {
   /* box-shadow: 0 5px 8px rgba(205, 219, 221, 0.392); */
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: rgba(255, 255, 255, 0);
   border: none;
   font-family: FangZhengSong;
   font-weight: 600;
 }
 
 .footer {
-  box-shadow: 0 -2px 3px 0 rgba(162, 169, 169, 0.3);
+  box-shadow: 0 -2px 2px 0 #2c3a47e2;
   min-height: 140px;
   padding: 10px;
-  /* background-color: #2C3A47; */
+  background-color: #2C3A47;
   /* background-image: linear-gradient(#5b99af, #000000); */
-  background-color: rgba(255, 255, 255, 0.9);
-  /* color: white; */
+  /* background-color: rgba(255, 255, 255, 0.9); */
+  color: white;
   margin-bottom: 18px;
 }
 

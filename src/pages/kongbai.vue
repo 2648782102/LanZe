@@ -1,5 +1,6 @@
 <template>
   <article>
+    <!-- 空白页，用于跳转刷新页面 -->
     
   </article>
 </template>

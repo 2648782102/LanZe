@@ -7,31 +7,31 @@
         <i class="fas fa-chevron-left"></i>
       </div>
       <div class="col-10 col-md-8 col-lg-9 dox bgwhite">
-        <section draggable="true" class="section1 col-10 col-md-7 col-lg-3">
-          <div v-loading='loding' element-loading-text="加载中..." class="box"
+        <section @dragstart="tuoDongGo($event)" @dragend="tuoDongOff($event,1)" draggable="true" class="section1 col-10 col-md-7 col-lg-3">
+          <div v-loading='loding1' element-loading-text="加载中..." element-loading-svg-view-box="-10, -10, 50, 50" :element-loading-spinner="loadingSVG" class="box"
             :class="{'animationC':anima1,'animationD':anima2}">
             <span @click="shouchang(1)" :class="shouchang1?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
             <p>{{ scArr1.content }}</p>
             <h5>— {{ scArr1.author }}</h5>
-            <img src="../../assets/beijing/fanzou.png" @click="xiangqing(scArr1)" alt="">
+            <img draggable="false" src="../../assets/beijing/fanzou.png" @click="xiangqing(scArr1)" alt="">
           </div>
         </section>
-        <section draggable="true" class="section2 col-10 col-md-8 col-lg-3 hidden-sm-and-down">
-          <div v-loading='loding' element-loading-text="加载中..." class="box"
+        <section @dragstart="tuoDongGo($event)" @dragend="tuoDongOff($event,2)" draggable="true" class="section2 col-10 col-md-8 col-lg-3 hidden-sm-and-down">
+          <div v-loading='loding2' element-loading-text="加载中..." element-loading-svg-view-box="-10, -10, 50, 50" :element-loading-spinner="loadingSVG" class="box"
             :class="{'animationC':anima1,'animationD':anima2}">
             <span @click="shouchang(2)" :class="shouchang2?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
             <p>{{ scArr2.content }}</p>
             <h5>— {{ scArr2.author }}</h5>
-            <img src="../../assets/beijing/fanzou.png" @click="xiangqing(scArr2)" alt="">
+            <img draggable="false" src="../../assets/beijing/fanzou.png" @click="xiangqing(scArr2)" alt="">
           </div>
         </section>
-        <section draggable="true" class="section3 col-10 col-md-8 col-lg-3 hidden-sm-and-down">
-          <div v-loading='loding' element-loading-text="加载中..." class="box"
+        <section @dragstart="tuoDongGo($event)" @dragend="tuoDongOff($event,3)" draggable="true" class="section3 col-10 col-md-8 col-lg-3 hidden-sm-and-down">
+          <div v-loading='loding3' element-loading-text="加载中..." element-loading-svg-view-box="-10, -10, 50, 50" :element-loading-spinner="loadingSVG" class="box"
             :class="{'animationC':anima1,'animationD':anima2}">
             <span @click="shouchang(3)" :class="shouchang3?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
             <p>{{ scArr3.content }}</p>
             <h5>— {{ scArr3.author }}</h5>
-            <img src="../../assets/beijing/fanzou.png" @click="xiangqing(scArr3)" alt="">
+            <img draggable="false" src="../../assets/beijing/fanzou.png" @click="xiangqing(scArr3)" alt="">
           </div>
         </section>
       </div>
@@ -44,7 +44,7 @@
 
 <script>
   import 'element-plus/theme-chalk/display.css'
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, watch } from 'vue'
   import axios from "axios"
   import { ElMessage } from 'element-plus'
   import { useRouter } from 'vue-router'
@@ -55,6 +55,23 @@
       // 编程路由
       const $router = useRouter()
       // const $route = useRoute()
+
+      // 生命周期钩子，当页面挂载时执行
+      onMounted(() => {
+        // 调用ajax函数，初始化古诗词
+        skiip()
+      })
+
+      const loadingSVG = `
+        <path class="path" d="
+          M 30 15
+          L 28 17
+          M 25.61 25.61
+          A 15 15, 0, 0, 1, 15 30
+          A 15 15, 0, 1, 1, 27.99 7.5
+          L 15 15
+        " style="stroke-width: 4px; fill: rgba(0, 0, 0, 0)"/>
+      `
 
       // 切换古诗词内容，函数
       function skiip() {
@@ -94,13 +111,13 @@
 
       // 诗词数组
       let scArr1 = ref({}), scArr2 = ref({}), scArr3 = ref({})
-      // 点击切换诗词
+      // 点击切换诗词，动画效果播放控制
       let anima1 = ref(false), anima2 = ref(false)
       // 加载动画
-      let loding = ref(false)
+      let loding1 = ref(false),loding2 = ref(false),loding3 = ref(false)
       // 点击切换(左)随机诗词内容
       function skip1() {
-        loding.value = true
+        loding1.value = true,loding2.value = true,loding3.value = true
         anima1.value = true
         setTimeout(() => {
           anima1.value = false
@@ -111,13 +128,13 @@
             type: 'success'
           })
           skiip()
-          loding.value = false
+          loding1.value = false,loding2.value = false,loding3.value = false
         }, 1000)
       }
 
       // 点击切换(右)随机诗词内容
       function skip2() {
-        loding.value = true
+        loding1.value = true,loding2.value = true,loding3.value = true
         anima2.value = true
         setTimeout(() => {
           anima2.value = false
@@ -128,7 +145,7 @@
             type: 'success'
           })
           skiip()
-          loding.value = false
+          loding1.value = false,loding2.value = false,loding3.value = false
         }, 1000)
       }
 
@@ -142,19 +159,54 @@
         })
       }
 
-      // 生命周期钩子，当页面挂载时执行
-      onMounted(() => {
-        // 调用ajax函数，初始化古诗词
-        skiip()
-      })
+      // 拖动开始事件
+      let tuox = 0  //记录拖动前元素的x轴坐标
+      let tuoy = 0  //记录拖动前元素的y轴坐标
+      function tuoDongGo(e) {
+        tuox = e.clientX
+        tuoy = e.clientY
+      }
+
+      // 拖动结束事件
+      let numX = 0  
+      let numY = 0
+      function tuoDongOff(e,serial) {
+        switch(serial) {
+              case 1: loding1.value = true
+                      break
+              case 2: loding2.value = true
+                      break
+              case 3: loding3.value = true
+                      break
+            }
+        numX = e.clientX-tuox
+        numY = e.clientY-tuoy
+        if(numX>150||numY>150||numX<-150||numY<-150) {
+           axios.get('https://v1.jinrishici.com/all.json')
+          .then(response => {
+            switch(serial) {
+              case 1: scArr1.value = response.data
+                      loding1.value = false
+                      break
+              case 2: scArr2.value = response.data
+                      loding2.value = false
+                      break
+              case 3: scArr3.value = response.data
+                      loding3.value = false
+                      break
+            }
+          })
+        }
+      }
 
       return {
         shouchang, shouchang1, shouchang2, shouchang3,
         scArr1, scArr2, scArr3,
         anima1, anima2,
         skip1, skip2,
-        loding,
+        loding1,loding2,loding3,
         xiangqing,
+        tuoDongGo,tuoDongOff,loadingSVG
       }
     }
 
