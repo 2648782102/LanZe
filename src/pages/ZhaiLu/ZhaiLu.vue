@@ -171,7 +171,10 @@
       let numX = 0  
       let numY = 0
       function tuoDongOff(e,serial) {
-        switch(serial) {
+        numX = e.clientX-tuox
+        numY = e.clientY-tuoy
+        if(numX>150||numY>150||numX<-150||numY<-150) {
+          switch(serial) {
               case 1: loding1.value = true
                       break
               case 2: loding2.value = true
@@ -179,9 +182,6 @@
               case 3: loding3.value = true
                       break
             }
-        numX = e.clientX-tuox
-        numY = e.clientY-tuoy
-        if(numX>150||numY>150||numX<-150||numY<-150) {
            axios.get('https://v1.jinrishici.com/all.json')
           .then(response => {
             switch(serial) {

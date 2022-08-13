@@ -1,9 +1,9 @@
 <template>
   <!-- 修改资料 -->
   <article class="box" v-loading="loading">
-    <el-form :model="form" class="p-5 col-12 col-lg-9 col-xl-7" label-position="labelPosition">
+    <el-form :model="form" class="p-5 col-12 col-lg-7 col-xl-9" label-position="labelPosition">
       <div class="text-center mb-4">
-        <h1>个人资料<i class="fab fa-jedi-order ms-2"></i></h1>
+        <h1>个人资料<i class="fab fa-jedi-order ms-2 tou-biao"></i></h1>
       </div>
 
       <el-form-item label="选择头像：">
@@ -29,7 +29,7 @@
         <el-input v-model="form.intro" />
       </el-form-item>
       <div class="mt-4 submit">
-        <button class="col-4 col-md-4 btn btn-success" type="button" @click="submit">
+        <button class="col-4 col-md-4 btn" style="background:#5b99af;color:white;" type="button" @click="submit">
           提交审核
         </button>
       </div>
@@ -186,6 +186,10 @@
     min-height: 700px;
     display: flex;
     justify-content: center;
+  }
+
+  .tou-biao {
+    color: #5b99af;
   }
 
   .upload {

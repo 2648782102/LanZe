@@ -258,6 +258,11 @@ section {
   width: 100%;
 }
 
+.tab-top {
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.05);
+  z-index: 3;
+}
+
 /* 小屏幕顶部 */
 .min-tap-top {
   width: 100%;
@@ -387,7 +392,7 @@ box-shadow:  6px 6px 12px #dedede,
 }
 
 .footer {
-  box-shadow: 0 -2px 2px 0 #2c3a47e2;
+  box-shadow: 0 0 2px 6px #2c3a47e2;
   min-height: 140px;
   padding: 10px;
   background-color: #2C3A47;

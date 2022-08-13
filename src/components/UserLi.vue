@@ -1,12 +1,12 @@
 <template>
   <!-- 茶楼，用户创作诗词展示 -->
-  <section v-loading="loading">
+  <section>
     <div class="dox-left">
       <h4>{{ name }}</h4>
       <p>{{ details }}</p>
     </div>
     <div v-if="userObj" class="avatar">
-      <el-avatar class="elavatar" :src="imgsrc" icon="UserFilled" />
+      <el-avatar class="elavatar" v-loading="loading" :src="imgsrc" icon="UserFilled" />
       <span class="pe-2 pt-3">{{ userObj.user_name }}</span>
     </div>
   </section>

@@ -13,7 +13,7 @@
     <!-- 最新的 Bootstrap5 核心 JavaScript 文件 -->
     <script src="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/js/bootstrap.min.js"></script>
     <!-- Font Awesome CSS-->
-    <!-- <link href="https://cdn.bootcss.com/font-awesome/5.13.0/css/all.css" rel="stylesheet"> -->
+    <link href="https://cdn.bootcss.com/font-awesome/5.13.0/css/all.css" rel="stylesheet">
     <!-- 导入罗蒂动画 -->
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.4/lottie_svg.min.js"></script> -->
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
@@ -73,6 +73,14 @@
         .el-tabs__item {
             width: 6rem;
             text-align: center;
+        }
+
+        /* 修改element plus的加载颜色 */
+        .el-loading-spinner .path {
+            stroke: #5b99af !important;
+        }
+        .el-loading-spinner .el-loading-text {
+            color: #5b99af !important;
         }
     </style>
 </head>

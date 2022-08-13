@@ -31,17 +31,17 @@ onMounted(() => {
       fixed:true,
       autoplay:true,
       audio: [
+      {
+          name: '少年不凡',
+          artist: '刘美麟',
+          url: 'https://music.163.com/song/media/outer/url?id=1465288704.mp3',
+          cover: 'http://p2.music.126.net/lvfb_64QYmbib7ccHgDNJA==/109951165165604312.jpg?param=130y130'
+        },
         {
           name: '浣纱歌 (伴奏)',
           artist: '许多葵 / KasaYAYA / 齐栾 / 逆水寒',
           url: 'https://music.163.com/song/media/outer/url?id=862100710.mp3',
           cover: 'http://p1.music.126.net/H0p9gXKszyJfGCmmjgaFSg==/109951163380162384.jpg?param=130y130'
-        },
-        {
-          name: '少年不凡',
-          artist: '刘美麟',
-          url: 'https://music.163.com/song/media/outer/url?id=1465288704.mp3',
-          cover: 'http://p2.music.126.net/lvfb_64QYmbib7ccHgDNJA==/109951165165604312.jpg?param=130y130'
         },
         {
           name: '卡农',

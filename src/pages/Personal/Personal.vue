@@ -27,10 +27,10 @@
                                 <span>主页</span>
                             </router-link>
                             <!-- 个人资料 -->
-                            <router-link :to="{name:'personalziLiao'}">
+                            <a style="cursor: pointer;" @click="gerenziliao">
                                 <i class="fas fa-folder-open" style="color: rgb(56, 147, 237);"></i>
                                 <span>个人资料</span>
-                            </router-link>
+                            </a>
                             <!-- 收藏 -->
                             <router-link :to="{name:'favorite'}">
                                 <i class="fas fa-star" style="color: rgb(255, 226, 62);"></i>
@@ -75,7 +75,14 @@
                 </div>
                 <!-- 主体部分 -->
                 <div class="roubox mt-2 border-re2">
-                    <router-view></router-view>
+                    <router-view class="left-box"></router-view>
+                    <div class="right-box ms-2 hidden-sm-and-down">
+                        <div><h1>兰泽诗词</h1></div>
+                        <div class="mt-2" id="tan" @click="clickTan"></div>
+                        <div class="mt-2 p-1">
+                            <p>历史记录：</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </el-row>
@@ -85,6 +92,8 @@
 <script>
     import { ref, onMounted, computed } from 'vue'
     import { useRouter } from "vue-router";
+    import lottie from "lottie-web";
+    import tanqiu from "../../assets/lottieJSON/tanqiu.json";
     import hoad1 from '../../assets/hoad/hoad1.jpg'
     import hoad2 from '../../assets/hoad/hoad2.jpg'
     import hoad3 from '../../assets/hoad/hoad3.jpg'
@@ -112,7 +121,20 @@
             let lanze_upload = computed(() => {
                 return $cookies.get('lanze_upload')
             })
+
+            let animation = ref(null)
             onMounted(() => {
+
+                console.log(lottie);
+                // 洛蒂动画初始化
+                animation = lottie.loadAnimation({
+                    container: document.getElementById('tan'),
+                    renderer: 'svg',
+                    loop: true,
+                    autoplay: false,
+                    animationData: tanqiu
+                })
+
                 if (lanze_upload.value) {
                     switch (lanze_upload.value.head_img) {
                         case 'hoad1.jpg':
@@ -150,11 +172,39 @@
                 }
             })
 
+            // 点击弹球时播放动画
+            let i =0;
+            function clickTan() {
+                // animation.play()
+                    animation.goToAndPlay(i*1080)
+                    let timerd = setTimeout(() => {
+                        clearInterval(timerd)
+                        animation.pause()
+                        i++
+                        if(i==4) {
+                        i = 0
+                    }
+                    },1080)
+            }
+
             // 登录
             function dengluClick() {
                 $router.push({
                     name: 'loginindex'
                 })
+            }
+
+            // 点击个人资料时判断是否为登录状态
+            function gerenziliao() {
+                if($cookies.get('lanze_user')) {
+                    $router.push({
+                    name: 'datamessage'
+                })
+                } else {
+                    $router.push({
+                        name: 'personalziLiao'
+                    })
+                }
             }
 
             // 输出内容
@@ -166,7 +216,9 @@
                 clockInNum,
                 imgsrc,
                 lanze_upload,
-                dengluClick
+                dengluClick,
+                clickTan,
+                gerenziliao
             }
         }
     }
@@ -183,20 +235,57 @@
         background-color: rgb(255, 255, 255);
         border-radius: 0 0 0.2rem 0.2rem;
         overflow: hidden;
-        box-shadow: 5px 5px 5px rgba(169, 176, 176, 0.615);
+        box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.05);
     }
 
     .roubox {
         background-color: rgb(255, 255, 255);
-        box-shadow: 5px 5px 5px rgba(169, 176, 176, 0.615);
+        display: flex;
+    }
+
+    .left-box {
+        min-height: 120vh;
+        box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.05);
+        background-color: white;
+    }
+
+    .right-box {
+        width: 30%;
+        height: 100vh;
+    }
+
+    .right-box>div {
+        box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .right-box>div:nth-child(1) {
+        width: 100%;
+        height: 10vh;
+        color: rgb(14, 32, 16);
+        background-image: url(../../assets/beijing/meihua.png);
+        background-size: 30% 90%;
+        background-repeat: no-repeat;
+    }
+    .right-box>div:nth-child(1)>h1 {
+        text-align: center;
+        line-height: 10vh;
+    }
+
+    .right-box>div:nth-child(2) {
+        width: 100%;
+        height: 20vh;
+        cursor: pointer;
+    }
+
+    .right-box>div:nth-child(3) {
+        width: 100%;
+        height: 50vh;
     }
 
     main {
         position: relative;
         width: 100%;
         min-height: 10rem;
-        background-image: url(../../assets/beijing/shuimo.png);
-        background-size: 100%;
     }
 
     /* 头像 */

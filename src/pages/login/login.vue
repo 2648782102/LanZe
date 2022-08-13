@@ -152,6 +152,7 @@
                       console.log(error);
                     })
                 } else {
+                  loading.value = false;
                   ElMessage({
                     message: `${res}`,
                     type: "warning",
@@ -159,6 +160,7 @@
                 }
               })
               .catch((error) => {
+                loading.value = false;
                 ElMessage({
                   message: `登录失败，错误为:${error}`,
                   type: "warning",

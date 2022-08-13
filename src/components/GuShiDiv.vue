@@ -64,7 +64,7 @@
     width: 100%;
     height: 100%;
     font-family: FangZhengSong;
-    color: rgb(19, 18, 29);
+    color: rgb(255, 255, 255);
     border-radius: 0.4rem;
     background-position: 0 bottom;
     background-repeat: no-repeat;
@@ -73,8 +73,10 @@
     overflow: hidden;
     text-shadow: 8px 8px 5px rgba(0, 0, 0, 0.2);
     padding: 40px;
-    background-image: url(../assets/beijing/k.webp);
-    background-size: 100% 100%;
+    /* background-image: url(../assets/beijing/k.webp);
+    background-size: 100% 130%; */
+    /* background-image: linear-gradient(to top, #30cfd0 0%, #330867 100%); */
+    background-image: linear-gradient(15deg, #13547a 0%, #80d0c7 100%);
   }
 
   article>h1 {
