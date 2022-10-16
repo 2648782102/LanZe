@@ -3,10 +3,10 @@
     <article>
         <el-row class="elrow pt-3 pb-3" :gutter="20" justify="center">
             <el-col class="bgwhite text-center p-3" :xs="22" :sm="22" :md="16" :lg="16" :xl="16" :offset="0">
-                <p>{{ origin }}</p>
+                <p>{{ poemName }}</p>
                 <p>{{ author }}</p>
-                <p v-if="category"><span class="tac">标签：</span>{{ category }}</p>
-                <p class="content" v-for="(item,index) in content" :key="index">{{ item }}</p>
+                <p v-if="tag"><span class="tac">标签：</span>{{ tag }}</p>
+                <p class="content" v-for="(item,index) in textBody" :key="index">{{ item }}</p>
                 <div class="title" v-show="title">
                     <p v-for="(item,index) in title" :key="index">{{ item }}</p>
                 </div>
@@ -29,37 +29,38 @@ export default {
         const $route = useRoute()
         const $router = useRouter()
         let author = '无题';
-        let category = [];
-        let content = [];
-        let origin = '无';
+        let tag = [];
+        let textBody = [];
+        let poemName = '无';
         let title = null;
 
         // 接收传参
         let shici = JSON.parse($route.query.shici)
 
-        if(shici.paragraphs) {
+        if(shici) {
             // 接收传值
             author = shici.author  // 作者
-            category = shici.tags  //  类型
-            content = JSON.parse(shici.paragraphs)  // 正文
-            origin = shici.rhythmic  //  诗名
+            tag = shici.tag  //  标签
+            textBody = JSON.parse(shici.textBody)  // 正文
+            poemName = shici.poemName  //  诗名
             if(shici.title) {
                 title = JSON.parse(shici.title)
             }
-        } else {
-            // 接收传值
-            author = shici.author  // 作者
-            category.push(shici.category)  //  类型
-            content.push(shici.content)  // 正文
-            origin = shici.origin  //  诗名
-        }
+        } 
+        // else {
+        //     // 接收传值
+        //     author = shici.author  // 作者
+        //     category.push(shici.category)  //  类型
+        //     content.push(shici.content)  // 正文
+        //     origin = shici.origin  //  诗名
+        // }
 
         function back() {
             $router.back()
         }
 
         return {
-            author,category,content,origin,title,
+            author,tag,textBody,poemName,title,
             back,
         }
     }

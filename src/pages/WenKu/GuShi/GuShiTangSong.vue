@@ -1,11 +1,11 @@
 <template>
   <section>
     <el-carousel height="92vh" direction="vertical" :autoplay="false">
-      <el-carousel-item @click="TangShi">
+      <el-carousel-item>
         <GuShiDiv :address="'tangshi300'" :title="book[0].title" :author="book[0].author" :age="book[0].age"
           :synopsis="book[0].synopsis" />
       </el-carousel-item>
-      <el-carousel-item @click="SongCi">
+      <el-carousel-item>
         <GuShiDiv :address="'songci300'" :title="book[1].title" :author="book[1].author" :age="book[1].age"
           :synopsis="book[1].synopsis" />
       </el-carousel-item>

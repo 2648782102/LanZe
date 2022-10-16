@@ -13,7 +13,7 @@
             <span @click="shouchang(1)" :class="shouchang1?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
             <p>{{ scArr1.content }}</p>
             <h5>— {{ scArr1.author }}</h5>
-            <img draggable="false" src="../../assets/beijing/fanzou.png" @click="xiangqing(scArr1)" alt="">
+            <img draggable="false" src="../../assets/beijing/fanzou.png" alt="">
           </div>
         </section>
         <section @dragstart="tuoDongGo($event)" @dragend="tuoDongOff($event,2)" draggable="true" class="section2 col-10 col-md-8 col-lg-3 hidden-sm-and-down">
@@ -22,7 +22,7 @@
             <span @click="shouchang(2)" :class="shouchang2?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
             <p>{{ scArr2.content }}</p>
             <h5>— {{ scArr2.author }}</h5>
-            <img draggable="false" src="../../assets/beijing/fanzou.png" @click="xiangqing(scArr2)" alt="">
+            <img draggable="false" src="../../assets/beijing/fanzou.png" alt="">
           </div>
         </section>
         <section @dragstart="tuoDongGo($event)" @dragend="tuoDongOff($event,3)" draggable="true" class="section3 col-10 col-md-8 col-lg-3 hidden-sm-and-down">
@@ -31,7 +31,7 @@
             <span @click="shouchang(3)" :class="shouchang3?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
             <p>{{ scArr3.content }}</p>
             <h5>— {{ scArr3.author }}</h5>
-            <img draggable="false" src="../../assets/beijing/fanzou.png" @click="xiangqing(scArr3)" alt="">
+            <img draggable="false" src="../../assets/beijing/fanzou.png" alt="">
           </div>
         </section>
       </div>
@@ -150,14 +150,14 @@
       }
 
       // 点击诗词卡片,切换到详情页
-      function xiangqing(uid) {
-        $router.push({
-          name: 'details',
-          query:{
-            shici:JSON.stringify(uid)
-          }
-        })
-      }
+      // function xiangqing(uid) {
+      //   $router.push({
+      //     name: 'details',
+      //     query:{
+      //       shici:JSON.stringify(uid)
+      //     }
+      //   })
+      // }
 
       // 拖动开始事件
       let tuox = 0  //记录拖动前元素的x轴坐标
@@ -205,7 +205,7 @@
         anima1, anima2,
         skip1, skip2,
         loding1,loding2,loding3,
-        xiangqing,
+        // xiangqing,
         tuoDongGo,tuoDongOff,loadingSVG
       }
     }
@@ -335,7 +335,6 @@
     width: 80%;
     position: absolute;
     bottom: 5%;
-    cursor: pointer;
   }
 
   section>.box>p {

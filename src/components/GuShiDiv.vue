@@ -12,6 +12,11 @@
   import axios from "axios";
   import { ref } from "vue";
   import { useRouter } from "vue-router";
+  import { createClient } from '@supabase/supabase-js';
+
+  const supabaseUrl = 'https://caqm0ri5g6h17oismvp0.baseapi.memfiredb.com'
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImV4cCI6MzE5Mzk3MzkyOSwiaWF0IjoxNjU2MDUzOTI5LCJpc3MiOiJzdXBhYmFzZSJ9.pDkmh4NNw19c9lJIQUpidkadJHrKhlsB-e3ZdHGD6tA'
+  const supabase = createClient(supabaseUrl, supabaseKey)
 
   export default {
     name: 'GuShiDiv',
@@ -23,30 +28,73 @@
       // 加载控制
       let loading = ref(false)
 
-      // 单击鉴赏按钮
-      function goClick() {
+      // let gettitle = null      // 获取到的诗词信息存储数组
+
+      async function asyncFunc() {
+
         if(props.address) {
-        loading.value = true
-        // 发送请求获取具体诗词内容
-        axios.get(`https://lanze-node.vercel.app/api/${props.address}`)
-          .then(response => {
-            loading.value = false
-            // response.data[0].author:诗名   response.data[0].paragraphs:诗集   response.data[0].rhythmic:作者
-            // response.data[0].tags:正文
-            let tangArr = JSON.stringify(response.data)
-            $router.push({
+
+        loading.value = true        //加载动画启动
+
+        let { data: response, error } = await supabase           // 请求数据
+        .from(props.address)
+        .select('*')
+
+        // author:作者   // tag:标签  // poemName:诗名  // textBody:正文
+
+        loading.value = false
+
+        let tangArr = JSON.stringify(response)
+
+        $router.push({
               name: 'searchul',
               query: {
                 ulArr: tangArr
               }
             })
-          })
-          .catch(function (error) {
-            console.log(error);
-          })
+
+        // 老版写法
+        // 发送请求获取具体诗词内容
+        // axios.get(`https://lanze-node.vercel.app/api/${props.address}`)
+        //   .then(response => {
+        //     // response.data[0].poemName:诗名   response.data[0].tag:诗集   response.data[0].author:作者
+        //     // response.data[0].textBody:正文
+        //   })
+        //   .catch(function (error) {
+        //     console.log(error);
+        //   })
           } else {
             alert('未添加此分栏，请等待更新!')
           }
+      }
+
+      // 单击鉴赏按钮
+      function goClick() {
+
+        asyncFunc();
+
+        // if(props.address) {
+        // loading.value = true
+        // // 发送请求获取具体诗词内容
+        // axios.get(`https://lanze-node.vercel.app/api/${props.address}`)
+        //   .then(response => {
+        //     loading.value = false
+        //     // response.data[0].author:诗名   response.data[0].paragraphs:诗集   response.data[0].rhythmic:作者
+        //     // response.data[0].tags:正文
+        //     let tangArr = JSON.stringify(response.data)
+        //     $router.push({
+        //       name: 'searchul',
+        //       query: {
+        //         ulArr: tangArr
+        //       }
+        //     })
+        //   })
+        //   .catch(function (error) {
+        //     console.log(error);
+        //   })
+        //   } else {
+        //     alert('未添加此分栏，请等待更新!')
+        //   }
       }
 
       return {

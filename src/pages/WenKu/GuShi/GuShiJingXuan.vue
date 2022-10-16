@@ -10,7 +10,7 @@
           :synopsis="book[1].synopsis" />
       </el-carousel-item>
       <el-carousel-item>
-        <GuShiDiv :address="''" :title="book[2].title" :author="book[2].author" :age="book[2].age"
+        <GuShiDiv :address="'caocao'" :title="book[2].title" :author="book[2].author" :age="book[2].age"
           :synopsis="book[2].synopsis" />
       </el-carousel-item>
       <el-carousel-item>
@@ -52,7 +52,7 @@
           author: "曹操",
           age: "东汉末",
           synopsis:
-            "魏武帝曹操（155年 [1]  —220年3月15日 [2]  ），字孟德，一名吉利，小字阿瞒 [164]  ，一说本姓夏侯 [169]  ，沛国谯县（今安徽省亳州市）人 [3-4]  。中国古代杰出的政治家、军事家、文学家、书法家、诗人 [5-6]  。东汉末年权相，太尉曹嵩之子，曹魏的奠基者。",
+            "曹操喜欢用诗歌、散文来抒发自己政治抱负，反映民生疾苦，是魏晋文学的代表人物，其文学成就，主要表当今诗歌上，散文也很有特点。曹操的诗歌，今存20多篇，全部是乐府诗体。内容大体上可分三类。一类是关涉时事的，一类是以表述理想为主的，一类是游仙诗。",
         },
         {
           title: "论语",

@@ -6,12 +6,12 @@
                 <el-page-header title="返回" icon="ArrowLeft" class="mt-4 ms-4" content="搜索内容" @back="goBack" />
                 <ul>
                     <li @click="xiangQing(item)" v-for="(item,index) in ulArrD[ulNext-1]" :key="index">
-                        <Li :title="item.author" :name="item.rhythmic" :details="JSON.parse(item.paragraphs)[0]" />
+                        <Li :title="item.author" :name="item.poemName" :details="JSON.parse(item.textBody)[0]" />
                     </li>
                 </ul>
                 <div class="paginationBox">
-                    <el-pagination small="true" class="pagination hidden-md-and-up" background layout="prev, pager, next" :current-page="ulNext" @update:current-page="currentPageClick" :page-count="ulArrD.length" hide-on-single-page="true" />
-                    <el-pagination class="pagination hidden-sm-and-down" background layout="prev, pager, next" :current-page="ulNext" @update:current-page="currentPageClick" :page-count="ulArrD.length" hide-on-single-page="true" />
+                    <el-pagination class="pagination hidden-md-and-up" background layout="prev, pager, next" :current-page="ulNext" @update:current-page="currentPageClick" :page-count="ulArrD.length"  />
+                    <el-pagination class="pagination hidden-sm-and-down" background layout="prev, pager, next" :current-page="ulNext" @update:current-page="currentPageClick" :page-count="ulArrD.length"  />
                 </div>
             </el-col>
         </el-row>
@@ -39,11 +39,12 @@ export default {
             $router.back()
         }
 
-
         // 分页
         // 存放已经分好的数据
         let ulArrD = computed(() => {
             let ulArr = computed(() => JSON.parse($route.query.ulArr))
+
+            // console.log(ulArr.value);
             let Arr = []
             while (ulArr.value.length) {
                 Arr.push(ulArr.value.splice(0,10))

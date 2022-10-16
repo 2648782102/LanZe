@@ -8,8 +8,8 @@
     >
       <UserLi
         :title="item.author"
-        :name="item.origin"
-        :details="item.content"
+        :name="item.poemName"
+        :details="item.textBody"
         :id="item.id"
       />
     </li>
@@ -22,7 +22,6 @@
       :current-page="ArrText"
       @update:current-page="currentPageClick"
       :page-count="liArrUl.length"
-      hide-on-single-page="true"
     />
   </section>
 </template>
@@ -32,6 +31,11 @@ import { ref, onMounted, computed } from "vue";
 import UserLi from "../../components/UserLi.vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
+import { createClient } from '@supabase/supabase-js';
+
+  const supabaseUrl = 'https://caqm0ri5g6h17oismvp0.baseapi.memfiredb.com'
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImV4cCI6MzE5Mzk3MzkyOSwiaWF0IjoxNjU2MDUzOTI5LCJpc3MiOiJzdXBhYmFzZSJ9.pDkmh4NNw19c9lJIQUpidkadJHrKhlsB-e3ZdHGD6tA'
+  const supabase = createClient(supabaseUrl, supabaseKey)
 
 export default {
   name: "JingXuan",
@@ -68,16 +72,33 @@ export default {
 
     let loading = ref(false);
     onMounted(() => {
-      loading.value = true;
-      axios
-        .get(`https://lan-ze-user.vercel.app/api/user/getCustomShiCi`)
-        .then((response) => {
-          loading.value = false;
-          liArr.value = response.data;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      async function asyncFunc() {
+
+      loading.value = true        //加载动画启动
+
+      let { data: response, error } = await supabase           // 请求数据
+        .from('customgushici')
+        .select('*')
+
+      // author:作者   // tag:标签  // poemName:诗名  // textBody:正文
+
+      loading.value = false
+
+      liArr.value = response;
+
+      }
+
+      asyncFunc();
+
+      // axios
+      //   .get(`https://lan-ze-user.vercel.app/api/user/getCustomShiCi`)
+      //   .then((response) => {
+      //     loading.value = false;
+      //     liArr.value = response.data;
+      //   })
+      //   .catch((error) => {
+      //     console.log(error);
+      //   });
     });
 
     return {
