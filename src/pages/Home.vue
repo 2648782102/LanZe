@@ -120,11 +120,7 @@
   import qieHuan from "../assets/lottieJSON/qieHuan.json";
   import { Vue3Lottie } from "vue3-lottie";
   import Audio from "./Audio.vue";
-  import { createClient } from '@supabase/supabase-js';
-
-  const supabaseUrl = 'https://caqm0ri5g6h17oismvp0.baseapi.memfiredb.com'
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImV4cCI6MzE5Mzk3MzkyOSwiaWF0IjoxNjU2MDUzOTI5LCJpc3MiOiJzdXBhYmFzZSJ9.pDkmh4NNw19c9lJIQUpidkadJHrKhlsB-e3ZdHGD6tA'
-  const supabase = createClient(supabaseUrl, supabaseKey)
+  import supabase from '../function/supabase.js'
 
   export default {
     name: "Home",
@@ -157,6 +153,8 @@
                 // .contains('author',[inputS.value])
                 // .eq('author', inputS.value)
                 .or(`author.like.%${inputS.value}%,poemName.like.%${inputS.value}%,textBody.like.%${inputS.value}%`)
+
+                console.log(response1);
 
                 let { data: response2, error2 } = await supabase           // 请求数据
                 .from('songci300')
@@ -193,29 +191,29 @@
           }
 
           
-      // axios
-      //   .get(`https://lanze-node.vercel.app/api/search?sear=${inputS.value}`)
-      //   .then((response) => {
-      //     // author:词人姓名 paragraphs：内容 rhythmic：词牌名 tags：类型
-      //     // console.log(response.data[0]);
-      //     let dataArr = JSON.stringify(response.data);
-      //     inputS.value = "";
-      //     ElMessage({
-      //       message: "搜索成功!",
-      //       type: "success",
-      //     });
-      //     loading.value = false;
-      //     // 路由切换，query传参
-      //     $router.push({
-      //       name: "searchul",
-      //       query: {
-      //         ulArr: dataArr,
-      //       },
-      //     });
-      //   })
-      //   .catch(function (error) {
-      //     console.log(error);
-      //   });
+      axios
+        .get(`https://lanze-node.vercel.app/api/search?sear=${inputS.value}`)
+        .then((response) => {
+          // author:词人姓名 paragraphs：内容 rhythmic：词牌名 tags：类型
+          // console.log(response.data[0]);
+          let dataArr = JSON.stringify(response.data);
+          inputS.value = "";
+          ElMessage({
+            message: "搜索成功!",
+            type: "success",
+          });
+          loading.value = false;
+          // 路由切换，query传参
+          $router.push({
+            name: "searchul",
+            query: {
+              ulArr: dataArr,
+            },
+          });
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
 
       // 解决路由切换后滚动条不重置问题
       // watch($route,(newvalue,oldvalue) => {

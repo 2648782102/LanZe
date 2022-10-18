@@ -46,6 +46,7 @@
   import Vcode from "vue3-puzzle-vcode";
   import { ElMessage } from "element-plus";
   import axios from "axios";
+  import supabase from '../../function/supabase.js'
 
   export default {
     name: "login",
@@ -113,9 +114,34 @@
         VcodeShow.value = false;
       }
 
+      const handleSubmit = async () => {
+
+        let { data: response, error } = await supabase           // 请求数据
+        .from('us_er')
+        .select('*')
+        .or(`user.eq.${form.user}`)
+
+      try {
+
+        if(response.length!=0) {
+          console.log('ok');
+          console.log(response);
+        } else {
+          console.log('no');
+        }
+
+      } catch (error) {
+        console.log('失败了！');
+      }
+  }
+
+  // handleSubmit();
+
+
       // 点击登录按钮
       let loading = ref(false); //加载效果
       function loginClick() {
+
         if (form.user == "" || form.password == "") {
           ElMessage({
             message: `账号或密码为空！`,
@@ -124,6 +150,7 @@
         } else {
           if (VcodeOK.value) {
             loading.value = true;
+            handleSubmit();
             axios
               .get(
                 `https://lan-ze-user.vercel.app/api/user/login?user=${form.user}&password=${form.password}`
