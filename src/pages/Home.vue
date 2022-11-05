@@ -426,8 +426,7 @@
     /* box-shadow: 0 5px 8px rgba(205, 219, 221, 0.392); */
     background-color: rgba(255, 255, 255, 0);
     border: none;
-    font-family: FangZhengSong;
-    font-weight: 600;
+    font-family: maoKen;
   }
 
   .footer {

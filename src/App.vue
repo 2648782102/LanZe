@@ -27,4 +27,16 @@ export default {
     font-family: FangZhengSong;
     src: url(./assets/ZiTi/FangZhengSong.ttf);
   }
+  @font-face {
+    font-family: piaoYiSong;
+    src: url(./assets/ZiTi/piaoYiSong.ttf);
+  }
+  @font-face {
+    font-family: hongLei;
+    src: url(./assets/ZiTi/hongLei.ttf);
+  }
+  @font-face {
+    font-family: maoKen;
+    src: url(./assets/ZiTi/maoKen.ttf);
+  }
 </style>

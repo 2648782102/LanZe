@@ -3,9 +3,15 @@
   <article class="mt-3 mb-3">
     <el-row class="elrow" justify="center">
       <!-- 中间主体部分 -->
+      <el-tooltip
+        effect="dark"
+        content="切换"
+        placement="bottom-end"
+      >
       <div class="chevron1 chevron hidden-sm-and-down" @click="skip1">
         <i class="fas fa-chevron-left"></i>
       </div>
+      </el-tooltip>
       <div class="col-10 col-md-8 col-lg-9 dox bgwhite">
         <section @dragstart="tuoDongGo($event)" @dragend="tuoDongOff($event,1)" draggable="true" class="section1 col-10 col-md-7 col-lg-3">
           <div v-loading='loding1' element-loading-text="加载中..." element-loading-svg-view-box="-10, -10, 50, 50" :element-loading-spinner="loadingSVG" class="box"
@@ -35,9 +41,15 @@
           </div>
         </section>
       </div>
+      <el-tooltip
+        effect="dark"
+        content="切换"
+        placement="top-start"
+      >
       <div class="chevron2 chevron hidden-sm-and-down" @click="skip2">
         <i class="fas fa-chevron-right"></i>
       </div>
+    </el-tooltip>
     </el-row>
   </article>
 </template>
@@ -342,12 +354,13 @@
     font-size: 20px;
     height: 196px;
     letter-spacing: 4px;
+    font-family: piaoYiSong;
   }
 
   section>.box>h5 {
     writing-mode: vertical-rl;
     font-size: 22px;
-    font-family: FangZhengSong;
+    font-family: hongLei;
   }
 
   .chevron1 {
@@ -356,6 +369,16 @@
     top: 40%;
     left: 4%;
     cursor: pointer;
+    animation: xiangzuo 1s infinite alternate ease-in-out;
+  }
+
+  @keyframes xiangzuo {
+    from {
+      left: 4%;
+    }
+    to {
+      left: 2%;
+    }
   }
 
   .chevron2 {
@@ -364,6 +387,16 @@
     top: 40%;
     right: 4%;
     cursor: pointer;
+    animation: xiangyou 1s infinite alternate ease-in-out;
+  }
+
+  @keyframes xiangyou {
+    from{
+      right: 4%;
+    }
+    to {
+      right: 2%;
+    }
   }
 
   .chevron>i {

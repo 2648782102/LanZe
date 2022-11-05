@@ -3,7 +3,7 @@
     <article>
         <el-row class="elrow pt-3 pb-3" :gutter="20" justify="center">
             <el-col class="bgwhite text-center p-3" :xs="22" :sm="22" :md="16" :lg="16" :xl="16" :offset="0">
-                <p>{{ poemName }}</p>
+                <p class="biaoTi">{{ poemName }}</p>
                 <p>{{ author }}</p>
                 <p v-if="tag"><span class="tac">标签：</span>{{ tag }}</p>
                 <p class="content" v-for="(item,index) in textBody" :key="index">{{ item }}</p>
@@ -71,8 +71,10 @@ export default {
     article {
         width: 100%;
         min-height: 700px;
-        font-family: FangZhengSong;
         background-color: #dff2f4;
+    }
+    .biaoTi {
+      font-family: piaoYiSong;
     }
     .elrow {
     width: 100%;
@@ -99,6 +101,7 @@ export default {
   }
   .content {
     letter-spacing: 0.1rem;
+    font-family: hongLei;
   }
   .fanhui {
     width: 7rem;

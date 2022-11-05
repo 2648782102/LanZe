@@ -42,6 +42,8 @@
   import Vcode from "vue3-puzzle-vcode";
   import { ElMessage } from 'element-plus'
   import axios from "axios";
+  import supabase from '../../function/supabase.js'
+  import { nanoid } from "nanoid";
 
   export default {
     name: 'adduser',
@@ -108,10 +110,58 @@
         VcodeShow.value = false
       }
 
+      const handleSubmit = async (user, password) => {
+
+        let id = nanoid()
+
+        const response = await supabase
+          .from('us_er')
+          .insert([
+            { id, user: form.user, password: form.password, power: 1, state: 0 },
+          ])
+
+        try {
+          $router.push({
+              name: 'login'
+            })
+          loading.value = false
+
+          console.log(response);
+          if (response.status!=400&&response.status!=409) {
+
+            const response1 = await supabase
+            .from("user_message")
+            .insert([
+            { id, user_name: '未命名', head_img: 'hoad1.jpg', intro: '什么都没有' },
+          ])
+          try {
+            console.log(response1);
+          }catch(error) {
+            console.log(error);
+          }
+          loading.value = false;
+            ElMessage({
+              type: 'success',
+              message: '注册成功，请登录!'
+            })
+          } else if(response.status==409) {
+            loading.value = false;
+            ElMessage({
+              type: 'warning',
+              message: '账号已存在，请登录!'
+            })
+          }
+
+        } catch (error) {
+          console.log(`请求失败了，原因${error}`);
+        }
+      }
+
       // 点击注册按钮
       let loading = ref(false)    //加载
       function addClick() {
         if (form.user == '' || form.password == '') {
+          loading.value = false;
           ElMessage({
             type: 'warning',
             message: '账号或密码为空!'
@@ -119,27 +169,28 @@
         } else {
           if (VcodeOK.value) {
             loading.value = true
-            axios.get(`https://lan-ze-user.vercel.app/api/user/adduser?user=${form.user}&password=${form.password}`)
-              .then(response => {
-                loading.value = false
-                if (response.data == 'OK') {
-                  $router.push({
-                    name: 'login'
-                  })
-                  ElMessage({
-                    type: 'success',
-                    message: '注册成功，请登录!'
-                  })
-                } else {
-                  ElMessage({
-                    type: 'warning',
-                    message: `${response.data}`
-                  })
-                }
-              })
-              .catch(error => {
-                console.log(error);
-              })
+            handleSubmit()
+            // axios.get(`https://lan-ze-user.vercel.app/api/user/adduser?user=${form.user}&password=${form.password}`)
+            //   .then(response => {
+            //     loading.value = false
+            //     if (response.data == 'OK') {
+            //       $router.push({
+            //         name: 'login'
+            //       })
+            //       ElMessage({
+            //         type: 'success',
+            //         message: '注册成功，请登录!'
+            //       })
+            //     } else {
+            //       ElMessage({
+            //         type: 'warning',
+            //         message: `${response.data}`
+            //       })
+            //     }
+            //   })
+            //   .catch(error => {
+            //     console.log(error);
+            //   })
           } else {
             ElMessage({
               message: '请先验证',

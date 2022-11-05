@@ -12,6 +12,7 @@
     "axios": "^0.27.2",
     "element-plus": "^2.2.2",
     "lottie-web": "^5.9.6",
+    "nanoid": "^4.0.0",
     "vue": "^3.2.36",
     "vue-cookies": "^1.8.1",
     "vue-router": "^4.0.15",

@@ -48,6 +48,7 @@
   import Vcode from "vue3-puzzle-vcode";
   import { ElMessage } from 'element-plus'
   import axios from "axios";
+  import supabase from '../../function/supabase.js'
 
   export default {
     name: 'datauser',
@@ -124,6 +125,60 @@
         VcodeShow.value = false
       }
 
+      const handleSubmit = async (user, password) => {
+
+        let { data: response, error } = await supabase           // 请求数据
+          .from('us_er')
+          .select('*')
+          .or(`user.eq.${form.user}`)
+
+        try {
+          loading.value = false
+
+          if (response.length != 0) {
+            if(response[0].password==form.password) {
+            const response2 = await supabase
+              .from('us_er')
+              .update({ password: form.xinPassword })
+              .or(`user.eq.${form.user}`)
+
+            try {
+              if(response2.status!=400&&response2.status!=409) {
+                $router.push({
+                      name: 'login'
+                    })
+                    loading.value = false;
+                    ElMessage({
+                      type: 'success',
+                      message: '修改成功，请重新登录!'
+                    })
+              }
+
+            } catch (error) {
+              console.log(error);
+            }
+          } else {
+            loading.value = false;
+            ElMessage({
+              type: 'warning',
+              message: '原密码错误!'
+            })
+          }
+
+
+          } else {
+            loading.value = false;
+            ElMessage({
+              type: 'warning',
+              message: '账号未注册!'
+            })
+          }
+
+        } catch (error) {
+          console.log(`请求失败了，原因${error}`);
+        }
+      }
+
       // 点击修改按钮
       let loading = ref(false)
       function dataClick() {
@@ -144,30 +199,31 @@
           } else {
             if (VcodeOK.value) {
               loading.value = true
-              axios.get(`https://lan-ze-user.vercel.app/api/user/dataUser?user=${form.user}&password=${form.password}&passwordOk=${form.passwordOk}`)
-                .then(response => {
-                  loading.value = false
-                  if (response.data == 'OK') {
-                    $router.push({
-                      name: 'login'
-                    })
-                    ElMessage({
-                      type: 'success',
-                      message: '修改成功，请重新登录!'
-                    })
-                  } else {
-                    ElMessage({
-                      type: 'warning',
-                      message: `${response.data}`
-                    })
-                  }
-                })
-                .catch(error => {
-                  ElMessage({
-                    type: 'warning',
-                    message: `错误:${error}`
-                  })
-                })
+              handleSubmit()
+              // axios.get(`https://lan-ze-user.vercel.app/api/user/dataUser?user=${form.user}&password=${form.password}&passwordOk=${form.passwordOk}`)
+              //   .then(response => {
+              //     loading.value = false
+              //     if (response.data == 'OK') {
+              //       $router.push({
+              //         name: 'login'
+              //       })
+              //       ElMessage({
+              //         type: 'success',
+              //         message: '修改成功，请重新登录!'
+              //       })
+              //     } else {
+              //       ElMessage({
+              //         type: 'warning',
+              //         message: `${response.data}`
+              //       })
+              //     }
+              //   })
+              //   .catch(error => {
+              //     ElMessage({
+              //       type: 'warning',
+              //       message: `错误:${error}`
+              //     })
+              //   })
             } else {
               ElMessage({
                 message: '请先验证',

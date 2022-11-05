@@ -42,6 +42,7 @@
   import Vcode from "vue3-puzzle-vcode";
   import { ElMessage, ElMessageBox } from 'element-plus'
   import axios from "axios";
+  import supabase from '../../function/supabase.js'
 
   export default {
     name: 'deleteuser',
@@ -108,68 +109,135 @@
         VcodeShow.value = false
       }
 
+      const handleSubmit = async (user, password) => {
+
+        let { data: response, error } = await supabase           // 请求数据
+          .from('us_er')
+          .select('*')
+          .or(`user.eq.${form.user}`)
+
+        try {
+          loading.value = false
+
+          if (response.length != 0) {
+            if (response[0].password == form.password) {
+              const response2 = await supabase
+              .from('us_er')
+              .delete()
+              .or(`user.eq.${form.user}`)
+
+              try {
+                if (response2.status!=400&&response2.status!=409) {
+                  const response3 = await supabase
+                  .from('user_message')
+                  .delete()
+                  .or(`id.eq.${response[0].id}`)
+
+                  try {
+
+                    $router.push({
+                    name: 'login'
+                  })
+                  loading.value = false;
+                  ElMessage({
+                    type: 'success',
+                    message: '注销成功!'
+                  })
+
+                  }catch(error) {
+                    console.log(error);
+                  }
+
+                }
+
+              } catch (error) {
+                console.log(error);
+              }
+            } else {
+              loading.value = false;
+              ElMessage({
+                type: 'warning',
+                message: '密码错误!'
+              })
+            }
+
+
+          } else {
+            loading.value = false;
+            ElMessage({
+              type: 'warning',
+              message: '账号未注册!'
+            })
+          }
+
+        } catch (error) {
+          console.log(`请求失败了，原因${error}`);
+        }
+      }
+
       // 定义弹出确认框表单双向绑定值
       let loading = ref(false)    //加载
       let queRen = ref('')
       function deleteClick() {
-        if(form.user==''||form.password=='') {
+        if (form.user == '' || form.password == '') {
           ElMessage({
-                        type: 'warning',
-                        message: '账号或密码为空!'
-                      })
-        } else {
-        // 判断是否已经验证过
-        if (VcodeOK.value) {
-          // 弹出输入确认框
-          ElMessageBox.prompt('账户注销后不可找回，确认注销请在下方输入： 确认注销', '警告', {
-            confirmButtonText: '确认',
-            cancelButtonText: '取消',
-            inputPattern: /确认注销/,
-            inputErrorMessage: '请输入确认注销！',
             type: 'warning',
-            icon: 'Delete'
+            message: '账号或密码为空!'
           })
-            .then(({ value }) => {   //单击确认
-              if (value == '确认注销') {
-                loading.value = true
-                axios.get(`https://lan-ze-user.vercel.app/api/user/deleteUser?user=${form.user}&password=${form.password}`)
-                  .then(response => {
-                    loading.value = false
-                    if (response.data == 'OK') {
-                      $router.push({
-                        name: 'login'
-                      })
-                      ElMessage({
-                        type: 'success',
-                        message: '账户注销成功!'
-                      })
-                    } else {
-                      ElMessage({
-                        type: 'warning',
-                        message: `${response.data}`
-                      })
-                    }
-                  })
-                  .catch(error => {
-                    console.log(error);
-                  })
-              }
+        } else {
+          // 判断是否已经验证过
+          if (VcodeOK.value) {
+            // 弹出输入确认框
+            ElMessageBox.prompt('账户注销后不可找回，确认注销请在下方输入： 确认注销', '警告', {
+              confirmButtonText: '确认',
+              cancelButtonText: '取消',
+              inputPattern: /确认注销/,
+              inputErrorMessage: '请输入确认注销！',
+              type: 'warning',
+              icon: 'Delete'
             })
-            .catch(() => {   //单击取消
-              ElMessage({
-                type: 'info',
-                message: '操作取消！',
+              .then(({ value }) => {   //单击确认
+                if (value == '确认注销') {
+                  loading.value = true
+                  handleSubmit()
+                  // axios.get(`https://lan-ze-user.vercel.app/api/user/deleteUser?user=${form.user}&password=${form.password}`)
+                  //   .then(response => {
+                  //     loading.value = false
+                  //     if (response.data == 'OK') {
+                  //       $router.push({
+                  //         name: 'login'
+                  //       })
+                  //       ElMessage({
+                  //         type: 'success',
+                  //         message: '账户注销成功!'
+                  //       })
+                  //     } else {
+                  //       ElMessage({
+                  //         type: 'warning',
+                  //         message: `${response.data}`
+                  //       })
+                  //     }
+                  //   })
+                  //   .catch(error => {
+                  //     console.log(error);
+                  //   })
+                }
               })
+              .catch(() => {   //单击取消
+                ElMessage({
+                  type: 'info',
+                  message: '操作取消！',
+                })
+              })
+          } else {
+            ElMessage({
+              message: '请先验证',
+              type: 'warning',
             })
-        } else {
-          ElMessage({
-            message: '请先验证',
-            type: 'warning',
-          })
-          // 弹出验证码模态框
-          VcodeShow.value = true
+            // 弹出验证码模态框
+            VcodeShow.value = true
+          }
         }
-      }
       }
 
       return {

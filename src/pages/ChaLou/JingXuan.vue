@@ -29,9 +29,8 @@
 <script>
 import { ref, onMounted, computed } from "vue";
 import UserLi from "../../components/UserLi.vue";
-import axios from "axios";
 import { useRouter } from "vue-router";
-import supabase from '../function/supabase.js'
+import supabase from '../../function/supabase.js'
 
 export default {
   name: "JingXuan",
