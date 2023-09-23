@@ -83,12 +83,10 @@
           </div>
         </div>
         <section class="section-main">
-          <el-scrollbar height="100vh">
+          <el-scrollbar ref="scrollbarRef" @scroll="scroll" height="100vh">
             <!-- 主体部分 -->
             <main id="main" v-loading="loading">
-              <el-scrollbar>
                 <router-view></router-view>
-              </el-scrollbar>
             </main>
             <!-- 底部 -->
             <el-footer class="footer mt-2">
@@ -134,6 +132,8 @@
       const $route = useRoute();
       // 搜索框model
       let inputS = ref("");
+
+      const scrollbarRef = ref()
 
       // 加载控制
       let loading = ref(false);
@@ -236,6 +236,7 @@
         if (from.name == "login" || to.name == "login") {
           next();
         } else {
+          // 重置垂直滚动
           isLottie.value = true;
           demoRefHua.value.play();
           setTimeout(() => {
@@ -246,6 +247,7 @@
 
       // 后置路由守卫
       $router.afterEach((to, from) => {
+        scrollbarRef.value.setScrollTop(0)
         if (to.name == "login") {
         } else if (from.name == "login") {
           $router.go(0)
@@ -267,6 +269,8 @@
         qieHuan,
         demoRefHua,
         isLottie,
+        scroll,
+        scrollbarRef
       };
     },
   };

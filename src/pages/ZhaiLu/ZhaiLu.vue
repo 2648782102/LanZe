@@ -369,7 +369,7 @@
     top: 40%;
     left: 4%;
     cursor: pointer;
-    animation: xiangzuo 1s infinite alternate ease-in-out;
+    /* animation: xiangzuo 1s infinite alternate ease-in-out; */
   }
 
   @keyframes xiangzuo {
@@ -387,7 +387,7 @@
     top: 40%;
     right: 4%;
     cursor: pointer;
-    animation: xiangyou 1s infinite alternate ease-in-out;
+    /* animation: xiangyou 1s infinite alternate ease-in-out; */
   }
 
   @keyframes xiangyou {
@@ -401,12 +401,12 @@
 
   .chevron>i {
     font-size: 5rem;
-    color: #5b99af57;
+    color: #e6e6e6;
     transition: 0.4s;
   }
 
   .chevron>i:hover {
-    color: #5b99af;
+    color: #b9dfd9;
     transition: 0.3s;
   }
 

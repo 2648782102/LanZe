@@ -11,7 +11,7 @@
 
 #### 项目展示
 
-  项目展示地址：https://app.memfiredb.com/caqm0ri5g6h17oismvp0/
+  项目展示地址：http://app.memfiredb.com/caqm0ri5g6h17oismvp0/
 
 ### 使用说明
 
