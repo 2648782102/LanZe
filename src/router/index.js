@@ -11,12 +11,6 @@ const router = createRouter({
         redirect:'/home',
     },
     {
-        name: 'productdisplay',  //产品介绍
-        path: '/productdisplay',
-        component:() => import('../pages/ProductDisplay.vue'),
-        meta:{title: '产品介绍',isAush:false}
-    },
-    {
         name: 'loginindex',  //登录页面父组件
         path: '/loginindex',
         component:() => import('../pages/login/loginIndex.vue'),
