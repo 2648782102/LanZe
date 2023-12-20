@@ -31,7 +31,6 @@ export default {
     .box {
         width: 100%;
         height: 100vh;
-        background-image: url(../assets/guGong.jpg);
         background-size: 100%;
         display: flex;
         flex-direction: column;
