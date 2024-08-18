@@ -45,8 +45,8 @@
   import { useRouter } from "vue-router";
   import Vcode from "vue3-puzzle-vcode";
   import { ElMessage } from "element-plus";
-  import axios from "axios";
   import supabase from '../../function/supabase.js'
+  import { userLogin } from '../../apis/api/login';
 
   export default {
     name: "login",
@@ -116,61 +116,99 @@
 
       const userData = async (uid) => {            // 请求用户信息函数
 
-        let { data: response, error } = await supabase           // 请求数据
-          .from('user_message')
-          .select('*')
-          .or(`id.eq.${uid}`)
-
-        try {
-
-          $cookies.config('1d')
-          $cookies.set('lanze_upload', response[0])
-          $router.push({
-            name: "shezhi",
-          });
-          loading.value = false;
-          ElMessage({
-            message: `登录成功！`,
-            type: "success",
-          });
-
-        } catch (error) {
-          console.log(`用户信息请求失败了，原因${error}`);
+        let data = {
+          user_name: form.user,
+          password: form.password
         }
+
+        let like = userLogin(data)
+
+        console.log(like);
+
+        // let { data: response, error } = await supabase           // 请求数据
+        //   .from('user_message')
+        //   .select('*')
+        //   .or(`id.eq.${uid}`)
+
+        // try {
+
+        //   $cookies.config('1d')
+        //   $cookies.set('lanze_upload', response[0])
+        //   $router.push({
+        //     name: "shezhi",
+        //   });
+        //   loading.value = false;
+        //   ElMessage({
+        //     message: `登录成功！`,
+        //     type: "success",
+        //   });
+
+        // } catch (error) {
+        //   console.log(`用户信息请求失败了，原因${error}`);
+        // }
       }
 
       const handleSubmit = async () => {
 
-        let { data: response, error } = await supabase           // 请求数据
-          .from('us_er')
-          .select('*')
-          .or(`user.eq.${form.user}`)
-
-        try {
-          if (response.length != 0) {
-            if (response[0].password == form.password) {
-              $cookies.config('1d')
-              $cookies.set('lanze_user', response[0])
-              userData(response[0].id)
-            } else {
-              loading.value = false;
-              ElMessage({
-                message: `密码错误！`,
-                type: "warning",
-              });
-            }
-          } else {
-            console.log('no');
-            loading.value = false;
-            ElMessage({
-              message: `此账号未注册！`,
-              type: "info",
-            });
-          }
-
-        } catch (error) {
-          console.log(`请求失败了，原因${error}`);
+        let data = {
+          username: form.user,
+          password: form.password
         }
+
+        let datas = await userLogin(data)
+
+        let code = datas.code
+
+        if(code === 200) {
+          $cookies.config('1d')
+          $cookies.set('lanze_user', form.user)
+          $cookies.set('lanze_upload', {
+            id:"43c1dff0-f889-11ec-8336-cf8928a48750",
+            user_name:"666用户",
+            head_img:"hoad6.jpg",
+            intro:"很好"
+          })
+          loading.value = false;
+          ElMessage({
+                message: `登录成功！`,
+                type: "success",
+              });
+
+              $router.push({
+            name: "shezhi",
+          });
+        }
+
+        // let { data: response, error } = await supabase           // 请求数据
+        //   .from('us_er')
+        //   .select('*')
+        //   .or(`user.eq.${form.user}`)
+
+        // try {
+        //   if (response.length != 0) {
+        //     if (response[0].password == form.password) {
+        //       $cookies.config('1d')
+        //       $cookies.set('lanze_user', response[0])
+        //       userData(response[0].id)
+        //     } else {
+        //       loading.value = false;
+        //       ElMessage({
+        //         message: `密码错误！`,
+        //         type: "warning",
+        //       });
+        //     }
+        //   } else {
+        //     console.log('no');
+        //     loading.value = false;
+        //     ElMessage({
+        //       message: `此账号未注册！`,
+        //       type: "info",
+        //     });
+        //   }
+
+        // } catch (error) {
+        //   console.log(`请求失败了，原因${error}`);
+        // }
       }
 
       // handleSubmit();
@@ -189,49 +227,6 @@
           if (VcodeOK.value) {
             loading.value = true;
             handleSubmit();
-            // 后端写法
-            // axios                      
-            //   .get(
-            //     `https://lan-ze-user.vercel.app/api/user/login?user=${form.user}&password=${form.password}`
-            //   )
-            //   .then((response) => {
-            //     let res = response.data;
-            //     // 判断传参若为对象，则登录成功，否则输出错误信息
-            //     if (typeof res == "object") {
-            //       $cookies.config('1d')
-            //       $cookies.set('lanze_user', res)
-            //       axios.get(`https://lan-ze-user.vercel.app/api/user/getUpload?id=${res.id}`)
-            //         .then(response => {
-            //           loading.value = false;
-            //           let resp = response.data
-            //           $cookies.config('1d')
-            //           $cookies.set('lanze_upload', resp)
-            //           $router.push({
-            //             name: "shezhi",
-            //           });
-            //           ElMessage({
-            //             message: `登录成功，欢迎:${res.user} 光临兰泽诗词!`,
-            //             type: "success",
-            //           });
-            //         })
-            //         .catch(error => {
-            //           console.log(error);
-            //         })
-            //     } else {
-            //       loading.value = false;
-            //       ElMessage({
-            //         message: `${res}`,
-            //         type: "warning",
-            //       });
-            //     }
-            //   })
-            //   .catch((error) => {
-            //     loading.value = false;
-            //     ElMessage({
-            //       message: `登录失败，错误为:${error}`,
-            //       type: "warning",
-            //     });
-            //   });
           } else {
             ElMessage({
               message: "请先验证",

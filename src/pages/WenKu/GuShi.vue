@@ -186,6 +186,7 @@ import songci300 from "../../assets/beijing/songci300.jpg";
 import caocao from "../../assets/beijing/caocao.jpg";
 import tangshi300 from "../../assets/beijing/tangshi300.jpg";
 import supabase from "../../function/supabase.js";
+import {PoetryClass} from '../../apis/api/list';
 
 
 export default {
@@ -220,14 +221,14 @@ export default {
         author: "李白 杜甫...",
         age: "唐",
         imgSrc: tangshi300,
-        to:'tangshi300'
+        to:1
       },
       {
         title: "宋词三百",
         author: "苏轼 李清照...",
         age: "宋",
         imgSrc: songci300,
-        to:'songci300'
+        to:2
       },
     ]);
 
@@ -239,15 +240,26 @@ export default {
 
         loading.value = true        //加载动画启动
 
-        let { data: response, error } = await supabase           // 请求数据
-        .from(va1)
-        .select('*')
+        // let { data: response, error } = await supabase           // 请求数据
+        // .from(va1)
+        // .select('*')
+
+        let params = {
+          type:va1
+        }
+
+        let response = await PoetryClass(params)
+
+        console.log(response.data);
+        console.log("------------------->");
+
+
 
         // author:作者   // tag:标签  // poemName:诗名  // textBody:正文
 
         loading.value = false
 
-        let tangArr = JSON.stringify(response)
+        let tangArr = JSON.stringify(response.data)
 
         $router.push({
               name: 'searchul',
@@ -256,6 +268,7 @@ export default {
               }
             })
       }
+      
 
       // function carTo(value) {
       //   asyncFunc(value)

@@ -86,7 +86,7 @@
       `
 
       // 切换古诗词内容，函数
-      function skiip() {
+      function  skiip() {
         // 发送请求到“古诗词.一言api”获取随机一首古诗词(部分)
         // 数据内容：作者：response.data.author，类型：response.data.category
         // 内容：response.data.content，诗名：response.data.origin
@@ -94,14 +94,18 @@
           .then(response => {
             scArr1.value = response.data;
           })
-        axios.get('https://v1.jinrishici.com/all.json')
+        setTimeout(() => {
+          axios.get('https://v1.jinrishici.com/all.json')
           .then(response => {
             scArr2.value = response.data;
           })
-        axios.get('https://v1.jinrishici.com/all.json')
+        },100)
+        setTimeout(() => {
+          axios.get('https://v1.jinrishici.com/all.json')
           .then(response => {
             scArr3.value = response.data;
           })
+        },200)
       }
 
       // 点击收藏切换样式

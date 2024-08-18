@@ -86,7 +86,7 @@
           <el-scrollbar ref="scrollbarRef" @scroll="scroll" height="100vh">
             <!-- 主体部分 -->
             <main id="main" v-loading="loading">
-                <router-view></router-view>
+              <router-view></router-view>
             </main>
             <!-- 底部 -->
             <el-footer class="footer mt-2">
@@ -111,7 +111,6 @@
 <script>
   import { ref } from "vue";
   import logo from "../assets/logo.png";
-  import axios from "axios";
   import { useRouter, useRoute } from "vue-router";
   import { ElMessage } from "element-plus";
   import "vue3-lottie/dist/style.css";
@@ -119,6 +118,8 @@
   import { Vue3Lottie } from "vue3-lottie";
   import Audio from "./Audio.vue";
   import supabase from '../function/supabase.js'
+  import { searchList } from '../apis/api/list'
+  import axios from "axios";
 
   export default {
     name: "Home",
@@ -127,6 +128,7 @@
       Audio
     },
     setup() {
+
       // 路由器
       const $router = useRouter();
       const $route = useRoute();
@@ -139,88 +141,69 @@
       let loading = ref(false);
       // 发送请求返回根据输入框内容搜索到的内容
       function inputEnter() {
+
         loading.value = true;
 
-            async function asyncFunc() {
+        async function asyncFunc() {
 
-              loading.value = true        //加载动画启动
+          loading.value = true        //加载动画启动
 
-              let searchData = []
+          let searchData = []
 
-              let { data: response1, error1 } = await supabase           // 请求数据
-                .from('tangshi300')
-                .select('*')
-                // .contains('author',[inputS.value])
-                // .eq('author', inputS.value)
-                .or(`author.like.%${inputS.value}%,poemName.like.%${inputS.value}%,textBody.like.%${inputS.value}%`)
-
-                console.log(response1);
-
-                let { data: response2, error2 } = await supabase           // 请求数据
-                .from('songci300')
-                .select('*')
-                // .contains('author',[inputS.value])
-                // .eq('author', inputS.value)
-                .or(`author.like.%${inputS.value}%,poemName.like.%${inputS.value}%,textBody.like.%${inputS.value}%`)
-
-                searchData = response1.concat(response2)
-
-              // author:作者   // tag:标签  // poemName:诗名  // textBody:正文
-
-              loading.value = false
-
-              let tangArr = JSON.stringify(searchData)
-
-              $router.push({
-                name: 'searchul',
-                query: {
-                  ulArr: tangArr
-                }
-              })
-
-              ElMessage({
-                message: "搜索成功!",
-                type: "success",
-              });
-
-              inputS.value = "";
-
-            }
-
-            asyncFunc();
+          // 请求数据
+          let datas = {
+            keyword: inputS.value
           }
 
-          
-      axios
-        .get(`https://lanze-node.vercel.app/api/search?sear=${inputS.value}`)
-        .then((response) => {
-          // author:词人姓名 paragraphs：内容 rhythmic：词牌名 tags：类型
-          // console.log(response.data[0]);
-          let dataArr = JSON.stringify(response.data);
-          inputS.value = "";
+          let { data } = await searchList(datas)
+
+          searchData = data
+
+          // let { data: response1, error1 } = await supabase           // 请求数据
+          //   .from('tangshi300')
+          //   .select('*')
+          //   // .contains('author',[inputS.value])
+          //   // .eq('author', inputS.value)
+          //   .or(`author.like.%${inputS.value}%,poemName.like.%${inputS.value}%,textBody.like.%${inputS.value}%`)
+
+          //   console.log(response1);
+
+          //   let { data: response2, error2 } = await supabase           // 请求数据
+          //   .from('songci300')
+          //   .select('*')
+          //   // .contains('author',[inputS.value])
+          //   // .eq('author', inputS.value)
+          //   .or(`author.like.%${inputS.value}%,poemName.like.%${inputS.value}%,textBody.like.%${inputS.value}%`)
+
+          //   searchData = response1.concat(response2)
+
+          // author:作者   // tag:标签  // poemName:诗名  // textBody:正文
+
+          loading.value = false
+
+          let tangArr = JSON.stringify(searchData)
+
+
+          // console.log(tangArr);
+
+          $router.push({
+            name: 'searchul',
+            query: {
+              ulArr: tangArr
+            }
+          })
+
           ElMessage({
             message: "搜索成功!",
             type: "success",
           });
-          loading.value = false;
-          // 路由切换，query传参
-          $router.push({
-            name: "searchul",
-            query: {
-              ulArr: dataArr,
-            },
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
 
-      // 解决路由切换后滚动条不重置问题
-      // watch($route,(newvalue,oldvalue) => {
-      // document.getElementById("main").scrollIntoView()
-      // document.getElementById('main').scrollTop = 0
-      // console.log(document.getElementById('main').scrollTop);
-      // })
+          inputS.value = "";
+
+        }
+
+        asyncFunc();
+      }
 
       // logo图片
       let logoUrl = logo;

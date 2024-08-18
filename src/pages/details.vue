@@ -3,13 +3,13 @@
   <article>
     <el-row class="elrow pt-3 pb-3" :gutter="20" justify="center">
       <el-col class="bgwhite text-center p-3" :xs="22" :sm="22" :md="16" :lg="16" :xl="16" :offset="0">
-        <p class="biaoTi">{{ poemName }}</p>
+        <p class="biaoTi">{{ title }}</p>
         <p>{{ author }}</p>
-        <p v-if="tag"><span class="tac">标签：</span>{{ tag }}</p>
-        <p class="content" v-for="(item,index) in textBody" :key="index">{{ item }}</p>
-        <div class="title" v-show="title">
+        <p class="tags-box" v-if="tags"><span class="tac" v-for="(item,index) in tags" :key="index">{{ item }}</span></p>
+        <p class="content" v-for="(item,index) in paragraphs" :key="index">{{ item }}</p>
+        <!-- <div class="title" v-show="title">
           <p v-for="(item,index) in title" :key="index">{{ item }}</p>
-        </div>
+        </div> -->
       </el-col>
       <!-- <button @click="back" class="btn btn-primary fanhui">返回</button> -->
       <el-tooltip content="返回" placement="top" effect="dark">
@@ -23,30 +23,34 @@
 
 <script>
   import { useRoute, useRouter } from "vue-router";
+  import axios from 'axios';
 
   export default {
     name: 'details',
     setup() {
+
       const $route = useRoute()
       const $router = useRouter()
       let author = '无题';
-      let tag = [];
-      let textBody = [];
-      let poemName = '无';
-      let title = null;
+      let tags = [];
+      let paragraphs = [];
+      let title = '无';
+      // let title = null;
 
       // 接收传参
       let shici = JSON.parse($route.query.shici)
 
+      console.log(shici);
+
       if (shici) {
         // 接收传值
         author = shici.author  // 作者
-        tag = shici.tag  //  标签
-        textBody = JSON.parse(shici.textBody)  // 正文
-        poemName = shici.poemName  //  诗名
-        if (shici.title) {
-          title = JSON.parse(shici.title)
-        }
+        tags = JSON.parse(shici.tags)  //  标签
+        paragraphs = JSON.parse(shici.paragraphs)  // 正文
+        title = shici.title  //  诗名
+        // if (shici.title) {
+        //   title = JSON.parse(shici.title)
+        // }
       }
       // else {
       //     // 接收传值
@@ -61,7 +65,7 @@
       }
 
       return {
-        author, tag, textBody, poemName, title,
+        author, tags, paragraphs, title,
         back,
       }
     }
@@ -127,4 +131,10 @@
     font-size: 0.8rem;
     margin-top: 3rem;
   }
+
+  .tags-box span {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+
 </style>
