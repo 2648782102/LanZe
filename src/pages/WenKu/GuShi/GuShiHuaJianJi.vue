@@ -15,24 +15,26 @@
         </div>
         <div class="lgbody gushi-tabs hidden-md-and-up">
             <div class="lgbox btn btn-dark text-while" @click="huajianjiClick"><p>花间集介绍</p><h5>赵崇祚 后蜀广政三年 (940)</h5></div>
-            <div class="lgbox btn btn-success" @click="shijiClick(1)"><p>花间集.其<span>一</span></p><h4 class="text-white">花间集第一部分 . . .</h4></div>
-            <div class="lgbox btn btn-success" @click="shijiClick(2)"><p>花间集.其<span>二</span></p><h4 class="text-white">花间集第二部分 . . .</h4></div>
-            <div class="lgbox btn btn-success" @click="shijiClick(3)"><p>花间集.其<span>三</span></p><h4 class="text-white">花间集第三部分 . . .</h4></div>
-            <div class="lgbox btn btn-success" @click="shijiClick(4)"><p>花间集.其<span>四</span></p><h4 class="text-white">花间集第四部分 . . .</h4></div>
-            <div class="lgbox btn btn-success" @click="shijiClick(5)"><p>花间集.其<span>五</span></p><h4 class="text-white">花间集第五部分 . . .</h4></div>
-            <div class="lgbox btn btn-success" @click="shijiClick(6)"><p>花间集.其<span>六</span></p><h4 class="text-white">花间集第六部分 . . .</h4></div>
-            <div class="lgbox btn btn-success" @click="shijiClick(7)"><p>花间集.其<span>七</span></p><h4 class="text-white">花间集第七部分 . . .</h4></div>
-            <div class="lgbox btn btn-success" @click="shijiClick(8)"><p>花间集.其<span>八</span></p><h4 class="text-white">花间集第八部分 . . .</h4></div>
-            <div class="lgbox btn btn-success" @click="shijiClick(9)"><p>花间集.其<span>九</span></p><h4 class="text-white">花间集第九部分 . . .</h4></div>
+            <div class="lgbox btn btn-success" @click="shijiClick(0)"><p>花间集.其<span>一</span></p><h4 class="text-white">花间集第一部分 . . .</h4></div>
+            <div class="lgbox btn btn-success" @click="shijiClick(1)"><p>花间集.其<span>二</span></p><h4 class="text-white">花间集第二部分 . . .</h4></div>
+            <div class="lgbox btn btn-success" @click="shijiClick(2)"><p>花间集.其<span>三</span></p><h4 class="text-white">花间集第三部分 . . .</h4></div>
+            <div class="lgbox btn btn-success" @click="shijiClick(3)"><p>花间集.其<span>四</span></p><h4 class="text-white">花间集第四部分 . . .</h4></div>
+            <div class="lgbox btn btn-success" @click="shijiClick(4)"><p>花间集.其<span>五</span></p><h4 class="text-white">花间集第五部分 . . .</h4></div>
+            <div class="lgbox btn btn-success" @click="shijiClick(5)"><p>花间集.其<span>六</span></p><h4 class="text-white">花间集第六部分 . . .</h4></div>
+            <div class="lgbox btn btn-success" @click="shijiClick(6)"><p>花间集.其<span>七</span></p><h4 class="text-white">花间集第七部分 . . .</h4></div>
+            <div class="lgbox btn btn-success" @click="shijiClick(7)"><p>花间集.其<span>八</span></p><h4 class="text-white">花间集第八部分 . . .</h4></div>
+            <div class="lgbox btn btn-success" @click="shijiClick(8)"><p>花间集.其<span>九</span></p><h4 class="text-white">花间集第九部分 . . .</h4></div>
         </div>
       </section>
   </template>
   
   <script>
-    import axios from 'axios'
     import { useRouter } from 'vue-router'
     import { ref } from 'vue'
     import 'element-plus/theme-chalk/display.css'
+    import { ElMessage } from 'element-plus'
+    import { PoetryHuajianji, PoetryHuajianjiIntro } from '../../../apis/api/list.js'
+    import { normalizeListResponse } from '../../../utils/response.js'
 
   export default {
       name: 'GuShiHuaJianJi',
@@ -43,40 +45,37 @@
         let loading = ref(false)
 
         // 点击花间集
-        function huajianjiClick() {
+        async function huajianjiClick() {
             loading.value = true
-            axios.get('https://lanze-node.vercel.app/api/huajianjia')
-            .then(response => {
+            try {
+                const response = await PoetryHuajianjiIntro()
+                const intro = response?.data?.data || response?.data || {}
+                await $router.push({
+                    name: 'details',
+                    query: { shici: JSON.stringify(intro) },
+                })
+            } catch (error) {
+                ElMessage({ message: error?.message || '花间集介绍加载失败', type: 'warning' })
+            } finally {
                 loading.value = false
-                $router.push({
-                name: 'details',
-                query:{
-                    shici:JSON.stringify(response.data[0])
-                }
-            })
-            })
-            .catch(function(error) {
-                console.log(error)
-            })
+            }
         }
 
         // 点击诗集
-        function shijiClick(value) {
+        async function shijiClick(value) {
             loading.value = true
-            axios.get('https://lanze-node.vercel.app/api/huajianji')
-            .then(response => {
+            try {
+                const response = await PoetryHuajianji({ chapter: value })
+                const poems = normalizeListResponse(response, [])
+                await $router.push({
+                    name: 'searchul',
+                    query: { ulArr: JSON.stringify(poems) },
+                })
+            } catch (error) {
+                ElMessage({ message: error?.message || '花间集分卷加载失败', type: 'warning' })
+            } finally {
                 loading.value = false
-                let Arr = response.data.slice(value*50,(value+1)*50)
-                $router.push({
-                name: 'searchul',
-                query:{
-                    ulArr:JSON.stringify(Arr)
-                }
-            })
-            })
-            .catch(function(error) {
-                console.log(error)
-            })
+            }
         }
         
         // 鼠标悬浮事件

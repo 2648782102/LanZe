@@ -10,14 +10,16 @@
             <el-menu router default-active="/zhailu" class="el-menu-demo" active-text-color='#5b99af' mode="horizontal">
               <!-- 网站logo -->
               <el-col :span="2" :offset="0" class="log-col">
-                <el-image @click="$router.push({ name: 'home' })" class="logo-img" :src="logoUrl" fit="fill" lazy>
+                <el-image @click="$router.push({ name: 'home' })" class="logo-img" :src="logoUrl" fit="fill" lazy
+                  aria-label="返回兰泽诗词首页" role="button">
                 </el-image>
               </el-col>
               <el-col :span="15" :offset="0" class="input-col">
                 <!-- 搜索框 -->
-                <el-input @focus="elinput1focus = true" @blur="elinput1focus = false" class="me-2 elinput1"
-                  :class="elinput1focus ? 'elinput1focus' : ''" v-model="inputS" placeholder="搜索诗词" prefix-icon="Search"
-                  clearable @keyup.enter="inputEnter" />
+                <el-input id="home-search-desktop" @focus="elinput1focus = true" @blur="elinput1focus = false"
+                  class="me-2 elinput1" :class="elinput1focus ? 'elinput1focus' : ''" v-model="inputS"
+                  placeholder="搜索诗词" prefix-icon="Search" clearable @keyup.enter="inputEnter"
+                  aria-label="搜索诗词，按回车提交" />
               </el-col>
               <!-- 右侧导航 -->
               <el-menu-item index="/zhailu">涉猎</el-menu-item>
@@ -37,44 +39,46 @@
         </el-header>
         <!-- 小屏幕显示为底部导航栏 -->
         <div class="min-tap-top hidden-md-and-up">
-          <el-input @focus="elinput1focus = true" @blur="elinput1focus = false" class="me-2 elinput1"
-            :class="elinput1focus ? 'elinput1focus' : ''" v-model="inputS" placeholder="搜索诗词" prefix-icon="Search"
-            clearable @keyup.enter="inputEnter" />
-          <el-image @click="$router.push({ name: 'home' })" class="logo-img" :src="logoUrl" fit="fill" lazy>
+          <el-input id="home-search-mobile" @focus="elinput1focus = true" @blur="elinput1focus = false"
+            class="me-2 elinput1" :class="elinput1focus ? 'elinput1focus' : ''" v-model="inputS"
+            placeholder="搜索诗词" prefix-icon="Search" clearable @keyup.enter="inputEnter"
+            aria-label="搜索诗词，按回车提交" />
+          <el-image @click="$router.push({ name: 'home' })" class="logo-img" :src="logoUrl" fit="fill" lazy
+            aria-label="返回兰泽诗词首页" role="button">
           </el-image>
         </div>
         <div class="min-tab-bottom hidden-md-and-up">
           <div class="tab-bottom-box">
             <div>
-              <router-link active-class="bottom-active" :to="{name: 'chalou'}">
+              <router-link active-class="bottom-active" :to="{name: 'chalou'}" aria-label="前往茶楼">
                 <div class="box-i"><i class="fas fa-coffee tab-i"></i>
                   <p>茶楼</p>
                 </div>
               </router-link>
             </div>
             <div>
-              <router-link active-class="bottom-active" :to="{name: 'wenku'}">
+              <router-link active-class="bottom-active" :to="{name: 'wenku'}" aria-label="前往文库">
                 <div class="box-i"><i class="fas fa-book tab-i"></i>
                   <p>文库</p>
                 </div>
               </router-link>
             </div>
             <div>
-              <router-link active-class="bottom-active" :to="{name: 'zhailu'}">
+              <router-link active-class="bottom-active" :to="{name: 'zhailu'}" aria-label="前往涉猎">
                 <div class="box-i"><i class="fas fa-chalkboard-teacher tab-i"></i>
                   <p>涉猎</p>
                 </div>
               </router-link>
             </div>
             <div>
-              <router-link active-class="bottom-active" :to="{name: 'duxue'}">
+              <router-link active-class="bottom-active" :to="{name: 'duxue'}" aria-label="前往笃学">
                 <div class="box-i"><i class="fas fa-pen-fancy tab-i"></i>
                   <p>笃学</p>
                 </div>
               </router-link>
             </div>
             <div>
-              <router-link active-class="bottom-active" :to="{name: 'personal'}">
+              <router-link active-class="bottom-active" :to="{name: 'personal'}" aria-label="前往个人中心">
                 <div class="box-i"><i class="fas fa-user-alt tab-i"></i>
                   <p>中心</p>
                 </div>
@@ -83,7 +87,7 @@
           </div>
         </div>
         <section class="section-main">
-          <el-scrollbar ref="scrollbarRef" @scroll="scroll" height="100vh">
+          <el-scrollbar ref="scrollbarRef" height="100vh" aria-label="页面内容滚动区域">
             <!-- 主体部分 -->
             <main id="main" v-loading="loading">
               <router-view></router-view>
@@ -109,17 +113,16 @@
 </template>
 
 <script>
-  import { ref } from "vue";
+  import { ref, watch, onBeforeUnmount } from "vue";
   import logo from "../assets/logo.png";
-  import { useRouter, useRoute } from "vue-router";
+  import { useRouter } from "vue-router";
   import { ElMessage } from "element-plus";
-  import "vue3-lottie/dist/style.css";
   import qieHuan from "../assets/lottieJSON/qieHuan.json";
   import { Vue3Lottie } from "vue3-lottie";
   import Audio from "./Audio.vue";
-  import supabase from '../function/supabase.js'
-  import { searchList } from '../apis/api/list'
-  import axios from "axios";
+  import { searchList } from "../apis/api/list.js";
+  import { useRouteTransition } from "../composables/useRouteTransition.js";
+  import { normalizeListResponse } from "../utils/response.js";
 
   export default {
     name: "Home",
@@ -131,78 +134,39 @@
 
       // 路由器
       const $router = useRouter();
-      const $route = useRoute();
       // 搜索框model
       let inputS = ref("");
 
       const scrollbarRef = ref()
+      const { transitionActive, start: startTransition, stop: stopTransition } = useRouteTransition();
 
       // 加载控制
       let loading = ref(false);
       // 发送请求返回根据输入框内容搜索到的内容
-      function inputEnter() {
-
-        loading.value = true;
-
-        async function asyncFunc() {
-
-          loading.value = true        //加载动画启动
-
-          let searchData = []
-
-          // 请求数据
-          let datas = {
-            keyword: inputS.value
-          }
-
-          let { data } = await searchList(datas)
-
-          searchData = data
-
-          // let { data: response1, error1 } = await supabase           // 请求数据
-          //   .from('tangshi300')
-          //   .select('*')
-          //   // .contains('author',[inputS.value])
-          //   // .eq('author', inputS.value)
-          //   .or(`author.like.%${inputS.value}%,poemName.like.%${inputS.value}%,textBody.like.%${inputS.value}%`)
-
-          //   console.log(response1);
-
-          //   let { data: response2, error2 } = await supabase           // 请求数据
-          //   .from('songci300')
-          //   .select('*')
-          //   // .contains('author',[inputS.value])
-          //   // .eq('author', inputS.value)
-          //   .or(`author.like.%${inputS.value}%,poemName.like.%${inputS.value}%,textBody.like.%${inputS.value}%`)
-
-          //   searchData = response1.concat(response2)
-
-          // author:作者   // tag:标签  // poemName:诗名  // textBody:正文
-
-          loading.value = false
-
-          let tangArr = JSON.stringify(searchData)
-
-
-          // console.log(tangArr);
-
-          $router.push({
-            name: 'searchul',
-            query: {
-              ulArr: tangArr
-            }
-          })
-
-          ElMessage({
-            message: "搜索成功!",
-            type: "success",
-          });
-
-          inputS.value = "";
-
+      async function inputEnter() {
+        const keyword = inputS.value.trim();
+        if (!keyword) {
+          ElMessage({ message: "请输入诗词、作者或标签", type: "warning" });
+          return;
         }
-
-        asyncFunc();
+        loading.value = true;
+        try {
+          const response = await searchList({ keyword });
+          const searchData = normalizeListResponse(response, []);
+          await $router.push({
+            name: "searchul",
+            query: { ulArr: JSON.stringify(searchData), keyword },
+          });
+          ElMessage({
+            message: searchData.length ? "搜索成功!" : "没有匹配结果，已展示推荐内容",
+            type: searchData.length ? "success" : "info",
+          });
+          inputS.value = "";
+        } catch (error) {
+          ElMessage({ message: error?.message || "搜索失败，请稍后重试", type: "error" });
+        } finally {
+          loading.value = false;
+        }
       }
 
       // logo图片
@@ -211,36 +175,30 @@
       let elinput1focus = ref(false);
 
       // 页面切换动画效果
-      let isLottie = ref(false);
+      let isLottie = transitionActive;
       let demoRefHua = ref(null);
 
-      // 前置路由守卫
-      $router.beforeEach((to, from, next) => {
-        if (from.name == "login" || to.name == "login") {
-          next();
-        } else {
-          // 重置垂直滚动
-          isLottie.value = true;
-          demoRefHua.value.play();
-          setTimeout(() => {
-            next();
-          }, 600);
-        }
+      const resetScroll = () => {
+        scrollbarRef.value?.setScrollTop?.(0);
+      };
+
+      const stopRouteWatcher = watch(
+        () => $router.currentRoute.value.fullPath,
+        () => {
+          resetScroll();
+          startTransition(500);
+          demoRefHua.value?.play?.();
+        },
+      );
+
+      const stopAnimationWatcher = watch(transitionActive, (active) => {
+        if (!active) demoRefHua.value?.stop?.();
       });
 
-      // 后置路由守卫
-      $router.afterEach((to, from) => {
-        scrollbarRef.value.setScrollTop(0)
-        if (to.name == "login") {
-        } else if (from.name == "login") {
-          $router.go(0)
-          next()
-        } else {
-          setTimeout(() => {
-            isLottie.value = false;
-            demoRefHua.value.stop();
-          }, 400);
-        }
+      onBeforeUnmount(() => {
+        stopRouteWatcher();
+        stopAnimationWatcher();
+        stopTransition();
       });
 
       return {
@@ -252,7 +210,6 @@
         qieHuan,
         demoRefHua,
         isLottie,
-        scroll,
         scrollbarRef
       };
     },

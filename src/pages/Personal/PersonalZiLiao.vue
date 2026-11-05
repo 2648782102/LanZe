@@ -11,14 +11,16 @@
     import { useRouter } from "vue-router";
     import { ElMessage } from 'element-plus'
     import { onBeforeMount } from "vue";
+    import { useSession } from '../../composables/useSession.js';
 
     export default {
         name: 'PersonalZiLiao',
         setup() {
             const $router = useRouter()
+            const { isLoggedIn } = useSession()
 
             onBeforeMount(() => {
-                if($cookies.get('lanze_user')) {
+                if(isLoggedIn.value) {
                     $router.push({
                     name: 'datamessage'
                 })

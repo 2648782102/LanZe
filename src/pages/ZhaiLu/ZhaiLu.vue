@@ -8,7 +8,8 @@
         content="切换"
         placement="bottom-end"
       >
-      <div class="chevron1 chevron hidden-sm-and-down" @click="skip1">
+      <div class="chevron1 chevron hidden-sm-and-down" @click="skip1" role="button" tabindex="0"
+        aria-label="切换到上一组诗词" @keyup.enter="skip1">
         <i class="fas fa-chevron-left"></i>
       </div>
       </el-tooltip>
@@ -16,7 +17,8 @@
         <section @dragstart="tuoDongGo($event)" @dragend="tuoDongOff($event,1)" draggable="true" class="section1 col-10 col-md-7 col-lg-3">
           <div v-loading='loding1' element-loading-text="加载中..." element-loading-svg-view-box="-10, -10, 50, 50" :element-loading-spinner="loadingSVG" class="box"
             :class="{'animationC':anima1,'animationD':anima2}">
-            <span @click="shouchang(1)" :class="shouchang1?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
+            <span @click="shouchang(1)" @keyup.enter="shouchang(1)" role="button" tabindex="0"
+              :aria-pressed="shouchang1" :class="shouchang1?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
             <p>{{ scArr1.content }}</p>
             <h5>— {{ scArr1.author }}</h5>
             <img draggable="false" src="../../assets/beijing/fanzou.png" alt="">
@@ -25,7 +27,8 @@
         <section @dragstart="tuoDongGo($event)" @dragend="tuoDongOff($event,2)" draggable="true" class="section2 col-10 col-md-8 col-lg-3 hidden-sm-and-down">
           <div v-loading='loding2' element-loading-text="加载中..." element-loading-svg-view-box="-10, -10, 50, 50" :element-loading-spinner="loadingSVG" class="box"
             :class="{'animationC':anima1,'animationD':anima2}">
-            <span @click="shouchang(2)" :class="shouchang2?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
+            <span @click="shouchang(2)" @keyup.enter="shouchang(2)" role="button" tabindex="0"
+              :aria-pressed="shouchang2" :class="shouchang2?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
             <p>{{ scArr2.content }}</p>
             <h5>— {{ scArr2.author }}</h5>
             <img draggable="false" src="../../assets/beijing/fanzou.png" alt="">
@@ -34,7 +37,8 @@
         <section @dragstart="tuoDongGo($event)" @dragend="tuoDongOff($event,3)" draggable="true" class="section3 col-10 col-md-8 col-lg-3 hidden-sm-and-down">
           <div v-loading='loding3' element-loading-text="加载中..." element-loading-svg-view-box="-10, -10, 50, 50" :element-loading-spinner="loadingSVG" class="box"
             :class="{'animationC':anima1,'animationD':anima2}">
-            <span @click="shouchang(3)" :class="shouchang3?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
+            <span @click="shouchang(3)" @keyup.enter="shouchang(3)" role="button" tabindex="0"
+              :aria-pressed="shouchang3" :class="shouchang3?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
             <p>{{ scArr3.content }}</p>
             <h5>— {{ scArr3.author }}</h5>
             <img draggable="false" src="../../assets/beijing/fanzou.png" alt="">
@@ -46,7 +50,8 @@
         content="切换"
         placement="top-start"
       >
-      <div class="chevron2 chevron hidden-sm-and-down" @click="skip2">
+      <div class="chevron2 chevron hidden-sm-and-down" @click="skip2" role="button" tabindex="0"
+        aria-label="切换到下一组诗词" @keyup.enter="skip2">
         <i class="fas fa-chevron-right"></i>
       </div>
     </el-tooltip>
@@ -56,18 +61,13 @@
 
 <script>
   import 'element-plus/theme-chalk/display.css'
-  import { ref, onMounted, watch } from 'vue'
-  import axios from "axios"
+  import { ref, onMounted } from 'vue'
   import { ElMessage } from 'element-plus'
-  import { useRouter } from 'vue-router'
+  import { PoetryRandomExcerpt } from '../../apis/api/list.js'
 
   export default {
     name: 'ZhaiLu',
     setup() {
-      // 编程路由
-      const $router = useRouter()
-      // const $route = useRoute()
-
       // 生命周期钩子，当页面挂载时执行
       onMounted(() => {
         // 调用ajax函数，初始化古诗词
@@ -85,27 +85,20 @@
         " style="stroke-width: 4px; fill: rgba(0, 0, 0, 0)"/>
       `
 
-      // 切换古诗词内容，函数
-      function  skiip() {
-        // 发送请求到“古诗词.一言api”获取随机一首古诗词(部分)
-        // 数据内容：作者：response.data.author，类型：response.data.category
-        // 内容：response.data.content，诗名：response.data.origin
-        axios.get('https://v1.jinrishici.com/all.json')
-          .then(response => {
-            scArr1.value = response.data;
-          })
-        setTimeout(() => {
-          axios.get('https://v1.jinrishici.com/all.json')
-          .then(response => {
-            scArr2.value = response.data;
-          })
-        },100)
-        setTimeout(() => {
-          axios.get('https://v1.jinrishici.com/all.json')
-          .then(response => {
-            scArr3.value = response.data;
-          })
-        },200)
+      let excerptIndex = 0;
+      async function loadExcerpt(serial = 0) {
+        const response = await PoetryRandomExcerpt({ index: excerptIndex++ });
+        const excerpt = response?.data || {};
+        const refs = [scArr1, scArr2, scArr3];
+        if (refs[serial]) refs[serial].value = excerpt;
+      }
+
+      async function skiip() {
+        try {
+          await Promise.all([loadExcerpt(0), loadExcerpt(1), loadExcerpt(2)]);
+        } catch (error) {
+          ElMessage({ message: "诗词加载失败，请稍后再试", type: "warning" });
+        }
       }
 
       // 点击收藏切换样式
@@ -131,49 +124,24 @@
       let anima1 = ref(false), anima2 = ref(false)
       // 加载动画
       let loding1 = ref(false),loding2 = ref(false),loding3 = ref(false)
-      // 点击切换(左)随机诗词内容
-      function skip1() {
-        loding1.value = true,loding2.value = true,loding3.value = true
-        anima1.value = true
+      async function switchExcerpts(direction) {
+        if (direction === 1) anima1.value = true;
+        else anima2.value = true;
+        loding1.value = true, loding2.value = true, loding3.value = true;
         setTimeout(() => {
-          anima1.value = false
-        }, 2000)
-        setTimeout(() => {
-          ElMessage({
-            message: '切换成功！',
-            type: 'success'
-          })
-          skiip()
-          loding1.value = false,loding2.value = false,loding3.value = false
-        }, 1000)
+          anima1.value = false;
+          anima2.value = false;
+        }, 700);
+        try {
+          await skiip();
+          ElMessage({ message: "切换成功！", type: "success" });
+        } finally {
+          loding1.value = false, loding2.value = false, loding3.value = false;
+        }
       }
 
-      // 点击切换(右)随机诗词内容
-      function skip2() {
-        loding1.value = true,loding2.value = true,loding3.value = true
-        anima2.value = true
-        setTimeout(() => {
-          anima2.value = false
-        }, 2000)
-        setTimeout(() => {
-          ElMessage({
-            message: '切换成功！',
-            type: 'success'
-          })
-          skiip()
-          loding1.value = false,loding2.value = false,loding3.value = false
-        }, 1000)
-      }
-
-      // 点击诗词卡片,切换到详情页
-      // function xiangqing(uid) {
-      //   $router.push({
-      //     name: 'details',
-      //     query:{
-      //       shici:JSON.stringify(uid)
-      //     }
-      //   })
-      // }
+      function skip1() { return switchExcerpts(1); }
+      function skip2() { return switchExcerpts(2); }
 
       // 拖动开始事件
       let tuox = 0  //记录拖动前元素的x轴坐标
@@ -198,20 +166,11 @@
               case 3: loding3.value = true
                       break
             }
-           axios.get('https://v1.jinrishici.com/all.json')
-          .then(response => {
-            switch(serial) {
-              case 1: scArr1.value = response.data
-                      loding1.value = false
-                      break
-              case 2: scArr2.value = response.data
-                      loding2.value = false
-                      break
-              case 3: scArr3.value = response.data
-                      loding3.value = false
-                      break
-            }
-          })
+          loadExcerpt(serial - 1).finally(() => {
+            if (serial === 1) loding1.value = false;
+            if (serial === 2) loding2.value = false;
+            if (serial === 3) loding3.value = false;
+          });
         }
       }
 
@@ -221,7 +180,6 @@
         anima1, anima2,
         skip1, skip2,
         loding1,loding2,loding3,
-        // xiangqing,
         tuoDongGo,tuoDongOff,loadingSVG
       }
     }

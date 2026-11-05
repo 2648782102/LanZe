@@ -1,26 +1,32 @@
 {
   "name": "LanZe",
   "version": "0.0.0",
+  "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test src/config/*.test.js src/services/*.test.js src/utils/*.test.js",
+    "lint": "node src/utils/lint.mjs"
   },
   "dependencies": {
-    "@element-plus/icons-vue": "^2.0.1",
-    "@supabase/supabase-js": "^2.0.0",
+    "@element-plus/icons-vue": "^2.3.2",
+    "@lottiefiles/lottie-player": "^2.0.12",
+    "@supabase/supabase-js": "^2.119.0",
     "aplayer": "^1.10.1",
-    "axios": "^1.6.3",
-    "element-plus": "^2.2.2",
-    "lottie-web": "^5.9.6",
-    "nanoid": "^4.0.0",
-    "vue": "^3.2.36",
-    "vue-cookies": "^1.8.1",
-    "vue-router": "^4.0.15",
-    "vue3-lottie": "^2.2.4",
-    "vue3-puzzle-vcode": "^1.0.6"
+    "axios": "^1.12.2",
+    "element-plus": "^2.14.7",
+    "lottie-web": "^5.13.0",
+    "nanoid": "^5.1.16",
+    "vue": "^3.5.45",
+    "vue-cookies": "^1.8.6",
+    "vue-router": "^4.6.4",
+    "vue3-lottie": "^4.0.0",
+    "vue3-puzzle-vcode": "^1.1.7"
   },
   "devDependencies": {
-    "@vue/compiler-sfc": "^3.0.4",
-    "vite": "^1.0.0-rc.13"
+    "@vitejs/plugin-vue": "^6.0.10",
+    "vite": "^6.4.5"
   }
 }

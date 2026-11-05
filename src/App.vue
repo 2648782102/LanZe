@@ -1,5 +1,5 @@
 <template>
-  <article>
+  <article aria-label="兰泽诗词应用">
     <router-view></router-view>
   </article>
 </template>
@@ -8,8 +8,6 @@
 
 export default {
   name: 'App',
-  components: {
-  }
 }
 </script>
 

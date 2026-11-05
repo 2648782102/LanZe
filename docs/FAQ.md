@@ -1,0 +1,105 @@
+# 常见问题
+
+## 项目与定位
+
+### 兰泽诗词是什么？
+
+一个始于 2022 年的中文古诗词前端项目。当前仓库由 Vue 3、Vue Router、Element Plus、Vite 6 与 Axios 组成，包含摘录、文库、搜索、茶楼、笃学、个人中心与音乐播放等界面。2026 年已补齐本地演示数据、单测、lint、治理文档、CI 与发布素材，目标是让它可复现、可贡献、可逐步替换数据源。
+
+### 这是一个完整的诗词社区产品吗？
+
+不是。仓库不附带经维护者验证的线上服务、账号系统、数据库、内容审核或运营支持。登录、搜索结果、作品发布、用户头像等能力默认使用浏览器本地演示数据，也可配置 `VITE_API_BASE_URL` 连接自建 API；请把它当作一个本地可运行的前端与开源协作对象。
+
+### README 为什么没有在线 Demo？
+
+旧 README 写过 `http://app.memfiredb.com/caqm0ri5g6h17oismvp0/`，代码里也散落过 MemFire/Vercel 域名。治理时无法验证它们仍可用，且与当前仓库代码是否一致也不清楚，因此删除了「项目展示地址」承诺。若未来有维护者明确托管并验证，可在 README 增加新地址，同时记录托管者、commit、部署方式与回滚步骤。
+
+### 为什么历史提交里写着 `1.0`、`2.0.0`，但 Release 叫 v0.2.0？
+
+`git log` 中的 `1.0版本`、`2.0.0` 等是 2022 年开发提交信息；v0.2.0 之前仓库没有对应 Git tag 或 GitHub Release。v0.2.0 是 2026 年这轮「工程现代化 + 治理 + 文档 + CI」的可追溯发布编号，不代表功能倒退。详细的提交归纳见 `CHANGELOG.md`。
+
+## 安装与运行
+
+### 需要哪个 Node 版本？
+
+建议 Node.js 20 或 22，与 `.github/workflows/ci.yml` 一致。当前 Vite 6 已在这两个版本及本地 Node 24 上完成构建与测试验证。
+
+### 为什么是 `npm ci` 而不是 `npm install`？
+
+仓库有 `package-lock.json`。`npm ci` 从锁文件做干净、可复现安装，是本地与 CI 的共同基线。若锁文件和 `package.json` 不一致，请一起修复，不要只提交其中一个。
+
+### `npm run dev` 后打开哪个地址？
+
+以终端输出为准。当前默认 `http://127.0.0.1:5173/`，端口被占用时 Vite 会分配其他端口。页面使用 hash 路由，例如 `http://127.0.0.1:5173/#/home`。
+
+### 测试与 lint 怎么运行？
+
+`npm run test` 执行 14 个 `node --test` 单测，`npm run lint` 执行静态扫描。CI 仍使用 `npm run test --if-present` 以兼容外部旧流程。
+
+### 首次启动遇到 esbuild 二进制错误？
+
+检查安装时是否用了 `--ignore-scripts`；Vite 6 的 esbuild 依赖安装脚本负责放置平台二进制。可按实际错误运行 `npm rebuild esbuild`。更多排查见 `docs/DEVELOPMENT.md`。
+
+## 数据与功能
+
+### 搜索/登录/文库没有配置后端时还能用吗？
+
+可以。未配置 `VITE_API_BASE_URL` 时会自动使用 `src/data/` 与 `src/services/mockApi.js` 的本地演示数据；`VITE_USE_MOCK=true` 可显式强制演示模式。配置自建 API 后优先请求远端，失败或返回无效数据时自动降级。
+
+### `VITE_API_BASE_URL` 和 `VITE_USE_MOCK` 是怎么配合的？
+
+`src/config/runtime.js` 统一解析它们：未配置 API 时 `useMock` 默认为 `true`；配置 API 且 `VITE_USE_MOCK=false` 时 `src/apis/request.js` 请求远端；远端失败会自动回到演示数据。其余变量见 `.env.example`。
+
+### 可以把 Supabase 的 anon key 放在前端吗？
+
+即使是公开（anon）key，也不等于「可以随意写在源码里」。它仍受 RLS/权限、项目配置和配额约束；v0.2.0 已移除历史硬编码 key，改为可选的 `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`。若旧部署仍使用历史凭据，应轮换或撤销。`service_role`、数据库口令、私人 token 绝不能加 `VITE_` 前缀或提交到仓库。详见 `SECURITY.md`。
+
+### 随机诗句、音乐、Lottie 动画为什么有时不显示？
+
+音乐、封面、部分 Lottie JSON、Bootstrap、Font Awesome 等仍来自外部 CDN。网络、CORS、地区限制、防盗链或服务变更都可能影响展示，且不在本仓库控制范围内。业务诗词数据默认使用本地演示数据兜底；CI 不依赖外部服务。
+
+### 收藏、登录态、个人资料会保存吗？
+
+摘录收藏是组件内布尔状态；演示登录、个人资料和发布作品会写入当前浏览器 `localStorage`，会话对象写入 Cookie。它们只用于本地演示，不是线上账号服务或跨设备持久化。不要输入真实密码或个人信息；演示账号为 `demo / lanze2026`。
+
+## 部署与 GitHub 展示
+
+### 可以部署到 GitHub Pages / Vercel / Netlify 吗？
+
+可以部署 `npm run build` 的静态产物。当前 hash 路由不需要 history fallback；若未来切换 history 模式则需配置 `index.html` rewrite。`vite.config.js` 使用相对 `base: './'`，适合 GitHub Pages 项目站点，但仍应实测资源路径。步骤见 `docs/DEPLOYMENT.md`，本仓库的 Pages workflow 是手动触发，不会自动发布到旧域名。
+
+### 为什么 CI 用 `npm run test --if-present`？
+
+`--if-present` 是兼容旧工作流的兜底写法；当前 `package.json` 已定义 `test` 脚本，所以 CI 会实际执行 14 个单测，不假定任何模块格式或测试框架。
+
+### 仓库 About、topics、Release、Discussion 在哪里维护？
+
+GitHub About 描述与 topics 在仓库设置中维护；v0.2.0 Release 与 Discussions 欢迎帖文案分别位于 `RELEASE_NOTES.md`、`ANNOUNCEMENT.md`，发布与展示清单见 `docs/PROMOTION.md`。如有变更，以仓库页面和 `CHANGELOG.md` 为准。
+
+## 许可与内容
+
+### 项目使用什么许可证？
+
+MIT，见 `LICENSE`：`Copyright (c) 2022-2026 LanZe contributors`。与 README 保持一致。
+
+### 字体、图片、音乐和诗词文本也是 MIT 吗？
+
+不一定。MIT 覆盖本仓库贡献者提供的代码与文档；`src/assets/` 中的字体/图片、外部音乐链接、CDN 资源和历史诗词数据可能有独立授权。二次发布、商用或重新分发前，需要逐项核查来源与许可；不清楚的素材应替换或移除。贡献指南也要求新增素材时说明来源。
+
+### 可以提交真实诗词语料吗？
+
+先确认版权状态、来源、许可、篇幅与署名要求。公版古籍文本也不等于所有点校、注释、排版或数字化版本都可自由使用。建议先开 issue 说明数据来源，并提交可审计的小规模示例或生成规则。
+
+## 参与贡献
+
+### 不会写代码可以参与吗？
+
+可以。文档勘误、术语统一、演示录屏脚本、可访问性检查、素材授权整理、FAQ 补充、中英文文案校对都很需要。请从 `CONTRIBUTING.md` 的验证清单开始，哪怕是修正一个失效链接也有价值。
+
+### 发现安全问题怎么报告？
+
+优先使用 GitHub 私密漏洞报告入口；不要在公开 issue 粘贴 PoC、真实凭据或用户数据。完整流程见 `SECURITY.md`。
+
+### 我想改 `package.json` / `src/**`，可以吗？
+
+可以，但请先开 issue 或在 PR 说明目标与验证范围，并同步 README、CI、开发文档与变更日志。跨源码与文档的改动尤其需要一起核对；最终以 `main` 分支为准。

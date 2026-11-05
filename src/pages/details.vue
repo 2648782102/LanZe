@@ -3,17 +3,18 @@
   <article>
     <el-row class="elrow pt-3 pb-3" :gutter="20" justify="center">
       <el-col class="bgwhite text-center p-3" :xs="22" :sm="22" :md="16" :lg="16" :xl="16" :offset="0">
-        <p class="biaoTi">{{ title }}</p>
-        <p>{{ author }}</p>
-        <p class="tags-box" v-if="tags"><span class="tac" v-for="(item,index) in tags" :key="index">{{ item }}</span></p>
-        <p class="content" v-for="(item,index) in paragraphs" :key="index">{{ item }}</p>
-        <!-- <div class="title" v-show="title">
-          <p v-for="(item,index) in title" :key="index">{{ item }}</p>
-        </div> -->
+        <p class="biaoTi">{{ details.title }}</p>
+        <p>{{ details.author }}</p>
+        <p class="tags-box" v-if="details.tags.length"><span class="tac" v-for="(item,index) in details.tags" :key="index">{{ item }}</span></p>
+        <p class="content" v-for="(item,index) in details.paragraphs" :key="index">{{ item }}</p>
+        <div class="title" v-if="details.annotation.length">
+          <p v-for="(item,index) in details.annotation" :key="index">{{ item }}</p>
+        </div>
       </el-col>
       <!-- <button @click="back" class="btn btn-primary fanhui">返回</button> -->
       <el-tooltip content="返回" placement="top" effect="dark">
-        <lottie-player @click="back" class="fanhui" src="https://assets9.lottiefiles.com/packages/lf20_gigyrcoy.json"
+        <lottie-player @click="back" @keyup.enter="back" role="button" tabindex="0" aria-label="返回上一页"
+          class="fanhui" src="https://assets9.lottiefiles.com/packages/lf20_gigyrcoy.json"
           background="transparent" speed="1" loop autoplay></lottie-player>
       </el-tooltip>
 
@@ -22,8 +23,9 @@
 </template>
 
 <script>
+  import { computed } from "vue";
   import { useRoute, useRouter } from "vue-router";
-  import axios from 'axios';
+  import { normalizeDetails, parseJsonObject } from "../utils/poemQuery.js";
 
   export default {
     name: 'details',
@@ -31,41 +33,16 @@
 
       const $route = useRoute()
       const $router = useRouter()
-      let author = '无题';
-      let tags = [];
-      let paragraphs = [];
-      let title = '无';
-      // let title = null;
-
-      // 接收传参
-      let shici = JSON.parse($route.query.shici)
-
-      console.log(shici);
-
-      if (shici) {
-        // 接收传值
-        author = shici.author  // 作者
-        tags = JSON.parse(shici.tags)  //  标签
-        paragraphs = JSON.parse(shici.paragraphs)  // 正文
-        title = shici.title  //  诗名
-        // if (shici.title) {
-        //   title = JSON.parse(shici.title)
-        // }
-      }
-      // else {
-      //     // 接收传值
-      //     author = shici.author  // 作者
-      //     category.push(shici.category)  //  类型
-      //     content.push(shici.content)  // 正文
-      //     origin = shici.origin  //  诗名
-      // }
+      const details = computed(() =>
+        normalizeDetails(parseJsonObject($route.query.shici, {})),
+      );
 
       function back() {
         $router.back()
       }
 
       return {
-        author, tags, paragraphs, title,
+        details,
         back,
       }
     }

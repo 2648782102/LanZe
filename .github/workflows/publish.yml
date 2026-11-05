@@ -1,0 +1,90 @@
+name: Publish v0.2.0
+
+on:
+  push:
+    tags:
+      - "v0.2.0"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  discussions: write
+
+concurrency:
+  group: publish-v0.2.0
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish release and welcome discussion
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create or update GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: v0.2.0
+          RELEASE_TITLE: 兰泽诗词 v0.2.0 · 本地可运行的开源前端
+        shell: bash
+        run: |
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            gh release edit "$TAG_NAME" \
+              --title "$RELEASE_TITLE" \
+              --notes-file RELEASE_NOTES.md
+          else
+            gh release create "$TAG_NAME" \
+              --title "$RELEASE_TITLE" \
+              --notes-file RELEASE_NOTES.md \
+              --verify-tag
+          fi
+
+      - name: Create welcome discussion if absent
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          DISCUSSION_TITLE: 欢迎参与兰泽诗词的重新整理 👋
+        shell: bash
+        run: |
+          category_id="$(
+            gh api graphql \
+              -f query='query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { discussionCategories(first: 50) { nodes { id name } } } }' \
+              -F owner="${REPOSITORY%/*}" \
+              -F name="${REPOSITORY#*/}" \
+              --jq '.data.repository.discussionCategories.nodes[] | select(.name == "Announcements") | .id' \
+              | head -n 1
+          )"
+          test -n "$category_id" || { echo "Announcements category not found" >&2; exit 1; }
+
+          repository_id="$(
+            gh api graphql \
+              -f query='query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { id } }' \
+              -F owner="${REPOSITORY%/*}" \
+              -F name="${REPOSITORY#*/}" \
+              --jq '.data.repository.id'
+          )"
+
+          existing_id="$(
+            gh api graphql \
+              -f query='query($owner: String!, $name: String!, $category: ID!) { repository(owner: $owner, name: $name) { discussions(first: 50, categoryId: $category) { nodes { id title } } } }' \
+              -F owner="${REPOSITORY%/*}" \
+              -F name="${REPOSITORY#*/}" \
+              -F category="$category_id" \
+              --jq --arg title "$DISCUSSION_TITLE" '.data.repository.discussions.nodes[] | select(.title == $title) | .id' \
+              | head -n 1
+          )"
+
+          if [ -n "$existing_id" ]; then
+            echo "Welcome discussion already exists: $existing_id"
+            exit 0
+          fi
+
+          gh api graphql \
+            -f query='mutation($repository: ID!, $category: ID!, $title: String!, $body: String!) { createDiscussion(input: {repositoryId: $repository, categoryId: $category, title: $title, body: $body}) { discussion { id url } } }' \
+            -F repository="$repository_id" \
+            -F category="$category_id" \
+            -F title="$DISCUSSION_TITLE" \
+            -F body=@ANNOUNCEMENT.md \
+            --jq '.data.createDiscussion.discussion | "Created discussion \(.id): \(.url)"'

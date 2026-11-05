@@ -4,7 +4,7 @@
     <el-form
       :model="form"
       class="p-5 col-12 col-lg-7 col-xl-9"
-      label-position="labelPosition"
+      label-position="right"
     >
       <div class="text-center mb-4">
         <h1>个人资料<i class="fab fa-jedi-order ms-2 tou-biao"></i></h1>
@@ -16,6 +16,10 @@
             v-for="(item, index) in imgSrc"
             :key="index"
             @click="imgClick(index)"
+            @keyup.enter="imgClick(index)"
+            role="button"
+            tabindex="0"
+            :aria-label="`选择第 ${index + 1} 张头像`"
             :src="imgSrc[index]"
             :class="imgArr[index] ? 'activeImg' : ''"
             fit="cover"
@@ -32,11 +36,11 @@
       </el-form-item>
 
       <el-form-item prop="name" label="用户名称：">
-        <el-input v-model="form.name" />
+        <el-input v-model="form.name" aria-label="用户名称" />
       </el-form-item>
 
       <el-form-item prop="intro" label="个性简介：">
-        <el-input v-model="form.intro" />
+        <el-input v-model="form.intro" aria-label="个性简介" />
       </el-form-item>
       <div class="mt-4 submit">
         <button
@@ -44,6 +48,7 @@
           style="background: #5b99af; color: white"
           type="button"
           @click="submit"
+          aria-label="提交个人资料"
         >
           提交审核
         </button>
@@ -53,7 +58,7 @@
 </template>
 
 <script>
-import { reactive, ref, onMounted } from "vue";
+import { reactive, ref, onMounted, watch } from "vue";
 import { ElMessage } from "element-plus";
 import hoad1 from "../../../assets/hoad/hoad1.jpg";
 import hoad2 from "../../../assets/hoad/hoad2.jpg";
@@ -65,12 +70,13 @@ import hoad7 from "../../../assets/hoad/hoad7.jpg";
 import hoad8 from "../../../assets/hoad/hoad8.jpg";
 import hoad9 from "../../../assets/hoad/hoad9.jpg";
 import { useRouter } from "vue-router";
-import supabase from "../../../function/supabase.js";
+import { useSession } from "../../../composables/useSession.js";
 
 export default {
   name: "dataMessage",
   setup() {
     const $router = useRouter();
+    const { isLoggedIn, profile, updateProfile } = useSession();
 
     let form = reactive({
       name: "",
@@ -79,21 +85,16 @@ export default {
 
     // 页面挂载时初始化数据
     let loading = ref(false);
-    onMounted(() => {
-      let upload = $cookies.get("lanze_upload");
-      if (upload) {
-        form.name = upload.user_name;
-        form.intro = upload.intro;
-      }
-    });
+    const syncForm = () => {
+      form.name = profile.value.user_name || "";
+      form.intro = profile.value.intro || "";
+      const selected = sqlImg.value.indexOf(profile.value.head_img);
+      lickImgIndex.value = selected >= 0 ? selected : 0;
+      imgArr.value = imgArr.value.map((_, index) => index === lickImgIndex.value);
+    };
 
-    // 当选择多张图片时触发
-    function handleExceed() {
-      ElMessage({
-        type: "error",
-        message: "只能上传一张图片,请先移除前一张！",
-      });
-    }
+    onMounted(syncForm);
+    watch(profile, syncForm);
 
     // 单选图片绑定
     let imgArr = ref([
@@ -144,86 +145,34 @@ export default {
       });
     }
 
-    const handleSubmit = async (id) => {
-
-      const response1 = await supabase
-        .from("user_message")
-        .update({
-          user_name: form.name,
-          head_img: sqlImg.value[lickImgIndex.value],
-          intro: form.intro,
-        })
-        .or(`id.eq.${id}`);
-
-      try {
-        if(response1.status!=400&&response1.status!=409) {
-          let response2 = await supabase // 请求数据
-          .from("user_message")
-          .select("*")
-          .or(`id.eq.${id}`);
-
-        try {
-          if(response2.status!=400&&response2.status!=409) {
-            console.log(response2);
-
-            $cookies.set("lanze_upload", response2.data[0]);
-            loading.value = false;
-             ElMessage({
-                  type: "success",
-                  message: "上传成功！",
-                });
-                $router.push({
-                  name: "kongbai",
-                });
-          }
-        } catch (error) {
-          console.log(error);
-        }
-        }
-      } catch (error) {
-        console.log(error);
+    async function submit() {
+      if (!isLoggedIn.value) {
+        ElMessage({ type: "warning", message: "请先登录后再修改资料" });
+        $router.push({ name: "loginindex" });
+        return;
       }
-    };
-
-    // 提交事件
-    function submit() {
+      if (!form.name.trim()) {
+        ElMessage({ type: "warning", message: "用户名称不能为空" });
+        return;
+      }
       loading.value = true;
-      let id = $cookies.get("lanze_user").id;
-      handleSubmit(id)
-      // axios
-      //   .get(
-      //     `https://lan-ze-user.vercel.app/api/user/userUpload?id=${id}&name=${
-      //       form.name
-      //     }&img=${sqlImg.value[lickImgIndex.value]}&intro=${form.intro}`
-      //   )
-      //   .then((response) => {
-      //     axios
-      //       .get(`https://lan-ze-user.vercel.app/api/user/getUpload?id=${id}`)
-      //       .then((response) => {
-      //         $cookies.set("lanze_upload", response.data);
-      //         loading.value = false;
-      //         if (typeof response.data == "object") {
-      //           ElMessage({
-      //             type: "success",
-      //             message: "上传成功！",
-      //           });
-      //           $router.push({
-      //             name: "kongbai",
-      //           });
-      //         }
-      //       })
-      //       .catch((error) => {
-      //         console.log(error);
-      //       });
-      //   })
-      //   .catch((error) => {
-      //     console.log(error);
-      //   });
+      try {
+        updateProfile({
+          user_name: form.name.trim(),
+          intro: form.intro.trim(),
+          head_img: sqlImg.value[lickImgIndex.value],
+        });
+        ElMessage({ type: "success", message: "资料已保存！" });
+        $router.push({ name: "personalziLiao" });
+      } catch (error) {
+        ElMessage({ type: "error", message: error?.message || "保存失败，请稍后重试" });
+      } finally {
+        loading.value = false;
+      }
     }
 
     return {
       form,
-      handleExceed,
       imgClick,
       imgArr,
       imgSrc,

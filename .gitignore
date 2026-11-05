@@ -4,3 +4,10 @@ dist
 dist-ssr
 *.local
 .vercel
+.env
+.env.*
+!.env.example
+coverage/
+playwright-report/
+test-results/
+*.log

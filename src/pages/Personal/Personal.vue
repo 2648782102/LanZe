@@ -6,17 +6,18 @@
                 <div class="top">
                     <!-- 上部头像，用户名等信息 -->
                     <main>
-                        <div @click="dengluClick" v-if="!lanze_upload" class="avatar denglu">
+                        <div @click="dengluClick" v-if="!isLoggedIn" class="avatar denglu" role="button" tabindex="0"
+                            aria-label="前往登录" @keyup.enter="dengluClick">
                             <el-avatar class="elavatar" icon="UserFilled" />
                             <span v-if="!lanze_upload" class="ps-2">请先登录</span>
                         </div>
-                        <div v-if="lanze_upload" class="avatar">
+                        <div v-if="isLoggedIn" class="avatar">
                             <el-avatar class="elavatar" :src="imgsrc" icon="UserFilled" />
                             <span v-if="lanze_upload" class="ps-2">{{ lanze_upload.user_name }}</span>
                         </div>
                         <div class="text1">
-                            <h3 v-if="!lanze_upload">简介</h3>
-                            <h3 v-if="lanze_upload">{{ lanze_upload.intro }}</h3>
+                            <h3 v-if="!isLoggedIn">简介</h3>
+                            <h3 v-if="isLoggedIn">{{ profile.intro }}</h3>
                         </div>
                     </main>
                     <footer>
@@ -27,27 +28,28 @@
                                 <span>主页</span>
                             </router-link>
                             <!-- 个人资料 -->
-                            <a style="cursor: pointer;" @click="gerenziliao">
+                            <a style="cursor: pointer;" role="button" tabindex="0" aria-label="查看个人资料"
+                                @click="gerenziliao" @keyup.enter="gerenziliao">
                                 <i class="fas fa-folder-open" style="color: rgb(56, 147, 237);"></i>
                                 <span>个人资料</span>
                             </a>
                             <!-- 收藏 -->
-                            <router-link :to="{name:'favorite'}">
+                            <router-link :to="{name:'favorite'}" aria-label="查看收藏">
                                 <i class="fas fa-star" style="color: rgb(255, 226, 62);"></i>
                                 <span>收藏</span>
                             </router-link>
                             <!-- 作品 -->
-                            <router-link :to="{name:'samplereels'}">
+                            <router-link :to="{name:'samplereels'}" aria-label="查看作品">
                                 <i class="fas fa-pen" style="color: rgb(251, 86, 86);"></i>
                                 <span>作品</span>
                             </router-link>
                             <!-- 投诉意见 -->
-                            <router-link :to="{name:'complaint'}">
+                            <router-link :to="{name:'complaint'}" aria-label="投诉意见">
                                 <i class="fas fa-edit" style="color: rgb(33, 193, 196);"></i>
                                 <span>投诉意见</span>
                             </router-link>
                             <!-- 设置 -->
-                            <router-link :to="{name:'shezhi'}">
+                            <router-link :to="{name:'shezhi'}" aria-label="设置">
                                 <i class="fas fa-cog" style="color: rgb(72, 68, 121);"></i>
                                 <span>设置</span>
                             </router-link>
@@ -78,7 +80,8 @@
                     <router-view class="left-box"></router-view>
                     <div class="right-box ms-2 hidden-sm-and-down">
                         <div><h1>兰泽诗词</h1></div>
-                        <div class="mt-2" id="tan" @click="clickTan"></div>
+                        <div class="mt-2" id="tan" @click="clickTan" role="button" tabindex="0"
+                            aria-label="播放兰泽动画" @keyup.enter="clickTan"></div>
                         <div class="mt-2 p-1">
                             <p>历史记录：</p>
                         </div>
@@ -90,7 +93,7 @@
 </template>
 
 <script>
-    import { ref, onMounted, computed } from 'vue'
+    import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
     import { useRouter } from "vue-router";
     import lottie from "lottie-web";
     import tanqiu from "../../assets/lottieJSON/tanqiu.json";
@@ -103,11 +106,14 @@
     import hoad7 from '../../assets/hoad/hoad7.jpg'
     import hoad8 from '../../assets/hoad/hoad8.jpg'
     import hoad9 from '../../assets/hoad/hoad9.jpg'
+    import { useSession } from '../../composables/useSession.js'
 
     export default {
         name: 'Personal',
         setup() {
             const $router = useRouter()
+            const { isLoggedIn, profile } = useSession()
+            const lanze_upload = computed(() => (isLoggedIn.value ? profile.value : null))
 
             let modelLis = ref('')
             let attentionNum = ref(0)
@@ -118,73 +124,47 @@
 
             // 头像的地址
             let imgsrc = ref(null)
-            let lanze_upload = computed(() => {
-                return $cookies.get('lanze_upload')
-            })
-
             let animation = ref(null)
-            onMounted(() => {
+            const avatarByFilename = {
+                'hoad1.jpg': hoad1, 'hoad2.jpg': hoad2, 'hoad3.jpg': hoad3,
+                'hoad4.jpg': hoad4, 'hoad5.jpg': hoad5, 'hoad6.jpg': hoad6,
+                'hoad7.jpg': hoad7, 'hoad8.jpg': hoad8, 'hoad9.jpg': hoad9,
+            }
 
-                console.log(lottie);
-                // 洛蒂动画初始化
-                animation = lottie.loadAnimation({
-                    container: document.getElementById('tan'),
+            const syncAvatar = () => {
+                imgsrc.value = avatarByFilename[lanze_upload.value?.head_img] || hoad1
+            }
+
+            const stopProfileWatcher = watch(lanze_upload, syncAvatar, { immediate: true })
+
+            onMounted(() => {
+                const container = document.getElementById('tan')
+                if (!container) return
+                animation.value = lottie.loadAnimation({
+                    container,
                     renderer: 'svg',
                     loop: true,
                     autoplay: false,
                     animationData: tanqiu
                 })
+            })
 
-                if (lanze_upload.value) {
-                    switch (lanze_upload.value.head_img) {
-                        case 'hoad1.jpg':
-                            imgsrc.value = hoad1
-                            break;
-                        case 'hoad2.jpg':
-                            imgsrc.value = hoad2
-                            break;
-                        case 'hoad3.jpg':
-                            imgsrc.value = hoad3
-                            break;
-                        case 'hoad4.jpg':
-                            imgsrc.value = hoad4
-                            break;
-                        case 'hoad5.jpg':
-                            imgsrc.value = hoad5
-                            break;
-                        case 'hoad6.jpg':
-                            imgsrc.value = hoad6
-                            break;
-                        case 'hoad7.jpg':
-                            imgsrc.value = hoad7
-                            break;
-                        case 'hoad8.jpg':
-                            imgsrc.value = hoad8
-                            break;
-                        case 'hoad9.jpg':
-                            imgsrc.value = hoad9
-                            break;
-                        default:
-                            imgsrc.value = hoad1
-                    }
-                } else {
-
-                }
+            onBeforeUnmount(() => {
+                stopProfileWatcher()
+                animation.value?.destroy?.()
             })
 
             // 点击弹球时播放动画
-            let i =0;
+            let i = 0;
+            let animationTimer = null;
             function clickTan() {
-                // animation.play()
-                    animation.goToAndPlay(i*1080)
-                    let timerd = setTimeout(() => {
-                        clearInterval(timerd)
-                        animation.pause()
-                        i++
-                        if(i==4) {
-                        i = 0
-                    }
-                    },1080)
+                if (!animation.value) return
+                animation.value.goToAndPlay(i * 1080)
+                if (animationTimer) clearTimeout(animationTimer)
+                animationTimer = setTimeout(() => {
+                    animation.value?.pause?.()
+                    i = (i + 1) % 4
+                }, 1080)
             }
 
             // 登录
@@ -196,7 +176,7 @@
 
             // 点击个人资料时判断是否为登录状态
             function gerenziliao() {
-                if($cookies.get('lanze_user')) {
+                if(isLoggedIn.value) {
                     $router.push({
                     name: 'datamessage'
                 })
@@ -215,6 +195,8 @@
                 collectNum,
                 clockInNum,
                 imgsrc,
+                isLoggedIn,
+                profile,
                 lanze_upload,
                 dengluClick,
                 clickTan,

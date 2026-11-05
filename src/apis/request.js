@@ -1,32 +1,115 @@
-import axios from 'axios'
-// import { ElMessage } from 'element-plus'
-import { baseUrl } from './env';
+import axios from "axios";
+import { ElMessage } from "element-plus";
+import { apiConfig, baseUrl } from "./env.js";
+import { failure, isSuccess, normalizePoemPayload } from "../utils/response.js";
+import {
+  mockCollectionPoems,
+  mockCustomPoems,
+  mockDeleteUser,
+  mockGetUserProfile,
+  mockHuajianjiChapter,
+  mockHuajianjiIntro,
+  mockLogin,
+  mockPoetryClass,
+  mockPublishPoem,
+  mockRandomExcerpt,
+  mockRandomPoem,
+  mockRegister,
+  mockSearchPoems,
+  mockUpdatePassword,
+  mockUpdateProfile,
+  result,
+} from "../services/mockApi.js";
+import { hasRemoteApi } from "../config/runtime.js";
 
-export const request = async (url, method, data, params) => {
-    try {
+let fallbackNoticeShown = false;
 
-        // 发起请求
-        let response = await axios({
-            url: `${baseUrl+url}`,
-            method,
-            data,
-            params
-        });
-
-        // 检查响应状态码
-        if (response.status !== 200) {
-            // 显示错误消息
-            ElMessage({
-                duration: 3000,
-                message: "网络出现异常请重试",
-                type: 'error',
-            })
-        }
-
-        // 返回响应数据
-        return response.data;
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
+const showFallbackNotice = (message) => {
+  if (fallbackNoticeShown || typeof document === "undefined") return;
+  fallbackNoticeShown = true;
+  ElMessage({
+    duration: 3500,
+    message: `${message}，已切换为本地演示数据`,
+    type: "warning",
+  });
 };
+
+const getMockResponse = (url, method, data, params) => {
+  const payload = { ...(params || {}), ...(data || {}) };
+  const path = String(url || "").replace(/^\/+/, "");
+
+  if (path === "poetry/random") return mockRandomPoem();
+  if (path === "poetry/random-excerpt") return mockRandomExcerpt(payload);
+  if (path === "poetry/search") return mockSearchPoems(payload);
+  if (path === "poetry/poetry-class") return mockPoetryClass(payload);
+  if (path === "poetry/collection") return mockCollectionPoems(payload);
+  if (path === "poetry/huajianji-intro") return mockHuajianjiIntro();
+  if (path === "poetry/huajianji") return mockHuajianjiChapter(payload.chapter);
+  if (path === "poetry/custom") return mockCustomPoems();
+  if (path === "user/login") return mockLogin(payload, apiConfig);
+  if (path === "user/reg") return mockRegister(payload);
+  if (path === "user/update") return mockUpdatePassword(payload);
+  if (path === "user/delete") return mockDeleteUser(payload);
+  if (path === "user/profile") return mockGetUserProfile(payload.id);
+  if (path === "user/profile/update") return mockUpdateProfile(payload);
+  if (path === "user/poem/publish") return mockPublishPoem(payload);
+  return result(null, 404, "本地演示数据暂不支持此接口");
+};
+
+const shouldFallback = (payload) => {
+  if (!payload || typeof payload !== "object") return true;
+  if (payload.code !== undefined && !isSuccess(payload)) return false;
+  if (payload.data === undefined && payload.list === undefined && !Array.isArray(payload)) return true;
+  return false;
+};
+
+const normalizeRemoteResponse = (payload, url, fallback) => {
+  if (Array.isArray(payload)) return normalizePoemPayload(payload, fallback);
+  if (payload && typeof payload === "object") {
+    if (typeof payload.data === "string" && ["ok", "OK"].includes(payload.data)) {
+      return { ...payload, code: 200, msg: payload.msg || "ok" };
+    }
+    if (Array.isArray(payload.data) || payload.list || payload.results) {
+      return normalizePoemPayload(payload, fallback);
+    }
+    return payload;
+  }
+  return fallback;
+};
+
+export const request = async (url, method = "get", data = null, params = null) => {
+  const useRemote = hasRemoteApi(apiConfig);
+  let remoteError = null;
+  const fallback = getMockResponse(url, method, data, params);
+
+  if (useRemote) {
+    try {
+      const response = await axios({
+        url: `${baseUrl}${url}`,
+        method,
+        data,
+        params,
+        timeout: apiConfig.apiTimeout,
+      });
+      const normalized = normalizeRemoteResponse(response.data, url, fallback);
+      if (!shouldFallback(normalized)) return normalized;
+      showFallbackNotice("远端接口未返回有效数据");
+      return fallback;
+    } catch (error) {
+      remoteError = error;
+    }
+  }
+
+  if (remoteError) showFallbackNotice("远端接口不可用");
+  return fallback;
+};
+
+export const requestOrThrow = async (...args) => {
+  const payload = await request(...args);
+  if (!payload || !isSuccess(payload)) {
+    throw new Error(payload?.msg || "请求失败");
+  }
+  return payload;
+};
+
+export const describeError = (error) => failure(error).msg;

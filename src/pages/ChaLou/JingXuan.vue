@@ -30,7 +30,9 @@
 import { ref, onMounted, computed } from "vue";
 import UserLi from "../../components/UserLi.vue";
 import { useRouter } from "vue-router";
-import supabase from '../../function/supabase.js'
+import { ElMessage } from "element-plus";
+import { PoetryCustom } from "../../apis/api/list.js";
+import { normalizeListResponse } from "../../utils/response.js";
 
 export default {
   name: "JingXuan",
@@ -43,11 +45,10 @@ export default {
 
     // 数据分页
     let liArrUl = computed(() => {
-      let Arr = [];
-      while (liArr.value.length / 8) {
-        Arr.push(liArr.value.splice(0, 8));
-      }
-      return Arr;
+      const pages = [];
+      const items = [...liArr.value];
+      while (items.length) pages.push(items.splice(0, 8));
+      return pages;
     });
 
     // 页数更新
@@ -66,34 +67,16 @@ export default {
     }
 
     let loading = ref(false);
-    onMounted(() => {
-      async function asyncFunc() {
-
-      loading.value = true        //加载动画启动
-
-      let { data: response, error } = await supabase           // 请求数据
-        .from('customgushici')
-        .select('*')
-
-      // author:作者   // tag:标签  // poemName:诗名  // textBody:正文
-
-      loading.value = false
-
-      liArr.value = response;
-
+    onMounted(async () => {
+      loading.value = true;
+      try {
+        const response = await PoetryCustom();
+        liArr.value = normalizeListResponse(response, []);
+      } catch (error) {
+        ElMessage({ message: error?.message || "作品加载失败", type: "warning" });
+      } finally {
+        loading.value = false;
       }
-
-      asyncFunc();
-
-      // axios
-      //   .get(`https://lan-ze-user.vercel.app/api/user/getCustomShiCi`)
-      //   .then((response) => {
-      //     loading.value = false;
-      //     liArr.value = response.data;
-      //   })
-      //   .catch((error) => {
-      //     console.log(error);
-      //   });
     });
 
     return {

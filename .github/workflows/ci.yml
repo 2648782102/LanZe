@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 22]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Test (if script exists)
+        run: npm run test --if-present
+
+      - name: Verify build output
+        shell: bash
+        run: |
+          test -f dist/index.html
+
+  docs:
+    name: Documentation checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check required files
+        shell: bash
+        run: |
+          for file in \
+            README.md \
+            LICENSE \
+            CONTRIBUTING.md \
+            CODE_OF_CONDUCT.md \
+            SECURITY.md \
+            CHANGELOG.md \
+            docs/ARCHITECTURE.md \
+            docs/DEVELOPMENT.md \
+            docs/DEPLOYMENT.md \
+            docs/ROADMAP.md \
+            docs/FAQ.md \
+            docs/PROMOTION.md \
+            .github/PULL_REQUEST_TEMPLATE.md \
+            .github/workflows/ci.yml \
+            .github/workflows/pages.yml \
+            .github/workflows/publish.yml
+          do
+            test -f "$file" || { echo "Missing required file: $file" >&2; exit 1; }
+          done
+
+      - name: Check license consistency
+        shell: bash
+        run: |
+          grep -q 'MIT License' LICENSE
+          grep -q '2022-2026 LanZe contributors' LICENSE
+          grep -q 'MIT' README.md
+
+      - name: Reject stale demo claims
+        shell: bash
+        run: |
+          if grep -nE 'app\.memfiredb\.com|lanze-node\.vercel\.app|lan-ze-user\.vercel\.app|项目展示地址[:：]' README.md; then
+            echo 'README contains a historical endpoint presented as a live demo.' >&2
+            exit 1
+          fi

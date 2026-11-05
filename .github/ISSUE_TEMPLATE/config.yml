@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 贡献与协作问题
+    url: https://github.com/2648782102/LanZe/blob/main/CONTRIBUTING.md
+    about: 先查阅贡献指南、开发文档和常见问题，再决定使用哪个模板。
+  - name: 安全问题的私密报告入口
+    url: https://github.com/2648782102/LanZe/security/advisories/new
+    about: 请勿在公开 issue 中提交 PoC、密钥或真实用户数据；详见 SECURITY.md。

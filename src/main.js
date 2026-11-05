@@ -12,6 +12,7 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 // 引入cookies
 import VueCookies from 'vue-cookies'
+import '@lottiefiles/lottie-player'
 
 const app = createApp(App);
 
@@ -20,5 +21,5 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   }
 app.use(ElementPlus);
 app.use(router);
-app.config.globalProperties.$cookies = VueCookies
+app.use(VueCookies);
 app.mount('#app');

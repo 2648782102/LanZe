@@ -1,21 +1,21 @@
 <template>
   <!-- 登录 -->
   <section v-loading="loading" element-loading-text="登录中..." class="card">
-    <el-form :model="form" :rules="rules" class="p-5" label-position="labelPosition">
+    <el-form :model="form" :rules="rules" class="p-5" label-position="right">
       <div class="text-center mb-4">
         <h1 style="color: rgb(53, 228, 170)">
           兰泽诗词<i class="fas fa-feather-alt"></i>
         </h1>
       </div>
       <el-form-item prop="user" label="账号">
-        <el-input v-model="form.user" />
+        <el-input v-model="form.user" aria-label="登录账号" autocomplete="username" />
       </el-form-item>
       <el-form-item prop="password" label="密码">
-        <el-input v-model="form.password" show-password />
+        <el-input v-model="form.password" show-password aria-label="登录密码" autocomplete="current-password" />
       </el-form-item>
       <div>
         <Vcode :show="VcodeShow" @success="VcodeSuccess" @close="VcodeClose" @fail="VcodeFail" />
-        <button class="yan-zheng" @click="btnVcode" type="button">验证</button>
+        <button class="yan-zheng" @click="btnVcode" type="button" aria-label="打开滑块验证">验证</button>
       </div>
       <div class="addData pt-3">
         <el-link @click="routeClick('adduser')">
@@ -31,10 +31,10 @@
         </div>
       </div>
       <div class="mt-4 submit">
-        <button class="col-4 col-md-4" type="button" @click="loginClick">
+        <button class="col-4 col-md-4" type="button" @click="loginClick" aria-label="提交登录">
           登录
         </button>
-        <button class="col-4 col-md-4" type="button" @click="back">取消</button>
+        <button class="col-4 col-md-4" type="button" @click="back" aria-label="取消登录">取消</button>
       </div>
     </el-form>
   </section>
@@ -45,8 +45,8 @@
   import { useRouter } from "vue-router";
   import Vcode from "vue3-puzzle-vcode";
   import { ElMessage } from "element-plus";
-  import supabase from '../../function/supabase.js'
   import { userLogin } from '../../apis/api/login';
+  import { useSession } from '../../composables/useSession.js';
 
   export default {
     name: "login",
@@ -56,6 +56,7 @@
     setup() {
       // 路由
       const $router = useRouter();
+      const { setSession } = useSession();
 
       // 表单信息双向绑定
       const form = reactive({
@@ -114,105 +115,21 @@
         VcodeShow.value = false;
       }
 
-      const userData = async (uid) => {            // 请求用户信息函数
-
-        let data = {
-          user_name: form.user,
-          password: form.password
-        }
-
-        let like = userLogin(data)
-
-        console.log(like);
-
-        // let { data: response, error } = await supabase           // 请求数据
-        //   .from('user_message')
-        //   .select('*')
-        //   .or(`id.eq.${uid}`)
-
-        // try {
-
-        //   $cookies.config('1d')
-        //   $cookies.set('lanze_upload', response[0])
-        //   $router.push({
-        //     name: "shezhi",
-        //   });
-        //   loading.value = false;
-        //   ElMessage({
-        //     message: `登录成功！`,
-        //     type: "success",
-        //   });
-
-        // } catch (error) {
-        //   console.log(`用户信息请求失败了，原因${error}`);
-        // }
-      }
-
       const handleSubmit = async () => {
-
-        let data = {
-          username: form.user,
-          password: form.password
-        }
-
-        let datas = await userLogin(data)
-
-        let code = datas.code
-
-        if(code === 200) {
-          $cookies.config('1d')
-          $cookies.set('lanze_user', form.user)
-          $cookies.set('lanze_upload', {
-            id:"43c1dff0-f889-11ec-8336-cf8928a48750",
-            user_name:"666用户",
-            head_img:"hoad6.jpg",
-            intro:"很好"
-          })
+        const response = await userLogin({
+          username: form.user.trim(),
+          password: form.password,
+        });
+        if (Number(response?.code) !== 200) {
           loading.value = false;
-          ElMessage({
-                message: `登录成功！`,
-                type: "success",
-              });
-
-              $router.push({
-            name: "shezhi",
-          });
+          ElMessage({ message: response?.msg || "登录失败，请检查账号密码", type: "warning" });
+          return;
         }
-
-        // let { data: response, error } = await supabase           // 请求数据
-        //   .from('us_er')
-        //   .select('*')
-        //   .or(`user.eq.${form.user}`)
-
-        // try {
-        //   if (response.length != 0) {
-        //     if (response[0].password == form.password) {
-        //       $cookies.config('1d')
-        //       $cookies.set('lanze_user', response[0])
-        //       userData(response[0].id)
-        //     } else {
-        //       loading.value = false;
-        //       ElMessage({
-        //         message: `密码错误！`,
-        //         type: "warning",
-        //       });
-        //     }
-        //   } else {
-        //     console.log('no');
-        //     loading.value = false;
-        //     ElMessage({
-        //       message: `此账号未注册！`,
-        //       type: "info",
-        //     });
-        //   }
-
-        // } catch (error) {
-        //   console.log(`请求失败了，原因${error}`);
-        // }
-      }
-
-      // handleSubmit();
-
+        setSession({ user: response.data, profile: response.data });
+        loading.value = false;
+        ElMessage({ message: "登录成功！", type: "success" });
+        $router.push({ name: "shezhi" });
+      };
 
       // 点击登录按钮
       let loading = ref(false); //加载效果
@@ -226,7 +143,10 @@
         } else {
           if (VcodeOK.value) {
             loading.value = true;
-            handleSubmit();
+            handleSubmit().catch((error) => {
+              loading.value = false;
+              ElMessage({ message: error?.message || "登录失败，请稍后重试", type: "error" });
+            });
           } else {
             ElMessage({
               message: "请先验证",

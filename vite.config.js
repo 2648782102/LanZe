@@ -1,13 +1,21 @@
-module.exports = {
-  base: './',   // 打包时使用绝对路径打包
-    proxy: { 
-      '/api': {
-        target: 'http://localhost:5565',  //你要跨域访问的网址
-        changeOrigin: true,   // 允许跨域
-        pathRewrite: {
-          '^/api': ''   // 重写路径: 去掉路径中开头的'/api'
-        }
-      }
-    }
-}
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
 
+export default defineConfig({
+  plugins: [vue()],
+  base: "./",
+  server: {
+    host: "127.0.0.1",
+    port: 5173,
+    strictPort: false,
+  },
+  preview: {
+    host: "127.0.0.1",
+    port: 4173,
+    strictPort: false,
+  },
+  build: {
+    target: "es2020",
+    sourcemap: false,
+  },
+});

@@ -1,5 +1,4 @@
-// 引入vuerouter
-import { createRouter,createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from "vue-router"
 
 const router = createRouter({
     // 路由模式
@@ -14,32 +13,32 @@ const router = createRouter({
         name: 'loginindex',  //登录页面父组件
         path: '/loginindex',
         component:() => import('../pages/login/loginIndex.vue'),
-        meta:{title: '登录页面',isAush:false},
+        meta:{title: '登录页面'},
         redirect: '/login',
         children:[
             {
                 name: 'login',  //登录
                 path: '/login',
                 component:() => import('../pages/login/login.vue'),
-                meta:{title: '登录',isAush:false},
+                meta:{title: '登录'},
             },
             {
                 name: 'adduser',  //注册
                 path: '/adduser',
                 component:() => import('../pages/login/addUser.vue'),
-                meta:{title: '注册',isAush:false},
+                meta:{title: '注册'},
             },
             {
                 name: 'datauser',  //修改
                 path: '/datauser',
                 component:() => import('../pages/login/dataUser.vue'),
-                meta:{title: '修改',isAush:false},
+                meta:{title: '修改'},
             },
             {
                 name: 'deleteuser',  //注销
                 path: '/deleteuser',
                 component:() => import('../pages/login/deleteUser.vue'),
-                meta:{title: '注销',isAush:false},
+                meta:{title: '注销'},
             },
         ]
     },
@@ -47,27 +46,27 @@ const router = createRouter({
         name: 'home',  //首页/摘录
         path: '/home',
         component:() => import('../pages/Home.vue'),
-        meta:{title: '首页/摘录',isAush:false},
+        meta:{title: '首页/摘录'},
         redirect:'/zhailu',
         children:[
             {
                 name: 'zhailu',  //摘录
                 path: '/zhailu',
                 component:() => import('../pages/ZhaiLu/ZhaiLu.vue'),
-                meta: {title: '摘录',isAush: false}
+                meta: {title: '摘录'}
             },
             {
                 name: 'wenku',  //文库
                 path: '/wenku',
                 component:() => import('../pages/WenKu/WenKu.vue'),
-                meta: {title: '文库',isAush: false},
+                meta: {title: '文库'},
                 redirect: '/gushi',
                 children:[
                     {
                         name: 'gushi',  //古诗类
                         path: '/gushi',
                         component:() => import('../pages/WenKu/GuShi.vue'),
-                        meta: {title: '古诗类',isAush: false}
+                        meta: {title: '古诗类'}
                     }
                 ]
             },
@@ -75,32 +74,32 @@ const router = createRouter({
                 name: 'chalou',  //茶社
                 path: '/chalou',
                 component:() => import('../pages/ChaLou/ChaLou.vue'),
-                meta: {title: '茶社',isAush: false},
+                meta: {title: '茶社'},
                 redirect: '/jingxuan',
                 children:[
                     {
                         name: 'feihua',  //飞花接龙
                         path: '/feihua',
                         component:() => import('../pages/ChaLou/FeiHua.vue'),
-                        meta: {title: '飞花接龙',isAush: false}
+                        meta: {title: '飞花接龙'}
                     },
                     { 
                         name: 'fengya',  //风俗雅文
                         path: '/fengya',
                         component:() => import('../pages/ChaLou/FengYa.vue'),
-                        meta: {title: '风俗雅文',isAush: false}
+                        meta: {title: '风俗雅文'}
                     },
                     {
                         name: 'jingxuan',  //精选诗文
                         path: '/jingxuan',
                         component:() => import('../pages/ChaLou/JingXuan.vue'),
-                        meta: {title: '精选诗文',isAush: false}
+                        meta: {title: '精选诗文'}
                     },
                     {
                         name: 'xiandai',  //现代诗歌
                         path: '/xiandai',
                         component:() => import('../pages/ChaLou/XianDai.vue'),
-                        meta: {title: '现代诗歌',isAush: false}
+                        meta: {title: '现代诗歌'}
                     },
                     
                 ]
@@ -109,68 +108,68 @@ const router = createRouter({
                 name: 'duxue',  //笃学
                 path: '/duxue',
                 component:() => import('../pages/DuXue/DuXue.vue'),
-                meta: {title: '笃学',isAush: false}
+                meta: {title: '笃学'}
             },
             {
                 name: 'personal',  //个人中心
                 path: '/personal',
                 component:() => import('../pages/Personal/Personal.vue'),
-                meta: {title: '个人中心',isAush: false},
+                meta: {title: '个人中心'},
                 redirect: '/personalziLiao',
                 children:[
                     {
                         name: 'personalhome',  //个人中心首页
                         path: '/personalhome',
                         component:() => import('../pages/Personal/PersonalHome.vue'),
-                        meta: {title: '个人中心首页',isAush: false}
+                        meta: {title: '个人中心首页'}
                     },
                     {
                         name: 'personalziLiao',  //个人资料
                         path: '/personalziLiao',
                         component:() => import('../pages/Personal/PersonalZiLiao.vue'),
-                        meta: {title: '个人资料',isAush: false}
+                        meta: {title: '个人资料'}
                     },
                     {
                         name: 'datamessage',  //修改资料
                         path: '/datamessage',
                         component:() => import('../pages/Personal/son/dataMessage.vue'),
-                        meta: {title: '修改资料',isAush: false}
+                        meta: {title: '修改资料'}
                     },
                     {
                         name: 'samplereels',  //作品
                         path: '/samplereels',
                         component:() => import('../pages/Personal/SampleReels.vue'),
-                        meta: {title: '作品',isAush: false}
+                        meta: {title: '作品'}
                     },
                     {
                         name: 'publishpoem',  //作品
                         path: '/publishpoem',
                         component:() => import('../pages/Personal/son/publishPoem.vue'),
-                        meta: {title: '发布作品',isAush: false}
+                        meta: {title: '发布作品'}
                     },
                     {
                         name: 'favorite',  //收藏
                         path: '/favorite',
                         component:() => import('../pages/Personal/Favorite.vue'),
-                        meta: {title: '收藏',isAush: false}
+                        meta: {title: '收藏'}
                     },
                     {
                         name: 'complaint',  //投诉意见
                         path: '/complaint',
                         component:() => import('../pages/Personal/Complaint.vue'),
-                        meta: {title: '投诉意见',isAush: false}
+                        meta: {title: '投诉意见'}
                     },
                     {
                         name: 'shezhi',  //设置
                         path: '/shezhi',
                         component:() => import('../pages/Personal/SheZhi.vue'),
-                        meta: {title: '设置',isAush: false}
+                        meta: {title: '设置'}
                     },
                     {
                         name: 'attention',  //关注
                         path: '/attention',
                         component:() => import('../pages/Personal/Attention.vue'),
-                        meta: {title: '关注',isAush: false}
+                        meta: {title: '关注'}
                     }
                 ]
             },
@@ -178,25 +177,25 @@ const router = createRouter({
                 name:'details',
                 path:'/details',
                 component:() => import('../pages/details.vue'),
-                meta: {title: '详情',isAush: false}
+                meta: {title: '详情'}
             },
             {
                 name:'searchul',
                 path:'/searchul',
                 component:() => import('../pages/searchUl.vue'),
-                meta: {title: '搜索结果',isAush: false}
+                meta: {title: '搜索结果'}
             },
             {
                 name:'kongbai',
                 path:'/kongbai',
                 component:() => import('../pages/kongbai.vue'),
-                meta: {title: '空白页',isAush: false}
+                meta: {title: '空白页'}
             },
             {
                 name:'audio',
                 path: '/audio',
                 component:() => import('../pages/Audio.vue'),
-                meta: {title: '音乐播放器',isAush: false}
+                meta: {title: '音乐播放器'}
             }
         ]
     }
@@ -204,14 +203,8 @@ const router = createRouter({
 })
 
 
-// 后置路由守卫
 router.afterEach((to) => {
-    // 判断目标组件是否配置title
-    if(to.meta.title) {
-        document.title = to.meta.title
-    } else {
-        document.title = '兰泽诗词'
-    }
-})
+    document.title = to.meta.title ? `${to.meta.title} · 兰泽诗词` : "兰泽诗词";
+});
 
 export default router;

@@ -1,7 +1,7 @@
 <template>
   <!-- 注册 -->
   <section v-loading='loading' element-loading-text="注册中..." class="card">
-    <el-form :model="form" :rules="rules" class="p-5" label-position="labelPosition">
+    <el-form :model="form" :rules="rules" class="p-5" label-position="right">
       <div class="text-center mb-4">
         <h1 style="color: rgb(53, 228, 170);">兰泽诗词<i class="fas fa-feather-alt"></i></h1>
       </div>
@@ -41,9 +41,6 @@ import { reactive, ref } from 'vue'
 import { useRouter } from "vue-router";
 import Vcode from "vue3-puzzle-vcode";
 import { ElMessage } from 'element-plus'
-import axios from "axios";
-import supabase from '../../function/supabase.js'
-import { nanoid } from "nanoid";
 import { userReg } from '../../apis/api/login';
 
 export default {
@@ -111,19 +108,13 @@ export default {
       VcodeShow.value = false
     }
 
-    const handleSubmit = async (user, password) => {
-
-      let id = nanoid()
-
+    const handleSubmit = async () => {
       let data = {
         user_name: form.user,
         password: form.password,
       }
 
       let res = await userReg(data)
-
-      console.log(res);
-
       if (res.code == 200) {
         loading.value = false
         ElMessage({
@@ -141,47 +132,6 @@ export default {
         })
       }
 
-      // const response = await supabase
-      //   .from('us_er')
-      //   .insert([
-      //     { id, user: form.user, password: form.password, power: 1, state: 0 },
-      //   ])
-
-      // try {
-      //   $router.push({
-      //       name: 'login'
-      //     })
-      //   loading.value = false
-
-      //   console.log(response);
-      //   if (response.status!=400&&response.status!=409) {
-
-      //     const response1 = await supabase
-      //     .from("user_message")
-      //     .insert([
-      //     { id, user_name: '未命名', head_img: 'hoad1.jpg', intro: '什么都没有' },
-      //   ])
-      //   try {
-      //     console.log(response1);
-      //   }catch(error) {
-      //     console.log(error);
-      //   }
-      //   loading.value = false;
-      //     ElMessage({
-      //       type: 'success',
-      //       message: '注册成功，请登录!'
-      //     })
-      //   } else if(response.status==409) {
-      //     loading.value = false;
-      //     ElMessage({
-      //       type: 'warning',
-      //       message: '账号已存在，请登录!'
-      //     })
-      //   }
-
-      // } catch (error) {
-      //   console.log(`请求失败了，原因${error}`);
-      // }
     }
 
     // 点击注册按钮
@@ -197,28 +147,10 @@ export default {
       } else {
         if (VcodeOK.value) {
           loading.value = true
-          handleSubmit()
-          // axios.get(`https://lan-ze-user.vercel.app/api/user/adduser?user=${form.user}&password=${form.password}`)
-          //   .then(response => {
-          //     loading.value = false
-          //     if (response.data == 'OK') {
-          //       $router.push({
-          //         name: 'login'
-          //       })
-          //       ElMessage({
-          //         type: 'success',
-          //         message: '注册成功，请登录!'
-          //       })
-          //     } else {
-          //       ElMessage({
-          //         type: 'warning',
-          //         message: `${response.data}`
-          //       })
-          //     }
-          //   })
-          //   .catch(error => {
-          //     console.log(error);
-          //   })
+          handleSubmit().catch((error) => {
+            loading.value = false;
+            ElMessage({ type: 'error', message: error?.message || '注册失败，请稍后重试' });
+          })
         } else {
           ElMessage({
             message: '请先验证',

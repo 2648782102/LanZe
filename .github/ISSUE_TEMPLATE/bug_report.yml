@@ -1,0 +1,74 @@
+name: 缺陷报告
+description: 报告本地安装、构建、页面交互或部署中可复现的问题
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢帮忙定位问题。请勿粘贴密钥、真实账号、Cookie 或用户数据；安全漏洞请按 `SECURITY.md` 私密报告。
+        提交前建议先看 `docs/FAQ.md` 与 `docs/DEVELOPMENT.md`。
+  - type: textarea
+    id: summary
+    attributes:
+      label: 问题概述
+      description: 用一两句话说明发生了什么、你预期发生什么。
+      placeholder: 示例：执行 npm run dev 后打开首页，控制台抛出 ReferenceError。
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤
+      description: 从干净检出开始，列出最小、可复制的步骤与命令。
+      placeholder: |
+        1. `git clone ... && cd LanZe`
+        2. `npm ci`
+        3. `npm run dev`
+        4. 打开 `http://localhost:3000/#/...`，点击……
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 预期与实际结果
+      placeholder: 预期：……；实际：……；是否白屏/无限加载/报错？
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: 环境
+      description: 请填写 commit SHA、Node/npm 版本、OS、浏览器、部署平台，以及是否启用 mock/自建 API。
+      placeholder: |
+        commit: b4ea7f4
+        Node: 20.x / 22.x
+        npm: 10.x
+        OS: macOS 15 / Windows 11 / Ubuntu 24.04
+        Browser: Chrome 1xx
+        配置: VITE_ENABLE_MOCK=true / VITE_API_BASE_URL=/api/ / 未配置
+        部署: 本地 dev / build 预览 / GitHub Pages / Vercel / Netlify
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志或截图
+      description: 贴出脱敏后的终端输出、浏览器控制台或网络错误；截图可拖到此处。不要包含私密信息。
+      render: shell
+  - type: textarea
+    id: workaround
+    attributes:
+      label: 已尝试的排查 / 临时方案
+      description: 例如重新 `npm ci`、禁用浏览器扩展、切换 mock、检查 CORS 或 CDN。
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: 提交前确认
+      options:
+        - label: 我已搜索现有 issue / Discussion，避免重复报告。
+          required: true
+        - label: 我已移除密钥、Cookie、真实账号与用户数据。
+          required: true
+        - label: 我理解本项目当前不承诺线上 Demo 或托管后端。
+          required: true

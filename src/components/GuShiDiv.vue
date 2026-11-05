@@ -4,15 +4,16 @@
     <h2>作者&代表人物: {{ author }}</h2>
     <h3>年代：{{ age }}</h3>
     <h3>简介: {{ synopsis }}</h3>
-    <button v-loading="loading" class="btn-go" @click="goClick" v-text="address?'开始鉴赏':'未添加'"></button>
+    <button v-loading="loading" class="btn-go" @click="goClick" :aria-label="address?'开始鉴赏':'未添加'" v-text="address?'开始鉴赏':'未添加'"></button>
   </article>
 </template>
 
 <script>
-  import axios from "axios";
   import { ref } from "vue";
   import { useRouter } from "vue-router";
-  import supabase from '../function/supabase.js'
+  import { ElMessage } from "element-plus";
+  import { PoetryCollection } from "../apis/api/list.js";
+  import { normalizeListResponse } from "../utils/response.js";
 
   export default {
     name: 'GuShiDiv',
@@ -24,74 +25,28 @@
       // 加载控制
       let loading = ref(false)
 
-      // let gettitle = null      // 获取到的诗词信息存储数组
-
       async function asyncFunc() {
-
-        if(props.address) {
-
-        loading.value = true        //加载动画启动
-
-        let { data: response, error } = await supabase           // 请求数据
-        .from(props.address)
-        .select('*')
-
-        // author:作者   // tag:标签  // poemName:诗名  // textBody:正文
-
-        loading.value = false
-
-        let tangArr = JSON.stringify(response)
-
-        $router.push({
-              name: 'searchul',
-              query: {
-                ulArr: tangArr
-              }
-            })
-
-        // 老版写法
-        // 发送请求获取具体诗词内容
-        // axios.get(`https://lanze-node.vercel.app/api/${props.address}`)
-        //   .then(response => {
-        //     // response.data[0].poemName:诗名   response.data[0].tag:诗集   response.data[0].author:作者
-        //     // response.data[0].textBody:正文
-        //   })
-        //   .catch(function (error) {
-        //     console.log(error);
-        //   })
-          } else {
-            alert('未添加此分栏，请等待更新!')
-          }
+        if (!props.address) {
+          ElMessage({ message: "未添加此分栏，请等待更新！", type: "info" });
+          return;
+        }
+        loading.value = true;
+        try {
+          const response = await PoetryCollection({ address: props.address });
+          const poems = normalizeListResponse(response, []);
+          await $router.push({
+            name: "searchul",
+            query: { ulArr: JSON.stringify(poems) },
+          });
+        } catch (error) {
+          ElMessage({ message: error?.message || "诗集加载失败", type: "warning" });
+        } finally {
+          loading.value = false;
+        }
       }
 
       // 单击鉴赏按钮
-      function goClick() {
-
-        asyncFunc();
-
-        // if(props.address) {
-        // loading.value = true
-        // // 发送请求获取具体诗词内容
-        // axios.get(`https://lanze-node.vercel.app/api/${props.address}`)
-        //   .then(response => {
-        //     loading.value = false
-        //     // response.data[0].author:诗名   response.data[0].paragraphs:诗集   response.data[0].rhythmic:作者
-        //     // response.data[0].tags:正文
-        //     let tangArr = JSON.stringify(response.data)
-        //     $router.push({
-        //       name: 'searchul',
-        //       query: {
-        //         ulArr: tangArr
-        //       }
-        //     })
-        //   })
-        //   .catch(function (error) {
-        //     console.log(error);
-        //   })
-        //   } else {
-        //     alert('未添加此分栏，请等待更新!')
-        //   }
-      }
+      function goClick() { return asyncFunc(); }
 
       return {
         goClick,

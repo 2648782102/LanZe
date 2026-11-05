@@ -1,4 +1,6 @@
-// 设置公用访问url，环境地址
-// apifox测试地址
-export const baseUrl = "http://localhost:5565/"
-        
+import { runtimeConfig } from "../config/runtime.js";
+
+export const baseUrl = runtimeConfig.apiBaseUrl;
+export const apiConfig = runtimeConfig;
+
+export { runtimeConfig };

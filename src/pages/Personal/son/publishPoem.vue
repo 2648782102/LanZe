@@ -5,26 +5,26 @@
       <form action="">
         <div>
           <label for="origin" class="form-label">诗词名：</label>
-          <input v-model="form.origin" class="form-control" type="text" id="origin">
+          <input v-model="form.origin" class="form-control" type="text" id="origin" aria-label="诗词名">
         </div>
         <div>
           <label for="author" class="form-label">作者：</label>
-          <input v-model="form.author" class="form-control" type="text" id="author">
+          <input v-model="form.author" class="form-control" type="text" id="author" aria-label="作者">
         </div>
         <div>
           <label for="category" class="form-label">标签：</label>
-          <input v-model="form.category" class="form-control" type="text" id="category">
+          <input v-model="form.category" class="form-control" type="text" id="category" aria-label="标签">
         </div>
         <div>
           <label for="content" class="form-label">正文：</label>
-          <textarea class="form-control" v-model="form.content" type="text" id="content"></textarea>
+          <textarea class="form-control" v-model="form.content" id="content" aria-label="正文"></textarea>
         </div>
         <div>
           <label for="title" class="form-label">注释：</label>
-          <textarea class="form-control" v-model="form.title" type="text" id="title"></textarea>
+          <textarea class="form-control" v-model="form.title" id="title" aria-label="注释"></textarea>
         </div>
         <div class="mt-3">
-          <button class="btn btn-success" @click="onSubmit">提交</button>
+          <button class="btn btn-success" type="button" @click="onSubmit" aria-label="提交作品">提交</button>
         </div>
       </form>
     </div>
@@ -32,15 +32,17 @@
 </template>
 
 <script>
-import { reactive,ref } from "@vue/reactivity";
+import { reactive } from "vue";
 import { useRouter } from "vue-router";
-import axios from 'axios';
 import { ElMessage } from "element-plus";
+import { userPublishPoem } from "../../../apis/api/login.js";
+import { useSession } from "../../../composables/useSession.js";
 
 export default {
   name: "publishPoem",
   setup() {
     const $router = useRouter()
+    const { isLoggedIn, profile } = useSession()
 
     let form = reactive({
       origin: "",
@@ -50,29 +52,30 @@ export default {
       title: "",
     });
 
-    function onSubmit() {
-      if(form.origin,form.author,form.category,form.content,form.title) {
-        let id = $cookies.get('lanze_user').id
-        axios.get(`https://lan-ze-user.vercel.app/api/user/addGuShiCi?id=${id}&origin=${form.origin}&author=${form.author}
-      &category=${form.category}&content=${form.content}&title=${form.title}`)
-      .then(response => {
-        console.log(response.data);
-        if(response.data=='ok') {
-          ElMessage({
-            type:'success',
-            message:'发布成功！'
-          })
-          $router.push({
-            name: 'kongbai'
-          })
-        }
-      })
-      .catch(error => {
-        console.log(error);
-      })
-      } else {
-        alert('不能为空！')
+    async function onSubmit() {
+      if (!isLoggedIn.value) {
+        ElMessage({ type: 'warning', message: '请先登录后再发布作品' });
+        $router.push({ name: 'loginindex' });
+        return;
       }
+      if (!form.origin.trim() || !form.content.trim()) {
+        ElMessage({ type: 'warning', message: '诗词名与正文不能为空！' });
+        return;
+      }
+      const response = await userPublishPoem({
+        origin: form.origin.trim(),
+        author: form.author.trim() || profile.value.user_name,
+        category: form.category.trim() || '用户作品',
+        content: form.content.trim(),
+        title: form.title.trim(),
+      });
+      if (Number(response?.code) !== 200) {
+        ElMessage({ type: 'error', message: response?.msg || '发布失败，请稍后重试' });
+        return;
+      }
+      ElMessage({ type: 'success', message: '发布成功！' });
+      Object.keys(form).forEach((key) => { form[key] = ""; });
+      $router.push({ name: 'samplereels' });
     }
 
     return {

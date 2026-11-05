@@ -1,35 +1,30 @@
 <template>
 <!-- 音乐播放器 -->
-  <div class="mainPage" ref="playerRef"></div>
+  <div class="mainPage" ref="playerRef" aria-label="兰泽诗词音乐播放器"></div>
 </template>
 
-<script>
-export default {
-  name: "Audio",
-};
-</script>
-
 <script setup>
-import "../../node_modules/aplayer/dist/APlayer.min.css";
+defineOptions({ name: "Audio" });
+
+import "aplayer/dist/APlayer.min.css";
 import APlayer from "aplayer";
 import {
-  reactive, 
+  reactive,
   onBeforeUnmount,
-  getCurrentInstance,
   onMounted,
   ref,
 } from "vue";
 
 const playerRef = ref();
-const { proxy } = getCurrentInstance();
 const state = reactive({
   instance: null,
 });
 onMounted(() => {
+    if (!playerRef.value) return;
     state.instance = new APlayer({
       container: playerRef.value,
-      fixed:true,
-      autoplay:true,
+      fixed: true,
+      autoplay: false,
       audio: [
       {
           name: '少年不凡',
@@ -63,11 +58,10 @@ onMounted(() => {
         },
         ],
     });
-  // });
-  // 销毁
-  onBeforeUnmount(() => {
-    state.instance.destroy();
-  });
+});
+
+onBeforeUnmount(() => {
+  state.instance?.destroy?.();
 });
 </script>
 

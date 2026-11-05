@@ -1,0 +1,50 @@
+name: 诗词内容 / 素材勘误
+description: 报告诗词文本、作者、出处或素材来源/授权的疑点
+title: "[Content] "
+labels: ["content"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请只提交可公开讨论的信息。公版诗词的数字化、点校、注释、字体、图片与音乐仍可能受独立授权约束；没有把握时先提出来源问题，不要批量粘贴全文或第三方资源。
+  - type: textarea
+    id: item
+    attributes:
+      label: 涉及内容
+      description: 页面/组件、诗句或素材标识、当前显示文本。
+      placeholder: "`src/pages/...` 中显示的「……」"
+    validations:
+      required: true
+  - type: textarea
+    id: correction
+    attributes:
+      label: 疑点与建议
+      description: 说明错字、断句、作者/出处、版本差异或授权来源问题，并给出建议。
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: 可核查来源
+      description: 给出书名、版本、公版数据库链接或授权说明；避免来源不明的转载站。
+    validations:
+      required: true
+  - type: dropdown
+    id: rights
+    attributes:
+      label: 是否涉及第三方授权
+      options:
+        - 否 / 不确定，仅文本勘误
+        - 是，涉及图片 / 字体 / 音乐 / 点校文本
+        - 需要维护者私下确认来源
+    validations:
+      required: true
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: 提交前确认
+      options:
+        - label: 我没有粘贴受版权保护的长篇全文、密钥或个人信息。
+          required: true
+        - label: 我理解内容勘误需要版本依据，不把个人偏好当作唯一标准。
+          required: true

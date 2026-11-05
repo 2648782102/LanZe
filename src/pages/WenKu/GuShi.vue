@@ -13,7 +13,9 @@
         class="el-col"
         :span="6"
       >
-        <el-card class="elCard" @click="asyncFunc(item.to)" shadow="hover" :body-style="{ padding: '0px' }">
+        <el-card class="elCard" @click="asyncFunc(item.to)" @keyup.enter="asyncFunc(item.to)"
+          role="button" tabindex="0" :aria-label="`查看${item.title}`" shadow="hover"
+          :body-style="{ padding: '0px' }">
           <img
             :src="item.imgSrc"
             class="image"
@@ -27,156 +29,10 @@
       </el-col>
     </el-row>
 
-    <!-- 大屏幕时在左边 -->
-    <!-- <el-tabs type="border-card" tab-position="left" class="gushi-tabs hidden-sm-and-down">
-            <el-tab-pane>
-                <template #label>
-                    <div>
-                        <i class="fas fa-star"> 精选文集</i>
-                    </div>
-                </template>
-                <GuShiJingXuan />
-            </el-tab-pane>
-            <el-tab-pane>
-                <template #label>
-                    <div>
-                        <i class="fas fa-cannabis"> 唐诗.宋词</i>
-                    </div>
-                </template>
-                <GuShiTangSong />
-            </el-tab-pane>
-            <el-tab-pane>
-                <template #label>
-                    <div>
-                        <i class="fas fa-music"> 元曲</i>
-                    </div>
-                </template>
-                <GuShiYuanQu />
-            </el-tab-pane>
-            <el-tab-pane>
-                <template #label>
-                    <div>
-                        <i class="fas fa-feather-alt"> 南唐二主词</i>
-                    </div>
-                </template>
-                <GuShiNanTang />
-            </el-tab-pane>
-            <el-tab-pane>
-                <template #label>
-                    <div>
-                        <i class="fas fa-user-graduate"> 教育</i>
-                    </div>
-                </template>
-                <GuShiJiaoYu />
-            </el-tab-pane>
-            <el-tab-pane>
-                <template #label>
-                    <div>
-                        <i class="fas fa-fan"> 花间集</i>
-                    </div>
-                </template>
-                <GuShiHuaJianJi />
-            </el-tab-pane>
-            <el-tab-pane label="全唐诗">
-                <template #label>
-                    <div class="gushi-tabs-span">
-                        <i style="font-weight: 800;">唐</i>
-                        &nbsp全唐诗
-                    </div>
-                </template>
-                <GuShiTangShi />
-            </el-tab-pane>
-            <el-tab-pane>
-                <template #label>
-                    <div class="gushi-tabs-span">
-                        <i style="font-weight: 800;">宋</i>
-                        &nbsp全宋词
-                    </div>
-                </template>
-                <GuShiSongCi />
-            </el-tab-pane>
-        </el-tabs>
-         小屏幕时在上边 -->
-    <!-- <el-tabs :stretch="true" type="border-card" tab-position="top" class="gushi-tabs hidden-md-and-up">
-            <el-tab-pane>
-                <template #label>
-                    <div>
-                        <i class="fas fa-star"> 精选文集</i>
-                    </div>
-                </template>
-                <GuShiJingXuan />
-            </el-tab-pane>
-            <el-tab-pane>
-                <template #label>
-                    <div>
-                        <i class="fas fa-cannabis"> 唐诗.宋词</i>
-                    </div>
-                </template>
-                <GuShiTangSong />
-            </el-tab-pane>
-            <el-tab-pane>
-                <template #label>
-                    <div>
-                        <i class="fas fa-music"> 元曲</i>
-                    </div>
-                </template>
-                <GuShiYuanQu />
-            </el-tab-pane>
-            <el-tab-pane>
-                <template #label>
-                    <div>
-                        <i class="fas fa-feather-alt"> 南唐二主词</i>
-                    </div>
-                </template>
-                <GuShiNanTang />
-            </el-tab-pane>
-            <el-tab-pane>
-                <template #label>
-                    <div>
-                        <i class="fas fa-user-graduate"> 教育</i>
-                    </div>
-                </template>
-                <GuShiJiaoYu />
-            </el-tab-pane>
-            <el-tab-pane>
-                <template #label>
-                    <div>
-                        <i class="fas fa-fan"> 花间集</i>
-                    </div>
-                </template>
-                <GuShiHuaJianJi />
-            </el-tab-pane>
-            <el-tab-pane label="全唐诗">
-                <template #label>
-                    <div>
-                        <i style="font-weight: 800;">唐</i>
-                        &nbsp全唐诗
-                    </div>
-                </template>
-                <GuShiTangShi />
-            </el-tab-pane>
-            <el-tab-pane>
-                <template #label>
-                    <div>
-                        <i style="font-weight: 800;">宋</i>
-                        &nbsp全宋词
-                    </div>
-                </template>
-                <GuShiSongCi />
-            </el-tab-pane>
-        </el-tabs> -->
   </article>
 </template>
 
 <script>
-// import GuShiJingXuan from './GuShi/GuShiJingXuan.vue'
-// import GuShiTangSong from './GuShi/GuShiTangSong.vue'
-// import GuShiYuanQu from './GuShi/GuShiYuanQu.vue'
-// import GuShiNanTang from './GuShi/GuShiNanTang.vue'
-// import GuShiTangShi from './GuShi/GuShiTangShi.vue'
-// import GuShiSongCi from './GuShi/GuShiSongCi.vue'
-// import GuShiHuaJianJi from './GuShi/GuShiHuaJianJi.vue'
-// import GuShiJiaoYu from './GuShi/GuShiJiaoYu.vue'
 import "element-plus/theme-chalk/display.css";
 import { reactive,ref } from "vue";
 import { useRouter } from "vue-router";
@@ -185,8 +41,9 @@ import shijing1 from "../../assets/beijing/shijing1.jpg";
 import songci300 from "../../assets/beijing/songci300.jpg";
 import caocao from "../../assets/beijing/caocao.jpg";
 import tangshi300 from "../../assets/beijing/tangshi300.jpg";
-import supabase from "../../function/supabase.js";
-import {PoetryClass} from '../../apis/api/list';
+import { ElMessage } from "element-plus";
+import { PoetryClass } from "../../apis/api/list.js";
+import { normalizeListResponse } from "../../utils/response.js";
 
 
 export default {
@@ -235,44 +92,21 @@ export default {
     // 加载控制
       let loading = ref(false)
 
-    async function asyncFunc(va1) {
-
-
-        loading.value = true        //加载动画启动
-
-        // let { data: response, error } = await supabase           // 请求数据
-        // .from(va1)
-        // .select('*')
-
-        let params = {
-          type:va1
-        }
-
-        let response = await PoetryClass(params)
-
-        console.log(response.data);
-        console.log("------------------->");
-
-
-
-        // author:作者   // tag:标签  // poemName:诗名  // textBody:正文
-
-        loading.value = false
-
-        let tangArr = JSON.stringify(response.data)
-
-        $router.push({
-              name: 'searchul',
-              query: {
-                ulArr: tangArr
-              }
-            })
+    async function asyncFunc(type) {
+      loading.value = true;
+      try {
+        const response = await PoetryClass({ type });
+        const poems = normalizeListResponse(response, []);
+        await $router.push({
+          name: "searchul",
+          query: { ulArr: JSON.stringify(poems) },
+        });
+      } catch (error) {
+        ElMessage({ message: error?.message || "分类加载失败", type: "warning" });
+      } finally {
+        loading.value = false;
       }
-      
-
-      // function carTo(value) {
-      //   asyncFunc(value)
-      // }
+    }
 
     return {
       carArr,
@@ -280,16 +114,6 @@ export default {
       loading
     };
   },
-  // components: {
-  //     GuShiJingXuan,
-  //     GuShiTangSong,
-  //     GuShiYuanQu,
-  //     GuShiNanTang,
-  //     GuShiSongCi,
-  //     GuShiTangShi,
-  //     GuShiHuaJianJi,
-  //     GuShiJiaoYu
-  // }
 };
 </script>
 
