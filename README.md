@@ -134,7 +134,7 @@ VITE_USE_MOCK=true
 ```text
 LanZe/
 ├── .github/                 # CI、Pages workflow、issue/PR 模板
-├── docs/                    # 架构、开发、部署、路线图、FAQ、宣发与巡检
+├── docs/                    # 架构、开发、部署、路线图、FAQ、素材、宣发与巡检
 ├── public/                  # favicon 与 OG/hero 展示素材（不覆盖 favicon.ico）
 ├── src/
 │   ├── apis/                # Axios 请求封装与业务 API 列表
@@ -154,6 +154,7 @@ LanZe/
 ├── vite.config.js           # ESM 构建配置（base './'）
 ├── package.json             # npm 脚本与依赖
 ├── README.md                # 本文件
+├── docs/THIRD_PARTY_ASSETS.md # 第三方素材与外链来源清单（授权待核验）
 ├── CONTRIBUTING.md          # 贡献指南
 ├── CODE_OF_CONDUCT.md       # 行为准则
 ├── SECURITY.md              # 安全政策
@@ -218,7 +219,7 @@ LanZe/
 
 ## 许可证
 
-本项目采用 [MIT License](LICENSE)，`Copyright (c) 2022-2026 LanZe contributors`。这不自动覆盖 `src/assets/` 内第三方字体/图片、外部音乐链接、CDN 资源或诗词文本可能适用的独立授权；二次发布与商用前请自行核查来源，详见 `docs/FAQ.md`。
+本项目采用 [MIT License](LICENSE)，`Copyright (c) 2022-2026 LanZe contributors`。这不自动覆盖 `src/assets/` 内第三方字体/图片、外部音乐链接、CDN 资源或诗词文本可能适用的独立授权；二次发布与商用前请自行核查来源，详见 `docs/THIRD_PARTY_ASSETS.md` 与 `docs/FAQ.md`。
 
 ## 致谢
 

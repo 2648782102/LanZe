@@ -130,3 +130,5 @@
 - 核对发现公开 Release body 仍是早先的 v0.2.0 文案，尚未包含本轮 vendor 分包与 Lottie 本地化；仓库内 `RELEASE_NOTES.md` 已更新，准备通过幂等发布 workflow 同步。
 - 新增 `scripts/smoke.mjs` 与 `npm run smoke`：启动 Vite preview，解析 `dist/index.html` 中的本地 JS/CSS 入口并逐项请求；本地验证 7 个静态资源均返回 200。CI 的 Node 20/22 build job 现在会执行该冒烟脚本。
 - README、`CONTRIBUTING.md`、`docs/DEVELOPMENT.md`、`docs/DEPLOYMENT.md`、`CHANGELOG.md` 已补充 `npm run smoke` 命令与验收说明；`npm run build`、`npm run smoke`、`npm run test`（14/14）、`npm run lint`、YAML、`git diff --check` 均通过。
+- `383d3a9` 推送后，CI run `42088476064` 与 publish run `42088486521` 均 success；Release body 与本地 `RELEASE_NOTES.md` 内容一致（仅末尾换行差异），Discussions 欢迎帖按标题查重未重复创建。
+- 新增 `docs/THIRD_PARTY_ASSETS.md`：按字体、图片、诗词、Lottie、音乐/CDN 分类记录来源线索与「授权未核验」状态；明确下载 LottieFiles JSON 不等于获得许可。修正 `docs/DEVELOPMENT.md` 中「部分 Lottie JSON 仍为外链」的过时表述，并让 CI 检查该清单文件存在。

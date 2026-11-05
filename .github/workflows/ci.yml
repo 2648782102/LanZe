@@ -74,6 +74,7 @@ jobs:
             docs/ROADMAP.md \
             docs/FAQ.md \
             docs/PROMOTION.md \
+            docs/THIRD_PARTY_ASSETS.md \
             .github/PULL_REQUEST_TEMPLATE.md \
             .github/workflows/ci.yml \
             .github/workflows/pages.yml \

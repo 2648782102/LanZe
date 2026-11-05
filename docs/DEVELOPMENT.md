@@ -100,7 +100,7 @@ VITE_USE_MOCK=true
 
 ### 方案 C：第三方数据源
 
-音乐、封面、部分 Lottie JSON、Bootstrap/Font Awesome 等仍来自外部 CDN。第三方可用性、速率限制、内容授权与隐私政策由提供方决定。业务数据默认使用本地演示兜底，CI 不依赖这些站点返回成功。
+音乐、封面与 Bootstrap/Font Awesome 仍来自外部 CDN；Lottie 动画 JSON 已保存到仓库并由 `useLottieSource()` 生成 Blob URL。第三方可用性、速率限制、内容授权与隐私政策由提供方决定，逐项记录见 `docs/THIRD_PARTY_ASSETS.md`。业务数据默认使用本地演示兜底，CI 不依赖这些站点返回成功。
 
 ## 6. 开发约定
 
@@ -111,7 +111,7 @@ VITE_USE_MOCK=true
 - 不向全局 `window` 追加未声明依赖；`scroll` 等标识符必须显式定义。
 - 样式优先局部作用域；调整 `index.html` 的全局 `overflow`/媒体查询时同时检查移动端滚动。
 - 不要在仓库中保存 `.env`、`dist/`、日志、真实 Cookie 或用户数据。
-- 新增资源时记录来源、许可与大小；大字体/图片优先做性能与授权评估。
+- 新增资源时在 `docs/THIRD_PARTY_ASSETS.md` 记录来源、许可与大小；大字体/图片优先做性能与授权评估。
 
 ## 7. 手动 QA 清单
 
