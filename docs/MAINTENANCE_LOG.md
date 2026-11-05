@@ -162,3 +162,4 @@
 - 本轮再次核对：当前可用 GitHub 连接具备 issue/文件写入但没有仓库 metadata 写权限，本机也无 GitHub HTTPS token；`homepage` 仍是失效 `lan-ze.vercel.app`，Pages 仍 `has_pages=false` 且项目站点返回 404。没有伪造线上 Demo、清空 homepage 或触发未经配置的 Pages 部署。
 - 将 `public/og-image.svg` 用本机 WebKit 按 1200×630 视口渲染并缩放到目标尺寸，目检标题/诗句/底部署名无裁切，生成 `public/og-image.png`（369 KB，SHA-256 已写入 `docs/PROMOTION.md`）。README、CHANGELOG 与素材清单同步；社交预览上传仍因缺少仓库设置写通道而未执行。
 - 用本机 Chrome 157 与临时隔离 profile 做了一次真实 CDP 冒烟：`#/home` 显示三条本地演示摘录与一个「兰泽 · 本地演示音」播放器，点击「文库」进入 `#/gushi` 并显示唐诗三百/宋词三百等分类，控制台错误、未捕获异常、失败网络请求均为 0。检查沉淀为可选 `npm run smoke:browser`，使用 CDP WebSocket 与临时 profile，不覆盖日常浏览器状态；CI 仍只运行无浏览器依赖的脚本。
+- `0a8b017` 的 CI run `42095302758` 与 `385bb13` 的 CI run `42095805722` 均为 success；后者三项 job 包含 Node 20/22 构建、17 项单测、构建冒烟与文档防护。再次强制更新 `v0.2.0` tag（annotated object `f9294f8`）触发 publish run `42095964071`，Release 与 Discussion 步骤均 success；公开 Release body 已加入可选 Chrome 点击流说明，并把「未执行完整 E2E」收窄为「未执行覆盖登录/发布全链路的完整 E2E」。
