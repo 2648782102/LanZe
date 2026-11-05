@@ -10,7 +10,7 @@
 
 - [ ] `node -v` 为 20 或 22（或与最终 `package.json` 的 `engines` 一致）。
 - [ ] `npm ci && npm run build && npm run test && npm run lint && npm run smoke` 通过。
-- [ ] 环境允许时，本机浏览器点击流 `npm run smoke:browser` 通过；CI 不强制依赖本机 Chrome。
+- [ ] 环境允许时，本机 Chrome 桌面/窄屏与登录发布冒烟 `npm run smoke:browser` 通过；CI 不强制依赖本机 Chrome。
 - [ ] 明确本次部署是「仅前端 + 浏览器本地演示数据」还是「前端 + 自建 API」。
 - [ ] 生产环境变量只含公开配置；`VITE_USE_MOCK` 按需求设置，避免把演示数据误写成正式账号服务。
 - [ ] 若关闭 mock，`VITE_API_BASE_URL` 指向可访问的 HTTPS API 或同源 `/api/`；后端已配置 CORS/鉴权/限流。远端失败时前端会自动降级。

@@ -33,7 +33,7 @@
 | 前端构建 | Vue 3 + Vue Router 4（hash 模式）+ Element Plus + Vite 6（ESM 配置） |
 | 在线 Demo | 不承诺；旧展示地址仅保留在 `CHANGELOG.md` 与 `docs/FAQ.md` 的事实说明中 |
 | 后端/账号 | 仓库不附带完整后端；默认使用本地演示数据，配置 `VITE_API_BASE_URL` 后可连接自建 API |
-| 测试 | `npm run test` 含 17 个 `node --test` 单测；CI 在 Node 20/22 执行构建与测试 |
+| 测试 | `npm run test` 含 18 个 `node --test` 单测；CI 在 Node 20/22 执行构建与测试 |
 | 许可 | [MIT](LICENSE)，`Copyright (c) 2022-2026 LanZe contributors` |
 | 发布 | `v0.2.0` 的 Release notes 与 Discussions 欢迎帖见 `RELEASE_NOTES.md`、`ANNOUNCEMENT.md` |
 
@@ -46,7 +46,7 @@
 - 👤 **个人中心**：登录/注册/资料/作品/收藏/设置等页面，演示态由浏览器本地存储支持。
 - 🎵 **音乐播放**：APlayer 默认加载仓库自制 WAV / SVG 演示资源；可通过公开配置接入授权明确的自定义音源。
 - 📱 **响应式布局**：包含移动端底部导航与大屏布局，仍需持续无障碍/布局回归。
-- 🧩 **现代前端栈**：Vue 3、Vue Router 4、Element Plus、Axios、Lottie，配合 Vite 6 构建与 17 项单测。
+- 🧩 **现代前端栈**：Vue 3、Vue Router 4、Element Plus、Axios、Lottie，配合 Vite 6 构建与 18 项单测。
 - 📚 **开源治理**：MIT、贡献/行为/安全政策、变更日志、CI、issue/PR 模板、发布与宣发文案。
 
 「特性」描述的是仓库中已有界面与默认演示数据能力，不等于提供线上账号、持久化服务或正式内容审核。逐项可信度见 `docs/FAQ.md`。
@@ -89,14 +89,14 @@ npm run dev
 
 ```bash
 npm run build        # 生成 dist/
-npm run test         # 17 个 node --test 单测
+npm run test         # 18 个 node --test 单测
 npm run lint         # 静态检查：失效后端地址、硬编码服务与脆弱引用
 npm run preview      # 预览 dist/
 npm run smoke        # 预览服务与入口静态资源 HTTP 冒烟
-npm run smoke:browser # 可选：本机 Chrome 首页→文库点击流冒烟
+npm run smoke:browser # 可选：本机 Chrome 桌面/窄屏与登录发布冒烟
 ```
 
-CI 在 Node 20/22 执行 `npm ci && npm run build && npm run test --if-present && npm run smoke`；`--if-present` 保留为兼容旧工作流的兜底写法。浏览器冒烟需要 macOS 上的本机 Chrome，不进入 CI 矩阵。
+CI 在 Node 20/22 执行 `npm ci && npm run build && npm run test --if-present && npm run smoke`；`--if-present` 保留为兼容旧工作流的兜底写法。可选浏览器冒烟需要 macOS 上的本机 Chrome，不进入 CI 矩阵；它用独立临时 profile 验证桌面/窄屏搜索、窄屏导航、演示登录（含滑块验证）、作品发布、本地音源挂载与控制台/网络错误，不替代跨浏览器、真实后端或正式 E2E 套件。
 
 ### 本地演示 / mock 模式
 
@@ -210,8 +210,8 @@ LanZe/
 
 简要版本（完整优先级与验收标准见 `docs/ROADMAP.md`）：
 
-- **v0.2.0（当前）**：Vite 6、本地演示数据、17 项单测、lint、README/许可证/治理文档、CI、模板、发布与宣发文案；Element Plus 按需注册、手工 vendor 分包、Lottie 动画、核心样式/图标与默认演示音源本地化。
-- **v0.3.x（工程优化）**：补充浏览器端交互 E2E、完善错误/空状态、完善自定义音源回退并核验第三方素材授权。
+- **v0.2.0（当前）**：Vite 6、本地演示数据、18 项单测、lint、README/许可证/治理文档、CI、模板、发布与宣发文案，以及可选的桌面/窄屏与登录发布浏览器冒烟；Element Plus 按需注册、手工 vendor 分包、Lottie 动画、核心样式/图标与默认演示音源本地化。
+- **v0.3.x（工程优化）**：把可选本机冒烟进一步扩展为 CI 可复现的浏览器 E2E，完善错误/空状态、自定义音源回退并核验第三方素材授权。
 - **v0.4.x（体验与内容）**：响应式与无障碍回归、素材授权清单、演示录屏、可选后端契约。
 - **后续（社区化）**：按真实贡献推进 i18n、内容版本依据与社区讨论，不预设交付期限。
 

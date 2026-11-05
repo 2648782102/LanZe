@@ -5,7 +5,7 @@
 ### Highlights
 
 - 🧩 升级到 Vite 6 与 `@vitejs/plugin-vue`，统一 ESM 配置、相对 `base: './'` 和 `dev` / `build` / `preview` 脚本。
-- 🧪 新增 `npm run test`：17 个 `node --test` 单测覆盖运行配置、音频播放列表、本地演示 API、响应归一化与查询解析；新增 `npm run lint` 静态检查。
+- 🧪 新增 `npm run test`：18 个 `node --test` 单测覆盖运行配置、音频播放列表、浏览器冒烟数据、本地演示 API、响应归一化与查询解析；新增 `npm run lint` 静态检查。
 - 📚 新增本地演示数据层：未配置 `VITE_API_BASE_URL` 或远端不可用时自动降级，摘录、分类文库、搜索、登录、注册、改密、个人资料与作品发布均可纯前端演示。
 - 🔐 清理历史硬编码 Supabase 密钥并改为可选环境变量；显式管理 Cookie 会话，移除固定假用户与依赖 `$cookies` 全局对象的用法。
 - 🛠 修复未定义的 `scroll` / `next()`、重复路由守卫、`ElMessage` 未导入、脆弱的 `node_modules` 样式引用和多处 JSON 解析问题。
@@ -15,7 +15,7 @@
 - 📖 重写 README：项目定位、快速开始、环境变量、本地演示、项目结构、部署、路线图、MIT 与英文摘要。
 - ⚖️ 新增 MIT 许可证、贡献指南、行为准则、安全政策、变更日志与 FAQ。
 - 🧭 新增架构、开发、部署、路线图、FAQ 与展示清单；历史 MemFire / Vercel 地址仅作为迁移背景，不再宣称可用。
-- ⚙️ 新增 Node 20 / 22 CI：`npm ci`、`npm run build`、`npm run test --if-present` 与构建产物冒烟；新增手动触发的 GitHub Pages workflow，以及可选的本地 Chrome 点击流冒烟脚本。
+- ⚙️ 新增 Node 20 / 22 CI：`npm ci`、`npm run build`、`npm run test --if-present` 与构建产物冒烟；新增手动触发的 GitHub Pages workflow，以及可选的本机 Chrome 桌面/窄屏与登录发布冒烟脚本。
 - 🧩 新增 bug / 功能 / 文档 / 内容勘误 issue 模板与 PR 模板。
 - 🖼 新增 `public/og-image.svg` 作为 README hero 与社交预览素材候选，保留原 `favicon.ico`。
 
@@ -65,7 +65,7 @@ npm run preview
 - 当前不提供经维护者验证的线上 Demo、托管后端或账号服务；静态部署只发布前端。
 - 本地演示账号与作品数据仅保存在浏览器 `localStorage`，不提供真实密码安全或跨设备同步；真实部署必须配置后端与认证方案。
 - Element Plus 已按需注册并按 Vue / Element / data / Lottie 手工分包；字体与图片等静态资源体积仍较大，后续可继续做懒加载。
-- 未执行覆盖登录/发布全链路的完整浏览器端交互 E2E；本版本验证覆盖构建、单测、静态扫描、构建产物 HTTP 冒烟，以及可选的本机 Chrome 首页→文库最小点击流。
+- 可选的本机 Chrome 冒烟已覆盖首页/文库、桌面与窄屏搜索、窄屏导航、演示登录滑块验证、作品发布与作品页回读；它不进入 CI 矩阵，不覆盖真实后端、跨浏览器或正式 E2E 套件。本版本验证还包括构建、18 项单测、静态扫描与构建产物 HTTP 冒烟。
 - Lottie 动画 JSON、前端核心样式/图标与默认演示音源/封面已本地化；自定义音源可能受第三方平台网络、防盗链或授权政策影响。
 - 字体、图片、自定义音源、诗词文本与 CDN 资源可能有独立授权，MIT 不自动覆盖第三方素材。
 

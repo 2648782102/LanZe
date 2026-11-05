@@ -163,3 +163,10 @@
 - 将 `public/og-image.svg` 用本机 WebKit 按 1200×630 视口渲染并缩放到目标尺寸，目检标题/诗句/底部署名无裁切，生成 `public/og-image.png`（369 KB，SHA-256 已写入 `docs/PROMOTION.md`）。README、CHANGELOG 与素材清单同步；社交预览上传仍因缺少仓库设置写通道而未执行。
 - 用本机 Chrome 157 与临时隔离 profile 做了一次真实 CDP 冒烟：`#/home` 显示三条本地演示摘录与一个「兰泽 · 本地演示音」播放器，点击「文库」进入 `#/gushi` 并显示唐诗三百/宋词三百等分类，控制台错误、未捕获异常、失败网络请求均为 0。检查沉淀为可选 `npm run smoke:browser`，使用 CDP WebSocket 与临时 profile，不覆盖日常浏览器状态；CI 仍只运行无浏览器依赖的脚本。
 - `0a8b017` 的 CI run `42095302758` 与 `385bb13` 的 CI run `42095805722` 均为 success；后者三项 job 包含 Node 20/22 构建、17 项单测、构建冒烟与文档防护。再次强制更新 `v0.2.0` tag（annotated object `f9294f8`）触发 publish run `42095964071`，Release 与 Discussion 步骤均 success；公开 Release body 已加入可选 Chrome 点击流说明，并把「未执行完整 E2E」收窄为「未执行覆盖登录/发布全链路的完整 E2E」。
+
+## 巡检 09 — 2026-11-06 03:49–04:18 CST
+
+- 复核当前时间、干净工作区、`main...origin/main`、公开仓库 metadata 与最新 CI/publish/Release/open issues；`42096153386` CI 与 `42095964071` publish 仍为 success，3 个 open issue 无新增外部贡献或评论。未认证 REST 写请求确认 repository metadata PATCH 返回 401、Pages GET 返回 404、workflow dispatch 返回 401，因此仍未清空失效 homepage、启用 Pages 或上传社交预览；没有伪造部署展示。
+- 将可选 `npm run smoke:browser` 从首页→文库点击流扩展为真实 CDP 回归：桌面 1280×800 与窄屏 390×844 搜索、窄屏底部导航切换、本地演示音源挂载、演示账号滑块验证登录、作品发布写入 `localStorage`、作品页回读，并清理临时 Cookie/演示数据。新增 `src/config/demoBrowser.node.js` 与 1 个单测，`npm run test` 从 17 项增至 18 项。
+- README、CHANGELOG、RELEASE_NOTES、ANNOUNCEMENT、CONTRIBUTING、SOCIAL_POSTS、`docs/DEVELOPMENT.md`、`docs/DEPLOYMENT.md`、`docs/FAQ.md`、`docs/ROADMAP.md` 同步为 18 项单测与新的浏览器冒烟边界；仍明确该脚本不进入 CI 矩阵，不覆盖真实后端、跨浏览器或正式 E2E 套件。历史巡检中的旧数字与当时状态按事实保留。
+- 本地验证：`npm run test`（18/18）、`npm run lint`、`npm run build`、`npm run smoke`（26 assets）、`npm run smoke:browser`（桌面/窄屏/登录/发布链路，控制台与网络错误 0）均通过；`git diff --check` 无新增空白错误。

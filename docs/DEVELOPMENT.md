@@ -34,11 +34,11 @@ npm run dev
 ```bash
 npm run dev                  # 开发服务器
 npm run build                # 生产构建，输出到 dist/
-npm run test                 # 17 个 node --test 单测
+npm run test                 # 18 个 node --test 单测
 npm run lint                 # 静态扫描失效后端地址、硬编码服务与脆弱引用
 npm run preview              # 预览构建产物
 npm run smoke                # 启动预览服务并检查首页与入口静态资源
-npm run smoke:browser        # 可选：本机 Chrome 点击流冒烟，需 macOS/Chrome
+npm run smoke:browser        # 可选：本机 Chrome 桌面/窄屏与登录发布冒烟，需 macOS/Chrome
 ```
 
 CI 的等价步骤是：
@@ -51,7 +51,7 @@ npm run lint
 npm run smoke
 ```
 
-`npm run smoke:browser` 使用临时 Chrome profile 与 CDP，在 1280×800 下打开 `#/home`、确认本地演示音轨已挂载、点击「文库」并确认分类页渲染，同时要求没有控制台错误、未捕获异常或失败请求。它不覆盖用户登录/发布全链路，也不替代完整 E2E。若 Chrome 路径或端口不同，可用 `CHROME_PATH`、`BROWSER_SMOKE_PORT`、`BROWSER_SMOKE_DEBUG_PORT` 覆盖。
+`npm run smoke:browser` 使用临时 Chrome profile 与 CDP，在 1280×800 和 390×844 下验证首页/文库、本地演示音源、桌面与窄屏搜索、窄屏导航，再完成演示登录滑块验证、作品发布与作品页回读；脚本要求控制台错误、未捕获异常与失败请求均为 0，并在结束后清理临时 Cookie 和 `localStorage` 演示数据。它仍是本机可选检查，不进入 CI 矩阵，不覆盖真实后端、跨浏览器、视觉截图或正式 E2E 套件。若 Chrome 路径或端口不同，可用 `CHROME_PATH`、`BROWSER_SMOKE_PORT`、`BROWSER_SMOKE_DEBUG_PORT` 覆盖。
 
 CI 仍使用 `npm run test --if-present` 以兼容外部旧流程；本地开发建议直接运行 `npm run test` 和 `npm run lint`。
 
@@ -126,7 +126,7 @@ VITE_USE_MOCK=true
 - [ ] `npm run dev` 启动；浏览器控制台无新增 `Uncaught` / 404 静态资源错误。
 - [ ] `npm run build`、`npm run test`、`npm run lint` 成功。
 - [ ] 修改构建配置后，`npm run smoke` 成功。
-- [ ] 条件允许时，修改首页/导航/播放器后 `npm run smoke:browser` 成功。
+- [ ] 条件允许时，修改首页/导航/播放器/登录/发布链路后 `npm run smoke:browser` 成功。
 - [ ] `dist/` 未被提交；`.env*` 未出现在 diff 中。
 
 ### 页面路径
