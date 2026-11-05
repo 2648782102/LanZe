@@ -50,35 +50,57 @@ jobs:
           DISCUSSION_TITLE: 欢迎参与兰泽诗词的重新整理 👋
         shell: bash
         run: |
+          set -euo pipefail
+
           owner="${REPOSITORY%/*}"
           repo="${REPOSITORY#*/}"
 
+          graphql() {
+            local response
+            response="$(
+              curl -fsS -X POST \
+                -H "Authorization: Bearer $GH_TOKEN" \
+                -H "Accept: application/vnd.github+json" \
+                -H "Content-Type: application/json" \
+                https://api.github.com/graphql \
+                --data-binary @-
+            )" || return 1
+            printf '%s' "$response" | jq -e '
+              if (.errors // [] | length) > 0 then
+                error((.errors[0].message // "GraphQL request failed"))
+              else
+                .
+              end'
+          }
+
           category_id="$(
-            gh api graphql \
-              -f query='query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { discussionCategories(first: 50) { nodes { id name } } } }' \
-              -f owner="$owner" \
-              -f name="$repo" \
-              --jq '.data.repository.discussionCategories.nodes[] | select(.name == "Announcements") | .id' \
-              | head -n 1
+            jq -n \
+              --arg owner "$owner" \
+              --arg name "$repo" \
+              '{query: "query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { discussionCategories(first: 50) { nodes { id name } } } }", variables: {owner: $owner, name: $name}}' \
+              | graphql \
+              | jq -r '[.data.repository.discussionCategories.nodes[]? | select(.name == "Announcements") | .id][0] // empty'
           )"
           test -n "$category_id" || { echo "Announcements category not found" >&2; exit 1; }
 
           repository_id="$(
-            gh api graphql \
-              -f query='query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { id } }' \
-              -f owner="$owner" \
-              -f name="$repo" \
-              --jq '.data.repository.id'
+            jq -n \
+              --arg owner "$owner" \
+              --arg name "$repo" \
+              '{query: "query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { id } }", variables: {owner: $owner, name: $name}}' \
+              | graphql \
+              | jq -r '.data.repository.id // empty'
           )"
+          test -n "$repository_id" || { echo "Repository id not found" >&2; exit 1; }
 
           existing_id="$(
-            gh api graphql \
-              -f query='query($owner: String!, $name: String!, $category: ID!) { repository(owner: $owner, name: $name) { discussions(first: 50, categoryId: $category) { nodes { id title } } } }' \
-              -f owner="$owner" \
-              -f name="$repo" \
-              -F category="$category_id" \
-              --jq --arg title "$DISCUSSION_TITLE" '.data.repository.discussions.nodes[] | select(.title == $title) | .id' \
-              | head -n 1
+            jq -n \
+              --arg owner "$owner" \
+              --arg name "$repo" \
+              --arg category "$category_id" \
+              '{query: "query($owner: String!, $name: String!, $category: ID!) { repository(owner: $owner, name: $name) { discussions(first: 50, categoryId: $category) { nodes { id title } } } }", variables: {owner: $owner, name: $name, category: $category}}' \
+              | graphql \
+              | jq -r --arg title "$DISCUSSION_TITLE" '[.data.repository.discussions.nodes[]? | select(.title == $title) | .id][0] // empty'
           )"
 
           if [ -n "$existing_id" ]; then
@@ -93,8 +115,5 @@ jobs:
             --arg title "$DISCUSSION_TITLE" \
             --rawfile body ANNOUNCEMENT.md \
             '{query: $query, variables: {input: {repositoryId: $repository, categoryId: $category, title: $title, body: $body}}}' \
-            > /tmp/create-discussion.json
-
-          gh api graphql \
-            --input /tmp/create-discussion.json \
-            --jq '.data.createDiscussion.discussion | "Created discussion \(.id): \(.url)"'
+            | graphql \
+            | jq -er '.data.createDiscussion.discussion // error("Discussion creation returned no discussion") | "Created discussion \(.id): \(.url)"'
