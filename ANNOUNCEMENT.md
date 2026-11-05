@@ -13,6 +13,7 @@
 - 清理历史硬编码的 Supabase 配置，修复若干运行时错误，补充 `lang="zh-CN"` 与关键交互无障碍标签。
 - Element Plus 改为按需注册并按 Vue / Element / data / Lottie 手工分包；Lottie 动画 JSON 改为仓库本地文件，移除两套重复运行时。
 - 新增 `npm run smoke`：启动预览服务并检查首页与入口静态资源，已接入 Node 20/22 CI。
+- 新增可选的 `npm run smoke:browser`：在本机 Chrome 独立 profile 中检查首页本地演示音源与文库点击流；不把最小冒烟写成完整 E2E。
 - 新增第三方素材与外链来源清单，明确授权仍待核验；不把下载或本地化行为写成已获得许可。
 - Bootstrap 与 Font Awesome 改为锁定版本的本地依赖，移除未使用的 Bootstrap/Popper JS 外链；构建冒烟会检查本地图标字体并拒绝旧 CDN。
 - 音乐播放器默认加载仓库自制的本地演示音源与封面，不再默认访问第三方音乐平台；自定义音源需要显式配置并自行核验授权。

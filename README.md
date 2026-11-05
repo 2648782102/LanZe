@@ -93,9 +93,10 @@ npm run test         # 17 个 node --test 单测
 npm run lint         # 静态检查：失效后端地址、硬编码服务与脆弱引用
 npm run preview      # 预览 dist/
 npm run smoke        # 预览服务与入口静态资源 HTTP 冒烟
+npm run smoke:browser # 可选：本机 Chrome 首页→文库点击流冒烟
 ```
 
-CI 在 Node 20/22 执行 `npm ci && npm run build && npm run test --if-present`；`--if-present` 保留为兼容旧工作流的兜底写法。
+CI 在 Node 20/22 执行 `npm ci && npm run build && npm run test --if-present && npm run smoke`；`--if-present` 保留为兼容旧工作流的兜底写法。浏览器冒烟需要 macOS 上的本机 Chrome，不进入 CI 矩阵。
 
 ### 本地演示 / mock 模式
 

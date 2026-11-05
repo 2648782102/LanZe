@@ -29,6 +29,7 @@
 - 保持事实准确：不写「线上 Demo 已可用」，不引用未验证的演示域名。
 - 命令必须可复制：`npm ci`、`npm run dev`、`npm run build`、`npm run test`、`npm run lint`。
 - 构建产物建议继续执行 `npm run smoke`，确认预览服务与入口静态资源可访问。
+- 在有本机 Chrome 的 macOS 环境，可额外运行 `npm run smoke:browser`，检查首页、文库点击流与本地演示音源；该脚本使用独立临时浏览器 profile，不覆盖日常浏览器状态。
 - 新增环境变量时同时更新 README、开发文档与部署文档，并说明它是公开配置还是私密配置。
 - 更新用户可见行为时，在 `CHANGELOG.md` 的 `Unreleased` 区追加一条。
 
@@ -62,6 +63,7 @@ ci: 增加 Node 20/22 构建矩阵
 - [ ] `npm run test` 通过（17 个 `node --test` 单测）。
 - [ ] `npm run lint` 通过（静态扫描）。
 - [ ] 如修改了构建配置或入口资源，`npm run smoke` 通过。
+- [ ] 如修改了首页、导航、播放器或路由，且环境允许，`npm run smoke:browser` 通过。
 - [ ] 手动检查至少一个桌面宽度和一个移动宽度。
 - [ ] 文档中的链接、路径和命令与实际仓库一致。
 - [ ] diff 中没有密钥、口令、Cookie、用户数据或历史失效演示链接。

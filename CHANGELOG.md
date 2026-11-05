@@ -18,7 +18,7 @@
 - 新增 `RELEASE_NOTES.md`、`ANNOUNCEMENT.md`、`SOCIAL_POSTS.md` 作为 v0.2.0 Release、Discussions 与社交文案素材。
 - 升级 Vite 到 6.4.5 并添加 `@vitejs/plugin-vue`，改为 ESM 配置、`"type": "module"` 与相对 `base: './'`。
 - 新增 `src/config/runtime.js`、`src/data/`、`src/services/`、`src/composables/`、`src/utils/`：统一公开配置、本地演示数据、浏览器存储、会话、响应归一化与查询解析。
-- 新增 `npm run test`（17 个 `node --test` 单测）、`npm run lint`、`npm run preview`、`npm run smoke` 与 `.env.example`。
+- 新增 `npm run test`（17 个 `node --test` 单测）、`npm run lint`、`npm run preview`、`npm run smoke`、可选的 `npm run smoke:browser` 与 `.env.example`。
 - 新增 `src/composables/useLottieSource.js` 与两份本地动画 JSON；Lottie 不再依赖历史外部 JSON 地址。
 
 ### Changed
@@ -34,6 +34,7 @@
 - 统一使用 `@lottiefiles/lottie-player` 播放本地动画 JSON，移除 `lottie-web` 与 `vue3-lottie` 两套重复运行时。
 - Bootstrap 5.1.1 与 Font Awesome 5.13.0 从历史 CDN 改为精确锁定版本的本地依赖；移除未使用的 Popper/Bootstrap JS 外链，`npm run smoke` 覆盖本地图标字体并拒绝两个旧 CDN 域名。
 - `src/pages/Audio.vue` 默认改用 `public/media/` 下由仓库生成的 WAV 演示音与 SVG 封面；移除 5 条硬编码第三方音乐/封面链接，自定义音源仅在 `VITE_AUDIO_SOURCE=custom` 且提供有效 `VITE_AUDIO_TRACKS` 时启用。新增 `src/config/audio.js` 的 3 个配置单测，CI 与 lint 拒绝默认播放列表重新引入第三方媒体域。
+- 新增可选的 Chrome/CDP 点击流冒烟：在独立临时 profile 中检查首页本地演示音源、文库导航、控制台异常与失败请求；不把它写成覆盖登录/发布的完整 E2E，也不加入 CI 矩阵。
 
 ### Known limitations
 
