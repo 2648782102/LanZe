@@ -157,3 +157,6 @@
 - 新增 `src/config/audio.js` 与 3 个配置单测：仅 `VITE_AUDIO_SOURCE=custom` 且 `VITE_AUDIO_TRACKS` 为有效 JSON 数组时启用自定义音源，无效或空配置自动回退本地演示音；自定义音源的授权、可用性与隐私政策明确由配置者负责。
 - `npm run smoke` 新增本地演示音源/封面 HTTP 检查及构建 JS 中第三方媒体域扫描，覆盖 26 个本地静态资源；CI docs job 与 `npm run lint` 增加对应防护。README、CHANGELOG、RELEASE_NOTES、ANNOUNCEMENT、CONTRIBUTING、SOCIAL_POSTS、`docs/` 与 `.env.example` 同步为 17 项单测、默认离线音源和可选自定义配置。
 - 本地验证：`npm run test`（17/17）、`npm run lint`、`npm run build`、`npm run smoke`（26 assets）、`npm audit --omit=dev`（0 vulnerabilities）、YAML 解析、Markdown 本地链接检查、默认媒体域检查均通过。`git diff --check` 仅报告 `SOCIAL_POSTS.md` 既有的 Markdown 双空格硬换行格式，未新增其它空白错误；历史日志中的「14 项单测」按当时事实保留。
+- `bbeddbb` 推送后 CI run `42094156948` 在 Node 20、Node 22 与 Documentation checks 三项均 success；新增 `Reject third-party media defaults` 步骤通过。强制更新 `v0.2.0` tag（annotated object `9081f6e`）触发 publish run `42094320355`，Release 与 Discussion 两个步骤均 success；公开 Release body 已同步为 17 项单测、本地演示音源与 `VITE_AUDIO_*` 说明。
+- #3 已更新为「复核本地化依赖、默认音源与浏览器回归」，写入默认音源本地化现状、自定义配置边界、17 项单测与浏览器回归验收标准，保留字体/Lottie/favicon 授权和可选音源错误态作为真实贡献入口；`docs/PROMOTION.md` 的 issue 入口同步。Discussion 正文自动同步仍受 Actions 默认令牌权限限制，未声称欢迎帖已更新。
+- 本轮再次核对：当前可用 GitHub 连接具备 issue/文件写入但没有仓库 metadata 写权限，本机也无 GitHub HTTPS token；`homepage` 仍是失效 `lan-ze.vercel.app`，Pages 仍 `has_pages=false` 且项目站点返回 404。没有伪造线上 Demo、清空 homepage 或触发未经配置的 Pages 部署。
