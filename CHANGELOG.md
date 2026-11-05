@@ -29,7 +29,7 @@
 - 修复路由守卫、未定义 `scroll` / `next()`、Cookie 字符串/对象混用、固定假用户、`ElMessage` 未导入、脆弱的 `node_modules` 引用、详情/列表 JSON 解析与分页修改原数组。
 - 清理历史硬编码 Supabase URL / anon key，改为可选的 `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`，缺失时使用本地兼容适配器。
 - 补充 `lang="zh-CN"`、页面描述和关键交互 `aria-label`，移除冲突 Lottie CDN 并改用本地 `@lottiefiles/lottie-player`。
-- CI 统一使用 `npm ci`、`npm run build`、`npm run test --if-present`；不假定 CommonJS。
+- CI 统一使用 `npm ci`、`npm run build`、`npm run test --if-present`，Documentation checks 执行 `npm run lint`；不假定 CommonJS。
 - Element Plus 改为按实际标签显式注册，反馈组件使用组件子路径导入；Vite 配置增加 Vue / Element / data / Lottie vendor 分包。
 - 统一使用 `@lottiefiles/lottie-player` 播放本地动画 JSON，移除 `lottie-web` 与 `vue3-lottie` 两套重复运行时。
 - Bootstrap 5.1.1 与 Font Awesome 5.13.0 从历史 CDN 改为精确锁定版本的本地依赖；移除未使用的 Popper/Bootstrap JS 外链，`npm run smoke` 覆盖本地图标字体并拒绝两个旧 CDN 域名。

@@ -40,7 +40,7 @@ vue3, vite, element-plus, javascript, frontend, chinese-poetry, poetry, classica
 
 | 顺序 | 动作 | 依据文件 | 执行前核对 |
 | --- | --- | --- | --- |
-| 1 | 合并治理与代码改动，确认 `npm ci && npm run build && npm run test --if-present` 通过 | `README.md`、`.github/workflows/ci.yml` | CI 在 Node 20/22 均为绿色 |
+| 1 | 合并治理与代码改动，确认 `npm ci && npm run build && npm run test --if-present && npm run lint` 通过 | `README.md`、`.github/workflows/ci.yml` | CI 与 Documentation checks 在 Node 20/22 均为绿色 |
 | 2 | 设置 About 描述、Website（留空或已验证 Pages URL）、topics、社交预览图 | 本文件第 1 节、`public/og-image.svg`、`public/og-image.png` | 不沿用旧展示域名 |
 | 3 | 启用 Discussions（如尚未启用），发布欢迎帖 | `ANNOUNCEMENT.md` | 将占位日期/链接替换为真实值 |
 | 4 | 创建 tag `v0.2.0` 与 GitHub Release | `RELEASE_NOTES.md` | 只描述已合并内容；不要把 git log 的 `2.0.0` 当旧 Release |
@@ -80,7 +80,7 @@ vue3, vite, element-plus, javascript, frontend, chinese-poetry, poetry, classica
 发布前检查：
 
 - [ ] 合并后的 README 与 `LICENSE` 都为 MIT 且年份/贡献者一致。
-- [ ] CI badge 指向真实 workflow；`npm run test --if-present` 的结果与 Release 描述一致。
+- [ ] CI badge 指向真实 workflow；`npm run test --if-present` 与 `npm run lint` 的结果与 Release 描述一致。
 - [ ] `CHANGELOG.md` 的 `Unreleased` 已转成对应发布条目或明确标注为候选。
 - [ ] 不写「线上 Demo 已恢复」「后端已上线」「已通过安全审计」等未验证表述。
 - [ ] 说明历史代码限制、第三方资源授权与后续路线图入口。
@@ -119,7 +119,7 @@ vue3, vite, element-plus, javascript, frontend, chinese-poetry, poetry, classica
 | 8–18s | 终端 `npm ci && npm run dev` | 「Node 20/22，按锁文件安装，启动本地开发服务器」 |
 | 18–32s | 首页/摘录卡片切换 | 「摘录、文库、搜索、茶楼等界面；演示数据可替换外部 API」 |
 | 32–45s | 文库分类、搜索结果、窄屏布局 | 「保留原有中文视觉，逐步收敛数据层与错误态」 |
-| 45–58s | `npm run build && npm run test --if-present`、CI workflow | 「可复现构建，Node 20/22 CI；测试脚本存在才执行」 |
+| 45–58s | `npm run build && npm run test --if-present && npm run lint`、CI workflow | 「可复现构建，Node 20/22 CI；测试与静态扫描都在 workflow 中」 |
 | 58–70s | CONTRIBUTING、ROADMAP、LICENSE | 「MIT、贡献指南、路线图；当前不承诺线上 Demo 或托管后端」 |
 
 录制前检查：终端不出现密钥/私人路径；浏览器不使用真实账号；若第三方 API 不可用，切换到 mock 或明确标注「演示数据」；字幕不出现 star 数或「正式上线」。

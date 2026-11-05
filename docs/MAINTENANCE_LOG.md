@@ -179,3 +179,9 @@
 - README、CHANGELOG、RELEASE_NOTES、ANNOUNCEMENT、CONTRIBUTING、SOCIAL_POSTS、`docs/ARCHITECTURE.md`、`docs/DEVELOPMENT.md`、`docs/FAQ.md`、`docs/ROADMAP.md`、`docs/THIRD_PARTY_ASSETS.md`、`.env.example` 与 `docs/PROMOTION.md` 同步为 23 项单测、无效配置回退提示及后续贡献边界；历史巡检中的旧数字仍按当时事实保留。
 - #2 更新为已完成核心边界与新的最小 PR 入口，#3 更新为 23 项单测、无效配置提示与不可达 URL/CI E2E 入口；仍保留 `good first issue` / `help wanted`，没有关闭或虚构外部贡献。
 - 本地验证：`npm run test`（23/23）、`npm run lint`、`npm run build`、`npm run smoke`（26 assets）、`npm run smoke:browser`（桌面/窄屏/登录/发布链路，控制台与网络错误 0）均通过。GitHub 展示限制不变：当前连接无仓库 metadata / Pages / Social preview 写通道，未清空失效 homepage、启用 Pages 或上传社交预览。
+
+## 巡检 11 — 2026-11-06 05:30–05:40 CST
+
+- 05:30 复核时间与线上状态：工作区干净且 `origin/main`、tag `v0.2.0` 均指向 `b66113d`；最新 CI run `42103450836`、publish run `42103883506` 仍为 success；公开 Release body 与 `RELEASE_NOTES.md` 一致（仅末尾换行差异），含 23 项单测与无效音源回退提示。3 个 open issue 无新评论、无 open PR；`homepage=https://lan-ze.vercel.app`、`has_pages=false`、项目站点仍 404。
+- 文档写「CI 等价步骤含 `npm run lint`」，但 `.github/workflows/ci.yml` 的 Documentation checks job 只做 shell 文本检查，未运行 Node 静态扫描。现给该 job 加 `actions/setup-node@v4`（Node 20）与 `npm run lint`，让 CI badge 覆盖真实的 lint 脚本，不依赖 `npm ci`，也不改变 Node 20/22 build 矩阵。
+- README、CHANGELOG、RELEASE_NOTES、ANNOUNCEMENT、SOCIAL_POSTS、`docs/DEVELOPMENT.md`、`docs/FAQ.md`、`docs/ROADMAP.md`、`docs/PROMOTION.md` 同步为「Node 20/22 build job 跑测试与构建冒烟，Documentation checks 跑 lint」；仍明确可选本机 Chrome 冒烟不进入 CI，不替代跨浏览器/真实后端 E2E。历史巡检按当时事实保留。

@@ -82,7 +82,7 @@ GitHub 侧配合：维护 About、topics、社交预览图；发布 `v0.2.0` Rel
 
 - [ ] 改动范围写入 `CHANGELOG.md` 的对应版本或 `Unreleased`。
 - [ ] `README.md`、`docs/DEVELOPMENT.md`、`docs/DEPLOYMENT.md` 与实际脚本/变量一致。
-- [ ] CI 在 Node 20/22 执行 `npm ci`、build、测试与文档检查。
+- [ ] CI 在 Node 20/22 执行 `npm ci`、build、测试、构建冒烟，并在 Documentation checks 执行静态扫描与文档检查。
 - [ ] 无新增硬编码密钥、真实用户数据或失效线上承诺。
 - [ ] 至少一条手动 QA 路径被记录；失败路径也有说明。
 - [ ] 若发布，Release notes 只描述已合并并验证的内容。

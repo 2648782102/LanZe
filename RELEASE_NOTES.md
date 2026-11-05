@@ -15,7 +15,7 @@
 - 📖 重写 README：项目定位、快速开始、环境变量、本地演示、项目结构、部署、路线图、MIT 与英文摘要。
 - ⚖️ 新增 MIT 许可证、贡献指南、行为准则、安全政策、变更日志与 FAQ。
 - 🧭 新增架构、开发、部署、路线图、FAQ 与展示清单；历史 MemFire / Vercel 地址仅作为迁移背景，不再宣称可用。
-- ⚙️ 新增 Node 20 / 22 CI：`npm ci`、`npm run build`、`npm run test --if-present` 与构建产物冒烟；新增手动触发的 GitHub Pages workflow，以及可选的本机 Chrome 桌面/窄屏与登录发布冒烟脚本。
+- ⚙️ 新增 Node 20 / 22 CI：`npm ci`、`npm run build`、`npm run test --if-present` 与构建产物冒烟；Documentation checks 执行 `npm run lint`；新增手动触发的 GitHub Pages workflow，以及可选的本机 Chrome 桌面/窄屏与登录发布冒烟脚本。
 - 🧩 新增 bug / 功能 / 文档 / 内容勘误 issue 模板与 PR 模板。
 - 🖼 新增 `public/og-image.svg` 作为 README hero 与社交预览素材候选，保留原 `favicon.ico`。
 

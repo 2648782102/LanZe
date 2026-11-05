@@ -8,7 +8,7 @@
 
 - 升级到 Vite 6，补齐 `build` / `preview` / `test` / `lint` 脚本，新增 23 个单测和静态检查。
 - 重写 README，补齐 MIT 许可、贡献指南、行为准则、安全政策、变更日志、架构/开发/部署/路线图/FAQ 文档。
-- 增加 issue/PR 模板、Node 20/22 CI 与手动 GitHub Pages workflow。
+- 增加 issue/PR 模板、Node 20/22 CI（含 Documentation checks 的静态扫描）与手动 GitHub Pages workflow。
 - 实现本地演示数据层：不配置后端也能体验摘录、分类文库、搜索、登录、注册、改密、个人资料与作品发布；远端 API 不可用时会自动降级。
 - 清理历史硬编码的 Supabase 配置，修复若干运行时错误，补充 `lang="zh-CN"` 与关键交互无障碍标签。
 - Element Plus 改为按需注册并按 Vue / Element / data / Lottie 手工分包；Lottie 动画 JSON 改为仓库本地文件，移除两套重复运行时。

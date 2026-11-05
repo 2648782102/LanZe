@@ -61,12 +61,12 @@
 **中文**
 
 > 旧前端项目怎么重新开放？我们没有先堆功能，而是先处理「别人能不能跑起来、能不能相信文档」：  
-> ① README 删除失效托管/演示承诺；② MIT + 贡献/行为/安全政策；③ 把 Vite 升到 6，统一 ESM 与相对 base；④ 用 `VITE_API_BASE_URL` + `VITE_USE_MOCK` 收敛请求层，未配置后端时自动使用本地演示数据；⑤ Node 20/22 CI 跑 `npm ci`、`npm run build`、`npm run test --if-present`，另有 23 项单测与静态检查；⑥ 默认音源/封面本地化，Pages 只手动触发，不自动发到旧域名。  
+> ① README 删除失效托管/演示承诺；② MIT + 贡献/行为/安全政策；③ 把 Vite 升到 6，统一 ESM 与相对 base；④ 用 `VITE_API_BASE_URL` + `VITE_USE_MOCK` 收敛请求层，未配置后端时自动使用本地演示数据；⑤ Node 20/22 CI 跑 `npm ci`、`npm run build`、`npm run test --if-present`，Documentation checks 跑 `npm run lint`，另有 23 项单测；⑥ 默认音源/封面本地化，Pages 只手动触发，不自动发到旧域名。  
 > 兰泽诗词的下一段是把可选本机浏览器冒烟沉淀为 CI 可复现的 E2E，继续拆分大体积依赖并补素材授权清单。欢迎来提可验证的小 PR。
 
 **English**
 
-> How do you reopen a dormant frontend? Start with trust, not features: remove stale demo claims; add MIT + contribution/security policies; upgrade to Vite 6 with one ESM config and a relative base; converge requests behind `VITE_API_BASE_URL` + `VITE_USE_MOCK`, with local demo data as the no-backend fallback; run Node 20/22 CI with `npm ci`, `npm run build` and `npm run test --if-present`, plus 23 unit tests and a lint scan; use a repository-generated local audio demo by default; keep Pages manual and away from dead domains.  
+> How do you reopen a dormant frontend? Start with trust, not features: remove stale demo claims; add MIT + contribution/security policies; upgrade to Vite 6 with one ESM config and a relative base; converge requests behind `VITE_API_BASE_URL` + `VITE_USE_MOCK`, with local demo data as the no-backend fallback; run Node 20/22 CI with `npm ci`, `npm run build` and `npm run test --if-present`, add `npm run lint` in Documentation checks, plus 23 unit tests; use a repository-generated local audio demo by default; keep Pages manual and away from dead domains.  
 > Next for LanZe: turn the optional local browser smoke into repeatable CI E2E, keep splitting bundles, and finish third-party asset licensing. Small, verifiable PRs welcome.
 
 ## 5. Release / Discussion 联动风格

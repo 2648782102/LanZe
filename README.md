@@ -96,7 +96,7 @@ npm run smoke        # 预览服务与入口静态资源 HTTP 冒烟
 npm run smoke:browser # 可选：本机 Chrome 桌面/窄屏与登录发布冒烟
 ```
 
-CI 在 Node 20/22 执行 `npm ci && npm run build && npm run test --if-present && npm run smoke`；`--if-present` 保留为兼容旧工作流的兜底写法。可选浏览器冒烟需要 macOS 上的本机 Chrome，不进入 CI 矩阵；它用独立临时 profile 验证桌面/窄屏搜索、窄屏导航、演示登录（含滑块验证）、作品发布、本地音源挂载与控制台/网络错误，不替代跨浏览器、真实后端或正式 E2E 套件。
+CI 在 Node 20/22 执行 `npm ci && npm run build && npm run test --if-present && npm run smoke`，Documentation checks 另执行 `npm run lint`；`--if-present` 保留为兼容旧工作流的兜底写法。可选浏览器冒烟需要 macOS 上的本机 Chrome，不进入 CI 矩阵；它用独立临时 profile 验证桌面/窄屏搜索、窄屏导航、演示登录（含滑块验证）、作品发布、本地音源挂载与控制台/网络错误，不替代跨浏览器、真实后端或正式 E2E 套件。
 
 ### 本地演示 / mock 模式
 
