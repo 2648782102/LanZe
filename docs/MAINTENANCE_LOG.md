@@ -160,3 +160,4 @@
 - `bbeddbb` 推送后 CI run `42094156948` 在 Node 20、Node 22 与 Documentation checks 三项均 success；新增 `Reject third-party media defaults` 步骤通过。强制更新 `v0.2.0` tag（annotated object `9081f6e`）触发 publish run `42094320355`，Release 与 Discussion 两个步骤均 success；公开 Release body 已同步为 17 项单测、本地演示音源与 `VITE_AUDIO_*` 说明。
 - #3 已更新为「复核本地化依赖、默认音源与浏览器回归」，写入默认音源本地化现状、自定义配置边界、17 项单测与浏览器回归验收标准，保留字体/Lottie/favicon 授权和可选音源错误态作为真实贡献入口；`docs/PROMOTION.md` 的 issue 入口同步。Discussion 正文自动同步仍受 Actions 默认令牌权限限制，未声称欢迎帖已更新。
 - 本轮再次核对：当前可用 GitHub 连接具备 issue/文件写入但没有仓库 metadata 写权限，本机也无 GitHub HTTPS token；`homepage` 仍是失效 `lan-ze.vercel.app`，Pages 仍 `has_pages=false` 且项目站点返回 404。没有伪造线上 Demo、清空 homepage 或触发未经配置的 Pages 部署。
+- 将 `public/og-image.svg` 用本机 WebKit 按 1200×630 视口渲染并缩放到目标尺寸，目检标题/诗句/底部署名无裁切，生成 `public/og-image.png`（369 KB，SHA-256 已写入 `docs/PROMOTION.md`）。README、CHANGELOG 与素材清单同步；社交预览上传仍因缺少仓库设置写通道而未执行。

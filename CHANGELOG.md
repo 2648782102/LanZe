@@ -14,6 +14,7 @@
 - 新增 `docs/ARCHITECTURE.md`、`docs/DEVELOPMENT.md`、`docs/DEPLOYMENT.md`、`docs/ROADMAP.md`、`docs/FAQ.md`、`docs/PROMOTION.md` 与维护巡检记录。
 - 新增 GitHub issue 模板、PR 模板、Node 20/22 CI、手动 GitHub Pages workflow 与 tag 触发的发布 workflow。
 - 新增 `public/og-image.svg` 作为 README hero / GitHub 展示素材候选。
+- 新增由仓库 SVG 渲染并目检过的 `public/og-image.png`（1200×630）作为社交预览图候选；记录尺寸、哈希与渲染方式，但不宣称已在 GitHub 设置中上传。
 - 新增 `RELEASE_NOTES.md`、`ANNOUNCEMENT.md`、`SOCIAL_POSTS.md` 作为 v0.2.0 Release、Discussions 与社交文案素材。
 - 升级 Vite 到 6.4.5 并添加 `@vitejs/plugin-vue`，改为 ESM 配置、`"type": "module"` 与相对 `base: './'`。
 - 新增 `src/config/runtime.js`、`src/data/`、`src/services/`、`src/composables/`、`src/utils/`：统一公开配置、本地演示数据、浏览器存储、会话、响应归一化与查询解析。

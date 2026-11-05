@@ -31,7 +31,7 @@ vue3, vite, element-plus, javascript, frontend, chinese-poetry, poetry, classica
 ### About / README 展示要点
 
 - Website 字段：在 GitHub Pages 实际部署并验证前**留空**；不要填历史 MemFire 地址或失效 Vercel 域名。
-- Social preview：把 `public/og-image.svg` 转成平台接受的 PNG 后上传；若直接上传 SVG 不被接受，保留仓库内 SVG 作为文档 hero。
+- Social preview：仓库已提供 `public/og-image.svg` 与由它渲染、目检过的 `public/og-image.png`（1200×630）。上传 GitHub Social preview 仍需要仓库设置写权限；当前连接不具备该权限，因此尚未上传，也不把它写成已展示。
 - README 首屏：项目定位 → 当前状态表 → 快速开始 → 本地演示/变量 → 路线图 → 许可证。不要在首屏堆砌 star/badge 或虚假在线体验。
 - Badges：保留 MIT、CI、Vue 3、Changelog；发布后方可增加 Release badge。CI badge 的 workflow 文件名必须与 `.github/workflows/ci.yml` 一致。
 - About 勾选/展示：README、License、Activity、Discussions（若启用）；不承诺「production-ready」「official demo」「hosted API」。
@@ -41,14 +41,21 @@ vue3, vite, element-plus, javascript, frontend, chinese-poetry, poetry, classica
 | 顺序 | 动作 | 依据文件 | 执行前核对 |
 | --- | --- | --- | --- |
 | 1 | 合并治理与代码改动，确认 `npm ci && npm run build && npm run test --if-present` 通过 | `README.md`、`.github/workflows/ci.yml` | CI 在 Node 20/22 均为绿色 |
-| 2 | 设置 About 描述、Website（留空或已验证 Pages URL）、topics、社交预览图 | 本文件第 1 节、`public/og-image.svg` | 不沿用旧展示域名 |
+| 2 | 设置 About 描述、Website（留空或已验证 Pages URL）、topics、社交预览图 | 本文件第 1 节、`public/og-image.svg`、`public/og-image.png` | 不沿用旧展示域名 |
 | 3 | 启用 Discussions（如尚未启用），发布欢迎帖 | `ANNOUNCEMENT.md` | 将占位日期/链接替换为真实值 |
 | 4 | 创建 tag `v0.2.0` 与 GitHub Release | `RELEASE_NOTES.md` | 只描述已合并内容；不要把 git log 的 `2.0.0` 当旧 Release |
 | 5 | 确认 CI 与 Pages 权限；Pages 按需手动触发（workflow 含 configure/upload/deploy 标准步骤） | `.github/workflows/ci.yml`、`.github/workflows/pages.yml`、`docs/DEPLOYMENT.md` | 不自动部署到失效域名；首次运行前在 Settings → Pages 选 GitHub Actions |
 | 6 | 给适合新人的 issue 加 `good first issue` / `help wanted` 标签 | `.github/ISSUE_TEMPLATE/*` | 先写清复现步骤或预期结果，避免空任务 |
 | 7 | 发布一条 Release/Discussion 公告，再按平台节奏发布短帖 | `SOCIAL_POSTS.md` | 不夸大 star、用户数、线上 Demo 或后端能力 |
 
-**执行记录：** 第 1、3、4 项已完成并验证；第 2 项已完成 About 描述与 topics，Website 仍为历史失效地址（待有可用 API/浏览器交互后清空），社交预览图未上传；第 5 项 Pages 未启用；第 6 项已创建 3 个带验收标准的 `good first issue` / `help wanted` 入口；第 7 项的 Release/Discussion 仓库内公告已发布，短帖仍为草稿；外部社交媒体未发布。
+**执行记录：** 第 1、3、4 项已完成并验证；第 2 项已完成 About 描述与 topics，Website 仍为历史失效地址（待有可用 API/浏览器交互后清空），`public/og-image.png` 已生成但社交预览图未上传；第 5 项 Pages 未启用；第 6 项已创建 3 个带验收标准的 `good first issue` / `help wanted` 入口；第 7 项的 Release/Discussion 仓库内公告已发布，短帖仍为草稿；外部社交媒体未发布。
+
+### 社交预览图渲染复核
+
+- 来源：`public/og-image.svg`（1200×630），SHA-256 `9f7b3221c02869e749617b7295fb132ee45089ff1a1d869794960ec94158d9da`。
+- 产物：`public/og-image.png`，1200×630 RGBA PNG，SHA-256 `e870f1b130cb1b41989c76e9a7883a17991a97ef10f5086b6aa73c40a25fdbf9`。
+- 本机使用 WebKit 按 1200×630 视口加载 SVG，生成 2× 快照后按目标尺寸缩放；已目检标题、诗句、GitHub 地址与四边留白，无裁切或缺失字形。Quick Look 的 `-s 1200` 会生成 1200×1200 方图，不适合作为社交预览图。
+- 当前只是仓库内候选素材；在 GitHub Settings → Social preview 实际上传并回读前，不把「社交预览已更新」写成事实。
 
 ## 3. GitHub Discussions 欢迎帖
 
@@ -84,7 +91,7 @@ vue3, vite, element-plus, javascript, frontend, chinese-poetry, poetry, classica
 
 - 附上仓库链接或已验证的 Release/Discussion 链接，不附历史失效 Demo。
 - 强调「开源、古诗词、本地 `npm run dev` 可运行、Vue 3 现代前端栈、MIT、欢迎贡献」。
-- 可配 `public/og-image.svg` 转出的图片或真实本地录屏；未录制前不要使用来源不明的截图。
+- 可配 `public/og-image.png` 或真实本地录屏；未录制前不要使用来源不明的截图。
 - 不写具体 star 数、下载量、用户量、性能提升百分比，除非有可复核来源。
 - 不同平台错开措辞，避免同一时段刷屏；发布后把有效反馈整理成 issue，而不是只在评论区讨论。
 

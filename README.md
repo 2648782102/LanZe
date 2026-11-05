@@ -146,7 +146,7 @@ VITE_USE_MOCK=true
 LanZe/
 ├── .github/                 # CI、Pages workflow、issue/PR 模板
 ├── docs/                    # 架构、开发、部署、路线图、FAQ、素材、宣发与巡检
-├── public/                  # favicon、OG/hero 展示素材与本地演示音源/封面
+├── public/                  # favicon、SVG/PNG 展示素材与本地演示音源/封面
 ├── src/
 │   ├── apis/                # Axios 请求封装与业务 API 列表
 │   ├── assets/              # 字体、图片、Lottie JSON
@@ -180,7 +180,7 @@ LanZe/
 
 ## 演示与截图
 
-仓库提供 `public/og-image.svg` 作为文档 hero / GitHub 社交预览候选。它不是运行截图，也不包含真实用户数据。若上传 GitHub 社交预览图，可将 SVG 转成平台接受的 PNG，见 `docs/PROMOTION.md`。
+仓库提供 `public/og-image.svg` 作为文档 hero，并提供由它渲染的 `public/og-image.png`（1200×630）作为 GitHub 社交预览候选。它们不是运行截图，也不包含真实用户数据；上传与核验步骤见 `docs/PROMOTION.md`。
 
 本地演示建议录屏脚本：
 
