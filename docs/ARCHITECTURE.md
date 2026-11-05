@@ -6,7 +6,7 @@
 
 - 历史基线共 42 次提交；首个提交 `74b4186`（2022-06-03）；v0.2.0 前无 Git tag。
 - 当前 `package.json` 脚本：`dev`、`build`、`preview`、`test`、`lint`；Vite `^6.4.5`，`"type": "module"`。
-- 当前源码形态：Vue 3 SFC + Vue Router 4 hash 模式 + Element Plus + Axios；`index.html` 保留 Bootstrap/Popper/Font Awesome CDN，Lottie 改为本地依赖。
+- 当前源码形态：Vue 3 SFC + Vue Router 4 hash 模式 + Element Plus + Axios；Bootstrap / Font Awesome 与 Lottie 均改为锁定版本或本地依赖。
 - 当前没有随仓库附带的后端、数据库迁移、账号服务或可验证线上 Demo；默认数据源为浏览器本地演示数据。
 
 ## 2. 系统边界
@@ -15,7 +15,7 @@
 浏览器
   ├── Vite 构建的静态前端（Vue 3 / Router / Element Plus）
   │     ├── 本地打包资源：src/assets、public
-  │     ├── 外部 CDN：Bootstrap / Popper / Font Awesome / 音乐封面；部分 Lottie JSON
+  │     ├── 外链：音乐 / 封面；样式与图标字体随构建产物本地分发
   │     └── UI 状态：路由、收藏态、Lottie、搜索输入、播放器
   │
   └── 数据源（统一入口）
@@ -36,7 +36,7 @@
 
 | 目录/文件 | 当前职责 | 已知限制 |
 | --- | --- | --- |
-| `index.html` | Vite HTML 入口，挂载 `#app` | 头部含多个第三方 CDN、全局样式和固定 `overflow: hidden` |
+| `index.html` | Vite HTML 入口，挂载 `#app` | 头部含本地 favicon、全局样式与固定 `overflow: hidden`；样式/图标依赖由 `src/main.js` 引入 |
 | `src/main.js` | 创建 Vue app，注册 Router、Element Plus、图标与 Cookie 插件 | 仍保留全局插件；读取统一走 `src/composables/useSession.js` |
 | `src/App.vue` | 根 `<router-view>` 与公用样式/字体声明 | 字体文件较大，授权与加载成本待审查 |
 | `src/router/index.js` | 约 25 条 hash 路由；集中注册标题与切换守卫 | 无真实鉴权；部分占位/空白页仍注册 |

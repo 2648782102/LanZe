@@ -59,8 +59,8 @@
 | 构建 | Vite 6 + `@vitejs/plugin-vue`，`package.json` 使用 `"type": "module"`，`base: './'` |
 | 语言 | JavaScript / Vue SFC；npm 脚本使用 `node --test` 与 ESM |
 | 数据 | `src/config/runtime.js` 统一公开配置，`src/apis/request.js` 在真实 API 与 `src/services/mockApi.js` 之间切换 |
-| 动效与媒体 | 本地 `@lottiefiles/lottie-player`、仓库内 Lottie JSON、APlayer；历史 CDN 见下方说明 |
-| 样式 | 组件内 CSS、Element Plus、Bootstrap/Font Awesome CDN（历史依赖） |
+| 动效与媒体 | 本地 `@lottiefiles/lottie-player`、仓库内 Lottie JSON、APlayer；音乐/封面外链见下方说明 |
+| 样式 | 组件内 CSS、Element Plus、锁定版本的本地 Bootstrap 5.1.1 / Font Awesome 5.13.0 |
 | 字体与素材 | `src/assets/` 下的字体、图片与背景；授权审查见 `docs/FAQ.md` |
 | 工具链 | npm、Node.js 20/22、GitHub Actions、`npm run test`、`npm run lint` |
 | 部署 | `vite build` 产物，可部署到 GitHub Pages / Vercel / Netlify 等静态托管 |
@@ -150,7 +150,7 @@ LanZe/
 │   ├── utils/               # 响应归一化、查询解析、lint 与单测
 │   ├── App.vue              # 根组件
 │   └── main.js              # 应用入口与全局插件
-├── index.html               # Vite HTML 入口（含历史 CDN 资源）
+├── index.html               # Vite HTML 入口（本地 favicon 与全局样式）
 ├── vite.config.js           # ESM 构建配置（base './'）
 ├── package.json             # npm 脚本与依赖
 ├── README.md                # 本文件
@@ -198,8 +198,8 @@ LanZe/
 
 简要版本（完整优先级与验收标准见 `docs/ROADMAP.md`）：
 
-- **v0.2.0（当前）**：Vite 6、本地演示数据、14 项单测、lint、README/许可证/治理文档、CI、模板、发布与宣发文案；Element Plus 按需注册、手工 vendor 分包、Lottie 动画本地化。
-- **v0.3.x（工程优化）**：补充浏览器端交互 E2E、完善错误/空状态、继续收敛历史 CDN 与第三方素材授权。
+- **v0.2.0（当前）**：Vite 6、本地演示数据、14 项单测、lint、README/许可证/治理文档、CI、模板、发布与宣发文案；Element Plus 按需注册、手工 vendor 分包、Lottie 动画与核心样式/图标本地化。
+- **v0.3.x（工程优化）**：补充浏览器端交互 E2E、完善错误/空状态、继续收敛音乐外链并核验第三方素材授权。
 - **v0.4.x（体验与内容）**：响应式与无障碍回归、素材授权清单、演示录屏、可选后端契约。
 - **后续（社区化）**：按真实贡献推进 i18n、内容版本依据与社区讨论，不预设交付期限。
 
@@ -219,14 +219,14 @@ LanZe/
 
 ## 许可证
 
-本项目采用 [MIT License](LICENSE)，`Copyright (c) 2022-2026 LanZe contributors`。这不自动覆盖 `src/assets/` 内第三方字体/图片、外部音乐链接、CDN 资源或诗词文本可能适用的独立授权；二次发布与商用前请自行核查来源，详见 `docs/THIRD_PARTY_ASSETS.md` 与 `docs/FAQ.md`。
+本项目采用 [MIT License](LICENSE)，`Copyright (c) 2022-2026 LanZe contributors`。这不自动覆盖 `src/assets/` 内第三方字体/图片、外部音乐链接、上游 npm 包中的字体/图标或诗词文本可能适用的独立授权；二次发布与商用前请自行核查来源，详见 `docs/THIRD_PARTY_ASSETS.md` 与 `docs/FAQ.md`。
 
 ## 致谢
 
 - 感谢 2022–2024 年间的原作者与早期贡献者留下的界面、素材、路由和 `git` 历史。
 - 感谢 Vue.js、Vite、Element Plus、Axios、Lottie、APlayer 等开源项目及其维护者。
 - 感谢所有通过 issue、Discussion、PR、文档勘误与本地验证参与社区维护的人。
-- 第三方诗词/音乐/字体/CDN 服务仅作为历史或可选外部依赖被提及，不代表其运营方与本仓库有隶属或背书关系。
+- 第三方诗词/音乐/字体服务与上游 npm 包仅按实际用途被提及，不代表其运营方或作者与本仓库有隶属或背书关系。
 
 ## English summary
 

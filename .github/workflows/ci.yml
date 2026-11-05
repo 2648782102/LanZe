@@ -97,3 +97,13 @@ jobs:
             echo 'README contains a historical endpoint presented as a live demo.' >&2
             exit 1
           fi
+
+      - name: Reject legacy style CDNs
+        shell: bash
+        run: |
+          if grep -nE 'cdn\.staticfile\.org|cdn\.bootcss\.com' index.html; then
+            echo 'index.html still references a legacy third-party style CDN.' >&2
+            exit 1
+          fi
+          grep -q 'bootstrap.*5\.1\.1' package.json || { echo 'Bootstrap 5.1.1 is not pinned.' >&2; exit 1; }
+          grep -q '@fortawesome/fontawesome-free.*5\.13\.0' package.json || { echo 'Font Awesome 5.13.0 is not pinned.' >&2; exit 1; }

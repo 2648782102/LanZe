@@ -10,6 +10,7 @@
 - 🔐 清理历史硬编码 Supabase 密钥并改为可选环境变量；显式管理 Cookie 会话，移除固定假用户与依赖 `$cookies` 全局对象的用法。
 - 🛠 修复未定义的 `scroll` / `next()`、重复路由守卫、`ElMessage` 未导入、脆弱的 `node_modules` 样式引用和多处 JSON 解析问题。
 - ♿ 设置 `lang="zh-CN"`、补充页面描述与关键交互 `aria-label`，移除冲突的 Lottie CDN，改用本地播放器依赖。
+- 📦 Bootstrap 5.1.1 / Font Awesome 5.13.0 改为精确锁定的本地依赖；移除未使用的 Popper/Bootstrap JS 外链，构建产物自带图标字体。
 - 📖 重写 README：项目定位、快速开始、环境变量、本地演示、项目结构、部署、路线图、MIT 与英文摘要。
 - ⚖️ 新增 MIT 许可证、贡献指南、行为准则、安全政策、变更日志与 FAQ。
 - 🧭 新增架构、开发、部署、路线图、FAQ 与展示清单；历史 MemFire / Vercel 地址仅作为迁移背景，不再宣称可用。
@@ -62,7 +63,7 @@ npm run preview
 - 本地演示账号与作品数据仅保存在浏览器 `localStorage`，不提供真实密码安全或跨设备同步；真实部署必须配置后端与认证方案。
 - Element Plus 已按需注册并按 Vue / Element / data / Lottie 手工分包；字体与图片等静态资源体积仍较大，后续可继续做懒加载。
 - 未执行完整浏览器端交互 E2E；本版本验证覆盖构建、单测、静态扫描和开发服务器 HTTP 响应。
-- Lottie 动画 JSON 已本地化；历史 Bootstrap / Font Awesome CDN 与音乐外链仍可能受网络环境影响。
+- Lottie 动画 JSON 与前端核心样式/图标已本地化；音乐与封面外链仍可能受第三方平台网络、防盗链或授权政策影响。
 - 字体、图片、音乐、诗词文本与 CDN 资源可能有独立授权，MIT 不自动覆盖第三方素材。
 
 ### 致谢

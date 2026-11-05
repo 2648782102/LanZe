@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import { setTimeout as delay } from "node:timers/promises";
 
 const port = Number(process.env.SMOKE_PORT || 4179);
@@ -32,16 +32,39 @@ async function expectOk(path) {
   if (!response.ok) throw new Error(`${path} returned ${response.status}`);
 }
 
+function localAssetPaths(html) {
+  return [...new Set(
+    [...html.matchAll(/(?:src|href)="(\.\/[^"?#]+)"/g)]
+      .map((match) => match[1])
+      .filter((asset) => asset.startsWith("./assets/") || asset === "./favicon.ico"),
+  )];
+}
+
 try {
   await waitForServer();
   const html = await readFile("dist/index.html", "utf8");
-  const assets = [...html.matchAll(/(?:src|href)="(\.\/assets\/[^"]+)"/g)]
-    .map((match) => `/${match[1].replace(/^\.\//, "")}`);
-  const uniqueAssets = [...new Set(assets)];
-  if (uniqueAssets.length === 0) throw new Error("No local build assets found in dist/index.html");
+  const localAssets = localAssetPaths(html);
+  if (localAssets.length === 0) throw new Error("No local build assets found in dist/index.html");
+
+  const forbiddenCdnHosts = ["cdn.staticfile.org", "cdn.bootcss.com"];
+  for (const host of forbiddenCdnHosts) {
+    if (html.includes(host)) throw new Error(`dist/index.html still references ${host}`);
+  }
+
+  const cssFiles = (await readdir("dist/assets")).filter((name) => name.endsWith(".css"));
+  const cssText = await Promise.all(
+    cssFiles.map((name) => readFile(`dist/assets/${name}`, "utf8")),
+  );
+  const fontAssets = [...new Set(
+    cssText.flatMap((text) =>
+      [...text.matchAll(/url\(\.\/([^)'"?#]+\.(?:woff2?|ttf|eot|svg))\)/g)].map((match) => `./assets/${match[1]}`),
+    ),
+  )];
+  const uniqueAssets = [...new Set([...localAssets, ...fontAssets])];
+  if (fontAssets.length === 0) throw new Error("No local icon font assets found in built CSS");
 
   await expectOk("/");
-  for (const asset of uniqueAssets) await expectOk(asset);
+  for (const asset of uniqueAssets) await expectOk(`/${asset.replace(/^\.\//, "")}`);
   console.log(`Smoke passed: ${uniqueAssets.length} local assets returned 200.`);
 } catch (error) {
   console.error(error instanceof Error ? error.message : error);

@@ -142,3 +142,10 @@
 - `f9c5b67` 的 CI run `42090691325` 在 Node 20、Node 22 与 Documentation checks 三项均 success；publish run `42090702226` success。日志明确输出「现有讨论因 GITHUB_TOKEN 无法更新而保持不变」的 warning，Release 更新成功且没有重复创建欢迎帖。
 - 已在 GitHub 创建 3 个带 `good first issue` / `help wanted` 标签、附验收标准的 open issue：#2 演示 API 边界单测、#3 历史 CDN 收敛、#4 Lottie/favicon 授权核验；并把入口写入 `docs/PROMOTION.md`。这些是仓库内真实贡献入口，不涉及外部社区群发或增长数字。
 - Pages 仍为 `has_pages=false`；官方 `actions/configure-pages@v5` 的 `enablement` 需要非 `GITHUB_TOKEN`、具备 `administration:write` / `pages:write` 的令牌，而当前可用写通道不包含该权限。未伪造线上 Demo，也没有把失效 homepage 改成未验证 URL。
+
+## 巡检 07 — 2026-11-06 03:10–03:20 CST
+
+- 清理 `index.html` 中的 Bootstrap 5.1.1、Popper 2.9.3、Bootstrap JS 与 Font Awesome 5.13.0 四个历史 CDN 引用；精确安装 `bootstrap@5.1.1` 与 `@fortawesome/fontawesome-free@5.13.0`，仅按需引入 CSS，未使用的 Popper/Bootstrap JS 不再进入页面。
+- `npm run smoke` 扩展为检查构建后 HTML 不含 `cdn.staticfile.org` / `cdn.bootcss.com`、favicon 可访问，并解析 CSS 中的本地字体/图标 URL 逐项请求；本轮构建冒烟覆盖 24 个本地静态资源且全部返回 200。CI docs job 增加旧 CDN 与依赖版本锁定的防护。
+- README、CHANGELOG、RELEASE_NOTES、ANNOUNCEMENT、ARCHITECTURE、DEVELOPMENT、DEPLOYMENT、FAQ、ROADMAP、`docs/THIRD_PARTY_ASSETS.md` 与 CONTRIBUTING 同步为「核心样式/图标本地化，音乐/封面外链仍待核验」；第三方清单记录两款上游包的许可证元数据，不把整站素材称为已完成授权审计。
+- 官方 Pages 文档确认默认 `GITHUB_TOKEN` 不能通过 `configure-pages` 的 `enablement` 启用站点；本轮没有管理员级 PAT/App 令牌，因此不触发未经配置的部署，也不改动 homepage。

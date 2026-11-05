@@ -81,7 +81,7 @@ VITE_USE_MOCK=true
 - 行为：设置 `VITE_USE_MOCK=true` 或未配置 API 时，随机摘录、分类、搜索、用户条目、登录和作品发布使用 `src/data/` 与 `src/services/mockApi.js`。
 - 演示数据不能包含真实用户、私人内容、生产密钥或未授权转载的全文数据集。
 - UI 应明确标注「演示数据」，并覆盖加载、空结果、请求失败三种状态。
-- 验收：断开外部业务 API 后首页、文库与搜索结果页仍可展示仓库内演示数据；外部 CDN / Lottie JSON 缺失不应导致业务功能白屏。
+- 验收：断开外部业务 API 后首页、文库与搜索结果页仍可展示仓库内演示数据；音乐/封面外链缺失不应导致业务功能白屏。
 
 ### 方案 B：自建 API
 
@@ -100,7 +100,7 @@ VITE_USE_MOCK=true
 
 ### 方案 C：第三方数据源
 
-音乐、封面与 Bootstrap/Font Awesome 仍来自外部 CDN；Lottie 动画 JSON 已保存到仓库并由 `useLottieSource()` 生成 Blob URL。第三方可用性、速率限制、内容授权与隐私政策由提供方决定，逐项记录见 `docs/THIRD_PARTY_ASSETS.md`。业务数据默认使用本地演示兜底，CI 不依赖这些站点返回成功。
+音乐与封面仍来自外部平台；Bootstrap 5.1.1、Font Awesome 5.13.0 与 Lottie 动画已改用锁定版本的本地依赖或仓库内文件，核心页面和图标样式不依赖第三方 CDN。第三方音乐/封面可用性、速率限制、内容授权与隐私政策仍由提供方决定，逐项记录见 `docs/THIRD_PARTY_ASSETS.md`。业务数据默认使用本地演示兜底，CI 不依赖这些站点返回成功。
 
 ## 6. 开发约定
 
@@ -147,7 +147,7 @@ VITE_USE_MOCK=true
 | 现象 | 排查 |
 | --- | --- |
 | `npm ci` 后 esbuild 二进制不可用 | 检查是否使用 `--ignore-scripts`；按实际错误运行 `npm rebuild esbuild` |
-| 页面打开即白屏 | 查看控制台、CDN 是否阻断、hash 路径是否正确、`index.html` 是否加载 `/src/main.js` |
+| 页面打开即白屏 | 查看控制台、音乐/封面外链是否阻断、hash 路径是否正确、`index.html` 是否加载 `/src/main.js` |
 | 搜索没有远端结果 | 检查 `VITE_USE_MOCK`、`VITE_API_BASE_URL` 与超时；默认会自动降级到演示数据 |
 | 摘录为空 | 检查是否清空了浏览器本地存储；演示数据不依赖今日诗词 API |
 | GitHub Pages 子路径资源 404 | 检查 `base: './'` 与发布目录；hash 路由本身不需要 rewrite |
