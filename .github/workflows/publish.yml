@@ -43,7 +43,7 @@ jobs:
               --verify-tag
           fi
 
-      - name: Create welcome discussion if absent
+      - name: Create or update welcome discussion
         env:
           GH_TOKEN: ${{ github.token }}
           REPOSITORY: ${{ github.repository }}
@@ -104,16 +104,22 @@ jobs:
           )"
 
           if [ -n "$existing_id" ]; then
-            echo "Welcome discussion already exists: $existing_id"
-            exit 0
+            jq -n \
+              --arg query 'mutation($input: UpdateDiscussionInput!) { updateDiscussion(input: $input) { discussion { id url } } }' \
+              --arg discussion "$existing_id" \
+              --arg title "$DISCUSSION_TITLE" \
+              --rawfile body ANNOUNCEMENT.md \
+              '{query: $query, variables: {input: {discussionId: $discussion, title: $title, body: $body}}}' \
+              | graphql \
+              | jq -er '.data.updateDiscussion.discussion // error("Discussion update returned no discussion") | "Updated discussion \(.id): \(.url)"'
+          else
+            jq -n \
+              --arg query 'mutation($input: CreateDiscussionInput!) { createDiscussion(input: $input) { discussion { id url } } }' \
+              --arg repository "$repository_id" \
+              --arg category "$category_id" \
+              --arg title "$DISCUSSION_TITLE" \
+              --rawfile body ANNOUNCEMENT.md \
+              '{query: $query, variables: {input: {repositoryId: $repository, categoryId: $category, title: $title, body: $body}}}' \
+              | graphql \
+              | jq -er '.data.createDiscussion.discussion // error("Discussion creation returned no discussion") | "Created discussion \(.id): \(.url)"'
           fi
-
-          jq -n \
-            --arg query 'mutation($input: CreateDiscussionInput!) { createDiscussion(input: $input) { discussion { id url } } }' \
-            --arg repository "$repository_id" \
-            --arg category "$category_id" \
-            --arg title "$DISCUSSION_TITLE" \
-            --rawfile body ANNOUNCEMENT.md \
-            '{query: $query, variables: {input: {repositoryId: $repository, categoryId: $category, title: $title, body: $body}}}' \
-            | graphql \
-            | jq -er '.data.createDiscussion.discussion // error("Discussion creation returned no discussion") | "Created discussion \(.id): \(.url)"'

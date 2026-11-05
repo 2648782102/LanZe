@@ -11,6 +11,9 @@
 - 增加 issue/PR 模板、Node 20/22 CI 与手动 GitHub Pages workflow。
 - 实现本地演示数据层：不配置后端也能体验摘录、分类文库、搜索、登录、注册、改密、个人资料与作品发布；远端 API 不可用时会自动降级。
 - 清理历史硬编码的 Supabase 配置，修复若干运行时错误，补充 `lang="zh-CN"` 与关键交互无障碍标签。
+- Element Plus 改为按需注册并按 Vue / Element / data / Lottie 手工分包；Lottie 动画 JSON 改为仓库本地文件，移除两套重复运行时。
+- 新增 `npm run smoke`：启动预览服务并检查首页与入口静态资源，已接入 Node 20/22 CI。
+- 新增第三方素材与外链来源清单，明确授权仍待核验；不把下载或本地化行为写成已获得许可。
 - 发布 v0.2.0 Release notes 和中英文宣发短帖草稿；外部社区宣发仍以真实、克制、可复核为前提。
 
 ### 先从本地开始
@@ -28,6 +31,7 @@ npm run dev
 npm run build
 npm run test
 npm run lint
+npm run smoke
 ```
 
 **当前不承诺线上 Demo，也不附带托管后端或账号服务**；旧 README 中的 MemFire 地址与代码里的历史 Vercel 链接仅作为迁移背景。演示账号和作品只保存在当前浏览器 `localStorage`，不是真实账号服务，请不要输入真实密码。
@@ -35,16 +39,17 @@ npm run lint
 ### 想参与，可以从哪里开始
 
 1. **文档勘误**：发现 README / docs 与源码不一致，开一个 `Docs` issue 或直接提最小 PR。
-2. **本地复现**：用 Node 20/22 跑一遍 `npm ci && npm run build && npm run test && npm run lint`，报告环境差异。
+2. **本地复现**：用 Node 20/22 跑一遍 `npm ci && npm run build && npm run test && npm run lint && npm run smoke`，报告环境差异。
 3. **演示数据 / API 契约**：讨论 `VITE_USE_MOCK`、`VITE_API_BASE_URL`、错误态与真实 API 的兼容边界。
 4. **工程优化**：为大包建立长期按需加载策略、继续收敛历史 CDN，并补充端到端交互测试。
-5. **素材与内容**：帮助核查字体、图片、音乐、诗词文本与 CDN 资源的来源和授权。
+5. **素材与内容**：按 `docs/THIRD_PARTY_ASSETS.md` 核查字体、图片、音乐、诗词文本、Lottie 与 CDN 资源的来源和授权。
 6. **体验改进**：响应式、无障碍、空状态、加载失败提示；优先小而可验证的改动。
 
 请先看贡献指南和路线图：
 
 - https://github.com/2648782102/LanZe/blob/main/CONTRIBUTING.md
 - https://github.com/2648782102/LanZe/blob/main/docs/ROADMAP.md
+- https://github.com/2648782102/LanZe/blob/main/docs/THIRD_PARTY_ASSETS.md
 
 如果不确定提案是否合适，欢迎在本帖下用一两句话说明目标与约束；可执行的讨论会尽量整理成 issue。
 
@@ -58,6 +63,6 @@ npm run lint
 
 ### 接下来
 
-路线图的近期重点是拆分大体积依赖、补充浏览器端交互回归、完善第三方素材授权清单与可选后端契约。具体进展以 `CHANGELOG.md`、PR 和 Release 为准。若你希望看到某个方向，欢迎在评论里写下「想解决的问题 + 最小验收标准」。
+路线图的近期重点是补充浏览器端交互回归、完成第三方素材授权核验、继续收敛历史 CDN 与可选后端契约。具体进展以 `CHANGELOG.md`、PR 和 Release 为准。若你希望看到某个方向，欢迎在评论里写下「想解决的问题 + 最小验收标准」。
 
 谢谢每一位愿意把旧项目重新打开的人。愿卷帙常新，也愿讨论保持耐心与清晰。
