@@ -37,6 +37,7 @@ npm run build                # 生产构建，输出到 dist/
 npm run test                 # 14 个 node --test 单测
 npm run lint                 # 静态扫描失效后端地址、硬编码服务与脆弱引用
 npm run preview              # 预览构建产物
+npm run smoke                # 启动预览服务并检查首页与入口静态资源
 ```
 
 CI 的等价步骤是：
@@ -46,6 +47,7 @@ npm ci
 npm run build
 npm run test
 npm run lint
+npm run smoke
 ```
 
 CI 仍使用 `npm run test --if-present` 以兼容外部旧流程；本地开发建议直接运行 `npm run test` 和 `npm run lint`。
@@ -120,6 +122,7 @@ VITE_USE_MOCK=true
 - [ ] `npm ci` 成功；`git status` 没有锁文件意外改动。
 - [ ] `npm run dev` 启动；浏览器控制台无新增 `Uncaught` / 404 静态资源错误。
 - [ ] `npm run build`、`npm run test`、`npm run lint` 成功。
+- [ ] 修改构建配置后，`npm run smoke` 成功。
 - [ ] `dist/` 未被提交；`.env*` 未出现在 diff 中。
 
 ### 页面路径

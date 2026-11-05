@@ -17,7 +17,7 @@
 - 新增 `RELEASE_NOTES.md`、`ANNOUNCEMENT.md`、`SOCIAL_POSTS.md` 作为 v0.2.0 Release、Discussions 与社交文案素材。
 - 升级 Vite 到 6.4.5 并添加 `@vitejs/plugin-vue`，改为 ESM 配置、`"type": "module"` 与相对 `base: './'`。
 - 新增 `src/config/runtime.js`、`src/data/`、`src/services/`、`src/composables/`、`src/utils/`：统一公开配置、本地演示数据、浏览器存储、会话、响应归一化与查询解析。
-- 新增 `npm run test`（14 个 `node --test` 单测）、`npm run lint`、`npm run preview` 与 `.env.example`。
+- 新增 `npm run test`（14 个 `node --test` 单测）、`npm run lint`、`npm run preview`、`npm run smoke` 与 `.env.example`。
 - 新增 `src/composables/useLottieSource.js` 与两份本地动画 JSON；Lottie 不再依赖历史外部 JSON 地址。
 
 ### Changed

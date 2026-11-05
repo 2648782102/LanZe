@@ -47,6 +47,7 @@ jobs:
         shell: bash
         run: |
           test -f dist/index.html
+          npm run smoke
 
   docs:
     name: Documentation checks

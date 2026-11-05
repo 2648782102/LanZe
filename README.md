@@ -92,6 +92,7 @@ npm run build        # 生成 dist/
 npm run test         # 14 个 node --test 单测
 npm run lint         # 静态检查：失效后端地址、硬编码服务与脆弱引用
 npm run preview      # 预览 dist/
+npm run smoke        # 预览服务与入口静态资源 HTTP 冒烟
 ```
 
 CI 在 Node 20/22 执行 `npm ci && npm run build && npm run test --if-present`；`--if-present` 保留为兼容旧工作流的兜底写法。
@@ -236,6 +237,7 @@ npm run dev
 npm run build
 npm run test
 npm run lint
+npm run smoke
 ```
 
 The app includes poetry excerpts, category browsing, search, a community/creation area, a personal centre and a player prototype. It uses Vite 6, built-in local demo data, 14 unit tests and a configurable API layer: `VITE_API_BASE_URL` takes priority when configured, with automatic fallback to demo data. No public demo, hosted backend, account service or commercial support is promised; historical MemFire/Vercel links should be treated as migration context only. The code is MIT-licensed to `2022-2026 LanZe contributors`; third-party assets may have separate terms. See `CONTRIBUTING.md`, `docs/DEVELOPMENT.md` and `docs/ROADMAP.md` before opening a PR.

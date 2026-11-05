@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "smoke": "node scripts/smoke.mjs",
     "test": "node --test src/config/*.test.js src/services/*.test.js src/utils/*.test.js",
     "lint": "node src/utils/lint.mjs"
   },
