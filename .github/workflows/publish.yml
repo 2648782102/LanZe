@@ -48,11 +48,14 @@ jobs:
           DISCUSSION_TITLE: 欢迎参与兰泽诗词的重新整理 👋
         shell: bash
         run: |
+          owner="${REPOSITORY%/*}"
+          repo="${REPOSITORY#*/}"
+
           category_id="$(
             gh api graphql \
               -f query='query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { discussionCategories(first: 50) { nodes { id name } } } }' \
-              -F owner="${REPOSITORY%/*}" \
-              -F name="${REPOSITORY#*/}" \
+              -f owner="$owner" \
+              -f name="$repo" \
               --jq '.data.repository.discussionCategories.nodes[] | select(.name == "Announcements") | .id' \
               | head -n 1
           )"
@@ -61,16 +64,16 @@ jobs:
           repository_id="$(
             gh api graphql \
               -f query='query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { id } }' \
-              -F owner="${REPOSITORY%/*}" \
-              -F name="${REPOSITORY#*/}" \
+              -f owner="$owner" \
+              -f name="$repo" \
               --jq '.data.repository.id'
           )"
 
           existing_id="$(
             gh api graphql \
               -f query='query($owner: String!, $name: String!, $category: ID!) { repository(owner: $owner, name: $name) { discussions(first: 50, categoryId: $category) { nodes { id title } } } }' \
-              -F owner="${REPOSITORY%/*}" \
-              -F name="${REPOSITORY#*/}" \
+              -f owner="$owner" \
+              -f name="$repo" \
               -F category="$category_id" \
               --jq --arg title "$DISCUSSION_TITLE" '.data.repository.discussions.nodes[] | select(.title == $title) | .id' \
               | head -n 1
@@ -81,10 +84,15 @@ jobs:
             exit 0
           fi
 
+          jq -n \
+            --arg query 'mutation($input: CreateDiscussionInput!) { createDiscussion(input: $input) { discussion { id url } } }' \
+            --arg repository "$repository_id" \
+            --arg category "$category_id" \
+            --arg title "$DISCUSSION_TITLE" \
+            --rawfile body ANNOUNCEMENT.md \
+            '{query: $query, variables: {input: {repositoryId: $repository, categoryId: $category, title: $title, body: $body}}}' \
+            > /tmp/create-discussion.json
+
           gh api graphql \
-            -f query='mutation($repository: ID!, $category: ID!, $title: String!, $body: String!) { createDiscussion(input: {repositoryId: $repository, categoryId: $category, title: $title, body: $body}) { discussion { id url } } }' \
-            -F repository="$repository_id" \
-            -F category="$category_id" \
-            -F title="$DISCUSSION_TITLE" \
-            -F body=@ANNOUNCEMENT.md \
+            --input /tmp/create-discussion.json \
             --jq '.data.createDiscussion.discussion | "Created discussion \(.id): \(.url)"'
