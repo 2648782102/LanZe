@@ -80,8 +80,9 @@
                     <router-view class="left-box"></router-view>
                     <div class="right-box ms-2 hidden-sm-and-down">
                         <div><h1>兰泽诗词</h1></div>
-                        <div class="mt-2" id="tan" @click="clickTan" role="button" tabindex="0"
-                            aria-label="播放兰泽动画" @keyup.enter="clickTan"></div>
+                        <lottie-player class="mt-2" id="tan" :src="tanqiuSource" background="transparent"
+                            speed="1" @click="clickTan" role="button" tabindex="0"
+                            aria-label="播放兰泽动画" @keyup.enter="clickTan"></lottie-player>
                         <div class="mt-2 p-1">
                             <p>历史记录：</p>
                         </div>
@@ -93,10 +94,10 @@
 </template>
 
 <script>
-    import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
+    import { ref, onBeforeUnmount, watch, computed } from 'vue'
     import { useRouter } from "vue-router";
-    import lottie from "lottie-web";
     import tanqiu from "../../assets/lottieJSON/tanqiu.json";
+    import { useLottieSource } from '../../composables/useLottieSource.js'
     import hoad1 from '../../assets/hoad/hoad1.jpg'
     import hoad2 from '../../assets/hoad/hoad2.jpg'
     import hoad3 from '../../assets/hoad/hoad3.jpg'
@@ -124,7 +125,7 @@
 
             // 头像的地址
             let imgsrc = ref(null)
-            let animation = ref(null)
+            const tanqiuSource = useLottieSource(tanqiu)
             const avatarByFilename = {
                 'hoad1.jpg': hoad1, 'hoad2.jpg': hoad2, 'hoad3.jpg': hoad3,
                 'hoad4.jpg': hoad4, 'hoad5.jpg': hoad5, 'hoad6.jpg': hoad6,
@@ -137,32 +138,22 @@
 
             const stopProfileWatcher = watch(lanze_upload, syncAvatar, { immediate: true })
 
-            onMounted(() => {
-                const container = document.getElementById('tan')
-                if (!container) return
-                animation.value = lottie.loadAnimation({
-                    container,
-                    renderer: 'svg',
-                    loop: true,
-                    autoplay: false,
-                    animationData: tanqiu
-                })
-            })
-
             onBeforeUnmount(() => {
                 stopProfileWatcher()
-                animation.value?.destroy?.()
+                if (animationTimer) clearTimeout(animationTimer)
             })
 
             // 点击弹球时播放动画
             let i = 0;
             let animationTimer = null;
-            function clickTan() {
-                if (!animation.value) return
-                animation.value.goToAndPlay(i * 1080)
+            function clickTan(event) {
+                const player = event?.currentTarget
+                if (!player) return
+                player.seek(`${i * 36}%`)
+                player.play()
                 if (animationTimer) clearTimeout(animationTimer)
                 animationTimer = setTimeout(() => {
-                    animation.value?.pause?.()
+                    player.pause?.()
                     i = (i + 1) % 4
                 }, 1080)
             }
@@ -200,6 +191,7 @@
                 lanze_upload,
                 dengluClick,
                 clickTan,
+                tanqiuSource,
                 gerenziliao
             }
         }

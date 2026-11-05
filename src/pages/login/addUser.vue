@@ -40,7 +40,7 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from "vue-router";
 import Vcode from "vue3-puzzle-vcode";
-import { ElMessage } from 'element-plus'
+import { ElMessage } from 'element-plus/es/components/message/index.mjs';
 import { userReg } from '../../apis/api/login';
 
 export default {

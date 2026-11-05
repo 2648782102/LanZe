@@ -30,7 +30,7 @@
 import { ref, onMounted, computed } from "vue";
 import UserLi from "../../components/UserLi.vue";
 import { useRouter } from "vue-router";
-import { ElMessage } from "element-plus";
+import { ElMessage } from "element-plus/es/components/message/index.mjs";
 import { PoetryCustom } from "../../apis/api/list.js";
 import { normalizeListResponse } from "../../utils/response.js";
 

@@ -1,6 +1,6 @@
 <template>
-  <Vue3Lottie v-show="isLottie" class="lottie hidden-sm-and-down" ref="demoRefHua" :animationData="qieHuan" :loop="1"
-    height="240vh" width="240vh" :autoPlay="false" />
+  <lottie-player v-show="isLottie" class="lottie hidden-sm-and-down" ref="demoRefHua" :src="qieHuanSource"
+    background="transparent" speed="1" style="height: 240vh; width: 240vh" />
   <article>
     <section>
       <el-container>
@@ -116,9 +116,9 @@
   import { ref, watch, onBeforeUnmount } from "vue";
   import logo from "../assets/logo.png";
   import { useRouter } from "vue-router";
-  import { ElMessage } from "element-plus";
+import { ElMessage } from "element-plus/es/components/message/index.mjs";
   import qieHuan from "../assets/lottieJSON/qieHuan.json";
-  import { Vue3Lottie } from "vue3-lottie";
+  import { useLottieSource } from "../composables/useLottieSource.js";
   import Audio from "./Audio.vue";
   import { searchList } from "../apis/api/list.js";
   import { useRouteTransition } from "../composables/useRouteTransition.js";
@@ -127,7 +127,6 @@
   export default {
     name: "Home",
     components: {
-      Vue3Lottie,
       Audio
     },
     setup() {
@@ -177,6 +176,7 @@
       // 页面切换动画效果
       let isLottie = transitionActive;
       let demoRefHua = ref(null);
+      const qieHuanSource = useLottieSource(qieHuan);
 
       const resetScroll = () => {
         scrollbarRef.value?.setScrollTop?.(0);
@@ -207,7 +207,7 @@
         elinput1focus,
         inputEnter,
         loading,
-        qieHuan,
+        qieHuanSource,
         demoRefHua,
         isLottie,
         scrollbarRef

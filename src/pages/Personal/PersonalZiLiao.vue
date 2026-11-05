@@ -9,7 +9,7 @@
 
 <script>
     import { useRouter } from "vue-router";
-    import { ElMessage } from 'element-plus'
+import { ElMessage } from 'element-plus/es/components/message/index.mjs';
     import { onBeforeMount } from "vue";
     import { useSession } from '../../composables/useSession.js';
 

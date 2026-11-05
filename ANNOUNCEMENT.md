@@ -37,7 +37,7 @@ npm run lint
 1. **文档勘误**：发现 README / docs 与源码不一致，开一个 `Docs` issue 或直接提最小 PR。
 2. **本地复现**：用 Node 20/22 跑一遍 `npm ci && npm run build && npm run test && npm run lint`，报告环境差异。
 3. **演示数据 / API 契约**：讨论 `VITE_USE_MOCK`、`VITE_API_BASE_URL`、错误态与真实 API 的兼容边界。
-4. **工程优化**：拆分大体积 chunk、减少外部 Lottie JSON 依赖、补充端到端交互测试。
+4. **工程优化**：为大包建立长期按需加载策略、继续收敛历史 CDN，并补充端到端交互测试。
 5. **素材与内容**：帮助核查字体、图片、音乐、诗词文本与 CDN 资源的来源和授权。
 6. **体验改进**：响应式、无障碍、空状态、加载失败提示；优先小而可验证的改动。
 

@@ -16,7 +16,7 @@
 <script>
     import { computed, onMounted, ref } from "vue";
     import { useRouter } from "vue-router";
-    import { ElMessage } from "element-plus";
+import { ElMessage } from "element-plus/es/components/message/index.mjs";
     import { useSession } from "../../composables/useSession.js";
     import { PoetryCustom } from "../../apis/api/list.js";
     import { normalizeListResponse } from "../../utils/response.js";

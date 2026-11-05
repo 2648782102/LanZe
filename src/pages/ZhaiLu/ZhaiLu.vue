@@ -62,7 +62,7 @@
 <script>
   import 'element-plus/theme-chalk/display.css'
   import { ref, onMounted } from 'vue'
-  import { ElMessage } from 'element-plus'
+import { ElMessage } from 'element-plus/es/components/message/index.mjs';
   import { PoetryRandomExcerpt } from '../../apis/api/list.js'
 
   export default {

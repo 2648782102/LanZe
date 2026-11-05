@@ -8,6 +8,9 @@ const forbiddenPatterns = [
   { pattern: /localhost:5565/, message: "禁止硬编码失效后端地址", excludeSelf: true },
   { pattern: /lan-ze-user\.vercel\.app|lanze-node\.vercel\.app|memfiredb\.com/, message: "禁止硬编码失效服务地址", excludeSelf: true },
   { pattern: /\.\.\/\.\.\/node_modules\//, message: "禁止直接引用 node_modules 路径", excludeSelf: true },
+  { pattern: /ElementPlusIconsVue/, message: "禁止全局注册全部 Element Plus 图标，请按需导入", excludeSelf: true },
+  { pattern: /app\.use\(ElementPlus\)/, message: "禁止全局注册全部 Element Plus 组件，请按需注册", excludeSelf: true },
+  { pattern: /lottie-web|vue3-lottie/, message: "禁止重复引入 Lottie 运行时，请使用 lottie-player", excludeSelf: true },
 ];
 
 const ownedFiles = new Set([

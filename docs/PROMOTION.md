@@ -1,6 +1,6 @@
 # 展示与宣发清单
 
-> **状态：可执行，但尚未执行。** 本文件由治理子任务写入，不代表已经调用 GitHub API、修改仓库设置、创建 Release/Discussion、发布社交媒体或投放任何内容。所有对外动作由主 agent 在合并后统一核对并执行。最后整理：2026-11-06。
+> **状态：部分已执行。** 本文件最初由治理子任务写入；主 agent 已核对并执行仓库自有渠道中的 Release、Discussions 欢迎帖、About 描述与 topics。社交预览图、Pages、社交平台短帖、外部社区投稿和付费推广均未执行。最后整理：2026-11-06。
 
 ## 1. 推荐仓库定位
 
@@ -48,17 +48,17 @@ vue3, vite, element-plus, javascript, frontend, chinese-poetry, poetry, classica
 | 6 | 给适合新人的 issue 加 `good first issue` / `help wanted` 标签 | `.github/ISSUE_TEMPLATE/*` | 先写清复现步骤或预期结果，避免空任务 |
 | 7 | 发布一条 Release/Discussion 公告，再按平台节奏发布短帖 | `SOCIAL_POSTS.md` | 不夸大 star、用户数、线上 Demo 或后端能力 |
 
-**本子任务没有执行以上任何 GitHub 侧动作，也没有调用发布 API。**
+**执行记录：** 第 1、3、4 项已完成并验证；第 2 项已完成 About 描述与 topics，Website 仍为历史失效地址（待有可用 API/浏览器交互后清空），社交预览图未上传；第 5 项 Pages 未启用；第 6、7 项未执行；外部社交媒体未发布。
 
 ## 3. GitHub Discussions 欢迎帖
 
-草稿：[`ANNOUNCEMENT.md`](../ANNOUNCEMENT.md)。建议分类 `Announcements`，标题「欢迎参与兰泽诗词的重新整理」。发帖前替换占位符、确认 Release/tag 是否存在，并补充维护者希望使用的联系/决策方式。
+已发布：[欢迎参与兰泽诗词的重新整理 👋](https://github.com/2648782102/LanZe/discussions/1)。分类 `Announcements`，内容来自 [`ANNOUNCEMENT.md`](../ANNOUNCEMENT.md)，由 tag 发布 workflow 幂等创建。
 
 欢迎帖应引导四类讨论：文档勘误、本地复现、mock/API 契约、素材授权；明确「暂无线上 Demo」与「社区维护、不承诺响应 SLA」。
 
 ## 4. Release v0.2.0
 
-草稿：[`RELEASE_NOTES.md`](../RELEASE_NOTES.md)。建议 tag/release 名 `v0.2.0`，标题「兰泽诗词 v0.2.0 · 开源治理与本地演示基线」。
+已发布：[v0.2.0 Release](https://github.com/2648782102/LanZe/releases/tag/v0.2.0)，标题「兰泽诗词 v0.2.0 · 本地可运行的开源前端」，内容来自 [`RELEASE_NOTES.md`](../RELEASE_NOTES.md)。
 
 发布前检查：
 

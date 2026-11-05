@@ -41,7 +41,7 @@ import shijing1 from "../../assets/beijing/shijing1.jpg";
 import songci300 from "../../assets/beijing/songci300.jpg";
 import caocao from "../../assets/beijing/caocao.jpg";
 import tangshi300 from "../../assets/beijing/tangshi300.jpg";
-import { ElMessage } from "element-plus";
+import { ElMessage } from "element-plus/es/components/message/index.mjs";
 import { PoetryClass } from "../../apis/api/list.js";
 import { normalizeListResponse } from "../../utils/response.js";
 

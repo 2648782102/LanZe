@@ -11,7 +11,7 @@
 <script>
   import { ref } from "vue";
   import { useRouter } from "vue-router";
-  import { ElMessage } from "element-plus";
+import { ElMessage } from "element-plus/es/components/message/index.mjs";
   import { PoetryCollection } from "../apis/api/list.js";
   import { normalizeListResponse } from "../utils/response.js";
 

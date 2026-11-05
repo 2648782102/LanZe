@@ -37,12 +37,14 @@
 
 <script>
   import { ref } from 'vue'
+  import { Picture } from '@element-plus/icons-vue'
   import webpa from "../../assets/LunBo/1.webp";
   import webpb from "../../assets/LunBo/2.webp";
   import webpc from "../../assets/LunBo/4.webp";
 
   export default {
     name: 'ChaLou',
+    components: { Picture },
     setup() {
       let imgArr = ref([
       webpa,

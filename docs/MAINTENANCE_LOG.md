@@ -98,3 +98,28 @@
 - [ ] 推送 `v0.2.0` tag 后确认 Release 与 Announcements 欢迎帖由 workflow 创建成功。
 - [ ] 如启用 Pages，先验证 `https://2648782102.github.io/LanZe/` 静态资源无 404，再把仓库 homepage 指向已验证 URL；否则清空历史 `lan-ze.vercel.app`。
 - [ ] 检查 issue/PR、Discussion 与 CI 失败；只修可复现、有边界的问题，不制造重复发布或外部群发。
+
+## 巡检 04 — 2026-11-06 02:38–03:10 CST
+
+### 发布流程修复与验证
+
+- `publish.yml` 原 Discussion 步骤把 `--jq --arg` 混用，导致 `gh api graphql` 报 `accepts 1 arg(s), received 4`。已改为 `jq -n` 构造 GraphQL 请求体、`curl` 直接 POST `https://api.github.com/graphql`、统一检查 `.errors[]` 并保留按标题查重的幂等逻辑。
+- 本地用假 GraphQL 响应演练「首次创建」「重复运行」「GraphQL 错误」三条路径均符合预期；YAML、`bash -n`、`npm run lint`、`npm run test` 和 `git diff --check` 通过。
+- 提交 `ab60d61 fix: create discussion with GraphQL request body` 后重新强制推送 `v0.2.0` tag，触发新 publish run `42086132389`。该 run 与同 commit 的 CI run `42086116449` 均为 success。
+- Release `v0.2.0` 为正式发布、非草稿，标题与 body 与 `RELEASE_NOTES.md` 一致；Discussions 欢迎帖创建于 `https://github.com/2648782102/LanZe/discussions/1`，日志给出 `D_kwDOHcVN884Aq2tn`。当前无 open issue 或 PR。
+- `https://2648782102.github.io/LanZe/` 返回 404，Pages 未启用；历史 homepage `https://lan-ze.vercel.app` 仍留在仓库 About 中，本轮没有可用的 GitHub 写元数据 API 或浏览器交互通道，未伪造部署或清空结果。
+
+### 前端体积与离线资源治理
+
+- Element Plus 从 `app.use(ElementPlus)` 全量插件改为按实际 `el-*` 标签显式注册；`ElMessage` / `ElMessageBox` 改用组件子路径导入；Element Plus Icons 仅在使用 `<Picture />` 的两个页面局部注册。
+- `vite.config.js` 增加 Vue / Element / data / Lottie vendor 的 `manualChunks`；入口 JS 从基线 1,841.31 kB 降到约 9.97 kB，Element vendor 从 916.95 kB 降到 306.83 kB，构建不再出现 >500 kB 的单个 JS chunk 警告。
+- 移除重复的 `lottie-web` 与 `vue3-lottie` 运行时，统一使用 `@lottiefiles/lottie-player`。新增 `src/composables/useLottieSource.js`，把本地动画 JSON 转成 Blob URL；两份历史 LottieFiles 外链动画已保存为 `src/assets/lottieJSON/fanHui.json` 与 `login.json`，首页与个人中心原有动画改走同一播放器。
+- `npm install --package-lock-only --ignore-scripts` 后 `npm audit` 为 0 vulnerabilities；`npm run build`（无大 chunk 警告）、`npm run test`（14/14）、`npm run lint`、`git diff --check` 通过；`npm run preview` 的首页与全部入口 JS/CSS 静态资源均返回 200。
+- README、CHANGELOG、`RELEASE_NOTES.md`、`ANNOUNCEMENT.md`、`docs/ROADMAP.md` 已同步；`docs/PROMOTION.md` 更新为已发布/未执行状态清单。历史 Bootstrap / Font Awesome CDN 与音乐外链仍保留，第三方素材授权尚未逐项核验。
+
+### 待复核（后续小时巡检）
+
+- [ ] 下一轮提交并推送后确认 GitHub CI 在 Node 20/22 仍为绿色。
+- [ ] 若有可用的仓库元数据写通道，清空失效 homepage；若启用 Pages，先实测 `https://2648782102.github.io/LanZe/` 静态资源无 404。
+- [ ] 可用时补一次浏览器端交互回归：按需注册的 Element 组件、路由切换动画、登录/资料/音乐/Lottie 页面。
+- [ ] 继续整理第三方字体、音乐、CDN 与历史 LottieFiles JSON 的来源和授权；不把下载行为误写成已获得授权。

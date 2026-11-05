@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ElMessage } from "element-plus";
+import { ElMessage } from "element-plus/es/components/message/index.mjs";
 import { apiConfig, baseUrl } from "./env.js";
 import { failure, isSuccess, normalizePoemPayload } from "../utils/response.js";
 import {

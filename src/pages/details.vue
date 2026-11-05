@@ -14,7 +14,7 @@
       <!-- <button @click="back" class="btn btn-primary fanhui">返回</button> -->
       <el-tooltip content="返回" placement="top" effect="dark">
         <lottie-player @click="back" @keyup.enter="back" role="button" tabindex="0" aria-label="返回上一页"
-          class="fanhui" src="https://assets9.lottiefiles.com/packages/lf20_gigyrcoy.json"
+          class="fanhui" :src="animationSource"
           background="transparent" speed="1" loop autoplay></lottie-player>
       </el-tooltip>
 
@@ -26,6 +26,8 @@
   import { computed } from "vue";
   import { useRoute, useRouter } from "vue-router";
   import { normalizeDetails, parseJsonObject } from "../utils/poemQuery.js";
+  import fanHui from "../assets/lottieJSON/fanHui.json";
+  import { useLottieSource } from "../composables/useLottieSource.js";
 
   export default {
     name: 'details',
@@ -33,6 +35,7 @@
 
       const $route = useRoute()
       const $router = useRouter()
+      const animationSource = useLottieSource(fanHui);
       const details = computed(() =>
         normalizeDetails(parseJsonObject($route.query.shici, {})),
       );
@@ -43,6 +46,7 @@
 
       return {
         details,
+        animationSource,
         back,
       }
     }

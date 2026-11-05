@@ -59,7 +59,7 @@
 | 构建 | Vite 6 + `@vitejs/plugin-vue`，`package.json` 使用 `"type": "module"`，`base: './'` |
 | 语言 | JavaScript / Vue SFC；npm 脚本使用 `node --test` 与 ESM |
 | 数据 | `src/config/runtime.js` 统一公开配置，`src/apis/request.js` 在真实 API 与 `src/services/mockApi.js` 之间切换 |
-| 动效与媒体 | `lottie-web` / `vue3-lottie` / 本地 `@lottiefiles/lottie-player`、APlayer；部分 Lottie JSON 仍为外部链接 |
+| 动效与媒体 | 本地 `@lottiefiles/lottie-player`、仓库内 Lottie JSON、APlayer；历史 CDN 见下方说明 |
 | 样式 | 组件内 CSS、Element Plus、Bootstrap/Font Awesome CDN（历史依赖） |
 | 字体与素材 | `src/assets/` 下的字体、图片与背景；授权审查见 `docs/FAQ.md` |
 | 工具链 | npm、Node.js 20/22、GitHub Actions、`npm run test`、`npm run lint` |
@@ -196,8 +196,8 @@ LanZe/
 
 简要版本（完整优先级与验收标准见 `docs/ROADMAP.md`）：
 
-- **v0.2.0（当前）**：Vite 6、本地演示数据、14 项单测、lint、README/许可证/治理文档、CI、模板、发布与宣发文案。
-- **v0.3.x（工程优化）**：拆分大体积依赖、减少外部 Lottie JSON、补充浏览器端交互 E2E、完善错误/空状态。
+- **v0.2.0（当前）**：Vite 6、本地演示数据、14 项单测、lint、README/许可证/治理文档、CI、模板、发布与宣发文案；Element Plus 按需注册、手工 vendor 分包、Lottie 动画本地化。
+- **v0.3.x（工程优化）**：补充浏览器端交互 E2E、完善错误/空状态、继续收敛历史 CDN 与第三方素材授权。
 - **v0.4.x（体验与内容）**：响应式与无障碍回归、素材授权清单、演示录屏、可选后端契约。
 - **后续（社区化）**：按真实贡献推进 i18n、内容版本依据与社区讨论，不预设交付期限。
 

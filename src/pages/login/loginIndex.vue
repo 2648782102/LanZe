@@ -8,7 +8,7 @@
     <div class="at2"></div>
     <!-- 罗蒂动画位置 -->
     <section class="lottie col-12 col-md-8 col-lg-5 col-xl-4">
-      <lottie-player src="https://assets6.lottiefiles.com/packages/lf20_ucbyrun5.json" background="transparent"
+      <lottie-player :src="animationSource" background="transparent"
         speed="1" style="width: 100%; height: 100%;" loop autoplay></lottie-player>
     </section>
     <!-- 路由子组件位置 -->
@@ -19,9 +19,14 @@
 </template>
 
 <script>
+  import loginAnimation from "../../assets/lottieJSON/login.json";
+  import { useLottieSource } from "../../composables/useLottieSource.js";
+
   export default {
     name: 'loginIndex',
     setup() {
+      const animationSource = useLottieSource(loginAnimation);
+      return { animationSource };
     }
   }
 </script>

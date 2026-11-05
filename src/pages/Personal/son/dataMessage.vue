@@ -59,7 +59,8 @@
 
 <script>
 import { reactive, ref, onMounted, watch } from "vue";
-import { ElMessage } from "element-plus";
+import { ElMessage } from "element-plus/es/components/message/index.mjs";
+import { Picture } from "@element-plus/icons-vue";
 import hoad1 from "../../../assets/hoad/hoad1.jpg";
 import hoad2 from "../../../assets/hoad/hoad2.jpg";
 import hoad3 from "../../../assets/hoad/hoad3.jpg";
@@ -74,6 +75,7 @@ import { useSession } from "../../../composables/useSession.js";
 
 export default {
   name: "dataMessage",
+  components: { Picture },
   setup() {
     const $router = useRouter();
     const { isLoggedIn, profile, updateProfile } = useSession();

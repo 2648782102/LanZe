@@ -32,7 +32,7 @@
     import { useRouter } from 'vue-router'
     import { ref } from 'vue'
     import 'element-plus/theme-chalk/display.css'
-    import { ElMessage } from 'element-plus'
+import { ElMessage } from 'element-plus/es/components/message/index.mjs';
     import { PoetryHuajianji, PoetryHuajianjiIntro } from '../../../apis/api/list.js'
     import { normalizeListResponse } from '../../../utils/response.js'
 
