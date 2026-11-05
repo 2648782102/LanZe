@@ -48,12 +48,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPOSITORY: ${{ github.repository }}
           DISCUSSION_TITLE: 欢迎参与兰泽诗词的重新整理 👋
+          DISCUSSION_URL: https://github.com/2648782102/LanZe/discussions/1
         shell: bash
         run: |
           set -euo pipefail
 
           owner="${REPOSITORY%/*}"
           repo="${REPOSITORY#*/}"
+          desired_body="$(< ANNOUNCEMENT.md)"
 
           graphql() {
             local response
@@ -104,13 +106,51 @@ jobs:
           )"
 
           if [ -n "$existing_id" ]; then
-            jq -n \
-              --arg query 'mutation($input: UpdateDiscussionInput!) { updateDiscussion(input: $input) { discussion { id url } } }' \
-              --arg discussion "$existing_id" \
-              --arg title "$DISCUSSION_TITLE" \
-              --rawfile body ANNOUNCEMENT.md \
-              '{query: $query, variables: {input: {discussionId: $discussion, title: $title, body: $body}}}' \
-              | graphql \
+            current_body="$(
+              jq -n \
+                --arg id "$existing_id" \
+                '{query: "query($id: ID!) { node(id: $id) { ... on Discussion { title body } } }", variables: {id: $id}}' \
+                | graphql \
+                | jq -r '.data.node.body // empty'
+            )"
+            desired_body_without_trailing_newlines="${desired_body%"$'\n'"}"
+            if [ "$current_body" = "$desired_body_without_trailing_newlines" ]; then
+              echo "Welcome discussion is already current: $DISCUSSION_URL"
+              exit 0
+            fi
+
+            update_request="$(
+              jq -n \
+                --arg query 'mutation($input: UpdateDiscussionInput!) { updateDiscussion(input: $input) { discussion { id url } } }' \
+                --arg discussion "$existing_id" \
+                --arg title "$DISCUSSION_TITLE" \
+                --rawfile body ANNOUNCEMENT.md \
+                '{query: $query, variables: {input: {discussionId: $discussion, title: $title, body: $body}}}'
+            )"
+            if ! update_response="$(
+              printf '%s' "$update_request" | curl -fsS -X POST \
+                -H "Authorization: Bearer $GH_TOKEN" \
+                -H "Accept: application/vnd.github+json" \
+                -H "Content-Type: application/json" \
+                https://api.github.com/graphql \
+                --data-binary @-
+            )"; then
+              echo "Discussion update request failed" >&2
+              exit 1
+            fi
+            if ! update_error="$(printf '%s' "$update_response" | jq -r '.errors[0].message // empty')"; then
+              echo "Discussion update returned an invalid response" >&2
+              exit 1
+            fi
+            if [ -n "$update_error" ]; then
+              if [[ "$update_error" == *"Resource not accessible by integration"* ]]; then
+                echo "::warning::Could not update $DISCUSSION_URL with the current GITHUB_TOKEN; the existing discussion was left unchanged. Update it manually or configure an explicitly permitted token." >&2
+                exit 0
+              fi
+              echo "Discussion update failed: $update_error" >&2
+              exit 1
+            fi
+            printf '%s' "$update_response" \
               | jq -er '.data.updateDiscussion.discussion // error("Discussion update returned no discussion") | "Updated discussion \(.id): \(.url)"'
           else
             jq -n \

@@ -132,3 +132,10 @@
 - README、`CONTRIBUTING.md`、`docs/DEVELOPMENT.md`、`docs/DEPLOYMENT.md`、`CHANGELOG.md` 已补充 `npm run smoke` 命令与验收说明；`npm run build`、`npm run smoke`、`npm run test`（14/14）、`npm run lint`、YAML、`git diff --check` 均通过。
 - `383d3a9` 推送后，CI run `42088476064` 与 publish run `42088486521` 均 success；Release body 与本地 `RELEASE_NOTES.md` 内容一致（仅末尾换行差异），Discussions 欢迎帖按标题查重未重复创建。
 - 新增 `docs/THIRD_PARTY_ASSETS.md`：按字体、图片、诗词、Lottie、音乐/CDN 分类记录来源线索与「授权未核验」状态；明确下载 LottieFiles JSON 不等于获得许可。修正 `docs/DEVELOPMENT.md` 中「部分 Lottie JSON 仍为外链」的过时表述，并让 CI 检查该清单文件存在。
+
+## 巡检 06 — 2026-11-06 03:00–03:10 CST
+
+- 本地用假 GraphQL 响应演练欢迎帖「首次创建」「已有则更新」「GraphQL 错误」三条路径，并核对 GitHub 官方 `UpdateDiscussionInput` 字段；`npm ci`、`npm run build`、`npm run smoke`、`npm run test`（14/14）、`npm run lint`、`npm audit --omit=dev`、YAML、Markdown 本地链接与 `git diff --check` 均通过。
+- `1e21786` 推送并强制更新 `v0.2.0` tag 后，Release 仍为正式发布且 body 与 `RELEASE_NOTES.md` 一致；新 publish run `42089909542` 的 Release 步骤 success，但 `updateDiscussion` 被 GitHub Actions 默认令牌以 `Resource not accessible by integration` 拒绝，Discussion 正文未被改写，也没有重复创建。
+- 这是平台权限边界，不是 GraphQL schema 错误：即使 workflow 声明 `discussions: write`，安装令牌仍不能修改他人/既有讨论正文。将发布步骤改为先读取现有正文并比对：一致则跳过；存在差异才尝试更新；更新受限时保留原帖并输出显式 warning，使 publish run 不再因不可控权限而整单失败。
+- `docs/PROMOTION.md` 同步为真实状态：欢迎帖已发布且幂等防重复，自动正文同步受令牌权限限制；未把旧帖正文宣称为已经更新。后续如需在线同步，应配置由维护者明确授权、具备 Discussions 写权限的令牌，或人工编辑欢迎帖。

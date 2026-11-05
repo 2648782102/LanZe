@@ -52,7 +52,7 @@ vue3, vite, element-plus, javascript, frontend, chinese-poetry, poetry, classica
 
 ## 3. GitHub Discussions 欢迎帖
 
-已发布：[欢迎参与兰泽诗词的重新整理 👋](https://github.com/2648782102/LanZe/discussions/1)。分类 `Announcements`，内容来自 [`ANNOUNCEMENT.md`](../ANNOUNCEMENT.md)，由 tag 发布 workflow 幂等创建/更新。
+已发布：[欢迎参与兰泽诗词的重新整理 👋](https://github.com/2648782102/LanZe/discussions/1)。分类 `Announcements`，内容来自 [`ANNOUNCEMENT.md`](../ANNOUNCEMENT.md)，由 tag 发布 workflow 幂等创建并避免重复发帖。正文同步会比对现有内容；Actions 默认令牌对 `updateDiscussion` 缺少写权限时，workflow 会保留原帖并输出 warning，不把它误报为已更新。
 
 欢迎帖应引导四类讨论：文档勘误、本地复现、mock/API 契约、素材授权；明确「暂无线上 Demo」与「社区维护、不承诺响应 SLA」。
 
