@@ -60,7 +60,7 @@ ci: 增加 Node 20/22 构建矩阵
 - [ ] `npm ci` 可从干净依赖状态完成。
 - [ ] `npm run dev` 能打开本地首页，终端无新增致命错误。
 - [ ] `npm run build` 生成 `dist/`。
-- [ ] `npm run test` 通过（18 个 `node --test` 单测）。
+- [ ] `npm run test` 通过（23 个 `node --test` 单测）。
 - [ ] `npm run lint` 通过（静态扫描）。
 - [ ] 如修改了构建配置或入口资源，`npm run smoke` 通过。
 - [ ] 如修改了首页、导航、播放器、登录/发布链路或路由，且环境允许，`npm run smoke:browser` 通过。

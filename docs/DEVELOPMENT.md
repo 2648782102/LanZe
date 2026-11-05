@@ -34,7 +34,7 @@ npm run dev
 ```bash
 npm run dev                  # 开发服务器
 npm run build                # 生产构建，输出到 dist/
-npm run test                 # 18 个 node --test 单测
+npm run test                 # 23 个 node --test 单测
 npm run lint                 # 静态扫描失效后端地址、硬编码服务与脆弱引用
 npm run preview              # 预览构建产物
 npm run smoke                # 启动预览服务并检查首页与入口静态资源
@@ -103,7 +103,7 @@ VITE_USE_MOCK=true
 
 ### 方案 C：可选自定义音源
 
-播放器默认只加载仓库内 WAV / SVG 演示资源；Bootstrap 5.1.1、Font Awesome 5.13.0 与 Lottie 动画也已本地化。只有设置 `VITE_AUDIO_SOURCE=custom` 并提供有效 `VITE_AUDIO_TRACKS` JSON 时才会启用自定义音源，其可用性、速率限制、内容授权与隐私政策由配置者负责。无效配置自动回退到本地演示音，CI 不依赖第三方站点返回成功。逐项记录见 `docs/THIRD_PARTY_ASSETS.md`。
+播放器默认只加载仓库内 WAV / SVG 演示资源；Bootstrap 5.1.1、Font Awesome 5.13.0 与 Lottie 动画也已本地化。只有设置 `VITE_AUDIO_SOURCE=custom` 并提供有效 `VITE_AUDIO_TRACKS` JSON 时才会启用自定义音源，其可用性、速率限制、内容授权与隐私政策由配置者负责。无效 JSON 或空列表自动回退到本地演示音，并显示一次可读提示；CI 不依赖第三方站点返回成功。自定义音源 URL 本身不可达时的播放器行为仍可作为后续贡献入口。逐项记录见 `docs/THIRD_PARTY_ASSETS.md`。
 
 ## 6. 开发约定
 

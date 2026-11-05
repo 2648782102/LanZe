@@ -45,7 +45,7 @@
 | `src/pages/WenKu/` | 分类文库、古诗卡片与结果页 | 分类数据来自统一请求层与演示数据，不再直连历史 Supabase 表 |
 | `src/pages/ChaLou/` | 精选诗文、飞花、现代诗等社区栏目 | 用户条目使用统一演示资料，不再自建另一个 Supabase 客户端 |
 | `src/pages/login/` 与 `src/pages/Personal/` | 登录、注册、资料、作品、收藏、设置等界面 | 会话结构由 `useSession` 统一；演示账号和作品仅存浏览器 `localStorage` |
-| `src/pages/Audio.vue` | APlayer 播放器演示 | 默认音频/封面来自 `public/media/`；自定义音源需显式配置并自行核验授权 |
+| `src/pages/Audio.vue` | APlayer 播放器演示 | 默认音频/封面来自 `public/media/`；自定义音源需显式配置并自行核验授权，无效配置回退本地演示音并显示提示 |
 | `src/apis/request.js` | Axios + 本地演示数据双通道请求函数 | 远端返回无效数据时自动降级并提示一次 |
 | `src/apis/env.js` | 从 `src/config/runtime.js` 导出 `baseUrl` 与运行配置 | 不再硬编码后端地址 |
 | `src/apis/api/list.js`、`login.js` | 领域 API 函数 | 真实 API 契约由自建服务定义；本地演示路径见 `src/services/mockApi.js` |

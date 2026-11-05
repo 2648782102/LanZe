@@ -170,3 +170,12 @@
 - 将可选 `npm run smoke:browser` 从首页→文库点击流扩展为真实 CDP 回归：桌面 1280×800 与窄屏 390×844 搜索、窄屏底部导航切换、本地演示音源挂载、演示账号滑块验证登录、作品发布写入 `localStorage`、作品页回读，并清理临时 Cookie/演示数据。新增 `src/config/demoBrowser.node.js` 与 1 个单测，`npm run test` 从 17 项增至 18 项。
 - README、CHANGELOG、RELEASE_NOTES、ANNOUNCEMENT、CONTRIBUTING、SOCIAL_POSTS、`docs/DEVELOPMENT.md`、`docs/DEPLOYMENT.md`、`docs/FAQ.md`、`docs/ROADMAP.md` 同步为 18 项单测与新的浏览器冒烟边界；仍明确该脚本不进入 CI 矩阵，不覆盖真实后端、跨浏览器或正式 E2E 套件。历史巡检中的旧数字与当时状态按事实保留。
 - 本地验证：`npm run test`（18/18）、`npm run lint`、`npm run build`、`npm run smoke`（26 assets）、`npm run smoke:browser`（桌面/窄屏/登录/发布链路，控制台与网络错误 0）均通过；`git diff --check` 无新增空白错误。
+- 04:16 复核 publish run `42101440222` 为 success，Release body 已与当时的 `RELEASE_NOTES.md` 同步为 18 项单测与登录/发布冒烟边界；`c300419` 的 CI run `42101345370` 仍为 success。公开 repo metadata 仍显示 `homepage=https://lan-ze.vercel.app`、`has_pages=false`。
+
+## 巡检 10 — 2026-11-06 04:16–04:30 CST
+
+- 按 #2 的验收方向补充 5 项本地演示 API 边界单测：随机摘录索引/环绕/缺参、分类命中与未命中回退、搜索空关键字/大小写/空格、发布作品去重与合并数据去重。`npm run test` 从 18 项增至 23 项；测试不依赖网络、真实浏览器或用户数据，并清理演示存储。
+- `src/pages/Audio.vue` 为无效 `VITE_AUDIO_TRACKS`（JSON 解析失败、空列表等）增加一次可读回退提示；默认播放器仍只加载仓库自制音源/封面。自定义音源 URL 本身不可达时的状态保留在 #3 与路线图，不夸大为已解决。
+- README、CHANGELOG、RELEASE_NOTES、ANNOUNCEMENT、CONTRIBUTING、SOCIAL_POSTS、`docs/ARCHITECTURE.md`、`docs/DEVELOPMENT.md`、`docs/FAQ.md`、`docs/ROADMAP.md`、`docs/THIRD_PARTY_ASSETS.md`、`.env.example` 与 `docs/PROMOTION.md` 同步为 23 项单测、无效配置回退提示及后续贡献边界；历史巡检中的旧数字仍按当时事实保留。
+- #2 更新为已完成核心边界与新的最小 PR 入口，#3 更新为 23 项单测、无效配置提示与不可达 URL/CI E2E 入口；仍保留 `good first issue` / `help wanted`，没有关闭或虚构外部贡献。
+- 本地验证：`npm run test`（23/23）、`npm run lint`、`npm run build`、`npm run smoke`（26 assets）、`npm run smoke:browser`（桌面/窄屏/登录/发布链路，控制台与网络错误 0）均通过。GitHub 展示限制不变：当前连接无仓库 metadata / Pages / Social preview 写通道，未清空失效 homepage、启用 Pages 或上传社交预览。
