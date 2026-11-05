@@ -107,3 +107,13 @@ jobs:
           fi
           grep -q 'bootstrap.*5\.1\.1' package.json || { echo 'Bootstrap 5.1.1 is not pinned.' >&2; exit 1; }
           grep -q '@fortawesome/fontawesome-free.*5\.13\.0' package.json || { echo 'Font Awesome 5.13.0 is not pinned.' >&2; exit 1; }
+
+      - name: Reject third-party media defaults
+        shell: bash
+        run: |
+          if grep -nE 'music\.163\.com|music\.126\.net' src/pages/Audio.vue src/config/audio.js; then
+            echo 'The default audio player still hardcodes third-party media hosts.' >&2
+            exit 1
+          fi
+          test -f public/media/lanze-demo.wav
+          test -f public/media/lanze-demo-cover.svg

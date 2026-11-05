@@ -149,3 +149,11 @@
 - `npm run smoke` 扩展为检查构建后 HTML 不含 `cdn.staticfile.org` / `cdn.bootcss.com`、favicon 可访问，并解析 CSS 中的本地字体/图标 URL 逐项请求；本轮构建冒烟覆盖 24 个本地静态资源且全部返回 200。CI docs job 增加旧 CDN 与依赖版本锁定的防护。
 - README、CHANGELOG、RELEASE_NOTES、ANNOUNCEMENT、ARCHITECTURE、DEVELOPMENT、DEPLOYMENT、FAQ、ROADMAP、`docs/THIRD_PARTY_ASSETS.md` 与 CONTRIBUTING 同步为「核心样式/图标本地化，音乐/封面外链仍待核验」；第三方清单记录两款上游包的许可证元数据，不把整站素材称为已完成授权审计。
 - 官方 Pages 文档确认默认 `GITHUB_TOKEN` 不能通过 `configure-pages` 的 `enablement` 启用站点；本轮没有管理员级 PAT/App 令牌，因此不触发未经配置的部署，也不改动 homepage。
+
+## 巡检 08 — 2026-11-06 03:16–03:35 CST
+
+- 复核 `95aa9a3` 的 CI run `42092069028` 与 tag publish run `42092192996` 均为 success；公开 Release body 已包含 Bootstrap / Font Awesome 本地化说明，并移除了旧版「历史 CDN 仍可能受网络环境影响」表述。前一轮记录的 Discussion 默认令牌写权限边界仍成立，publish run 不因不可控权限而失败。
+- 默认播放器移除 5 条 `music.163.com` / `music.126.net` 硬编码音轨与封面，改为读取 `public/media/lanze-demo.wav` 与 `public/media/lanze-demo-cover.svg`：WAV 为仓库脚本合成的 8 秒单声道 PCM，SVG 为仓库内原创封面；默认构建不请求第三方音乐平台。
+- 新增 `src/config/audio.js` 与 3 个配置单测：仅 `VITE_AUDIO_SOURCE=custom` 且 `VITE_AUDIO_TRACKS` 为有效 JSON 数组时启用自定义音源，无效或空配置自动回退本地演示音；自定义音源的授权、可用性与隐私政策明确由配置者负责。
+- `npm run smoke` 新增本地演示音源/封面 HTTP 检查及构建 JS 中第三方媒体域扫描，覆盖 26 个本地静态资源；CI docs job 与 `npm run lint` 增加对应防护。README、CHANGELOG、RELEASE_NOTES、ANNOUNCEMENT、CONTRIBUTING、SOCIAL_POSTS、`docs/` 与 `.env.example` 同步为 17 项单测、默认离线音源和可选自定义配置。
+- 本地验证：`npm run test`（17/17）、`npm run lint`、`npm run build`、`npm run smoke`（26 assets）、`npm audit --omit=dev`（0 vulnerabilities）、YAML 解析、Markdown 本地链接检查、默认媒体域检查均通过。`git diff --check` 仅报告 `SOCIAL_POSTS.md` 既有的 Markdown 双空格硬换行格式，未新增其它空白错误；历史日志中的「14 项单测」按当时事实保留。

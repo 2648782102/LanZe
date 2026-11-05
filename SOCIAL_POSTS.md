@@ -17,13 +17,13 @@
 **中文**
 
 > 把 2022 年留下的「兰泽诗词」重新整理成可参与的开源前端：README、MIT、贡献指南、安全政策、架构/部署文档、Node 20/22 CI、issue 模板都补齐了。Vue 3 + Vite 6，本地 `npm ci && npm run dev` 就能看摘录、文库、搜索与茶楼界面。  
-> 不承诺线上 Demo 或托管后端，先从可复现、14 项单测和本地演示数据开始。欢迎文档勘误、API 适配、交互回归与前端稳定性 PR。  
+> 不承诺线上 Demo 或托管后端，先从可复现、17 项单测和本地演示数据开始。欢迎文档勘误、API 适配、交互回归与前端稳定性 PR。  
 > #开源 #Vue3 #古诗词
 
 **English**
 
 > Reopening LanZe, a 2022 Chinese poetry frontend, as a maintainable open-source repo: rewritten README, MIT license, contributing/security docs, architecture & deployment notes, Node 20/22 CI, and issue templates. Built with Vue 3 + Vite 6; `npm ci && npm run dev` runs excerpts, library, search and community UI locally with built-in demo data.  
-> No hosted demo or backend is promised—reproducible builds, 14 unit tests and local data come first. Docs, API and frontend fixes welcome.  
+> No hosted demo or backend is promised—reproducible builds, 17 unit tests and local data come first. Docs, API and frontend fixes welcome.  
 > #opensource #Vue3 #ChinesePoetry
 
 ## 2. 微博 / 即刻风格：中文项目与新人友好
@@ -61,24 +61,24 @@
 **中文**
 
 > 旧前端项目怎么重新开放？我们没有先堆功能，而是先处理「别人能不能跑起来、能不能相信文档」：  
-> ① README 删除失效托管/演示承诺；② MIT + 贡献/行为/安全政策；③ 把 Vite 升到 6，统一 ESM 与相对 base；④ 用 `VITE_API_BASE_URL` + `VITE_USE_MOCK` 收敛请求层，未配置后端时自动使用本地演示数据；⑤ Node 20/22 CI 跑 `npm ci`、`npm run build`、`npm run test --if-present`，另有 14 项单测与静态检查；⑥ Pages 只手动触发，不自动发到旧域名。  
+> ① README 删除失效托管/演示承诺；② MIT + 贡献/行为/安全政策；③ 把 Vite 升到 6，统一 ESM 与相对 base；④ 用 `VITE_API_BASE_URL` + `VITE_USE_MOCK` 收敛请求层，未配置后端时自动使用本地演示数据；⑤ Node 20/22 CI 跑 `npm ci`、`npm run build`、`npm run test --if-present`，另有 17 项单测与静态检查；⑥ 默认音源/封面本地化，Pages 只手动触发，不自动发到旧域名。  
 > 兰泽诗词的下一段是拆分大体积依赖、补充 E2E 与素材授权清单。欢迎来提可验证的小 PR。
 
 **English**
 
-> How do you reopen a dormant frontend? Start with trust, not features: remove stale demo claims; add MIT + contribution/security policies; upgrade to Vite 6 with one ESM config and a relative base; converge requests behind `VITE_API_BASE_URL` + `VITE_USE_MOCK`, with local demo data as the no-backend fallback; run Node 20/22 CI with `npm ci`, `npm run build` and `npm run test --if-present`, plus 14 unit tests and a lint scan; keep Pages manual and away from dead domains.  
+> How do you reopen a dormant frontend? Start with trust, not features: remove stale demo claims; add MIT + contribution/security policies; upgrade to Vite 6 with one ESM config and a relative base; converge requests behind `VITE_API_BASE_URL` + `VITE_USE_MOCK`, with local demo data as the no-backend fallback; run Node 20/22 CI with `npm ci`, `npm run build` and `npm run test --if-present`, plus 17 unit tests and a lint scan; use a repository-generated local audio demo by default; keep Pages manual and away from dead domains.  
 > Next for LanZe: bundle splitting, E2E coverage and third-party asset licensing. Small, verifiable PRs welcome.
 
 ## 5. Release / Discussion 联动风格
 
 **中文**
 
-> `v0.2.0` 整理好了：README、许可证、贡献与安全文档、架构/开发/部署/路线图、CI、模板、14 项单测、Vite 6 与本地演示数据都补齐了。它是一个可复现的起点，不是「诗词社区正式上线」的公告。  
+> `v0.2.0` 整理好了：README、许可证、贡献与安全文档、架构/开发/部署/路线图、CI、模板、17 项单测、Vite 6、本地演示数据与本地演示音源都补齐了。它是一个可复现的起点，不是「诗词社区正式上线」的公告。  
 > 当前最需要的是本地验证、文档与源码一致性、mock/API 边界、第三方素材授权和交互回归。路线图与 FAQ 都写清了已知限制；如果没有后端，请用本地演示理解界面。仓库见链接 👇
 
 **English**
 
-> `v0.2.0` is ready: rewritten README, MIT license, contribution/security docs, architecture/development/deployment/roadmap notes, CI, templates, 14 unit tests, Vite 6 and local demo data. It is a reproducible starting point—not a launch announcement for a hosted poetry community.  
+> `v0.2.0` is ready: rewritten README, MIT license, contribution/security docs, architecture/development/deployment/roadmap notes, CI, templates, 17 unit tests, Vite 6, local demo data and a local audio demo. It is a reproducible starting point—not a launch announcement for a hosted poetry community.  
 > Most useful next: local reproduction, docs/code consistency, mock/API boundaries, third-party asset licensing and interaction QA. Known limits are in the roadmap and FAQ; built-in demo data works when no backend is configured. Repo in the link 👇
 
 ---

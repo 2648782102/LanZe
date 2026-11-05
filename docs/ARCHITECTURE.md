@@ -15,7 +15,7 @@
 浏览器
   ├── Vite 构建的静态前端（Vue 3 / Router / Element Plus）
   │     ├── 本地打包资源：src/assets、public
-  │     ├── 外链：音乐 / 封面；样式与图标字体随构建产物本地分发
+  │     ├── 本地演示音源 / 封面；自定义音源由可选配置提供
   │     └── UI 状态：路由、收藏态、Lottie、搜索输入、播放器
   │
   └── 数据源（统一入口）
@@ -45,7 +45,7 @@
 | `src/pages/WenKu/` | 分类文库、古诗卡片与结果页 | 分类数据来自统一请求层与演示数据，不再直连历史 Supabase 表 |
 | `src/pages/ChaLou/` | 精选诗文、飞花、现代诗等社区栏目 | 用户条目使用统一演示资料，不再自建另一个 Supabase 客户端 |
 | `src/pages/login/` 与 `src/pages/Personal/` | 登录、注册、资料、作品、收藏、设置等界面 | 会话结构由 `useSession` 统一；演示账号和作品仅存浏览器 `localStorage` |
-| `src/pages/Audio.vue` | APlayer 播放器演示 | 音频/封面指向第三方 URL，可用性不在仓库控制范围 |
+| `src/pages/Audio.vue` | APlayer 播放器演示 | 默认音频/封面来自 `public/media/`；自定义音源需显式配置并自行核验授权 |
 | `src/apis/request.js` | Axios + 本地演示数据双通道请求函数 | 远端返回无效数据时自动降级并提示一次 |
 | `src/apis/env.js` | 从 `src/config/runtime.js` 导出 `baseUrl` 与运行配置 | 不再硬编码后端地址 |
 | `src/apis/api/list.js`、`login.js` | 领域 API 函数 | 真实 API 契约由自建服务定义；本地演示路径见 `src/services/mockApi.js` |
@@ -111,7 +111,7 @@ data source adapter
 
 - 历史代码中存在两处硬编码 anon key、多个历史外部域名和分散的 Axios 调用；v0.2.0 已清理源码中的硬编码 key 并统一请求入口。若历史部署仍使用这些凭据，应在服务端轮换或撤销。
 - 浏览器中的 `VITE_` 变量不是秘密；私密配置只属于服务端环境。
-- 字体、图片、音乐、诗词文本与 CDN 资源需要单独确认授权；MIT 只覆盖本仓库贡献者提供的代码/文档。
+- 字体、图片、自定义音源、诗词文本与 CDN 资源需要单独确认授权；MIT 只覆盖本仓库贡献者提供的代码/文档与仓库生成的默认演示资源。
 - 安全报告的私密流程见根目录 `SECURITY.md`。
 
 ## 8. 演进原则

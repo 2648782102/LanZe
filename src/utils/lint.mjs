@@ -11,6 +11,7 @@ const forbiddenPatterns = [
   { pattern: /ElementPlusIconsVue/, message: "禁止全局注册全部 Element Plus 图标，请按需导入", excludeSelf: true },
   { pattern: /app\.use\(ElementPlus\)/, message: "禁止全局注册全部 Element Plus 组件，请按需注册", excludeSelf: true },
   { pattern: /lottie-web|vue3-lottie/, message: "禁止重复引入 Lottie 运行时，请使用 lottie-player", excludeSelf: true },
+  { pattern: /music\.163\.com|music\.126\.net/, message: "禁止在默认播放器中硬编码第三方音乐/封面外链", excludeSelf: true },
 ];
 
 const ownedFiles = new Set([

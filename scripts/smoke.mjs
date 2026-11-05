@@ -51,6 +51,20 @@ try {
     if (html.includes(host)) throw new Error(`dist/index.html still references ${host}`);
   }
 
+  const builtJs = (await readdir("dist/assets")).filter((name) => name.endsWith(".js"));
+  const builtJsText = await Promise.all(
+    builtJs.map((name) => readFile(`dist/assets/${name}`, "utf8")),
+  );
+  const thirdPartyMediaHosts = ["music.163.com", "music.126.net", "p1.music.126.net", "p2.music.126.net"];
+  for (const host of thirdPartyMediaHosts) {
+    if (builtJsText.some((text) => text.includes(host))) {
+      throw new Error(`Built JavaScript still references ${host}`);
+    }
+  }
+
+  const mediaAssets = ["media/lanze-demo.wav", "media/lanze-demo-cover.svg"];
+  for (const asset of mediaAssets) await expectOk(`/${asset}`);
+
   const cssFiles = (await readdir("dist/assets")).filter((name) => name.endsWith(".css"));
   const cssText = await Promise.all(
     cssFiles.map((name) => readFile(`dist/assets/${name}`, "utf8")),
@@ -65,7 +79,7 @@ try {
 
   await expectOk("/");
   for (const asset of uniqueAssets) await expectOk(`/${asset.replace(/^\.\//, "")}`);
-  console.log(`Smoke passed: ${uniqueAssets.length} local assets returned 200.`);
+  console.log(`Smoke passed: ${uniqueAssets.length + mediaAssets.length} local assets returned 200.`);
 } catch (error) {
   console.error(error instanceof Error ? error.message : error);
   process.exitCode = 1;

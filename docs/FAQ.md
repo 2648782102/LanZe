@@ -34,7 +34,7 @@
 
 ### 测试与 lint 怎么运行？
 
-`npm run test` 执行 14 个 `node --test` 单测，`npm run lint` 执行静态扫描。CI 仍使用 `npm run test --if-present` 以兼容外部旧流程。
+`npm run test` 执行 17 个 `node --test` 单测，`npm run lint` 执行静态扫描。CI 仍使用 `npm run test --if-present` 以兼容外部旧流程。
 
 ### 首次启动遇到 esbuild 二进制错误？
 
@@ -56,7 +56,7 @@
 
 ### 随机诗句、音乐、Lottie 动画为什么有时不显示？
 
-音乐与封面仍来自外部平台；Lottie JSON、Bootstrap 与 Font Awesome 已本地化或改为锁定版本的 npm 依赖。音乐/封面可能受网络、CORS、地区限制、防盗链或服务变更影响，且不在本仓库控制范围内。业务诗词数据默认使用本地演示数据兜底；CI 不依赖外部服务。
+默认音乐与封面来自 `public/media/` 的仓库自制演示资源；Lottie JSON、Bootstrap 与 Font Awesome 已本地化或改为锁定版本的 npm 依赖。只有显式配置 `VITE_AUDIO_SOURCE=custom` 时，自定义音源才可能受网络、CORS、地区限制、防盗链或服务变更影响，且不在本仓库控制范围内。业务诗词数据默认使用本地演示数据兜底；CI 不依赖外部服务。
 
 ### 收藏、登录态、个人资料会保存吗？
 
@@ -70,7 +70,7 @@
 
 ### 为什么 CI 用 `npm run test --if-present`？
 
-`--if-present` 是兼容旧工作流的兜底写法；当前 `package.json` 已定义 `test` 脚本，所以 CI 会实际执行 14 个单测，不假定任何模块格式或测试框架。
+`--if-present` 是兼容旧工作流的兜底写法；当前 `package.json` 已定义 `test` 脚本，所以 CI 会实际执行 17 个单测，不假定任何模块格式或测试框架。
 
 ### 仓库 About、topics、Release、Discussion 在哪里维护？
 
@@ -84,7 +84,7 @@ MIT，见 `LICENSE`：`Copyright (c) 2022-2026 LanZe contributors`。与 README 
 
 ### 字体、图片、音乐和诗词文本也是 MIT 吗？
 
-不一定。MIT 覆盖本仓库贡献者提供的代码与文档；`src/assets/` 中的字体/图片、上游 npm 包内的字体/图标、外部音乐链接和历史诗词数据可能有独立授权。二次发布、商用或重新分发前，需要逐项核查来源与许可；不清楚的素材应替换或移除。贡献指南也要求新增素材时说明来源。
+不一定。MIT 覆盖本仓库贡献者提供的代码与文档；`src/assets/` 中的字体/图片、上游 npm 包内的字体/图标、自定义音源配置和历史诗词数据可能有独立授权。`public/media/` 的默认演示音源/封面由本仓库生成；二次发布、商用或重新分发前，仍需逐项核查其余素材来源与许可，不清楚的素材应替换或移除。贡献指南也要求新增素材时说明来源。
 
 ### 可以提交真实诗词语料吗？
 

@@ -33,7 +33,7 @@
 | 前端构建 | Vue 3 + Vue Router 4（hash 模式）+ Element Plus + Vite 6（ESM 配置） |
 | 在线 Demo | 不承诺；旧展示地址仅保留在 `CHANGELOG.md` 与 `docs/FAQ.md` 的事实说明中 |
 | 后端/账号 | 仓库不附带完整后端；默认使用本地演示数据，配置 `VITE_API_BASE_URL` 后可连接自建 API |
-| 测试 | `npm run test` 含 14 个 `node --test` 单测；CI 在 Node 20/22 执行构建与测试 |
+| 测试 | `npm run test` 含 17 个 `node --test` 单测；CI 在 Node 20/22 执行构建与测试 |
 | 许可 | [MIT](LICENSE)，`Copyright (c) 2022-2026 LanZe contributors` |
 | 发布 | `v0.2.0` 的 Release notes 与 Discussions 欢迎帖见 `RELEASE_NOTES.md`、`ANNOUNCEMENT.md` |
 
@@ -44,9 +44,9 @@
 - 🔎 **搜索与详情**：按关键词检索并跳转到搜索结果/详情；默认检索仓库内演示数据，也可接自建 API。
 - 🍵 **茶楼与创作**：现代诗、精选诗文、飞花接龙、作品发布等社区界面原型。
 - 👤 **个人中心**：登录/注册/资料/作品/收藏/设置等页面，演示态由浏览器本地存储支持。
-- 🎵 **音乐播放**：APlayer 与静态音频链接组成的播放器演示。
+- 🎵 **音乐播放**：APlayer 默认加载仓库自制 WAV / SVG 演示资源；可通过公开配置接入授权明确的自定义音源。
 - 📱 **响应式布局**：包含移动端底部导航与大屏布局，仍需持续无障碍/布局回归。
-- 🧩 **现代前端栈**：Vue 3、Vue Router 4、Element Plus、Axios、Lottie，配合 Vite 6 构建与 14 项单测。
+- 🧩 **现代前端栈**：Vue 3、Vue Router 4、Element Plus、Axios、Lottie，配合 Vite 6 构建与 17 项单测。
 - 📚 **开源治理**：MIT、贡献/行为/安全政策、变更日志、CI、issue/PR 模板、发布与宣发文案。
 
 「特性」描述的是仓库中已有界面与默认演示数据能力，不等于提供线上账号、持久化服务或正式内容审核。逐项可信度见 `docs/FAQ.md`。
@@ -59,7 +59,7 @@
 | 构建 | Vite 6 + `@vitejs/plugin-vue`，`package.json` 使用 `"type": "module"`，`base: './'` |
 | 语言 | JavaScript / Vue SFC；npm 脚本使用 `node --test` 与 ESM |
 | 数据 | `src/config/runtime.js` 统一公开配置，`src/apis/request.js` 在真实 API 与 `src/services/mockApi.js` 之间切换 |
-| 动效与媒体 | 本地 `@lottiefiles/lottie-player`、仓库内 Lottie JSON、APlayer；音乐/封面外链见下方说明 |
+| 动效与媒体 | 本地 `@lottiefiles/lottie-player`、仓库内 Lottie JSON、APlayer 与 `public/media/` 自制演示音源/封面 |
 | 样式 | 组件内 CSS、Element Plus、锁定版本的本地 Bootstrap 5.1.1 / Font Awesome 5.13.0 |
 | 字体与素材 | `src/assets/` 下的字体、图片与背景；授权审查见 `docs/FAQ.md` |
 | 工具链 | npm、Node.js 20/22、GitHub Actions、`npm run test`、`npm run lint` |
@@ -89,7 +89,7 @@ npm run dev
 
 ```bash
 npm run build        # 生成 dist/
-npm run test         # 14 个 node --test 单测
+npm run test         # 17 个 node --test 单测
 npm run lint         # 静态检查：失效后端地址、硬编码服务与脆弱引用
 npm run preview      # 预览 dist/
 npm run smoke        # 预览服务与入口静态资源 HTTP 冒烟
@@ -118,6 +118,17 @@ v0.2.0 已实现数据来源切换和无需联网账号的演示数据：
 | `VITE_USE_MOCK` | 否 | `true` | 未配置 API 时自动为 `true`；显式关闭后才会请求远端 |
 | `VITE_SUPABASE_URL` | 否 | `https://example.supabase.co` | 可选；需与 `VITE_SUPABASE_ANON_KEY` 同时配置，否则使用本地适配器 |
 | `VITE_SUPABASE_ANON_KEY` | 否 | 公开 anon key | 可选公开配置；不要放服务端密钥或 `service_role` |
+| `VITE_AUDIO_SOURCE` | 否 | `local` | `local` 使用仓库自制演示音源；仅在确认授权后设置为 `custom` |
+| `VITE_AUDIO_TRACKS` | 否 | JSON 数组 | `custom` 模式下的音轨列表；每项至少含 `url`，可选 `name`、`artist`、`cover` |
+
+默认情况下音乐播放器只请求 `public/media/` 内的本地资源，不加载第三方音乐或封面。若设置为 `VITE_AUDIO_SOURCE=custom`，`VITE_AUDIO_TRACKS` 必须是 JSON 数组，例如：
+
+```dotenv
+VITE_AUDIO_SOURCE=custom
+VITE_AUDIO_TRACKS=[{"name":"示例","artist":"作者","url":"/media/example.mp3","cover":"/media/example.svg"}]
+```
+
+音源与封面的版权、可用性、防盗链与隐私政策由配置者自行负责；配置缺失或 JSON 无效时自动回退到本地演示音。`VITE_` 变量会进入浏览器产物，不要填入私密地址或凭据。
 
 可创建 `.env.local`（已被 `.gitignore` 忽略）：
 
@@ -135,7 +146,7 @@ VITE_USE_MOCK=true
 LanZe/
 ├── .github/                 # CI、Pages workflow、issue/PR 模板
 ├── docs/                    # 架构、开发、部署、路线图、FAQ、素材、宣发与巡检
-├── public/                  # favicon 与 OG/hero 展示素材（不覆盖 favicon.ico）
+├── public/                  # favicon、OG/hero 展示素材与本地演示音源/封面
 ├── src/
 │   ├── apis/                # Axios 请求封装与业务 API 列表
 │   ├── assets/              # 字体、图片、Lottie JSON
@@ -198,8 +209,8 @@ LanZe/
 
 简要版本（完整优先级与验收标准见 `docs/ROADMAP.md`）：
 
-- **v0.2.0（当前）**：Vite 6、本地演示数据、14 项单测、lint、README/许可证/治理文档、CI、模板、发布与宣发文案；Element Plus 按需注册、手工 vendor 分包、Lottie 动画与核心样式/图标本地化。
-- **v0.3.x（工程优化）**：补充浏览器端交互 E2E、完善错误/空状态、继续收敛音乐外链并核验第三方素材授权。
+- **v0.2.0（当前）**：Vite 6、本地演示数据、17 项单测、lint、README/许可证/治理文档、CI、模板、发布与宣发文案；Element Plus 按需注册、手工 vendor 分包、Lottie 动画、核心样式/图标与默认演示音源本地化。
+- **v0.3.x（工程优化）**：补充浏览器端交互 E2E、完善错误/空状态、完善自定义音源回退并核验第三方素材授权。
 - **v0.4.x（体验与内容）**：响应式与无障碍回归、素材授权清单、演示录屏、可选后端契约。
 - **后续（社区化）**：按真实贡献推进 i18n、内容版本依据与社区讨论，不预设交付期限。
 
@@ -219,12 +230,12 @@ LanZe/
 
 ## 许可证
 
-本项目采用 [MIT License](LICENSE)，`Copyright (c) 2022-2026 LanZe contributors`。这不自动覆盖 `src/assets/` 内第三方字体/图片、外部音乐链接、上游 npm 包中的字体/图标或诗词文本可能适用的独立授权；二次发布与商用前请自行核查来源，详见 `docs/THIRD_PARTY_ASSETS.md` 与 `docs/FAQ.md`。
+本项目采用 [MIT License](LICENSE)，`Copyright (c) 2022-2026 LanZe contributors`。这不自动覆盖 `src/assets/` 内第三方字体/图片、自定义音源配置、上游 npm 包中的字体/图标或诗词文本可能适用的独立授权；二次发布与商用前请自行核查来源，详见 `docs/THIRD_PARTY_ASSETS.md` 与 `docs/FAQ.md`。
 
 ## 致谢
 
 - 感谢 2022–2024 年间的原作者与早期贡献者留下的界面、素材、路由和 `git` 历史。
-- 感谢 Vue.js、Vite、Element Plus、Axios、Lottie、APlayer 等开源项目及其维护者。
+- 感谢 Vue.js、Vite、Element Plus、Axios、Lottie、APlayer 等开源项目及其维护者；默认演示音源与封面由本仓库生成，其他历史素材来源仍在核验。
 - 感谢所有通过 issue、Discussion、PR、文档勘误与本地验证参与社区维护的人。
 - 第三方诗词/音乐/字体服务与上游 npm 包仅按实际用途被提及，不代表其运营方或作者与本仓库有隶属或背书关系。
 

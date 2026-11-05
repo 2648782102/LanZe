@@ -61,7 +61,7 @@ vue3, vite, element-plus, javascript, frontend, chinese-poetry, poetry, classica
 已创建 3 个范围明确、带验收标准的 open issue，均标记 `good first issue` 与 `help wanted`：
 
 - [#2 为本地演示 API 补充边界单测](https://github.com/2648782102/LanZe/issues/2)
-- [#3 收敛首页历史外链并核验可锁定依赖](https://github.com/2648782102/LanZe/issues/3)（核心改动已由维护者实现，issue 保留为补充核对与回归任务）
+- [#3 收敛首页历史外链、默认音源与可锁定依赖](https://github.com/2648782102/LanZe/issues/3)（核心改动已由维护者实现，issue 保留为补充核对与回归任务）
 - [#4 核验 Lottie 动画与 favicon 的素材授权](https://github.com/2648782102/LanZe/issues/4)
 
 这些 issue 不设增长目标，也不把新人当作免费劳动力；每条都写明背景、最小范围、验收标准与边界。

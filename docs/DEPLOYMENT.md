@@ -14,7 +14,7 @@
 - [ ] 生产环境变量只含公开配置；`VITE_USE_MOCK` 按需求设置，避免把演示数据误写成正式账号服务。
 - [ ] 若关闭 mock，`VITE_API_BASE_URL` 指向可访问的 HTTPS API 或同源 `/api/`；后端已配置 CORS/鉴权/限流。远端失败时前端会自动降级。
 - [ ] MemFire/Vercel 历史地址不再作为生产依赖；源码中不再包含历史硬编码 anon key。
-- [ ] 锁定版本的上游字体/图标包、仓库内字体/图片、音乐/封面外链与诗词文本的使用符合其授权与隐私要求。
+- [ ] 锁定版本的上游字体/图标包、仓库内字体/图片、自定义音源/封面与诗词文本的使用符合其授权与隐私要求；默认 `VITE_AUDIO_SOURCE=local` 使用仓库自制演示资源。
 - [ ] 记录 commit SHA、构建命令、变量清单与回滚方式。
 
 ## 3. GitHub Pages（手动 workflow）
@@ -68,7 +68,7 @@ npm run build
 - 用 HTTPS 提供静态文件；不要把 `dist/` 提交进 Git。
 - 若 API 与前端不同源，后端需允许站点 Origin；优先同源 `/api/` 反向代理。
 - 缓存 `index.html` 时使用较短 TTL，静态资源可长缓存并带内容哈希。
-- 设置 CSP 时把仍需使用的第三方音乐/封面域加入白名单；核心样式与图标字体已随构建产物本地分发。
+- 默认音源、封面、核心样式与图标字体均随构建产物本地分发；只有显式启用 `custom` 音源时，才需要把相应域加入 CSP 白名单。
 
 ## 7. 环境变量与构建矩阵
 
@@ -78,6 +78,7 @@ npm run build
 | `VITE_API_BASE_URL` | 可不填 | `https://api.example.com/` 或 `/api/` |
 | `VITE_API_TIMEOUT` | `4000` | 按后端响应时间调整 |
 | `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` | 可不填 | 仅在确认权限与 RLS 后填写公开配置 |
+| `VITE_AUDIO_SOURCE` / `VITE_AUDIO_TRACKS` | `local` / 空 | `custom` 时填写已核验授权的公开音轨 JSON |
 
 平台构建时变量是在**构建阶段**注入，修改后需要重新构建。不同平台的环境（Production / Preview / Development）应分别配置；不要把生产 API 地址写进 Preview 的公开 demo，除非该 demo 也经过授权。
 
@@ -95,4 +96,4 @@ npm run build
 - 不自动部署到旧 MemFire Cloud 展示地址或任何未验证自定义域。
 - 不在 CI 中运行需要私密凭据的发布步骤。
 - 不把历史 anon key 当作生产凭据继续使用。
-- 不把第三方音乐/诗词/字体服务承诺为 SLA 或本仓库托管内容。
+- 不把自定义音源、第三方诗词/字体服务承诺为 SLA 或本仓库托管内容。

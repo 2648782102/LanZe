@@ -29,7 +29,8 @@ find src/assets public -type f -print
 | 类别 | 当前位置 | 域名 / 用途 | 风险与状态 | 后续动作 |
 | --- | --- | --- | --- | --- |
 | 样式与图标包 | `package.json` / `package-lock.json` | npm：`bootstrap@5.1.1`（MIT）、`@fortawesome/fontawesome-free@5.13.0`（CC BY 4.0 / SIL OFL 1.1 / MIT 组合） | 已精确锁定版本；上游许可证已由 npm 元数据核对，整体第三方素材授权仍以 `docs/THIRD_PARTY_ASSETS.md` 为准 | 构建产物中的字体/图标按上游许可证保留版权与许可说明；继续检查实际使用图标集合 |
-| 音乐与封面 | `src/pages/Audio.vue` | `music.163.com` 音频外链、`music.126.net` 封面外链 | 第三方平台资源；可用性、版权与热链政策不在本仓库控制范围 | 改用明确授权音频/封面，或提供可关闭的演示占位 |
+| 默认演示音源与封面 | `public/media/lanze-demo.wav`、`public/media/lanze-demo-cover.svg` | 2026-11-06 由本仓库脚本生成的合成 PCM 音与原创 SVG | 由仓库贡献者提供；不引入第三方录音或美术素材 | 保持默认离线可用；如替换仍需记录生成方式与权利来源 |
+| 可选自定义音源 | `src/config/audio.js`、`VITE_AUDIO_TRACKS` | 部署者显式提供的音轨 URL / 封面 URL | 默认不含任何第三方媒体域；启用后版权、热链与隐私政策由配置者负责 | 仅在授权明确时设置 `VITE_AUDIO_SOURCE=custom`，无效配置自动回退到本地演示音 |
 | 徽章 | `README.md` | `img.shields.io`、GitHub Actions badge | 文档展示外链；不参与运行时核心功能 | 可保留，但离线文档不应依赖其加载 |
 | 文档链接 | 全仓库 | GitHub、Vue、Vite 等官方/项目链接 | 属说明性链接 | 定期检查失效链接，不把其承诺视为本项目能力 |
 
@@ -43,4 +44,4 @@ find src/assets public -type f -print
 - [ ] 核查两份 LottieFiles 动画的具体授权；若无法确认，替换为自制或明确许可作品。
 - [ ] 核查 4 个 TTF 字体是否允许 Web 嵌入与仓库再分发，并评估 WOFF2 子集化。
 - [ ] 继续检查锁定版本 Bootstrap / Font Awesome 随构建产物分发的字体、图标与许可证文件是否完整。
-- [ ] 对音乐演示提供可离线运行且授权明确的替代资源。
+- [x] 默认音乐演示已提供离线、仓库自制的音源与封面；继续补自定义音源失败时的可读状态。

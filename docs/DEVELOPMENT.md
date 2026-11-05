@@ -34,7 +34,7 @@ npm run dev
 ```bash
 npm run dev                  # 开发服务器
 npm run build                # 生产构建，输出到 dist/
-npm run test                 # 14 个 node --test 单测
+npm run test                 # 17 个 node --test 单测
 npm run lint                 # 静态扫描失效后端地址、硬编码服务与脆弱引用
 npm run preview              # 预览构建产物
 npm run smoke                # 启动预览服务并检查首页与入口静态资源
@@ -67,7 +67,7 @@ VITE_USE_MOCK=true
 核对顺序：
 
 1. 打开 `package.json`，确认实际脚本名与 README/CI 一致。
-2. 打开 `src/config/runtime.js`，确认 `VITE_API_BASE_URL`、`VITE_API_TIMEOUT`、`VITE_USE_MOCK`、`VITE_SUPABASE_URL`、`VITE_SUPABASE_ANON_KEY` 的解析规则。
+2. 打开 `src/config/runtime.js` 与 `src/config/audio.js`，确认 `VITE_API_BASE_URL`、`VITE_API_TIMEOUT`、`VITE_USE_MOCK`、`VITE_SUPABASE_URL`、`VITE_SUPABASE_ANON_KEY`、`VITE_AUDIO_SOURCE`、`VITE_AUDIO_TRACKS` 的解析规则。
 3. 打开 `src/apis/request.js`，确认远端优先、失败降级与提示逻辑。
 4. 搜索 `http://`、`https://` 与 `createClient(`，确认页面是否仍有绕过请求层的外部调用或外部素材。
 5. 若源码与文档不一致，以源码事实修文档；若属于现代化遗漏，开 issue 说明。
@@ -81,7 +81,7 @@ VITE_USE_MOCK=true
 - 行为：设置 `VITE_USE_MOCK=true` 或未配置 API 时，随机摘录、分类、搜索、用户条目、登录和作品发布使用 `src/data/` 与 `src/services/mockApi.js`。
 - 演示数据不能包含真实用户、私人内容、生产密钥或未授权转载的全文数据集。
 - UI 应明确标注「演示数据」，并覆盖加载、空结果、请求失败三种状态。
-- 验收：断开外部业务 API 后首页、文库与搜索结果页仍可展示仓库内演示数据；音乐/封面外链缺失不应导致业务功能白屏。
+- 验收：断开外部业务 API 后首页、文库与搜索结果页仍可展示仓库内演示数据；播放器默认使用 `public/media/` 的本地音源/封面，自定义音源不可达时不应导致业务功能白屏。
 
 ### 方案 B：自建 API
 
@@ -98,9 +98,9 @@ VITE_USE_MOCK=true
 
 这些路径同时有本地演示实现，但不是已发布的稳定后端规范。自建服务应明确返回结构、状态码、CORS、限流、错误体与鉴权方式，并用 OpenAPI 或示例 JSON 固定契约。生产环境优先同源 `/api/` 代理，避免把任意第三方域暴露给浏览器。
 
-### 方案 C：第三方数据源
+### 方案 C：可选自定义音源
 
-音乐与封面仍来自外部平台；Bootstrap 5.1.1、Font Awesome 5.13.0 与 Lottie 动画已改用锁定版本的本地依赖或仓库内文件，核心页面和图标样式不依赖第三方 CDN。第三方音乐/封面可用性、速率限制、内容授权与隐私政策仍由提供方决定，逐项记录见 `docs/THIRD_PARTY_ASSETS.md`。业务数据默认使用本地演示兜底，CI 不依赖这些站点返回成功。
+播放器默认只加载仓库内 WAV / SVG 演示资源；Bootstrap 5.1.1、Font Awesome 5.13.0 与 Lottie 动画也已本地化。只有设置 `VITE_AUDIO_SOURCE=custom` 并提供有效 `VITE_AUDIO_TRACKS` JSON 时才会启用自定义音源，其可用性、速率限制、内容授权与隐私政策由配置者负责。无效配置自动回退到本地演示音，CI 不依赖第三方站点返回成功。逐项记录见 `docs/THIRD_PARTY_ASSETS.md`。
 
 ## 6. 开发约定
 
@@ -111,7 +111,7 @@ VITE_USE_MOCK=true
 - 不向全局 `window` 追加未声明依赖；`scroll` 等标识符必须显式定义。
 - 样式优先局部作用域；调整 `index.html` 的全局 `overflow`/媒体查询时同时检查移动端滚动。
 - 不要在仓库中保存 `.env`、`dist/`、日志、真实 Cookie 或用户数据。
-- 新增资源时在 `docs/THIRD_PARTY_ASSETS.md` 记录来源、许可与大小；大字体/图片优先做性能与授权评估。
+- 新增资源时在 `docs/THIRD_PARTY_ASSETS.md` 记录来源、许可与大小；大字体/图片优先做性能与授权评估；默认播放列表不得重新引入第三方媒体域。
 
 ## 7. 手动 QA 清单
 
@@ -147,7 +147,7 @@ VITE_USE_MOCK=true
 | 现象 | 排查 |
 | --- | --- |
 | `npm ci` 后 esbuild 二进制不可用 | 检查是否使用 `--ignore-scripts`；按实际错误运行 `npm rebuild esbuild` |
-| 页面打开即白屏 | 查看控制台、音乐/封面外链是否阻断、hash 路径是否正确、`index.html` 是否加载 `/src/main.js` |
+| 页面打开即白屏 | 查看控制台、自定义音源配置是否阻断、hash 路径是否正确、`index.html` 是否加载 `/src/main.js` |
 | 搜索没有远端结果 | 检查 `VITE_USE_MOCK`、`VITE_API_BASE_URL` 与超时；默认会自动降级到演示数据 |
 | 摘录为空 | 检查是否清空了浏览器本地存储；演示数据不依赖今日诗词 API |
 | GitHub Pages 子路径资源 404 | 检查 `base: './'` 与发布目录；hash 路由本身不需要 rewrite |
