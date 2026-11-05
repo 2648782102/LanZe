@@ -192,3 +192,9 @@
 - 通过 GitHub connector 读取 publish job `127548703281` 的日志：GITHUB_TOKEN 具备 `Contents: write` / `Discussions: write`，但 `updateDiscussion` 仍被 `Resource not accessible by integration` 拒绝；workflow 按既有设计输出 warning 并保留原帖，Job success 不代表欢迎帖正文已更新。
 - 公开 Discussions REST 数据回读确认 Discussion #1 的 `updated_at=2026-11-05T18:38:21Z`，正文仍是首版「新增 14 个单测和静态检查」。仓库内 `ANNOUNCEMENT.md` 已为 23 项单测、Documentation checks 执行 lint、本地音源与素材清单等当前文案；`docs/PROMOTION.md` 精确记录「线上欢迎帖未同步」，不声称已更新、不重复发帖。
 - 浏览器控制通道超时，且编辑公开帖子属于需 action-time 确认的外部内容写入；本轮不绕过确认、不尝试未授权 PATCH，也不把 CUA 超时写成已编辑。仅做文档状态修订；`RELEASE_NOTES.md` / `ANNOUNCEMENT.md` 未改动，因此不 retag、不重发 Release。
+
+## 收尾 — 2026-11-06 08:00 CST
+
+- 维护窗口结束。最后一次复核：`main` 与 `origin/main` 同步于 `fd2effb`，`v0.2.0` tag 仍指向 `9534ccc` 的发布内容；最新 CI run `42123080088` 三项 job 均 success，公开 Release `v0.2.0`（id `435565910`）仍为正式发布。3 个 open issue 无评论、无 open PR、Discussion #1 无评论。
+- 本窗口完成 Vite 6 / 本地演示数据 / 23 项单测 / lint / 构建冒烟 / 可选浏览器冒烟 / Node 20/22 CI / 文档治理 / Release 与 3 个新人入口；文档与公开 Release 保持一致，已如实记录在线欢迎帖、失效 homepage、Pages 与社交预览的权限限制。
+- 未进行付费推广、虚假宣传、刷 star 或外部社区群发；`SOCIAL_POSTS.md` 仍为草稿。自动化 `lanze-08-00` 已 `PAUSED`，不再继续巡检或重复发布。
