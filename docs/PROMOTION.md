@@ -48,13 +48,23 @@ vue3, vite, element-plus, javascript, frontend, chinese-poetry, poetry, classica
 | 6 | 给适合新人的 issue 加 `good first issue` / `help wanted` 标签 | `.github/ISSUE_TEMPLATE/*` | 先写清复现步骤或预期结果，避免空任务 |
 | 7 | 发布一条 Release/Discussion 公告，再按平台节奏发布短帖 | `SOCIAL_POSTS.md` | 不夸大 star、用户数、线上 Demo 或后端能力 |
 
-**执行记录：** 第 1、3、4 项已完成并验证；第 2 项已完成 About 描述与 topics，Website 仍为历史失效地址（待有可用 API/浏览器交互后清空），社交预览图未上传；第 5 项 Pages 未启用；第 6、7 项未执行；外部社交媒体未发布。
+**执行记录：** 第 1、3、4 项已完成并验证；第 2 项已完成 About 描述与 topics，Website 仍为历史失效地址（待有可用 API/浏览器交互后清空），社交预览图未上传；第 5 项 Pages 未启用；第 6 项已创建 3 个带验收标准的 `good first issue` / `help wanted` 入口；第 7 项的 Release/Discussion 仓库内公告已发布，短帖仍为草稿；外部社交媒体未发布。
 
 ## 3. GitHub Discussions 欢迎帖
 
 已发布：[欢迎参与兰泽诗词的重新整理 👋](https://github.com/2648782102/LanZe/discussions/1)。分类 `Announcements`，内容来自 [`ANNOUNCEMENT.md`](../ANNOUNCEMENT.md)，由 tag 发布 workflow 幂等创建并避免重复发帖。正文同步会比对现有内容；Actions 默认令牌对 `updateDiscussion` 缺少写权限时，workflow 会保留原帖并输出 warning，不把它误报为已更新。
 
 欢迎帖应引导四类讨论：文档勘误、本地复现、mock/API 契约、素材授权；明确「暂无线上 Demo」与「社区维护、不承诺响应 SLA」。
+
+### 新人入口
+
+已创建 3 个范围明确、带验收标准的 open issue，均标记 `good first issue` 与 `help wanted`：
+
+- [#2 为本地演示 API 补充边界单测](https://github.com/2648782102/LanZe/issues/2)
+- [#3 收敛首页历史 CDN 到可锁定依赖](https://github.com/2648782102/LanZe/issues/3)
+- [#4 核验 Lottie 动画与 favicon 的素材授权](https://github.com/2648782102/LanZe/issues/4)
+
+这些 issue 不设增长目标，也不把新人当作免费劳动力；每条都写明背景、最小范围、验收标准与边界。
 
 ## 4. Release v0.2.0
 

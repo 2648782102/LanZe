@@ -139,3 +139,6 @@
 - `1e21786` 推送并强制更新 `v0.2.0` tag 后，Release 仍为正式发布且 body 与 `RELEASE_NOTES.md` 一致；新 publish run `42089909542` 的 Release 步骤 success，但 `updateDiscussion` 被 GitHub Actions 默认令牌以 `Resource not accessible by integration` 拒绝，Discussion 正文未被改写，也没有重复创建。
 - 这是平台权限边界，不是 GraphQL schema 错误：即使 workflow 声明 `discussions: write`，安装令牌仍不能修改他人/既有讨论正文。将发布步骤改为先读取现有正文并比对：一致则跳过；存在差异才尝试更新；更新受限时保留原帖并输出显式 warning，使 publish run 不再因不可控权限而整单失败。
 - `docs/PROMOTION.md` 同步为真实状态：欢迎帖已发布且幂等防重复，自动正文同步受令牌权限限制；未把旧帖正文宣称为已经更新。后续如需在线同步，应配置由维护者明确授权、具备 Discussions 写权限的令牌，或人工编辑欢迎帖。
+- `f9c5b67` 的 CI run `42090691325` 在 Node 20、Node 22 与 Documentation checks 三项均 success；publish run `42090702226` success。日志明确输出「现有讨论因 GITHUB_TOKEN 无法更新而保持不变」的 warning，Release 更新成功且没有重复创建欢迎帖。
+- 已在 GitHub 创建 3 个带 `good first issue` / `help wanted` 标签、附验收标准的 open issue：#2 演示 API 边界单测、#3 历史 CDN 收敛、#4 Lottie/favicon 授权核验；并把入口写入 `docs/PROMOTION.md`。这些是仓库内真实贡献入口，不涉及外部社区群发或增长数字。
+- Pages 仍为 `has_pages=false`；官方 `actions/configure-pages@v5` 的 `enablement` 需要非 `GITHUB_TOKEN`、具备 `administration:write` / `pages:write` 的令牌，而当前可用写通道不包含该权限。未伪造线上 Demo，也没有把失效 homepage 改成未验证 URL。
