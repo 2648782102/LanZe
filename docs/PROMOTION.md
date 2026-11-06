@@ -52,9 +52,9 @@ vue3, vite, element-plus, javascript, frontend, chinese-poetry, poetry, classica
 
 ### 社交预览图渲染复核
 
-- 来源：`public/og-image.svg`（1200×630），SHA-256 `9f7b3221c02869e749617b7295fb132ee45089ff1a1d869794960ec94158d9da`。
-- 产物：`public/og-image.png`，1200×630 RGBA PNG，SHA-256 `e870f1b130cb1b41989c76e9a7883a17991a97ef10f5086b6aa73c40a25fdbf9`。
-- 本机使用 WebKit 按 1200×630 视口加载 SVG，生成 2× 快照后按目标尺寸缩放；已目检标题、诗句、GitHub 地址与四边留白，无裁切或缺失字形。Quick Look 的 `-s 1200` 会生成 1200×1200 方图，不适合作为社交预览图。
+- 来源：`public/og-image.svg`（1200×630），SHA-256 `f5bf79d04459e22b26be99b3b6cdd296c52e6838848ee61b825abe20719ad19c`。
+- 产物：`public/og-image.png`，1200×630 RGB PNG，SHA-256 `254351fc40a230ee16e8ba14ac2467691e3439743c6c06dcce2149170da0ff0b`。
+- 本机使用 Chrome 按 1200×630 视口加载 SVG 并截图；新版按逐字定位排布竖排诗句，已目检标题、诗句、印章、GitHub 地址与四边留白，无裁切或缺失字形。Quick Look 的 `-s 1200` 会生成 1200×1200 方图，不适合作为社交预览图。
 - 当前只是仓库内候选素材；在 GitHub Settings → Social preview 实际上传并回读前，不把「社交预览已更新」写成事实。
 
 ## 3. GitHub Discussions 欢迎帖
@@ -117,8 +117,8 @@ vue3, vite, element-plus, javascript, frontend, chinese-poetry, poetry, classica
 | --- | --- | --- |
 | 0–8s | README 首屏、hero 图 | 「兰泽诗词：一个本地可运行的中文古诗词开源前端」 |
 | 8–18s | 终端 `npm ci && npm run dev` | 「Node 20/22，按锁文件安装，启动本地开发服务器」 |
-| 18–32s | 首页/摘录卡片切换 | 「摘录、文库、搜索、茶楼等界面；演示数据可替换外部 API」 |
-| 32–45s | 文库分类、搜索结果、窄屏布局 | 「保留原有中文视觉，逐步收敛数据层与错误态」 |
+| 18–32s | 首页/三折经卷摘录切换 | 「摘录、文库、搜索、茶楼等界面；演示数据可替换外部 API」 |
+| 32–45s | 文库分类、搜索结果、窄屏布局 | 「以竹纸墨绿重排原有中文界面，逐步收敛数据层与错误态」 |
 | 45–58s | `npm run build && npm run test --if-present && npm run lint`、CI workflow | 「可复现构建，Node 20/22 CI；测试与静态扫描都在 workflow 中」 |
 | 58–70s | CONTRIBUTING、ROADMAP、LICENSE | 「MIT、贡献指南、路线图；当前不承诺线上 Demo 或托管后端」 |
 

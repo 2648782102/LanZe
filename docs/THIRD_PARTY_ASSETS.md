@@ -17,7 +17,7 @@ find src/assets public -type f -print
 | --- | --- | --- | --- | --- |
 | 字体 | `src/assets/ZiTi/*.ttf`（4 个 TTF） | 2022–2024 年历史提交；文件名含 `piaoYiSong`、`hongLei`、`FangZhengSong`、`maoKen` | 未核验 | 核对字体厂商、授权书与是否允许嵌入/再分发；优先转换为授权明确的 WOFF2 子集 |
 | 图片 | `src/assets/**/*.jpg`、`*.png`、`*.webp` | 历史提交；部分文件名与诗词分类、头像、轮播图有关 | 未核验 | 按文件查找原始出处、许可与人物/美术权利；无法确认时替换 |
-| OG / favicon | `public/og-image.svg`、`public/og-image.png`、`public/favicon.ico` | SVG 与 1200×630 PNG 为 2026 年仓库内展示素材；favicon 来自历史提交 | SVG/PNG 由仓库贡献者提供；favicon 未核验 | 确认 favicon 来源；如需在线启用社交预览图，具备仓库设置写权限后按 `docs/PROMOTION.md` 上传并回读 |
+| OG / favicon | `public/og-image.svg`、`public/og-image.png`、`public/favicon.ico` | SVG 与 1200×630 PNG 为 2026 年视觉重构后的仓库内展示素材；favicon 来自历史提交 | SVG/PNG 由仓库贡献者提供；favicon 未核验 | 确认 favicon 来源；如需在线启用社交预览图，具备仓库设置写权限后按 `docs/PROMOTION.md` 上传并回读 |
 | 诗词文本 | `src/data/poems.js`、历史页面中的静态文本 | 2022–2024 年历史内容与 2026 年演示数据 | 未核验 | 标注公版依据、底本与校勘来源；现代作品必须取得作者许可 |
 | Lottie 动画 | `src/assets/lottieJSON/qieHuan.json`、`tanqiu.json` | 历史仓库内文件 | 未核验 | 核对作者/导出来源与是否允许再分发 |
 | Lottie 动画 | `src/assets/lottieJSON/fanHui.json`、`login.json` | 2026-11-06 从历史页面引用的 LottieFiles CDN 地址下载并保存 | **仅完成本地化，授权未核验** | 查 LottieFiles 页面、作者与 License；无法确认时替换为自制/明确授权动画 |

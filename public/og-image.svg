@@ -1,50 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
-  <title id="title">兰泽诗词 LanZe</title>
-  <desc id="desc">古诗词开源前端项目的展示图，水墨青绿色背景与诗句卡片</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="兰泽诗词：以折页与竖排文字重新呈现的古诗词前端">
   <defs>
     <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#eef5ef"/>
-      <stop offset="0.55" stop-color="#dcebe3"/>
-      <stop offset="1" stop-color="#c6ddd2"/>
+      <stop offset="0" stop-color="#f7f4ec"/>
+      <stop offset="1" stop-color="#ded7c9"/>
     </linearGradient>
-    <linearGradient id="ink" x1="0" y1="0" x2="0.9" y2="1">
-      <stop offset="0" stop-color="#174b52"/>
-      <stop offset="1" stop-color="#0c3038"/>
-    </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#123c3f" flood-opacity="0.18"/>
-    </filter>
+    <pattern id="fiber" width="36" height="36" patternUnits="userSpaceOnUse">
+      <path d="M0 0H36M0 18H36" stroke="#2f5d50" stroke-opacity=".045"/>
+      <path d="M18 0V36" stroke="#2f5d50" stroke-opacity=".025"/>
+    </pattern>
   </defs>
   <rect width="1200" height="630" fill="url(#paper)"/>
-  <circle cx="1030" cy="105" r="175" fill="#f7f2df" opacity="0.65"/>
-  <path d="M0 500 C180 425 260 555 420 480 C590 400 650 510 800 455 C965 392 1060 450 1200 395 L1200 630 L0 630 Z" fill="#7eaa9a" opacity="0.28"/>
-  <path d="M0 540 C210 480 310 585 490 520 C655 460 735 555 900 500 C1030 458 1110 490 1200 462 L1200 630 L0 630 Z" fill="#396f70" opacity="0.22"/>
-  <g fill="#315d5f" opacity="0.13" font-family="serif" font-size="210" font-weight="700">
-    <text x="810" y="585">诗</text>
+  <rect width="1200" height="630" fill="url(#fiber)"/>
+  <path d="M74 74H1126M74 556H1126" stroke="#2f5d50" stroke-opacity=".35"/>
+  <path d="M74 74V556M1126 74V556" stroke="#2f5d50" stroke-opacity=".35"/>
+  <g fill="#26352f" font-family="Songti SC, Noto Serif CJK SC, serif" text-anchor="middle">
+    <text x="600" y="164" font-size="38" letter-spacing="18">兰 泽 诗 词</text>
+    <text x="600" y="210" font-size="16" letter-spacing="7" fill="#5a655d">LANZE · CLASSICAL CHINESE POETRY</text>
   </g>
-  <g transform="translate(82 78)">
-    <rect width="520" height="474" rx="26" fill="#ffffff" opacity="0.88" filter="url(#shadow)"/>
-    <rect x="34" y="34" width="452" height="406" rx="14" fill="none" stroke="#a7c5b6" stroke-width="2"/>
-    <text x="60" y="125" fill="#12393f" font-family="PingFang SC, Noto Serif CJK SC, serif" font-size="66" font-weight="700">兰泽诗词</text>
-    <text x="62" y="174" fill="#4f756e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="23" letter-spacing="3">LANZE · OPEN SOURCE</text>
-    <line x1="62" y1="205" x2="458" y2="205" stroke="#d7e5dc" stroke-width="2"/>
-    <text x="62" y="270" fill="#204c50" font-family="Noto Serif CJK SC, Songti SC, serif" font-size="34">以现代前端，重开一卷诗词</text>
-    <text x="62" y="325" fill="#5b7d76" font-family="PingFang SC, sans-serif" font-size="23">Vue 3 · Vite · 本地演示 · MIT</text>
-    <rect x="62" y="365" width="186" height="48" rx="24" fill="url(#ink)"/>
-    <text x="90" y="397" fill="#ffffff" font-family="PingFang SC, sans-serif" font-size="21">npm run dev</text>
-    <text x="270" y="397" fill="#54766f" font-family="ui-monospace, monospace" font-size="20">→  localhost</text>
+  <g fill="#26352f" font-family="Songti SC, Noto Serif CJK SC, serif" font-size="32" text-anchor="middle">
+    <text x="410" y="292">山</text><text x="410" y="330">有</text><text x="410" y="368">木</text><text x="410" y="406">兮</text><text x="410" y="444">木</text><text x="410" y="482">有</text><text x="410" y="520">枝</text>
+    <text x="482" y="292">心</text><text x="482" y="330">悦</text><text x="482" y="368">君</text><text x="482" y="406">兮</text><text x="482" y="444">君</text><text x="482" y="482">不</text><text x="482" y="520">知</text>
+    <text x="594" y="292">海</text><text x="594" y="330">上</text><text x="594" y="368">生</text><text x="594" y="406">明</text><text x="594" y="444">月</text>
+    <text x="666" y="292">天</text><text x="666" y="330">涯</text><text x="666" y="368">共</text><text x="666" y="406">此</text><text x="666" y="444">时</text>
   </g>
-  <g transform="translate(690 152)" filter="url(#shadow)">
-    <rect width="360" height="326" rx="20" fill="#fdfcf5" opacity="0.96"/>
-    <rect x="24" y="24" width="312" height="278" rx="10" fill="none" stroke="#cdbfa0" stroke-width="2"/>
-    <g fill="#315a58" font-family="Noto Serif CJK SC, Songti SC, serif" font-size="31">
-      <text x="56" y="92">山有木兮木有枝</text>
-      <text x="56" y="145">心悦君兮君不知</text>
-    </g>
-    <line x1="56" y1="181" x2="304" y2="181" stroke="#ded4b9" stroke-width="2"/>
-    <text x="56" y="224" fill="#8a7b5c" font-family="PingFang SC, sans-serif" font-size="20">摘录 · 文库 · 茶楼 · 笃学</text>
-    <circle cx="292" cy="260" r="18" fill="#b34f42" opacity="0.85"/>
-    <text x="282" y="267" fill="#fff7ec" font-family="serif" font-size="17">泽</text>
+  <g stroke="#9e3b2f" stroke-width="3" fill="none">
+    <rect x="820" y="386" width="88" height="88" rx="2"/>
   </g>
-  <text x="82" y="595" fill="#3f6662" font-family="PingFang SC, sans-serif" font-size="20">github.com/2648782102/LanZe · 历史演示链接不作为线上服务承诺</text>
+  <g fill="#9e3b2f" font-family="Songti SC, serif" font-size="28" text-anchor="middle">
+    <text x="864" y="424">兰</text><text x="864" y="458">泽</text>
+  </g>
+  <text x="600" y="602" fill="#5a655d" font-family="Songti SC, serif" font-size="17" letter-spacing="4" text-anchor="middle">github.com/2648782102/LanZe</text>
 </svg>

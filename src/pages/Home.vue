@@ -1,406 +1,390 @@
 <template>
-  <lottie-player v-show="isLottie" class="lottie hidden-sm-and-down" ref="demoRefHua" :src="qieHuanSource"
-    background="transparent" speed="1" style="height: 240vh; width: 240vh" />
-  <article>
-    <section>
-      <el-container>
-        <!-- 大屏幕显示为顶部导航栏 -->
-        <el-header style="padding: 0" class="hidden-sm-and-down tab-top">
-          <el-affix :offset="0">
-            <el-menu router default-active="/zhailu" class="el-menu-demo" active-text-color='#5b99af' mode="horizontal">
-              <!-- 网站logo -->
-              <el-col :span="2" :offset="0" class="log-col">
-                <el-image @click="$router.push({ name: 'home' })" class="logo-img" :src="logoUrl" fit="fill" lazy
-                  aria-label="返回兰泽诗词首页" role="button">
-                </el-image>
-              </el-col>
-              <el-col :span="15" :offset="0" class="input-col">
-                <!-- 搜索框 -->
-                <el-input id="home-search-desktop" @focus="elinput1focus = true" @blur="elinput1focus = false"
-                  class="me-2 elinput1" :class="elinput1focus ? 'elinput1focus' : ''" v-model="inputS"
-                  placeholder="搜索诗词" prefix-icon="Search" clearable @keyup.enter="inputEnter"
-                  aria-label="搜索诗词，按回车提交" />
-              </el-col>
-              <!-- 右侧导航 -->
-              <el-menu-item index="/zhailu">涉猎</el-menu-item>
-              <el-menu-item index="/wenku">文库</el-menu-item>
-              <el-menu-item index="/chalou">茶楼</el-menu-item>
-              <el-menu-item index="/duxue">笃学</el-menu-item>
-              <!-- 个人中心下拉菜单 -->
-              <el-sub-menu index="4">
-                <template #title>个人中心</template>
-                <el-menu-item index="personalziLiao">个人资料</el-menu-item>
-                <el-menu-item index="favorite">收藏</el-menu-item>
-                <el-menu-item index="samplereels">作品</el-menu-item>
-                <el-menu-item index="shezhi">设置</el-menu-item>
-              </el-sub-menu>
-            </el-menu>
-          </el-affix>
-        </el-header>
-        <!-- 小屏幕显示为底部导航栏 -->
-        <div class="min-tap-top hidden-md-and-up">
-          <el-input id="home-search-mobile" @focus="elinput1focus = true" @blur="elinput1focus = false"
-            class="me-2 elinput1" :class="elinput1focus ? 'elinput1focus' : ''" v-model="inputS"
-            placeholder="搜索诗词" prefix-icon="Search" clearable @keyup.enter="inputEnter"
-            aria-label="搜索诗词，按回车提交" />
-          <el-image @click="$router.push({ name: 'home' })" class="logo-img" :src="logoUrl" fit="fill" lazy
-            aria-label="返回兰泽诗词首页" role="button">
-          </el-image>
-        </div>
-        <div class="min-tab-bottom hidden-md-and-up">
-          <div class="tab-bottom-box">
-            <div>
-              <router-link active-class="bottom-active" :to="{name: 'chalou'}" aria-label="前往茶楼">
-                <div class="box-i"><i class="fas fa-coffee tab-i"></i>
-                  <p>茶楼</p>
-                </div>
-              </router-link>
-            </div>
-            <div>
-              <router-link active-class="bottom-active" :to="{name: 'wenku'}" aria-label="前往文库">
-                <div class="box-i"><i class="fas fa-book tab-i"></i>
-                  <p>文库</p>
-                </div>
-              </router-link>
-            </div>
-            <div>
-              <router-link active-class="bottom-active" :to="{name: 'zhailu'}" aria-label="前往涉猎">
-                <div class="box-i"><i class="fas fa-chalkboard-teacher tab-i"></i>
-                  <p>涉猎</p>
-                </div>
-              </router-link>
-            </div>
-            <div>
-              <router-link active-class="bottom-active" :to="{name: 'duxue'}" aria-label="前往笃学">
-                <div class="box-i"><i class="fas fa-pen-fancy tab-i"></i>
-                  <p>笃学</p>
-                </div>
-              </router-link>
-            </div>
-            <div>
-              <router-link active-class="bottom-active" :to="{name: 'personal'}" aria-label="前往个人中心">
-                <div class="box-i"><i class="fas fa-user-alt tab-i"></i>
-                  <p>中心</p>
-                </div>
-              </router-link>
-            </div>
+  <div class="paper-shell">
+    <lottie-player v-show="isLottie" class="route-veil" ref="demoRefHua" :src="qieHuanSource"
+      background="transparent" speed="1" aria-hidden="true" />
+
+    <header class="site-head tab-top hidden-sm-and-down">
+      <div class="head-inner">
+        <button class="brand" type="button" @click="$router.push({ name: 'home' })" aria-label="返回兰泽诗词首页">
+          <span class="brand-seal" aria-hidden="true">兰<br>泽</span>
+          <span class="brand-name">兰泽诗词<span>LANZE</span></span>
+        </button>
+
+        <form class="search" role="search" @submit.prevent="inputEnter">
+          <label class="visually-hidden" for="home-search-desktop">搜索诗词</label>
+          <input id="home-search-desktop" v-model="inputS" type="search" placeholder="搜索诗词、作者" autocomplete="off"
+            aria-label="搜索诗词，按回车提交" @keyup.enter="inputEnter">
+          <button type="submit" aria-label="提交搜索">检</button>
+        </form>
+
+        <nav class="main-nav" aria-label="主导航">
+          <router-link v-for="item in navItems" :key="item.name" :to="{ name: item.name }"
+            :class="{ 'is-current': isCurrent(item.name) }">{{ item.label }}</router-link>
+          <router-link :to="{ name: 'personal' }" :class="{ 'is-current': isCurrent('personal') }">个人</router-link>
+        </nav>
+      </div>
+    </header>
+
+    <header class="mobile-head hidden-md-and-up">
+      <form class="search mobile-search" role="search" @submit.prevent="inputEnter">
+        <label class="visually-hidden" for="home-search-mobile">搜索诗词</label>
+        <input id="home-search-mobile" v-model="inputS" type="search" placeholder="搜索诗词" autocomplete="off"
+          aria-label="搜索诗词，按回车提交" @keyup.enter="inputEnter">
+        <button type="submit" aria-label="提交搜索">检</button>
+      </form>
+      <button class="brand compact" type="button" @click="$router.push({ name: 'home' })" aria-label="返回兰泽诗词首页">
+        <span class="brand-seal" aria-hidden="true">兰</span>
+      </button>
+    </header>
+
+    <div class="mobile-veil hidden-md-and-up" aria-hidden="true"></div>
+    <nav class="tab-bottom min-tab-bottom hidden-md-and-up" aria-label="移动端导航">
+      <router-link v-for="item in mobileItems" :key="item.name" :to="{ name: item.name }" active-class="bottom-active"
+        :aria-label="`前往${item.label}`">
+        <span class="tab-glyph" aria-hidden="true">{{ item.glyph }}</span>
+        <span>{{ item.label }}</span>
+      </router-link>
+    </nav>
+
+    <section class="section-main">
+      <el-scrollbar ref="scrollbarRef" height="100vh" aria-label="页面内容滚动区域">
+        <main id="main" v-loading="loading">
+          <router-view />
+        </main>
+        <footer class="site-foot">
+          <div class="foot-rule" aria-hidden="true"></div>
+          <div class="foot-inner">
+            <p class="foot-colophon">兰泽诗词 · 卷帙常新</p>
+            <p>开源学习项目 · 演示数据仅存于本机浏览器 · MIT 许可</p>
+            <p>Copyright © 2022–2026 LanZe contributors</p>
           </div>
-        </div>
-        <section class="section-main">
-          <el-scrollbar ref="scrollbarRef" height="100vh" aria-label="页面内容滚动区域">
-            <!-- 主体部分 -->
-            <main id="main" v-loading="loading">
-              <router-view></router-view>
-            </main>
-            <!-- 底部 -->
-            <el-footer class="footer mt-2">
-              <el-row justify="center">
-                <el-col class="footerCol" :span="24" :offset="0">
-                  <div class="foot-h5 pt-2">
-                    <h5>Copyright &copy; 2022 lan-ze&nbsp;</h5>
-                    <h5>All Rights Reserved</h5>
-                  </div>
-                  <p>本站仅供学习交流使用</p>
-                </el-col>
-              </el-row>
-            </el-footer>
-          </el-scrollbar>
-        </section>
-      </el-container>
+        </footer>
+      </el-scrollbar>
     </section>
+
     <Audio class="Aud hidden-sm-and-down" />
-  </article>
+  </div>
 </template>
 
 <script>
-  import { ref, watch, onBeforeUnmount } from "vue";
-  import logo from "../assets/logo.png";
-  import { useRouter } from "vue-router";
+import { ref, watch, onBeforeUnmount } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus/es/components/message/index.mjs";
-  import qieHuan from "../assets/lottieJSON/qieHuan.json";
-  import { useLottieSource } from "../composables/useLottieSource.js";
-  import Audio from "./Audio.vue";
-  import { searchList } from "../apis/api/list.js";
-  import { useRouteTransition } from "../composables/useRouteTransition.js";
-  import { normalizeListResponse } from "../utils/response.js";
+import qieHuan from "../assets/lottieJSON/qieHuan.json";
+import { useLottieSource } from "../composables/useLottieSource.js";
+import { useRouteTransition } from "../composables/useRouteTransition.js";
+import Audio from "./Audio.vue";
+import { searchList } from "../apis/api/list.js";
+import { normalizeListResponse } from "../utils/response.js";
 
-  export default {
-    name: "Home",
-    components: {
-      Audio
-    },
-    setup() {
+export default {
+  name: "Home",
+  components: { Audio },
+  setup() {
+    const $router = useRouter();
+    const $route = useRoute();
+    const inputS = ref("");
+    const loading = ref(false);
+    const scrollbarRef = ref();
+    const { transitionActive, start: startTransition, stop: stopTransition } = useRouteTransition();
+    const navItems = [
+      { name: "zhailu", label: "涉猎" },
+      { name: "wenku", label: "文库" },
+      { name: "chalou", label: "茶楼" },
+      { name: "duxue", label: "笃学" },
+    ];
+    const mobileItems = [
+      { name: "chalou", label: "茶楼", glyph: "茶" },
+      { name: "wenku", label: "文库", glyph: "卷" },
+      { name: "zhailu", label: "涉猎", glyph: "诗" },
+      { name: "duxue", label: "笃学", glyph: "学" },
+      { name: "personal", label: "中心", glyph: "人" },
+    ];
 
-      // 路由器
-      const $router = useRouter();
-      // 搜索框model
-      let inputS = ref("");
+    const isCurrent = (name) => {
+      const path = $route.path.toLowerCase();
+      if (name === "wenku") return path.includes("wenku") || path.includes("gushi");
+      if (name === "chalou") return /chalou|jingxuan|fengya|feihua|xiandai/.test(path);
+      if (name === "personal") return /personal|favorite|samplereels|shezhi|publishpoem/.test(path);
+      return path.includes(name);
+    };
 
-      const scrollbarRef = ref()
-      const { transitionActive, start: startTransition, stop: stopTransition } = useRouteTransition();
-
-      // 加载控制
-      let loading = ref(false);
-      // 发送请求返回根据输入框内容搜索到的内容
-      async function inputEnter() {
-        const keyword = inputS.value.trim();
-        if (!keyword) {
-          ElMessage({ message: "请输入诗词、作者或标签", type: "warning" });
-          return;
-        }
-        loading.value = true;
-        try {
-          const response = await searchList({ keyword });
-          const searchData = normalizeListResponse(response, []);
-          await $router.push({
-            name: "searchul",
-            query: { ulArr: JSON.stringify(searchData), keyword },
-          });
-          ElMessage({
-            message: searchData.length ? "搜索成功!" : "没有匹配结果，已展示推荐内容",
-            type: searchData.length ? "success" : "info",
-          });
-          inputS.value = "";
-        } catch (error) {
-          ElMessage({ message: error?.message || "搜索失败，请稍后重试", type: "error" });
-        } finally {
-          loading.value = false;
-        }
+    async function inputEnter() {
+      const keyword = inputS.value.trim();
+      if (!keyword) {
+        ElMessage({ message: "请输入诗词、作者或标签", type: "warning" });
+        return;
       }
+      loading.value = true;
+      try {
+        const response = await searchList({ keyword });
+        const searchData = normalizeListResponse(response, []);
+        await $router.push({ name: "searchul", query: { ulArr: JSON.stringify(searchData), keyword } });
+        ElMessage({
+          message: searchData.length ? "已找到相关诗句" : "没有匹配结果，已展示推荐内容",
+          type: searchData.length ? "success" : "info",
+        });
+        inputS.value = "";
+      } catch (error) {
+        ElMessage({ message: error?.message || "搜索失败，请稍后重试", type: "error" });
+      } finally {
+        loading.value = false;
+      }
+    }
 
-      // logo图片
-      let logoUrl = logo;
-      // 搜索框状态，聚焦/失焦
-      let elinput1focus = ref(false);
+    const isLottie = transitionActive;
+    const demoRefHua = ref(null);
+    const qieHuanSource = useLottieSource(qieHuan);
+    const resetScroll = () => scrollbarRef.value?.setScrollTop?.(0);
+    const stopRouteWatcher = watch(
+      () => $router.currentRoute.value.fullPath,
+      () => {
+        resetScroll();
+        startTransition(500);
+        demoRefHua.value?.play?.();
+      },
+    );
+    const stopAnimationWatcher = watch(transitionActive, (active) => {
+      if (!active) demoRefHua.value?.stop?.();
+    });
+    onBeforeUnmount(() => {
+      stopRouteWatcher();
+      stopAnimationWatcher();
+      stopTransition();
+    });
 
-      // 页面切换动画效果
-      let isLottie = transitionActive;
-      let demoRefHua = ref(null);
-      const qieHuanSource = useLottieSource(qieHuan);
-
-      const resetScroll = () => {
-        scrollbarRef.value?.setScrollTop?.(0);
-      };
-
-      const stopRouteWatcher = watch(
-        () => $router.currentRoute.value.fullPath,
-        () => {
-          resetScroll();
-          startTransition(500);
-          demoRefHua.value?.play?.();
-        },
-      );
-
-      const stopAnimationWatcher = watch(transitionActive, (active) => {
-        if (!active) demoRefHua.value?.stop?.();
-      });
-
-      onBeforeUnmount(() => {
-        stopRouteWatcher();
-        stopAnimationWatcher();
-        stopTransition();
-      });
-
-      return {
-        inputS,
-        logoUrl,
-        elinput1focus,
-        inputEnter,
-        loading,
-        qieHuanSource,
-        demoRefHua,
-        isLottie,
-        scrollbarRef
-      };
-    },
-  };
+    return {
+      inputS, loading, inputEnter, scrollbarRef, navItems, mobileItems, isCurrent,
+      qieHuanSource, demoRefHua, isLottie,
+    };
+  },
+};
 </script>
 
 <style scoped>
-  * {
-    box-sizing: border-box;
-  }
+.paper-shell { position: relative; }
 
-  #main {
-    position: relative;
-  }
+.route-veil {
+  position: fixed;
+  inset: -20vh;
+  width: 140vh;
+  height: 140vh;
+  z-index: 30;
+  pointer-events: none;
+  opacity: 0.38;
+}
 
-  .lottie {
-    position: absolute;
-    top: 0;
-    z-index: 10;
-  }
+.site-head {
+  position: relative;
+  z-index: 12;
+  height: 88px;
+  border-bottom: 1px solid var(--rule);
+  background: rgba(247, 244, 236, 0.92);
+  backdrop-filter: blur(8px);
+}
 
-  article {
-    display: flex;
-    justify-content: center;
-    /* background-color: #5b99af; */
-  }
+.head-inner {
+  max-width: 1360px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 42px;
+  display: grid;
+  grid-template-columns: 260px minmax(180px, 300px) 1fr;
+  align-items: center;
+  gap: 32px;
+}
 
-  section {
-    width: 100%;
-  }
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  text-align: left;
+}
 
-  .tab-top {
-    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.05);
-    z-index: 3;
-  }
+.brand-seal {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 46px;
+  border: 2px solid var(--seal);
+  color: var(--seal);
+  font-family: var(--font-display);
+  font-size: 15px;
+  line-height: 1.05;
+  letter-spacing: 1px;
+}
 
-  /* 小屏幕顶部 */
-  .min-tap-top {
-    width: 100%;
-    height: 40px;
-    background-color: white;
-    box-shadow: 0 2px 2px 2px rgba(92, 92, 92, 0.293);
-    z-index: 10;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding: 5px;
-    display: flex;
-    justify-content: space-between;
-  }
+.brand-name {
+  font-family: var(--font-display);
+  font-size: 25px;
+  letter-spacing: 5px;
+  white-space: nowrap;
+}
 
-  /* 小屏幕底部导航栏 */
-  .min-tab-bottom {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 80px;
-    background-color: white;
-    border-radius: 20px 20px 0 0;
-    box-shadow: 0 -2px 2px 2px rgba(126, 126, 127, 0.293);
-    z-index: 20;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+.brand-name span {
+  display: block;
+  margin-top: -3px;
+  font-family: var(--font-sans);
+  font-size: 9px;
+  letter-spacing: 4px;
+  color: var(--ink-soft);
+}
 
-  .tab-bottom-box {
-    width: 100%;
-    height: 60%;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-  }
+.search {
+  display: flex;
+  align-items: stretch;
+  height: 38px;
+  border-bottom: 1px solid var(--rule-strong);
+}
 
-  .tab-bottom-box>div {
-    width: 56px;
-    height: 56px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: FangZhengSong;
-  }
+.search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+  letter-spacing: 1px;
+  outline: none;
+}
 
-  .tab-bottom-box a {
-    text-decoration: none;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+.search input::placeholder { color: #8a9088; }
+.search input::-webkit-search-cancel-button { cursor: pointer; }
 
-  .tab-bottom-box a:not(.bottom-active) {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 54px;
-    height: 54px;
-    color: rgba(36, 36, 38, 0.7);
-    border-radius: 50%;
-    border-radius: 50px;
-    transition: 0.4s;
-  }
+.search button {
+  width: 34px;
+  border: 0;
+  background: transparent;
+  color: var(--jade);
+  font-family: var(--font-display);
+  font-size: 18px;
+}
 
-  .bottom-active {
-    width: 100%;
-    height: 100%;
-    color: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    background: linear-gradient(145deg, #ffffff, #e6e6e6);
-    box-shadow: 6px 6px 12px #dedede,
-      -6px -6px 12px #ffffff;
-    transition: 0.3s;
-  }
+.main-nav {
+  display: flex;
+  justify-content: flex-end;
+  gap: 34px;
+}
 
-  .box-i {
-    width: 80%;
-    height: 80%;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    padding: 6px;
-    font-size: 20px;
-  }
+.main-nav a {
+  position: relative;
+  padding: 8px 0;
+  color: var(--ink-soft);
+  font-size: 15px;
+  letter-spacing: 4px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
 
-  .box-i p {
-    font-size: 8px;
-  }
+.main-nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 2px;
+  width: 0;
+  height: 2px;
+  background: var(--jade);
+  transition: width 0.25s ease;
+}
 
-  .log-col {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+.main-nav a:hover,
+.main-nav a.is-current { color: var(--jade-deep); }
+.main-nav a.is-current::after { width: 100%; }
 
-  .input-col {
-    display: flex;
-    align-items: center;
-  }
+.section-main { position: relative; }
+#main { position: relative; min-height: 84vh; }
 
-  .logo-img {
-    width: 2rem;
-    height: 2rem;
-    cursor: pointer;
-  }
+.site-foot {
+  position: relative;
+  margin: 0 42px 28px;
+  padding: 30px 0 24px;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-soft);
+  text-align: center;
+}
 
-  .elinput1 {
-    transition: width 0.5s ease-in-out;
-    width: 8.4rem;
-  }
+.foot-rule {
+  width: 46px;
+  height: 1px;
+  margin: -31px auto 30px;
+  background: var(--seal);
+}
 
-  .elinput1focus {
-    width: 16rem;
-  }
+.foot-inner p { margin: 2px 0; font-size: 12px; letter-spacing: 2px; }
+.foot-colophon {
+  font-family: var(--font-display);
+  font-size: 18px !important;
+  letter-spacing: 8px !important;
+  color: var(--jade-deep);
+}
 
-  .el-menu-demo {
-    /* box-shadow: 0 5px 8px rgba(205, 219, 221, 0.392); */
-    background-color: rgba(255, 255, 255, 0);
-    border: none;
-    font-family: maoKen;
-  }
+.mobile-head {
+  position: relative;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 64px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--rule);
+  background: rgba(247, 244, 236, 0.96);
+}
 
-  .footer {
-    box-shadow: 0 0 2px 6px #2c3a47e2;
-    min-height: 140px;
-    padding: 10px;
-    background-color: #2C3A47;
-    /* background-image: linear-gradient(#5b99af, #000000); */
-    /* background-color: rgba(255, 255, 255, 0.9); */
-    color: white;
-    margin-bottom: 18px;
-  }
+.mobile-search { flex: 1; height: 34px; }
+.brand.compact { padding: 0; border: 0; background: none; }
+.brand.compact .brand-seal { width: 34px; height: 38px; font-size: 18px; }
+.mobile-veil { display: none; }
 
-  .footerCol {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
+.tab-bottom {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  justify-content: space-around;
+  height: 72px;
+  border-top: 1px solid var(--rule);
+  background: rgba(247, 244, 236, 0.97);
+  backdrop-filter: blur(10px);
+}
 
-  .foot-h5 {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
+.tab-bottom a {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--ink-soft);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-decoration: none;
+}
 
-  .foot-h5>h5 {
-    font-size: 0.8rem;
-  }
+.tab-glyph {
+  font-family: var(--font-display);
+  font-size: 19px;
+  line-height: 1;
+}
+
+.bottom-active { color: var(--jade-deep); }
+.bottom-active .tab-glyph { color: var(--seal); }
+
+@media (max-width: 1100px) {
+  .head-inner { grid-template-columns: 200px minmax(150px, 220px) 1fr; gap: 20px; padding: 0 24px; }
+  .main-nav { gap: 20px; }
+  .main-nav a { letter-spacing: 2px; }
+  .site-foot { margin: 0 24px 24px; }
+}
+
+@media (max-width: 767px) {
+  #main { min-height: 72vh; }
+  .site-foot { margin: 0 18px 90px; padding-bottom: 12px; }
+  .foot-inner p { font-size: 11px; letter-spacing: 1px; }
+}
 </style>

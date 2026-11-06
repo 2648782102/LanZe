@@ -14,10 +14,25 @@ export default {
 </script>
 
 <style scoped>
-    span {
+  span {
     float: right;
+    color: var(--jade);
+    font-size: 0.85rem;
+    letter-spacing: 2px;
   }
-  p,span {
-    color: rgb(152, 152, 152);
+
+  h4 {
+    margin: 0 0 0.3rem;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    letter-spacing: 3px;
+  }
+
+  p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    letter-spacing: 1px;
   }
 </style>

@@ -92,9 +92,9 @@
 <style scoped>
     article {
         width: 100%;
-        min-height: 100vh;
-        font-family: FangZhengSong;
-        padding-bottom: 10px;
+        min-height: 80vh;
+        font-family: var(--font-song);
+        padding: 28px 20px 20px;
     }
 
     .elrow {
@@ -104,28 +104,30 @@
     }
 
     ul {
-        min-height: 72rem;
+        min-height: 48rem;
         list-style-type: none;
         margin: 0;
-        padding: 1rem 1rem 0 1rem;
+        padding: 0.5rem 1.2rem 0;
     }
 
     li {
-        height: 7rem;
-        padding: 1rem 1rem 0 1rem;
-        border-radius: 0.4rem;
+        height: auto;
+        min-height: 6.5rem;
+        padding: 1rem 0.8rem;
+        border-bottom: 1px solid var(--rule);
+        border-radius: 0;
         cursor: pointer;
         overflow: hidden;
+        transition: background 0.2s ease;
     }
 
     li:hover {
-        background-color: rgba(240, 248, 255, 0.781);
+        background: rgba(47, 93, 80, 0.055);
     }
 
     .paginationBox {
         display: flex;
         justify-content: center;
-        margin-bottom: 0.5rem;
-        margin-top: 0.5rem;
+        margin: 1.5rem 0 0.5rem;
     }
 </style>

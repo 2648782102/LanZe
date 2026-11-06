@@ -1,0 +1,45 @@
+.bgwhite {
+  background: var(--paper-light) !important;
+  border: 1px solid var(--rule) !important;
+  border-radius: 0 !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.border-re2 { border-radius: 0 !important; }
+
+#main article { font-family: var(--font-song); }
+
+#main h1,
+#main h2,
+#main h3,
+#main h4 { font-family: var(--font-display); font-weight: 400; }
+
+.el-page-header__content { color: var(--jade-deep); font-family: var(--font-display); letter-spacing: 4px; }
+.el-page-header__left { color: var(--ink-soft); }
+.el-divider--horizontal { border-top-color: var(--rule); }
+.el-card { border: 1px solid var(--rule); border-radius: 0; background: var(--paper-light); box-shadow: none; }
+.el-card__body { color: var(--ink); }
+.el-menu--horizontal .el-menu-item { color: var(--ink-soft); font-family: var(--font-song); letter-spacing: 3px; }
+.el-menu--horizontal .el-menu-item.is-active { color: var(--jade-deep); border-bottom: 2px solid var(--jade); }
+.el-tabs__item { color: var(--ink-soft); font-family: var(--font-song); }
+.el-carousel__item { background: var(--paper-deep); }
+.el-empty__description p { color: var(--ink-soft); }
+.el-link { color: var(--jade); }
+.el-link:hover { color: var(--seal); }
+.el-form-item__label { color: var(--ink-soft); }
+.el-pagination.is-background .el-pager li,
+.el-pagination.is-background .btn-next,
+.el-pagination.is-background .btn-prev { background: var(--paper-light); color: var(--ink-soft); }
+
+.aplayer {
+  border-radius: 0 !important;
+  box-shadow: 0 -6px 24px rgba(31, 64, 56, 0.14) !important;
+  font-family: var(--font-sans) !important;
+}
+
+.aplayer .aplayer-info { border-bottom: 0 !important; background: var(--paper-light) !important; }
+.aplayer .aplayer-title { color: var(--ink) !important; }
+.aplayer .aplayer-author { color: var(--ink-soft) !important; }
+.aplayer .aplayer-icon path { fill: var(--jade) !important; }
+.aplayer .aplayer-controller { background: var(--paper-light) !important; }
+.aplayer .aplayer-bar-wrap { color: var(--jade) !important; }

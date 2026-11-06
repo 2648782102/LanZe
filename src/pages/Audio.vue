@@ -38,15 +38,16 @@ onBeforeUnmount(() => {
 .audioFallback {
   position: fixed;
   right: 1rem;
-  bottom: 5rem;
+  bottom: 6.5rem;
   z-index: 2100;
   max-width: min(24rem, calc(100vw - 2rem));
   margin: 0;
   padding: 0.65rem 0.9rem;
-  border-radius: 0.4rem;
-  background: #fff8e6;
-  color: #664d03;
-  box-shadow: 0 0.15rem 0.6rem rgb(0 0 0 / 18%);
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  background: var(--paper-light);
+  color: var(--jade-deep);
+  box-shadow: var(--shadow);
   font-size: 0.875rem;
   line-height: 1.5;
 }

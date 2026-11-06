@@ -39,7 +39,7 @@
 
 ## 主要特性
 
-- 📜 **摘录与随机诗句**：卡片式摘录、切换动画、收藏态演示与详情页入口。
+- 📜 **摘录与随机诗句**：三折经卷式竖排摘录、翻页切换、朱印收藏态与详情页入口。
 - 🏛 **分类文库**：唐诗、宋词、元曲、南唐、花间集、诗经/楚辞等分类界面与鉴赏入口。
 - 🔎 **搜索与详情**：按关键词检索并跳转到搜索结果/详情；默认检索仓库内演示数据，也可接自建 API。
 - 🍵 **茶楼与创作**：现代诗、精选诗文、飞花接龙、作品发布等社区界面原型。
@@ -60,7 +60,7 @@
 | 语言 | JavaScript / Vue SFC；npm 脚本使用 `node --test` 与 ESM |
 | 数据 | `src/config/runtime.js` 统一公开配置，`src/apis/request.js` 在真实 API 与 `src/services/mockApi.js` 之间切换 |
 | 动效与媒体 | 本地 `@lottiefiles/lottie-player`、仓库内 Lottie JSON、APlayer 与 `public/media/` 自制演示音源/封面 |
-| 样式 | 组件内 CSS、Element Plus、锁定版本的本地 Bootstrap 5.1.1 / Font Awesome 5.13.0 |
+| 样式 | `src/styles/lanze-pages.css` 设计 token、组件内 CSS、Element Plus、锁定版本的本地 Bootstrap 5.1.1 / Font Awesome 5.13.0 |
 | 字体与素材 | `src/assets/` 下的字体、图片与背景；授权审查见 `docs/FAQ.md` |
 | 工具链 | npm、Node.js 20/22、GitHub Actions、`npm run test`、`npm run lint` |
 | 部署 | `vite build` 产物，可部署到 GitHub Pages / Vercel / Netlify 等静态托管 |
@@ -181,7 +181,7 @@ LanZe/
 
 ## 演示与截图
 
-仓库提供 `public/og-image.svg` 作为文档 hero，并提供由它渲染的 `public/og-image.png`（1200×630）作为 GitHub 社交预览候选。它们不是运行截图，也不包含真实用户数据；上传与核验步骤见 `docs/PROMOTION.md`。
+仓库提供 `public/og-image.svg` 作为文档 hero，并提供由它渲染的 `public/og-image.png`（1200×630）作为 GitHub 社交预览候选。两者采用与新版界面一致的竹纸、墨绿与朱砂视觉，不是运行截图，也不包含真实用户数据；上传与核验步骤见 `docs/PROMOTION.md`。
 
 本地演示建议录屏脚本：
 

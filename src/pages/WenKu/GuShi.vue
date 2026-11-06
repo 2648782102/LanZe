@@ -119,7 +119,7 @@ export default {
 
 <style scoped>
 article {
-  padding: 20px 20px 0 20px;
+  padding: 28px 24px 24px;
 }
 
 .gushi-tabs {
@@ -139,27 +139,44 @@ article {
 
 .elCard {
   cursor: pointer;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.elCard:hover {
+  transform: translateY(-4px);
+  border-color: var(--jade);
 }
 
 .image {
   width: 100%;
-  height: 300px;
+  height: 210px;
   display: block;
+  object-fit: cover;
+  filter: saturate(0.72) sepia(0.12);
 }
 
 .el-col {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .car-div {
   width: 100%;
   height: 100%;
-  padding: 20px;
+  padding: 18px 20px 22px;
+}
+
+.car-div h1 {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  letter-spacing: 4px;
 }
 
 .car-div > p {
-  font-size: 0.8rem;
-  color: rgb(105, 105, 105);
-  margin: 0;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  margin: 2px 0;
+  letter-spacing: 1px;
 }
 </style>

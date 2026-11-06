@@ -70,28 +70,32 @@ export default {
 <style scoped>
 span {
   float: right;
+  color: var(--jade);
+  font-size: 0.85rem;
+  letter-spacing: 2px;
 }
-p,
-span {
-  color: rgb(152, 152, 152);
-}
+p { color: var(--ink-soft); }
+h4 { margin: 0 0 0.4rem; color: var(--ink); font-family: var(--font-display); letter-spacing: 3px; }
 section {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
 }
 .dox-left  {
     width: 80%;
     overflow: hidden;
 }
 .dox-left>p {
-    width: 40%;
-    height: 1.6rem;
+    width: 100%;
+    height: 1.7rem;
+    margin: 0;
     overflow: hidden;
 }
 .elavatar {
   width: 2.6rem;
   height: 2.6rem;
   font-size: 1.5rem;
+  border: 1px solid var(--rule);
 }
 </style>

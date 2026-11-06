@@ -1,414 +1,375 @@
 <template>
-  <!-- 摘录页面 -->
-  <article class="mt-3 mb-3">
-    <el-row class="elrow" justify="center">
-      <!-- 中间主体部分 -->
-      <el-tooltip
-        effect="dark"
-        content="切换"
-        placement="bottom-end"
-      >
-      <div class="chevron1 chevron hidden-sm-and-down" @click="skip1" role="button" tabindex="0"
-        aria-label="切换到上一组诗词" @keyup.enter="skip1">
-        <i class="fas fa-chevron-left"></i>
-      </div>
-      </el-tooltip>
-      <div class="col-10 col-md-8 col-lg-9 dox bgwhite">
-        <section @dragstart="tuoDongGo($event)" @dragend="tuoDongOff($event,1)" draggable="true" class="section1 col-10 col-md-7 col-lg-3">
-          <div v-loading='loding1' element-loading-text="加载中..." element-loading-svg-view-box="-10, -10, 50, 50" :element-loading-spinner="loadingSVG" class="box"
-            :class="{'animationC':anima1,'animationD':anima2}">
-            <span @click="shouchang(1)" @keyup.enter="shouchang(1)" role="button" tabindex="0"
-              :aria-pressed="shouchang1" :class="shouchang1?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
-            <p>{{ scArr1.content }}</p>
-            <h5>— {{ scArr1.author }}</h5>
-            <img draggable="false" src="../../assets/beijing/fanzou.png" alt="">
-          </div>
-        </section>
-        <section @dragstart="tuoDongGo($event)" @dragend="tuoDongOff($event,2)" draggable="true" class="section2 col-10 col-md-8 col-lg-3 hidden-sm-and-down">
-          <div v-loading='loding2' element-loading-text="加载中..." element-loading-svg-view-box="-10, -10, 50, 50" :element-loading-spinner="loadingSVG" class="box"
-            :class="{'animationC':anima1,'animationD':anima2}">
-            <span @click="shouchang(2)" @keyup.enter="shouchang(2)" role="button" tabindex="0"
-              :aria-pressed="shouchang2" :class="shouchang2?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
-            <p>{{ scArr2.content }}</p>
-            <h5>— {{ scArr2.author }}</h5>
-            <img draggable="false" src="../../assets/beijing/fanzou.png" alt="">
-          </div>
-        </section>
-        <section @dragstart="tuoDongGo($event)" @dragend="tuoDongOff($event,3)" draggable="true" class="section3 col-10 col-md-8 col-lg-3 hidden-sm-and-down">
-          <div v-loading='loding3' element-loading-text="加载中..." element-loading-svg-view-box="-10, -10, 50, 50" :element-loading-spinner="loadingSVG" class="box"
-            :class="{'animationC':anima1,'animationD':anima2}">
-            <span @click="shouchang(3)" @keyup.enter="shouchang(3)" role="button" tabindex="0"
-              :aria-pressed="shouchang3" :class="shouchang3?'shouchang-yes':'shouchang-no'" class="shouchang">收藏</span>
-            <p>{{ scArr3.content }}</p>
-            <h5>— {{ scArr3.author }}</h5>
-            <img draggable="false" src="../../assets/beijing/fanzou.png" alt="">
+  <article class="excursion" aria-label="每日摘录">
+    <div class="leaf-head">
+      <p class="leaf-kicker">兰泽 · 涉猎</p>
+      <h1>今日摘录</h1>
+      <p class="leaf-note">三页折卷，一页一句。左右翻页可换一组诗句。</p>
+    </div>
+
+    <div class="turn">
+      <button class="turn-btn" type="button" @click="skip1" aria-label="切换到上一组诗词">
+        <span aria-hidden="true">‹</span><em>上一折</em>
+      </button>
+
+      <div class="concertina" :class="{ 'is-turning': isTurning }">
+        <section v-for="(card, index) in cards" :key="index" class="leaf"
+          :class="`leaf-${index + 1}`"
+          draggable="true" @dragstart="tuoDongGo($event)" @dragend="tuoDongOff($event, index)">
+          <div v-loading="card.loading" class="leaf-face">
+            <span class="leaf-index" aria-hidden="true">{{ ['壹', '贰', '叁'][index] }}</span>
+            <button class="seal" type="button" :class="{ 'is-kept': card.kept }"
+              :aria-pressed="card.kept" :aria-label="card.kept ? `取消收藏第${index + 1}句` : `收藏第${index + 1}句`"
+              @click="toggleKeep(index)">
+              {{ card.kept ? '已藏' : '收藏' }}
+            </button>
+            <p class="verse">{{ card.excerpt.content || '正在展卷……' }}</p>
+            <p class="attribution">{{ card.excerpt.author || '兰泽' }}</p>
+            <p class="origin">{{ card.excerpt.origin || '' }}</p>
+            <div class="landscape" aria-hidden="true">
+              <span class="sun"></span>
+              <span class="ridge ridge-a"></span>
+              <span class="ridge ridge-b"></span>
+              <span class="ridge ridge-c"></span>
+              <span class="boat"></span>
+            </div>
           </div>
         </section>
       </div>
-      <el-tooltip
-        effect="dark"
-        content="切换"
-        placement="top-start"
-      >
-      <div class="chevron2 chevron hidden-sm-and-down" @click="skip2" role="button" tabindex="0"
-        aria-label="切换到下一组诗词" @keyup.enter="skip2">
-        <i class="fas fa-chevron-right"></i>
-      </div>
-    </el-tooltip>
-    </el-row>
+
+      <button class="turn-btn" type="button" @click="skip2" aria-label="切换到下一组诗词">
+        <em>下一折</em><span aria-hidden="true">›</span>
+      </button>
+    </div>
+
+    <p class="leaf-foot">向左或向右拖动单页，也可单独更换那一折的诗句。</p>
   </article>
 </template>
 
 <script>
-  import 'element-plus/theme-chalk/display.css'
-  import { ref, onMounted } from 'vue'
-import { ElMessage } from 'element-plus/es/components/message/index.mjs';
-  import { PoetryRandomExcerpt } from '../../apis/api/list.js'
+import "element-plus/theme-chalk/display.css";
+import { reactive, onMounted, ref } from "vue";
+import { ElMessage } from "element-plus/es/components/message/index.mjs";
+import { PoetryRandomExcerpt } from "../../apis/api/list.js";
 
-  export default {
-    name: 'ZhaiLu',
-    setup() {
-      // 生命周期钩子，当页面挂载时执行
-      onMounted(() => {
-        // 调用ajax函数，初始化古诗词
-        skiip()
-      })
+export default {
+  name: "ZhaiLu",
+  setup() {
+    let excerptIndex = 0;
+    const isTurning = ref(false);
+    const cards = reactive([
+      { excerpt: {}, kept: false, loading: true },
+      { excerpt: {}, kept: false, loading: true },
+      { excerpt: {}, kept: false, loading: true },
+    ]);
 
-      const loadingSVG = `
-        <path class="path" d="
-          M 30 15
-          L 28 17
-          M 25.61 25.61
-          A 15 15, 0, 0, 1, 15 30
-          A 15 15, 0, 1, 1, 27.99 7.5
-          L 15 15
-        " style="stroke-width: 4px; fill: rgba(0, 0, 0, 0)"/>
-      `
+    async function loadExcerpt(serial = 0) {
+      const response = await PoetryRandomExcerpt({ index: excerptIndex++ });
+      const excerpt = response?.data || {};
+      if (cards[serial]) cards[serial].excerpt = excerpt;
+    }
 
-      let excerptIndex = 0;
-      async function loadExcerpt(serial = 0) {
-        const response = await PoetryRandomExcerpt({ index: excerptIndex++ });
-        const excerpt = response?.data || {};
-        const refs = [scArr1, scArr2, scArr3];
-        if (refs[serial]) refs[serial].value = excerpt;
-      }
-
-      async function skiip() {
-        try {
-          await Promise.all([loadExcerpt(0), loadExcerpt(1), loadExcerpt(2)]);
-        } catch (error) {
-          ElMessage({ message: "诗词加载失败，请稍后再试", type: "warning" });
-        }
-      }
-
-      // 点击收藏切换样式
-      let shouchang1 = ref(false), shouchang2 = ref(false), shouchang3 = ref(false)
-      // 点击收藏
-      function shouchang(value) {
-        switch (value) {
-          case 1:
-            shouchang1.value = !shouchang1.value
-            break;
-          case 2:
-            shouchang2.value = !shouchang2.value
-            break;
-          case 3:
-            shouchang3.value = !shouchang3.value
-            break;
-        }
-      }
-
-      // 诗词数组
-      let scArr1 = ref({}), scArr2 = ref({}), scArr3 = ref({})
-      // 点击切换诗词，动画效果播放控制
-      let anima1 = ref(false), anima2 = ref(false)
-      // 加载动画
-      let loding1 = ref(false),loding2 = ref(false),loding3 = ref(false)
-      async function switchExcerpts(direction) {
-        if (direction === 1) anima1.value = true;
-        else anima2.value = true;
-        loding1.value = true, loding2.value = true, loding3.value = true;
-        setTimeout(() => {
-          anima1.value = false;
-          anima2.value = false;
-        }, 700);
-        try {
-          await skiip();
-          ElMessage({ message: "切换成功！", type: "success" });
-        } finally {
-          loding1.value = false, loding2.value = false, loding3.value = false;
-        }
-      }
-
-      function skip1() { return switchExcerpts(1); }
-      function skip2() { return switchExcerpts(2); }
-
-      // 拖动开始事件
-      let tuox = 0  //记录拖动前元素的x轴坐标
-      let tuoy = 0  //记录拖动前元素的y轴坐标
-      function tuoDongGo(e) {
-        tuox = e.clientX
-        tuoy = e.clientY
-      }
-
-      // 拖动结束事件
-      let numX = 0  
-      let numY = 0
-      function tuoDongOff(e,serial) {
-        numX = e.clientX-tuox
-        numY = e.clientY-tuoy
-        if(numX>150||numY>150||numX<-150||numY<-150) {
-          switch(serial) {
-              case 1: loding1.value = true
-                      break
-              case 2: loding2.value = true
-                      break
-              case 3: loding3.value = true
-                      break
-            }
-          loadExcerpt(serial - 1).finally(() => {
-            if (serial === 1) loding1.value = false;
-            if (serial === 2) loding2.value = false;
-            if (serial === 3) loding3.value = false;
-          });
-        }
-      }
-
-      return {
-        shouchang, shouchang1, shouchang2, shouchang3,
-        scArr1, scArr2, scArr3,
-        anima1, anima2,
-        skip1, skip2,
-        loding1,loding2,loding3,
-        tuoDongGo,tuoDongOff,loadingSVG
+    async function skiip() {
+      try {
+        await Promise.all([loadExcerpt(0), loadExcerpt(1), loadExcerpt(2)]);
+      } catch {
+        ElMessage({ message: "诗词加载失败，请稍后再试", type: "warning" });
       }
     }
 
-  }
+    function toggleKeep(index) {
+      cards[index].kept = !cards[index].kept;
+    }
+
+    async function switchExcerpts() {
+      isTurning.value = true;
+      cards.forEach((card) => { card.loading = true; });
+      try {
+        await skiip();
+        ElMessage({ message: "已换一折", type: "success" });
+      } finally {
+        cards.forEach((card) => { card.loading = false; });
+        window.setTimeout(() => { isTurning.value = false; }, 420);
+      }
+    }
+
+    function skip1() { return switchExcerpts(); }
+    function skip2() { return switchExcerpts(); }
+
+    let tuox = 0;
+    let tuoy = 0;
+    function tuoDongGo(event) {
+      tuox = event.clientX;
+      tuoy = event.clientY;
+    }
+
+    function tuoDongOff(event, serial) {
+      const deltaX = event.clientX - tuox;
+      const deltaY = event.clientY - tuoy;
+      if (Math.abs(deltaX) > 120 || Math.abs(deltaY) > 120) {
+        cards[serial].loading = true;
+        loadExcerpt(serial).finally(() => { cards[serial].loading = false; });
+      }
+    }
+
+    onMounted(async () => {
+      await skiip();
+      cards.forEach((card) => { card.loading = false; });
+    });
+
+    return {
+      cards, isTurning, toggleKeep, skip1, skip2, tuoDongGo, tuoDongOff,
+    };
+  },
+};
 </script>
 
 <style scoped>
-  .elrow {
-    position: relative;
-    width: 100%;
-    margin: 0;
-    font-family: FangZhengSong;
-    font-weight: 600;
-  }
+.excursion {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 54px 42px 36px;
+}
 
-  .lottie {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 4;
-  }
+.leaf-head {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: 28px;
+  margin-bottom: 34px;
+}
 
-  .dox {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-around;
-  }
+.leaf-kicker {
+  margin: 0;
+  color: var(--seal);
+  font-size: 12px;
+  letter-spacing: 5px;
+}
 
-  section {
-    height: 86vh;
-    padding: 1rem 0 1rem 0;
-    position: relative;
-  }
+.leaf-head h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(34px, 4vw, 52px);
+  font-weight: 400;
+  letter-spacing: 16px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
 
-  section>.box {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    background-color: rgba(223, 223, 223, 0.1);
-    border-radius: 0.3rem;
-    border: 1px solid rgba(84, 84, 84, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 30%;
-    background-color: white;
-    position: relative;
-    /* 溢出隐藏 */
-    overflow: hidden;
-    /* 开启3D */
-    transform-style: preserve-3d;
-    /* 设置旋转元素的基点位置 */
-    transform-style: top center;
-    /* 设置过渡 */
-    transition: 0.45s ease-in-out;
-  }
+.leaf-note {
+  margin: 0;
+  justify-self: end;
+  max-width: 260px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.9;
+  text-align: right;
+}
 
-  .shouchang {
-    position: absolute;
-    top: -8px;
-    left: -32px;
-    width: 94px;
-    height: 44px;
-    font-size: 18px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    transform: rotateZ(-40deg);
-    cursor: pointer;
-    transition: 0.3s;
-  }
+.turn {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) 64px;
+  align-items: center;
+  gap: 12px;
+}
 
-  .shouchang-yes {
-    background-color: red;
-    color: white;
-  }
+.turn-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  height: 140px;
+  border: 0;
+  background: none;
+  color: var(--jade);
+}
 
-  .shouchang-no {
-    background-color: rgb(255, 255, 255);
-    color: rgb(195, 195, 195);
-  }
+.turn-btn span {
+  font-family: var(--font-display);
+  font-size: 46px;
+  line-height: 1;
+  transition: transform 0.25s ease;
+}
 
-  section>.box::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* 背景渐变(高光效果) */
-    background: linear-gradient(-226deg, rgba(225, 225, 225, 0) 40%,
-        rgba(255, 254, 182, 0.3) 40%, rgba(225, 225, 225, 0) 60%);
-    transform: translateY(-330px);
-  }
+.turn-btn em {
+  font-size: 11px;
+  font-style: normal;
+  letter-spacing: 3px;
+  writing-mode: vertical-rl;
+}
 
-  section>.box::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 120%;
-    /* 背景渐变(高光效果) */
-    background: linear-gradient(226deg, rgba(225, 225, 225, 0) 40%,
-        rgba(232, 232, 232, 0.3) 50%, rgba(225, 225, 225, 0) 60%);
-    /* 默认上移出可视范围 */
-    transform: translateY(-100%);
-    /* 设置过渡 */
-    transition: transform 0.85s cubic-bezier(0.165, 0.84, 0.44, 1);
-  }
+.turn-btn:hover span { transform: scale(1.18); }
+.turn-btn:last-child:hover span { transform: scale(1.18); }
 
-  section>.box:hover {
-    transform: rotateX(7deg) translateY(-6px);
-    box-shadow: 0 10px 10px rgba(120, 120, 120, 0.126);
-    transition: 0.45s ease-in-out;
-  }
+.concertina {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  min-height: 460px;
+  border-top: 1px solid var(--rule-strong);
+  border-bottom: 1px solid var(--rule-strong);
+  box-shadow: var(--shadow);
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
 
-  section>.box:hover::after {
-    transform: translateY(100%);
-  }
+.concertina.is-turning { transform: translateY(6px); opacity: 0.72; }
 
+.leaf {
+  position: relative;
+  min-width: 0;
+  border-right: 1px solid var(--rule);
+  background:
+    linear-gradient(90deg, rgba(38, 53, 47, 0.05), transparent 12%, transparent 88%, rgba(38, 53, 47, 0.06)),
+    var(--paper-light);
+}
 
-  section>.box>img {
-    width: 80%;
-    position: absolute;
-    bottom: 5%;
-  }
+.leaf:last-child { border-right: 0; }
+.leaf:nth-child(2) { background-color: #f2eee3; }
 
-  section>.box>p {
-    writing-mode: vertical-rl;
-    font-size: 20px;
-    height: 196px;
-    letter-spacing: 4px;
-    font-family: piaoYiSong;
-  }
+.leaf::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -1px;
+  width: 8px;
+  background: linear-gradient(90deg, transparent, rgba(38, 53, 47, 0.08));
+  pointer-events: none;
+}
 
-  section>.box>h5 {
-    writing-mode: vertical-rl;
-    font-size: 22px;
-    font-family: hongLei;
-  }
+.leaf-face {
+  position: relative;
+  height: 100%;
+  min-height: 460px;
+  padding: 34px 26px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
 
-  .chevron1 {
-    display: flex;
-    position: absolute;
-    top: 40%;
-    left: 4%;
-    cursor: pointer;
-    /* animation: xiangzuo 1s infinite alternate ease-in-out; */
-  }
+.leaf-index {
+  align-self: flex-start;
+  color: var(--jade);
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 3px;
+}
 
-  @keyframes xiangzuo {
-    from {
-      left: 4%;
-    }
-    to {
-      left: 2%;
-    }
-  }
+.seal {
+  position: absolute;
+  top: 28px;
+  right: 22px;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 2px solid var(--seal);
+  background: transparent;
+  color: var(--seal);
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 1px;
+  line-height: 1.1;
+  transition: background 0.2s ease, color 0.2s ease;
+}
 
-  .chevron2 {
-    display: flex;
-    position: absolute;
-    top: 40%;
-    right: 4%;
-    cursor: pointer;
-    /* animation: xiangyou 1s infinite alternate ease-in-out; */
-  }
+.seal.is-kept { background: var(--seal); color: var(--paper-light); }
 
-  @keyframes xiangyou {
-    from{
-      right: 4%;
-    }
-    to {
-      right: 2%;
-    }
-  }
+.verse {
+  margin: 48px 0 0;
+  height: 230px;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(22px, 2.1vw, 30px);
+  letter-spacing: 8px;
+  line-height: 1.9;
+  writing-mode: vertical-rl;
+}
 
-  .chevron>i {
-    font-size: 5rem;
-    color: #e6e6e6;
-    transition: 0.4s;
-  }
+.attribution {
+  margin: 26px 0 0;
+  color: var(--jade-deep);
+  font-size: 14px;
+  letter-spacing: 4px;
+  writing-mode: vertical-rl;
+}
 
-  .chevron>i:hover {
-    color: #b9dfd9;
-    transition: 0.3s;
-  }
+.origin {
+  margin: 12px 0 0;
+  color: var(--ink-soft);
+  font-size: 11px;
+  letter-spacing: 2px;
+}
 
-  /* 点击切换诗词随机诗词动画效果(左) */
-  .animationC {
-    animation: animationc 2s ease-in-out;
-    box-shadow: 8px 8px 8px rgba(120, 120, 120, 0.126);
-  }
+.landscape {
+  position: relative;
+  width: 100%;
+  height: 92px;
+  margin-top: auto;
+  overflow: hidden;
+}
 
-  @keyframes animationc {
-    0% {
-      transform: rotateY(0);
-    }
+.sun {
+  position: absolute;
+  left: 22%;
+  top: 14px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--seal);
+  opacity: 0.8;
+}
 
-    50% {
-      transform: rotateY(-45deg) skewY(-10deg);
-    }
+.ridge {
+  position: absolute;
+  bottom: 0;
+  width: 120%;
+  height: 54px;
+  border-radius: 50% 50% 0 0;
+}
 
-    100% {
-      transform: rotateY(0);
-    }
-  }
+.ridge-a { left: -18%; background: rgba(47, 93, 80, 0.13); height: 68px; }
+.ridge-b { left: 14%; background: rgba(47, 93, 80, 0.2); height: 50px; }
+.ridge-c { left: 52%; background: rgba(47, 93, 80, 0.12); height: 62px; }
 
-  /* 点击切换诗词随机诗词动画效果(右) */
-  .animationD {
-    animation: animationd 2s ease-in-out;
-    box-shadow: -8px 4px 8px rgba(120, 120, 120, 0.126);
-  }
+.boat {
+  position: absolute;
+  left: 46%;
+  bottom: 8px;
+  width: 18px;
+  height: 2px;
+  background: var(--ink);
+}
 
-  @keyframes animationd {
-    0% {
-      transform: rotateY(0);
-    }
+.boat::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: -7px;
+  width: 8px;
+  height: 7px;
+  border-left: 1px solid var(--ink);
+  transform: skewX(-18deg);
+}
 
-    50% {
-      transform: rotateY(45deg) skewY(10deg);
-    }
+.leaf-foot {
+  margin: 22px 0 0;
+  color: var(--ink-soft);
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-align: center;
+}
 
-    100% {
-      transform: rotateY(0);
-    }
-  }
+@media (max-width: 991px) {
+  .excursion { padding: 36px 18px 24px; }
+  .leaf-head { grid-template-columns: 1fr; gap: 6px; text-align: center; }
+  .leaf-kicker, .leaf-note { justify-self: center; text-align: center; }
+  .leaf-head h1 { letter-spacing: 8px; }
+  .turn { grid-template-columns: 38px minmax(0, 1fr) 38px; gap: 4px; }
+  .turn-btn { height: 96px; }
+  .turn-btn em { display: none; }
+  .concertina { grid-template-columns: 1fr; min-height: 0; }
+  .leaf { border-right: 0; border-bottom: 1px solid var(--rule); }
+  .leaf:last-child { border-bottom: 0; }
+  .leaf-face { min-height: 430px; padding-top: 24px; }
+  .verse { margin-top: 44px; height: 210px; }
+}
 </style>

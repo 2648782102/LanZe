@@ -3,8 +3,8 @@
   <section v-loading="loading" element-loading-text="登录中..." class="card">
     <el-form :model="form" :rules="rules" class="p-5" label-position="right">
       <div class="text-center mb-4">
-        <h1 style="color: rgb(53, 228, 170)">
-          兰泽诗词<i class="fas fa-feather-alt"></i>
+        <h1 class="login-title">
+          兰泽诗词<span>登录</span>
         </h1>
       </div>
       <el-form-item prop="user" label="账号">
@@ -175,23 +175,53 @@ import { ElMessage } from "element-plus/es/components/message/index.mjs";
 </script>
 
 <style scoped>
+  .login-title {
+    margin: 0;
+    color: var(--jade-deep);
+    font-family: var(--font-display);
+    font-size: 2rem;
+    letter-spacing: 8px;
+  }
+
+  .login-title span {
+    display: block;
+    margin-top: 4px;
+    color: var(--seal);
+    font-size: 0.7rem;
+    letter-spacing: 6px;
+  }
+
+  .card {
+    width: min(100%, 430px);
+    padding: 36px 34px;
+    border: 1px solid var(--rule);
+    background: var(--paper-light);
+    box-shadow: var(--shadow);
+  }
+
   .submit {
-    height: 40px;
     display: flex;
-    justify-content: space-around;
+    gap: 12px;
   }
 
   .submit>button {
-    border: 0;
-    background-color: white;
-    transition: 0.3s;
+    flex: 1;
+    height: 42px;
+    border: 1px solid var(--jade);
+    background: var(--jade);
+    color: var(--paper-light);
+    letter-spacing: 4px;
+    transition: 0.2s;
+  }
+
+  .submit>button:last-child {
+    background: transparent;
+    color: var(--jade);
   }
 
   .submit>button:hover {
-    border-bottom: 5px solid rgb(53, 228, 170);
-    border-radius: 10px;
-    box-shadow: 2px -2px 2px rgba(142, 144, 150, 0.1);
-    transition: 0.3s;
+    background: var(--jade-deep);
+    color: var(--paper-light);
   }
 
   .addData {
@@ -200,20 +230,19 @@ import { ElMessage } from "element-plus/es/components/message/index.mjs";
   }
 
   .yan-zheng {
-    width: 30%;
-    border: 0;
-    background-color: rgb(255, 255, 255);
-    border-radius: 0.2rem;
-    font-size: 0.8rem;
-    transition: 0.4s;
-    color: rgb(71, 31, 116);
-    box-shadow: 0.2rem 0.2rem 0.2rem #d9d9d9, -0.2rem -0.2rem 0.2rem #f5f5f5;
+    width: 100%;
+    height: 40px;
+    border: 1px solid var(--rule);
+    background: var(--paper-light);
+    border-radius: 0;
+    font-size: 0.9rem;
+    letter-spacing: 4px;
+    color: var(--jade);
+    transition: 0.2s;
   }
 
   .yan-zheng:hover {
-    border-radius: 0.3rem;
-    background: #ffffff;
-    box-shadow: none;
-    transition: 0.2s;
+    border-color: var(--jade);
+    background: rgba(47, 93, 80, 0.06);
   }
 </style>

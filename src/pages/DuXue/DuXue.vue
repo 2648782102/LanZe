@@ -54,12 +54,15 @@ export default {
   .carousel-image {
     width: 100%;
     height: 100%;
+    object-fit: cover;
+    filter: saturate(0.75) sepia(0.12);
   }
     .car>.el-carousel {
-      background-color: rgb(213, 217, 224);
-      border-radius: 0.3rem;
+      background-color: var(--paper-deep);
+      border: 1px solid var(--rule);
+      border-radius: 0;
     }
     .dox {
-      min-height: 100vh;
+      min-height: 62vh;
     }
 </style>

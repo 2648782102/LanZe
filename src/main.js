@@ -2,6 +2,8 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import '@fortawesome/fontawesome-free/css/all.min.css'
+import 'element-plus/theme-chalk/display.css'
+import './styles/lanze-pages.css'
 
 // 映入vuerouter
 import router from './router/index'

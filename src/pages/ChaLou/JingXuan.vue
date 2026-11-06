@@ -95,21 +95,24 @@ export default {
 ul {
   list-style-type: none;
   margin: 0;
-  padding: 0 1rem 0 1rem;
+  padding: 0 1.2rem;
 }
 li {
-  padding: 1rem 1rem 0 1rem;
-  border-radius: 0.4rem;
+  padding: 0.9rem 0.4rem;
+  border-bottom: 1px solid var(--rule);
+  border-radius: 0;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 li:hover {
-  background-color: rgba(240, 248, 255, 0.781);
+  background: rgba(47, 93, 80, 0.055);
 }
 .box-ul {
-  min-height: 100vh;
+  min-height: 62vh;
 }
 .sec-pag {
   display: flex;
   justify-content: center;
+  padding: 18px 0;
 }
 </style>
