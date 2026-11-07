@@ -221,3 +221,4 @@
 - 将当前版本统一为 `v0.4.0 · 离线馆藏与声景曲库`：重写 `RELEASE_NOTES.md`、`ANNOUNCEMENT.md`、`SOCIAL_POSTS.md`，同步 README、CHANGELOG、FAQ、开发文档、路线图与展示清单中的 39 项单测、9,350 篇离线馆藏、三段本地声景和默认离线边界；历史 v0.2.0 / v0.3.0 段落按当时事实保留。
 - `package.json` 与锁文件补充 Node `>=20` / npm `>=10`；CI Documentation checks 增加 engines 校验，发布 workflow 改为仅由 `v0.4.0` tag push 触发，Release 标题跟随当前版本，不覆盖历史 Release。
 - `docs/PROMOTION.md` 明确把 GitHub About 描述、社交预览、Pages、在线 Discussion #1、外部短帖与 v0.4.0 tag/Release 标为待实际写权限或线上回读核对；不把候选文案、文件哈希或 workflow success 误写成公开展示已完成。
+- 首次推送 `34d3912` 后 Browser E2E `42371313191` success；CI `42371313168` 的 Documentation checks 因「候选文案」四字命中过宽的发布措辞守卫而失败，Node 20/22 两个 build job 仍 success。现把守卫收窄到明确的「候选，待 tag/Release」等过期句式，避免把素材/About 候选文案误判为未发布 Release。
