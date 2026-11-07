@@ -40,7 +40,8 @@
 | `src/main.js` | 创建 Vue app，注册 Router 与 Cookie 插件 | 会话读取统一走 `src/composables/useSession.js` |
 | `src/App.vue` | 展馆壳层：页头、瓷面网格、页脚、移动端导航、音源与通知 | 登录/注册页使用 `bare` 路由元数据隐藏壳层 |
 | `src/router/index.js` | 六类主页面与旧 URL 重定向 | 无真实鉴权；旧路由只作兼容入口 |
-| `src/views/ReadView.vue` | 今日展厅：整首诗、余韵、收藏、换诗与朗读 | 词牌长题按视觉规则分行 |
+| `src/views/ReadView.vue` | 今日展厅：整首诗、三张余韵摘录卡、收藏、换诗与朗读 | 词牌长题按视觉规则分行；摘录收藏只存当前浏览器 |
+| `src/components/ExcerptCard.vue` | 摘录瓷笺：编号、诗句、作者、出处、单独收藏与笺注入口 | 复用当前 CSS token，不恢复旧 UI 套件 |
 | `src/views/ExploreView.vue` | 诗词索引：关键词、体裁、结果列表与空状态 | URL 查询同步搜索/筛选条件 |
 | `src/views/PoemView.vue` | 读诗详情：正文、笺注、相关诗目与操作 | 旧 `details` query 走 legacy 归一化 |
 | `src/views/CollectionView.vue` | 我的诗卷：收藏、最近阅读、本地作品与资料 | 数据只存当前浏览器 |

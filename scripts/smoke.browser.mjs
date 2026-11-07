@@ -146,6 +146,7 @@ const main = async () => {
         'lanze_demo_works',
         'lanze_demo_profile',
         'lanze_saved_poems',
+        'lanze_saved_excerpts',
         'lanze_recent_poems',
         'lanze_compose_draft',
       ]) {
@@ -186,6 +187,27 @@ const main = async () => {
   if (home.audioDocks !== 1) throw new Error("Expected one native local audio dock");
   if (!home.audioTitle.includes("兰泽 · 本地演示音")) throw new Error("Local demo audio was not selected");
   if (home.navCount !== 3) throw new Error("Primary navigation did not render");
+  const excerptCards = await evaluate(`(() => {
+    const cards = [...document.querySelectorAll('.excerpt-card')];
+    return {
+      count: cards.length,
+      firstVerse: cards[0]?.querySelector('.excerpt-card__verse')?.textContent?.trim() || '',
+      labels: cards.map((card) => card.querySelector('.excerpt-card__index')?.textContent?.trim()),
+      saveButtons: cards.filter((card) => card.querySelector('.excerpt-card__save')).length,
+      detailLinks: cards.filter((card) => card.querySelector('.excerpt-card__detail')).length,
+      pressedStates: cards.map((card) => card.querySelector('.excerpt-card__save')?.getAttribute('aria-pressed')),
+    };
+  })()`);
+  if (excerptCards.count !== 3 || excerptCards.saveButtons !== 3 || excerptCards.detailLinks !== 3) {
+    throw new Error("Three interactive excerpt cards did not render");
+  }
+  if (!excerptCards.firstVerse || excerptCards.labels.join("") !== "壹贰叁") {
+    throw new Error("Excerpt card content or sequence did not render");
+  }
+  if (excerptCards.pressedStates.some((state) => !["true", "false"].includes(state))) {
+    throw new Error("Excerpt card save controls are missing pressed state");
+  }
+  const firstExcerpt = excerptCards.firstVerse;
   const dockLayout = await evaluate(`(() => {
     const dock = document.querySelector('.audio-dock');
     if (!dock) return null;
@@ -214,6 +236,32 @@ const main = async () => {
   if (!scrolledDock || Math.abs(scrolledDock.bottom - dockLayout.bottom) > 1) {
     throw new Error("Audio dock did not stay pinned while scrolling");
   }
+  currentStep = "excerpt cards";
+  if (!await evaluate(`(() => {
+    const button = document.querySelector('.excerpt-card__save');
+    if (!button) return false;
+    button.click();
+    return true;
+  })()`)) throw new Error("Excerpt card save control was not found");
+  const savedExcerpt = await waitUntil("saved excerpt in local storage", () => evaluate(`(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('lanze_saved_excerpts') || '[]');
+      return Array.isArray(saved) && saved.length > 0 ? saved : null;
+    } catch {
+      return null;
+    }
+  })()`));
+  if (!savedExcerpt) throw new Error("Saving an excerpt did not persist locally");
+  if (!await evaluate(`(() => {
+    const button = [...document.querySelectorAll('button')].find((node) => (node.innerText || '').includes('换一组'));
+    if (!button) return false;
+    button.click();
+    return true;
+  })()`)) throw new Error("Excerpt rotation control was not found");
+  const rotatedExcerpts = await waitUntil("rotated excerpt cards", () => evaluate(
+    `document.querySelector('.excerpt-card__verse')?.textContent?.trim() !== ${JSON.stringify(firstExcerpt)}`,
+  ));
+  if (!rotatedExcerpts) throw new Error("Excerpt cards did not rotate");
   await evaluate("window.scrollTo({ top: 0, behavior: 'instant' })");
   await waitUntil("page scroll reset", () => evaluate("scrollY === 0"));
 

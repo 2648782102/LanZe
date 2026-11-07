@@ -74,19 +74,33 @@
         <article class="strip-intro">
           <p class="eyebrow">余韵 · 三则</p>
           <h2>读完一首，<br />让句子再走一段。</h2>
-          <p>摘录来自仓库内置示例。它们不假装是运营数据，只是此刻顺手翻到的三行。</p>
-          <router-link class="button" to="/explore">
-            进入诗词索引
-            <AppIcon name="arrow-right" :size="16" />
-          </router-link>
+          <p>三张瓷笺一页一句，可单独收藏在当前浏览器，也可换一组摘录。它们来自仓库内置示例，不假装是运营数据。</p>
+          <div class="strip-actions">
+            <router-link class="button" to="/explore">
+              进入诗词索引
+              <AppIcon name="arrow-right" :size="16" />
+            </router-link>
+            <button
+              class="button button--quiet"
+              type="button"
+              aria-label="换一组今日摘录"
+              @click="nextExcerpts"
+            >
+              <AppIcon name="chevron-right" :size="15" />
+              换一组
+            </button>
+          </div>
         </article>
-        <ol class="strip-list">
-          <li v-for="(excerpt, index) in excerpts" :key="excerpt.content">
-            <span>{{ String(index + 1).padStart(2, "0") }}</span>
-            <p>{{ excerpt.content }}</p>
-            <small>{{ excerpt.author }} · {{ excerpt.origin }}</small>
-          </li>
-        </ol>
+        <div class="excerpt-cards" aria-label="三张今日摘录卡片">
+          <ExcerptCard
+            v-for="(excerpt, index) in excerpts"
+            :key="excerpt.content"
+            :excerpt="excerpt"
+            :index="index"
+            :saved="excerptSaved.includes(excerpt.id)"
+            @toggle-save="toggleExcerptSave(excerpt)"
+          />
+        </div>
       </div>
     </section>
   </main>
@@ -95,7 +109,9 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import AppIcon from "../components/AppIcon.vue";
+import ExcerptCard from "../components/ExcerptCard.vue";
 import { demoExcerpts } from "../data/poems.js";
+import { readStore, writeStore } from "../services/browserStore.js";
 import { loadCatalog, useLibrary } from "../composables/useLibrary.js";
 import { notify } from "../composables/useNotices.js";
 import exhibitImage from "../assets/exhibit/songci300-768.jpg";
@@ -109,6 +125,9 @@ const dateLabel = new Intl.DateTimeFormat("zh-CN", {
 }).format(now);
 const dayIndex = Math.floor(Date.now() / 86400000);
 const page = ref(dayIndex % 10);
+const excerptPage = ref(Math.floor(dayIndex / 3));
+const storedExcerptSaves = readStore("lanze_saved_excerpts", []);
+const excerptSaved = ref(Array.isArray(storedExcerptSaves) ? storedExcerptSaves.map(String) : []);
 const isSwitching = ref(false);
 let switchTimer;
 
@@ -134,8 +153,20 @@ const titleParts = computed(() => {
 });
 const saved = computed(() => isSaved(poem.value.id));
 const excerpts = computed(() => {
-  const start = page.value % demoExcerpts.length;
-  return Array.from({ length: 3 }, (_, index) => demoExcerpts[(start + index) % demoExcerpts.length]);
+  const start = (excerptPage.value * 3) % demoExcerpts.length;
+  return Array.from({ length: 3 }, (_, index) => {
+    const source = demoExcerpts[(start + index) % demoExcerpts.length];
+    return {
+      ...source,
+      id: `excerpt-${(start + index) % demoExcerpts.length}`,
+      title: source.origin,
+      paragraph: source.content,
+      paragraphs: [source.content],
+      tags: [source.category, "摘录"],
+      type: "legacy",
+      titleNote: "本页只展示一句摘录，不替代完整底本。",
+    };
+  });
 });
 
 const nextPoem = () => {
@@ -149,10 +180,24 @@ const nextPoem = () => {
   }, reducedMotion ? 0 : 120);
 };
 
+const nextExcerpts = () => {
+  excerptPage.value += 1;
+};
+
 const toggleSave = () => {
   if (!poem.value.id) return;
   const added = toggleSaved(poem.value);
   notify(added ? "已收入你的诗卷" : "已从诗卷移除", added ? "success" : "info");
+};
+
+const toggleExcerptSave = (excerpt) => {
+  const added = !excerptSaved.value.includes(excerpt.id);
+  const next = added
+    ? [...excerptSaved.value, excerpt.id]
+    : excerptSaved.value.filter((id) => id !== excerpt.id);
+  excerptSaved.value = next;
+  writeStore("lanze_saved_excerpts", next);
+  notify(added ? "已收下这一句摘录" : "已取消这句摘录", added ? "success" : "info");
 };
 
 const speakPoem = () => {
@@ -486,6 +531,7 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
   z-index: 1;
   border-top: 1px solid var(--line);
   background: rgba(232, 236, 229, 0.56);
+  padding-bottom: 84px;
 }
 
 .strips-grid {
@@ -519,43 +565,19 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
   line-height: 1.9;
 }
 
-.strip-list {
+.strip-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+}
+
+.excerpt-cards {
   display: grid;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.strip-list li {
-  display: grid;
-  grid-template-columns: 44px 1fr auto;
-  align-items: baseline;
-  gap: 18px;
-  padding: 24px 0;
-  border-bottom: 1px solid var(--line);
-}
-
-.strip-list li:first-child {
-  padding-top: 4px;
-}
-
-.strip-list li > span {
-  color: var(--brass);
-  font-family: var(--font-number);
-  font-size: 11px;
-}
-
-.strip-list p {
-  margin: 0;
-  font-family: var(--font-poem);
-  font-size: 19px;
-  letter-spacing: 0.06em;
-}
-
-.strip-list small {
-  color: var(--ink-faint);
-  font-size: 10px;
-  white-space: nowrap;
+  min-width: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  align-items: stretch;
 }
 
 @media (max-width: 1000px) {
@@ -620,7 +642,19 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
   .strips-grid {
     grid-template-columns: 1fr;
     gap: 44px;
-    padding-block: 58px 66px;
+    padding-block: 58px 46px;
+  }
+
+  .strip-intro {
+    max-width: 560px;
+  }
+
+  .excerpt-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .excerpt-cards > :last-child {
+    grid-column: 1 / -1;
   }
 }
 
@@ -667,13 +701,12 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
     grid-column: 1 / -1;
   }
 
-  .strip-list li {
-    grid-template-columns: 30px 1fr;
-    gap: 8px 12px;
+  .excerpt-cards {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .strip-list small {
-    grid-column: 2;
+  .excerpt-cards > :last-child {
+    grid-column: auto;
   }
 }
 </style>
