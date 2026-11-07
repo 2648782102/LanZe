@@ -6,7 +6,7 @@
 | --- | --- |
 | Node.js | 20 或 22（与 `.github/workflows/ci.yml` 一致） |
 | npm | 随 Node 分发；仓库使用 `package-lock.json` |
-| 浏览器 | 最新版 Chrome / Edge / Firefox / Safari 之一 |
+| 浏览器 | 日常开发：最新版 Chrome / Edge / Firefox / Safari 之一；浏览器冒烟：Chrome / Chromium |
 | 编辑器 | 任意；建议启用 Vue / ESLint / EditorConfig 相关插件 |
 | 端口 | `vite.config.js` 默认 `127.0.0.1:5173`；被占用时 Vite 自动换端口 |
 
@@ -38,7 +38,7 @@ npm run test                 # 27 个 node --test 单测
 npm run lint                 # 静态扫描失效后端地址、硬编码服务与脆弱引用
 npm run preview              # 预览构建产物
 npm run smoke                # 启动预览服务并检查首页与入口静态资源
-npm run smoke:browser        # 可选：本机 Chrome 桌面/窄屏与登录发布冒烟，需 macOS/Chrome
+npm run smoke:browser        # Chrome / Chromium 桌面、窄屏、登录与发布冒烟
 ```
 
 CI 的等价步骤是：
@@ -49,11 +49,12 @@ npm run build
 npm run test
 npm run lint
 npm run smoke
+npm run smoke:browser
 ```
 
-`npm run smoke:browser` 使用临时 Chrome profile 与 CDP，在 1280×800 和 390×844 下验证今日展厅、单张历史摘录卡及竖排/扇舟图/收藏/换句、本地诗目收藏与音源、桌面/窄屏搜索、窄屏导航，再完成演示登录、作品发布与诗卷回读；脚本要求控制台错误、未捕获异常、失败请求为 0，并统计非用户输入引起的 CLS（预算 0.05），结束后清理临时 Cookie 和 `localStorage` 演示数据。它仍是本机可选检查，不进入 CI 矩阵，不覆盖真实后端、跨浏览器、视觉截图或正式 E2E 套件。若 Chrome 路径或端口不同，可用 `CHROME_PATH`、`BROWSER_SMOKE_PORT`、`BROWSER_SMOKE_DEBUG_PORT` 覆盖。
+`npm run smoke:browser` 使用临时 Chrome / Chromium profile 与 CDP，在 1280×800 和 390×844 下验证今日展厅、单张历史摘录卡及竖排/扇舟图/收藏/换句、本地诗目收藏与吸底音源、桌面/窄屏搜索、窄屏导航，再完成演示登录、作品发布与诗卷回读；脚本要求控制台错误、未捕获异常、意外失败请求为 0，并统计非用户输入引起的 CLS（预算 0.05），结束后清理临时 Cookie 和 `localStorage` 演示数据。独立的 `.github/workflows/browser-e2e.yml` 在 Ubuntu 用 `browser-actions/setup-chrome@v2` 安装 Chromium，并通过 action 的 `chrome-path` 输出设置 `CHROME_PATH` 后运行同一脚本。本机也可用 `CHROME_PATH`、`BROWSER_SMOKE_PORT`、`BROWSER_SMOKE_DEBUG_PORT` 覆盖；脚本仍不覆盖真实后端、跨浏览器矩阵或视觉截图回归。
 
-CI 的 Node 20/22 build job 使用 `npm run test --if-present` 以兼容外部旧流程，Documentation checks job 执行 `npm run lint`；本地开发建议直接运行 `npm run test` 和 `npm run lint`。
+CI 的 Node 20/22 build job 使用 `npm run test --if-present` 以兼容外部旧流程，Documentation checks job 执行 `npm run lint`；Browser E2E job 执行构建与 `npm run smoke:browser`。本地开发建议直接运行上述全部命令。
 
 ## 4. 配置与 `.env`
 
@@ -103,7 +104,7 @@ VITE_USE_MOCK=true
 
 ### 方案 C：可选自定义音源
 
-播放器默认只加载仓库内 WAV / SVG 演示资源，界面只使用自有 CSS/SVG 图标。只有设置 `VITE_AUDIO_SOURCE=custom` 并提供有效 `VITE_AUDIO_TRACKS` JSON 时才会启用自定义音源，其可用性、速率限制、内容授权与隐私政策由配置者负责。无效 JSON 或空列表自动回退到本地演示音，并显示一次可读提示；CI 不依赖第三方站点返回成功。自定义音源 URL 本身不可达时的播放器行为仍可作为后续贡献入口。逐项记录见 `docs/THIRD_PARTY_ASSETS.md`。
+播放器默认只加载仓库内 WAV / SVG 演示资源，界面只使用自有 CSS/SVG 图标。只有设置 `VITE_AUDIO_SOURCE=custom` 并提供有效 `VITE_AUDIO_TRACKS` JSON 时才会启用自定义音源，其可用性、速率限制、内容授权与隐私政策由配置者负责。无效 JSON 或空列表自动回退到本地演示音并显示一次可读提示；URL 不可达或播放失败时，播放器显示「音源不可达」状态，点击播放按钮会重新加载并重试，业务页面保持可用。CI 不依赖第三方站点返回成功。逐项记录见 `docs/THIRD_PARTY_ASSETS.md`。
 
 ## 6. 开发约定
 
@@ -126,7 +127,7 @@ VITE_USE_MOCK=true
 - [ ] `npm run dev` 启动；浏览器控制台无新增 `Uncaught` / 404 静态资源错误。
 - [ ] `npm run build`、`npm run test`、`npm run lint` 成功。
 - [ ] 修改构建配置后，`npm run smoke` 成功。
-- [ ] 条件允许时，修改首页/摘录卡片/导航/播放器/登录/发布链路后 `npm run smoke:browser` 成功。
+- [ ] 修改首页/摘录卡片/导航/播放器/登录/发布链路/路由后 `npm run smoke:browser` 成功。
 - [ ] `dist/` 未被提交；`.env*` 未出现在 diff 中。
 
 ### 页面路径
@@ -156,6 +157,7 @@ VITE_USE_MOCK=true
 | 摘录为空或来源不对 | 检查 `VITE_POETRY_SOURCE`、`VITE_POETRY_SOURCE_URL`、超时与页面来源状态；失败会自动回退内置摘录 |
 | GitHub Pages 子路径资源 404 | 检查 `base: './'` 与发布目录；hash 路由本身不需要 rewrite |
 | `npm run test` 失败 | 查看 `node --test` 输出；CI 使用 `npm run test --if-present` 兜底 |
+| `npm run smoke:browser` 找不到浏览器 | 安装 Chrome / Chromium，或用 `CHROME_PATH` 指向可执行文件；CI 使用 setup-chrome action 的输出 |
 | Vite 配置因模块类型报错 | `vite.config.js` 使用 ESM 导出，与 `"type": "module"` 一致；CI 只跑 npm 脚本 |
 
 ## 9. 提交前检查
@@ -166,6 +168,8 @@ git diff --check
 npm run build
 npm run test
 npm run lint
+npm run smoke
+npm run smoke:browser
 ```
 
 同时阅读 `CONTRIBUTING.md`、`CHANGELOG.md` 与 `docs/DEPLOYMENT.md`（若改动影响构建/部署）。跨 `package*.json`、`vite.config.js`、`index.html`、`src/**` 与文档的改动，请在 PR 中说明验证范围和同步结果。

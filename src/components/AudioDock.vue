@@ -1,5 +1,9 @@
 <template>
-  <aside class="audio-dock" :class="{ 'is-collapsed': isCollapsed }" aria-label="兰泽本地播放器">
+  <aside
+    class="audio-dock"
+    :class="{ 'is-collapsed': isCollapsed, 'is-error': hasError }"
+    aria-label="兰泽本地播放器"
+  >
     <button
       class="audio-dock__handle"
       type="button"
@@ -14,7 +18,8 @@
       :src="track.url"
       preload="none"
       @timeupdate="syncProgress"
-      @loadedmetadata="syncProgress"
+      @loadedmetadata="handleReady"
+      @canplay="handleReady"
       @ended="isPlaying = false"
       @error="handleError"
       @pause="isPlaying = false"
@@ -23,7 +28,7 @@
     <button
       class="audio-dock__toggle"
       type="button"
-      :aria-label="isPlaying ? '暂停本地演示音' : '播放本地演示音'"
+      :aria-label="isPlaying ? '暂停音源' : hasError ? '重试音源' : '播放音源'"
       @click="toggle"
     >
       <AppIcon :name="isPlaying ? 'pause' : 'play'" :size="17" />
@@ -35,7 +40,7 @@
         <span :style="{ width: `${progress}%` }" />
       </div>
     </div>
-    <span class="audio-dock__state">{{ isPlaying ? "播放中" : "试听" }}</span>
+    <span class="audio-dock__state" role="status" aria-live="polite">{{ stateLabel }}</span>
   </aside>
 </template>
 
@@ -49,10 +54,15 @@ const audioRef = ref();
 const isPlaying = ref(false);
 const progress = ref(0);
 const isCollapsed = ref(false);
+const hasError = ref(false);
 const track = computed(() => audioConfig.tracks[0] || {
   name: "没有可用音轨",
   artist: "兰泽",
   url: "",
+});
+const stateLabel = computed(() => {
+  if (hasError.value) return "音源不可达";
+  return isPlaying.value ? "播放中" : "试听";
 });
 
 const syncProgress = () => {
@@ -64,17 +74,26 @@ const syncProgress = () => {
   progress.value = Math.min(100, (audio.currentTime / audio.duration) * 100);
 };
 
+const handleReady = () => {
+  hasError.value = false;
+  syncProgress();
+};
+
 const toggle = async () => {
   const audio = audioRef.value;
   if (!audio?.src) {
-    notify("没有可用的本地音源", "warning");
+    notify("没有可用音源，请检查配置或改用仓库内的本地演示音。", "warning");
     return;
   }
   if (audio.paused) {
+    const retry = hasError.value;
+    hasError.value = false;
     try {
+      if (retry) audio.load();
       await audio.play();
     } catch {
-      notify("浏览器没有开始播放本地演示音，请稍后再试", "warning");
+      hasError.value = true;
+      notify("浏览器没有开始播放音源，请检查地址、格式或稍后重试。", "warning");
     }
   } else {
     audio.pause();
@@ -84,6 +103,7 @@ const toggle = async () => {
 const handleError = () => {
   isPlaying.value = false;
   progress.value = 0;
+  hasError.value = true;
   notify("音源无法加载。请检查自定义音轨地址，或改用仓库内的本地演示音。", "warning", 5200);
 };
 
@@ -197,6 +217,14 @@ onBeforeUnmount(() => {
   color: rgba(251, 252, 249, 0.5);
   font-size: 9px;
   letter-spacing: 0.1em;
+}
+
+.audio-dock.is-error {
+  border-color: rgba(214, 132, 115, 0.55);
+}
+
+.audio-dock.is-error .audio-dock__state {
+  color: #e2aca0;
 }
 
 audio {

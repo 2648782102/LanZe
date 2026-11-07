@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { mkdtemp } from "node:fs/promises";
+import { access, mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
@@ -8,8 +8,14 @@ import { POETRY_SOURCE_URL } from "../src/config/poetrySource.constants.js";
 
 const port = Number(process.env.BROWSER_SMOKE_PORT || 4188);
 const debugPort = Number(process.env.BROWSER_SMOKE_DEBUG_PORT || 9223);
-const chromePath = process.env.CHROME_PATH
-  || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+const chromeCandidates = [
+  process.env.CHROME_PATH,
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "/usr/bin/google-chrome",
+  "/usr/bin/google-chrome-stable",
+  "/usr/bin/chromium",
+  "/usr/bin/chromium-browser",
+].filter(Boolean);
 const origin = `http://127.0.0.1:${port}`;
 const poetrySourceUrl = process.env.VITE_POETRY_SOURCE_URL || POETRY_SOURCE_URL;
 const processes = [];
@@ -31,6 +37,18 @@ const stopAll = () => {
   }
 };
 process.on("exit", stopAll);
+
+const resolveChromePath = async () => {
+  for (const candidate of chromeCandidates) {
+    try {
+      await access(candidate);
+      return candidate;
+    } catch {
+      continue;
+    }
+  }
+  throw new Error(`Chrome or Chromium was not found; set CHROME_PATH. Candidates: ${chromeCandidates.join(", ")}`);
+};
 
 const waitFor = async (url) => {
   for (let attempt = 0; attempt < 60; attempt += 1) {
@@ -54,6 +72,7 @@ const waitUntil = async (label, check, attempts = 32) => {
 };
 
 const main = async () => {
+  const chromePath = await resolveChromePath();
   const profile = await mkdtemp(join(tmpdir(), "lanze-browser-smoke-"));
   const preview = spawn(
     process.execPath,
@@ -63,6 +82,7 @@ const main = async () => {
   processes.push(preview);
   const chrome = spawn(chromePath, [
     "--headless=new",
+    "--no-sandbox",
     "--disable-gpu",
     "--no-first-run",
     "--no-default-browser-check",
@@ -235,11 +255,16 @@ const main = async () => {
     text: document.querySelector('#app')?.innerText || '',
     audioDocks: document.querySelectorAll('.audio-dock').length,
     audioTitle: document.querySelector('.audio-dock__title')?.textContent?.trim() || '',
+    audioState: document.querySelector('.audio-dock__state')?.textContent?.trim() || '',
+    audioStateRole: document.querySelector('.audio-dock__state')?.getAttribute('role') || '',
     navCount: document.querySelectorAll('.main-nav a').length,
   }))()`);
   if (!home.text.includes("余韵 · 一则")) throw new Error("Today's reading page did not render");
   if (home.audioDocks !== 1) throw new Error("Expected one native local audio dock");
   if (!home.audioTitle.includes("兰泽 · 本地演示音")) throw new Error("Local demo audio was not selected");
+  if (home.audioStateRole !== "status" || !["试听", "播放中"].includes(home.audioState)) {
+    throw new Error("Audio dock status is missing or reports an unexpected initial state");
+  }
   if (home.navCount !== 3) throw new Error("Primary navigation did not render");
   const excerptCards = await evaluate(`(() => {
     const cards = [...document.querySelectorAll('.legacy-card')];

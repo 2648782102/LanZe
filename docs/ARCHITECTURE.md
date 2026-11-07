@@ -26,7 +26,7 @@
 
 构建与治理（不在浏览器运行时内）
   ├── npm ci / npm run build / npm run test / npm run lint
-  ├── GitHub Actions: .github/workflows/ci.yml
+  ├── GitHub Actions: ci.yml、browser-e2e.yml、publish.yml
   └── GitHub Pages: .github/workflows/pages.yml（手动触发，产物 artifact）
 ```
 
@@ -47,7 +47,7 @@
 | `src/views/CollectionView.vue` | 我的诗卷：收藏、最近阅读、本地作品与资料 | 数据只存当前浏览器 |
 | `src/views/ComposeView.vue` | 写作台：草稿、实时预览与本地发布 | 未登录时重定向到登录 |
 | `src/views/AuthView.vue` | 登录与注册 | 表单校验、演示账号与本地会话 |
-| `src/components/AudioDock.vue` | 原生音频播放器 | 默认音源来自 `public/media/`；无效自定义配置显示回退提示 |
+| `src/components/AudioDock.vue` | 原生音频播放器 | 默认音源来自 `public/media/`；无效自定义配置显示回退提示，不可达 URL 显示状态并允许重试 |
 | `src/apis/request.js` | Axios + 本地演示数据双通道请求函数 | 远端返回无效数据时自动降级并提示一次 |
 | `src/services/poetrySource.js` | 首页历史摘录卡的独立诗句源适配器 | 默认请求公开随机诗句接口；失败或超时回退内置摘录，并显示来源状态 |
 | `src/apis/env.js` | 从 `src/config/runtime.js` 导出 `baseUrl` 与运行配置 | 不再硬编码后端地址 |
@@ -75,7 +75,7 @@
 
 ### 4.4 通知与音源
 
-`useNotices` 提供统一的成功、提示与错误反馈；`src/apis/request.js` 的远端降级提示也复用该通道。`AudioDock` 使用原生 `<audio>` 加载本地演示音，并在无效自定义配置时给出回退提示。
+`useNotices` 提供统一的成功、提示与错误反馈；`src/apis/request.js` 的远端降级提示也复用该通道。`AudioDock` 使用原生 `<audio>` 加载本地演示音，无效自定义配置时给出回退提示，音源不可达时显示可复核状态并允许重试。
 
 ### 4.5 登录/个人中心
 

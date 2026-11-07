@@ -1,17 +1,16 @@
-name: Publish v0.2.0
+name: Publish v0.3.0
 
 on:
   push:
     tags:
-      - "v0.2.0"
-  workflow_dispatch:
+      - "v0.3.0"
 
 permissions:
   contents: write
   discussions: write
 
 concurrency:
-  group: publish-v0.2.0
+  group: publish-v0.3.0
   cancel-in-progress: false
 
 jobs:
@@ -23,13 +22,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.ref }}
 
       - name: Create or update GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG_NAME: v0.2.0
-          RELEASE_TITLE: 兰泽诗词 v0.2.0 · 本地可运行的开源前端
+          TAG_NAME: ${{ github.ref_name }}
+          RELEASE_TITLE: 兰泽诗词 ${{ github.ref_name }} · 青瓷数字诗馆
         shell: bash
         run: |
           if gh release view "$TAG_NAME" >/dev/null 2>&1; then

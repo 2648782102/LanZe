@@ -2,7 +2,15 @@
 
 本文件按「待发布 → 历史里程碑」组织，历史部分依据仓库 `git log` 归纳，并非逐条完整提交记录。历史基线停在 42 次提交，首个提交为 `74b4186`（2022-06-03），最后一段历史基线提交为 `b4ea7f4`（2024-08-18）；v0.2.0 之前没有 Git tag 或已发布 Release。历史提交信息中的 `1.0`、`1.1`、`2.0.0` 是开发标记，不代表本仓库存在对应正式发行版。
 
-## [Unreleased]
+## [v0.3.0] — 2026-11-07（候选，待 tag / Release）
+
+> 本段汇总 `v0.2.0` 之后合并到 `main` 的视图重构、体验完善与工程验证；发布前以 CI、Browser E2E 与本地验证为准。`v0.2.0` 仍是独立历史 Release。
+
+### Added — CI Browser E2E 与音源错误态
+
+- 新增 `.github/workflows/browser-e2e.yml`：在 Ubuntu / Node 22 安装 Chromium，通过 `browser-actions/setup-chrome@v2` 的 `chrome-path` 输出设置 `CHROME_PATH`，构建后执行 `npm run smoke:browser`；Documentation checks 同步把该文件列为必检 workflow。
+- `scripts/smoke.browser.mjs` 支持 `CHROME_PATH`、Linux Chromium 常见路径和 `--no-sandbox`，并断言吸底播放器状态的 `role="status"` 与初始文案；同一脚本保留桌面/窄屏、诗句源拦截、收藏、登录、发布、控制台/网络错误与 CLS 预算检查。
+- `src/components/AudioDock.vue` 为不可达自定义音源或播放失败增加「音源不可达」状态、错误描边和重试入口；加载成功后自动恢复状态，不阻断业务页面。
 
 ### Changed — 青瓷数字诗馆：完全重构
 
@@ -23,6 +31,20 @@
 - 修复首页摘录卡只读固定 `demoExcerpts`、换句几乎不变且不走任何诗句源的问题：新增可配置的 `src/services/poetrySource.js`，默认请求历史同款随机古诗词接口，记录来源状态；超时、失败、空数据、重复诗句或显式 `VITE_POETRY_SOURCE=false` 时回退内置摘录并提示。摘录收藏按内容持久化，浏览器冒烟拦截诗句源并验证异步收敛、换句与来源状态；CI/构建/单测仍不依赖外部网络。
 - 细化历史摘录卡视觉：保持白卡比例、单卡构图、竖排诗句与水墨扇舟图不变，为长诗句增加分级字号和字距，收敛旋转角标的裁切感、悬浮高光与整块亮红收藏态，并补上键盘焦点、低饱和朱砂收藏态和减少动效规则。
 - 按截图复核继续增加历史摘录卡左右内边距：诗句右缘与扇舟图右缘都向卡内收，浏览器冒烟增加右侧留白下限断言，避免长诗句重新贴边。
+
+### Changed — 文档、发布素材与素材证据
+
+- README、贡献/安全政策、架构/开发/部署/FAQ/路线图/素材清单同步为当前 27 项单测、自有组件、可配置诗句源、CI Browser E2E、不可达音源状态与 v0.3.0 候选；不把候选写成已发布 Release或已验证线上 Demo。
+- `RELEASE_NOTES.md`、`ANNOUNCEMENT.md`、`SOCIAL_POSTS.md` 重写为当前设计、验证边界和后续贡献入口；`SOCIAL_POSTS.md` 仍是草稿，不自动群发，不含增长数字或付费推广。
+- `.github/workflows/publish.yml` 改由 `v0.3.0` tag / `workflow_dispatch` 触发，Release 标题与 checkout ref 跟随真实 tag；不覆盖 `v0.2.0` 历史 Release。
+- `docs/THIRD_PARTY_ASSETS.md` 补当前 WOFF2 子集、压缩展品图、摘录卡字体/图片、自制媒体、展示图与 favicon 的 SHA-256；明确哈希只是身份证据，授权仍未核验。
+
+### Known limitations
+
+- 当前不提供经维护者验证的线上 Demo、托管后端或账号服务；默认演示状态只保存在当前浏览器。
+- CI Browser E2E 只覆盖 Chromium 关键链路；跨浏览器矩阵、视觉截图回归、真实后端契约与完整无障碍审计仍是后续事项。
+- 历史字体、图片、favicon、诗词文本与首页第三方诗句源的来源/授权仍需逐项核验；MIT 不自动覆盖第三方素材。
+- GitHub 展示中的失效 homepage、未启用 Pages、社交预览与在线欢迎帖正文仍需按实际写权限核对，不在仓库文档里伪造完成状态。
 
 ## [v0.2.0] — 2026-11-06
 

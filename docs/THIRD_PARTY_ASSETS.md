@@ -9,7 +9,7 @@ rg -n 'https?://' index.html src --glob '!src/config/*.test.js'
 find src/assets public -type f -print
 ```
 
-构建、单测与静态冒烟不依赖这些外部站点：`npm ci && npm run build && npm run test && npm run lint && npm run smoke`；可选浏览器冒烟通过 CDP 拦截诗句源请求并注入固定响应，仍会检查其它运行时网络错误。
+构建、单测、静态冒烟与 CI Browser E2E 不依赖这些外部站点：CI 运行 `npm ci && npm run build && npm run test && npm run lint && npm run smoke`，Browser E2E 执行 `npm run smoke:browser`；浏览器冒烟通过 CDP 拦截诗句源请求并注入固定响应，仍会检查其它运行时网络错误。
 
 ## 仓库内二进制与数据素材
 
@@ -32,7 +32,7 @@ find src/assets public -type f -print
 | --- | --- | --- | --- | --- |
 | 运行时依赖 | `package.json` / `package-lock.json` | Vue、Vue Router、Axios、Vue Cookies、Supabase JS 与 Vite 工具链 | 当前不再引入 Bootstrap、Font Awesome、Element Plus、Lottie、APlayer 或滑块验证码；npm 包各自许可见 lock 元数据 | 升级时再次核对依赖许可与构建产物中的版权说明 |
 | 默认演示音源与封面 | `public/media/lanze-demo.wav`、`public/media/lanze-demo-cover.svg` | 2026-11-06 由本仓库脚本生成的合成 PCM 音与原创 SVG | 由仓库贡献者提供；不引入第三方录音或美术素材 | 保持默认离线可用；如替换仍需记录生成方式与权利来源 |
-| 可选自定义音源 | `src/config/audio.js`、`VITE_AUDIO_TRACKS` | 部署者显式提供的音轨 URL / 封面 URL | 默认不含任何第三方媒体域；启用后版权、热链与隐私政策由配置者负责 | 仅在授权明确时设置 `VITE_AUDIO_SOURCE=custom`，无效配置自动回退到本地演示音并显示提示 |
+| 可选自定义音源 | `src/config/audio.js`、`src/components/AudioDock.vue`、`VITE_AUDIO_TRACKS` | 部署者显式提供的音轨 URL / 封面 URL | 默认不含任何第三方媒体域；启用后版权、热链与隐私政策由配置者负责 | 仅在授权明确时设置 `VITE_AUDIO_SOURCE=custom`；无效配置自动回退并显示提示，不可达 URL 显示状态并允许重试 |
 | 首页诗句源 | `src/services/poetrySource.js`、`VITE_POETRY_SOURCE_URL` | 默认 `https://v1.jinrishici.com/all.json`，对应历史首页使用的公开随机诗句接口；请求带缓存破坏参数，重复结果回退内置摘录 | 第三方服务不随仓库托管，授权与稳定性未核验；不承诺 SLA | 可通过 `VITE_POETRY_SOURCE=false` 完全关闭，或换成自建兼容接口；公开部署前核查服务条款与内容授权 |
 | 徽章 | `README.md` | `img.shields.io`、GitHub Actions badge | 文档展示外链；不参与运行时核心功能 | 可保留，但离线文档不应依赖其加载 |
 | 文档链接 | 全仓库 | GitHub、Vue、Vite 等官方/项目链接 | 属说明性链接 | 定期检查失效链接，不把其承诺视为本项目能力 |
@@ -41,6 +41,24 @@ find src/assets public -type f -print
 
 `LICENSE` 覆盖本仓库贡献者提供的代码、文档与自绘 SVG。它不自动覆盖历史第三方字体、图片、诗词文本、已移除动画的旧来源或 CDN 脚本，也不代表这些服务运营方为本仓库背书。二次发布、商用或打包离线分发前，应逐项补齐来源、许可、署名与替换记录；无法确认的材料默认替换或移除。
 
+## 当前二进制 SHA-256
+
+以下哈希记录当前工作树文件的字节身份，便于素材替换、审计与回归核对；哈希不是许可证明，也不改变上表的「授权未核验」状态。
+
+| 文件 | SHA-256 |
+| --- | --- |
+| `src/assets/fonts/LanZeSong-subset.woff2` | `dfb124c02a09fe03bcd0f8d4d3125c50637758b716a7b81b9f0eb00516e6acd8` |
+| `src/assets/exhibit/auth-cover-960.jpg` | `a865b2b2efc4d0bffc279f32b6d1ea9caa2d6b92d244a1b62b0cbb71414d0709` |
+| `src/assets/exhibit/songci300-768.jpg` | `842d925768d917352d63b21b9b30a6764c33998148361d0a2a25ced84a793588` |
+| `src/assets/excerpt/fanzou-720.png` | `4263cece79f59c55b7287151ff718638221e74056d15e8c49aca1adb5a4d9316` |
+| `src/assets/excerpt/hongLei-excerpt.woff2` | `a79c5335d19afac98f4f2caae7e7b9c2ec38f70b2965dd5978c053c7a75fbe21` |
+| `src/assets/excerpt/piaoYiSong-excerpt.woff2` | `f12990c619ed3431193fa804dc6f703bf1a648526cdb3760bf2f306a8a4cbb39` |
+| `public/media/lanze-demo-cover.svg` | `ed5c4969d2781040df0bcf6efe855eb1cf00cb42c8afa132a40ac8fa353557da` |
+| `public/media/lanze-demo.wav` | `acb0dd40b18b94cc6431d5b42b0cd2c72ae77a1f8757983e3bf85b8aa66c200d` |
+| `public/og-image.png` | `34acbf01d0fbc94a5db478dcc99c7358921eaac5c413f0dbb8151b0349bfce4c` |
+| `public/og-image.svg` | `f3f1d2dc1af474ed3af7d2c513e6c688b296386da285f3c28d1551a870eeda04` |
+| `public/favicon.ico` | `44a67fa9fa240e75a263991a80936224e047603dd7a0b7189813b4938218fe0a` |
+
 ## 待办
 
 - [ ] 为每类素材补「来源 URL / 作者 / License / 下载日期 / 文件哈希 / 是否允许再分发」字段。
@@ -48,5 +66,5 @@ find src/assets public -type f -print
 - [ ] 核查今日展厅与登录封面压缩图对应的历史原图来源、许可与美术权利；无法确认时替换。
 - [x] 已从当前工作树移除未被源码引用的历史字体、图片与头像文件；原始文件仍可由 Git 历史追溯。
 - [x] 默认音乐演示已提供离线、仓库自制的音源与封面；无效配置已有回退提示。
-- [ ] 继续补自定义音源 URL 不可达时的播放器状态。
+- [x] 自定义音源 URL 不可达时，播放器显示可读状态并允许重试，不影响业务页面。
 - [ ] 核查首页诗句源的服务条款、内容版权与公开部署隐私边界；无法确认时使用 `VITE_POETRY_SOURCE=false` 或自建兼容接口。
