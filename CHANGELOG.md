@@ -9,6 +9,12 @@
 ### Added
 
 - 本次保存补齐 `v0.4.0` 发布与展示文案、Node/npm `engines` 约束及发布 workflow；发布前用 `npm ci` 重建依赖并复核全部质量门。
+- GitHub Pages 静态预览已启用并回读：手动 workflow `42376966164` 以 `6251b0d` 构建并部署成功，项目站点首页、入口 JS/CSS、馆藏清单与音频清单均返回 200；仓库 Website 已改为同一 Pages URL。
+
+### Changed
+
+- GitHub About 描述已由 27 项单测旧口径更新为 v0.4.0 当前事实：39 项单测、9,350 篇离线馆藏、三段本地声景；Website 不再使用未核验归属的 Vercel 地址。展示、部署、路线图、FAQ 与 README 同步为「已验证静态预览，不承诺托管后端或完整线上 Demo」。
+- 已发布 `v0.4.0` Release 正文按发布时快照保留；后续展示状态以 GitHub 页面/公开 API、维护日志和本文件为准，避免把版本说明改写成持续更新的展示看板。
 
 ## [v0.4.0] — 2026-11-07（当前版本）
 
@@ -25,7 +31,7 @@
 
 ### Changed
 
-- GitHub topics 已移除无关的 `element-plus` 并补上 `static-site`、`design-system`、`github-actions`；公开 API 回读显示 About 描述仍为 27 项单测旧口径、Website 字段为可访问但未核验归属的 Vercel 地址，仓库文案不把它们写成已完成展示。
+- GitHub topics 已移除无关的 `element-plus` 并补上 `static-site`、`design-system`、`github-actions`；发布时公开 API 回读显示 About 描述仍为 27 项单测旧口径、Website 字段为可访问但未核验归属的 Vercel 地址，因此当时的文档不把它们写成已完成展示。该口径后续已在 `Unreleased` 中更新。
 - 收口移动端产品体验：窄屏播放器默认收起并与底部导航分层，缩小触控区但仍保留 44px 级主按钮；索引行、筛选容器、表单、页脚与摘录区按 320px 基线消除溢出，压缩解释性文案，减少首屏堆叠与页面留白。视口单位改用 `dvh`，补齐字体 accent token、路由首帧标题和固定层安全区留白，保持零页面级横向滚动和 CLS 0。
 - 默认媒体资源由旧 8 秒 `lanze-demo.wav` 替换为三段本地声景；静态冒烟逐项请求曲库资源，CI 校验曲库哈希，lint 拒绝旧演示音文件名和第三方音乐域回到默认配置。自定义音源仍只在显式启用且授权明确时使用。
 

@@ -4,8 +4,8 @@
 
 ## 使用约定
 
-- 核心信息：开源、古诗词、本地可运行、Vue 3 + Vite 6、自有组件、9,350 篇离线馆藏、三段可复现本地声景、39 项单测、CI Browser E2E、MIT、中文文档、欢迎贡献。
-- 不写「正式上线 / 生产可用 / 后端已恢复 / 官方 Demo」；旧展示地址一律不用。
+- 核心信息：开源、古诗词、本地可运行、Vue 3 + Vite 6、自有组件、9,350 篇离线馆藏、三段可复现本地声景、39 项单测、CI Browser E2E、MIT、中文文档、欢迎贡献；可附已验证的 GitHub Pages 静态预览链接。
+- 不写「正式上线 / 生产可用 / 后端已恢复 / 官方线上 Demo」；GitHub Pages 只称静态前端预览，旧展示地址一律不用。
 - 不写具体 star 数、增长数据、性能百分比或未经录制的演示效果。
 - 配图优先用仓库内 `public/og-image.png`，或真实本地录屏；不要使用来源不明的截图。
 - 每条都可以按平台语气微调；同一天不要把所有短帖一次性刷到同一社区。
@@ -17,7 +17,7 @@
 **中文**
 
 > 把 2022 年留下的「兰泽诗词」整理成一间青瓷数字诗馆：Vue 3 自有组件、今日展厅、诗词索引、读诗详情、我的诗卷与写作台，先安静读完一首诗，再决定去哪里。\
-> 这轮把业务诗库换成 9,350 篇可校验的离线馆藏，保留单张历史白色摘录卡，并把单段演示音升级为三段可复现生成的本地声景曲库；39 项单测与 CI Browser E2E 覆盖主要演示链路。本地 `npm ci && npm run dev` 即可，不承诺线上 Demo 或托管后端。\
+> 这轮把业务诗库换成 9,350 篇可校验的离线馆藏，保留单张历史白色摘录卡，并把单段演示音升级为三段可复现生成的本地声景曲库；39 项单测与 CI Browser E2E 覆盖主要演示链路。本地 `npm ci && npm run dev` 即可，也可查看 GitHub Pages 静态前端预览，不承诺托管后端或完整线上 Demo。\
 > #开源 #Vue3 #古诗词
 
 **English**
@@ -66,13 +66,13 @@
 
 > 旧前端项目的维护不只是换个皮肤。兰泽诗词把 36 个旧页面收敛到六类主任务，移除 Element Plus / Bootstrap / Lottie / APlayer / 滑块验证码，改用 Vue 3 自有组件；旧 URL 保留兼容重定向，历史白色摘录卡作为明确视觉例外单独还原。\
 > 工程侧：9,350 篇离线馆藏按 16 个分卷按需加载，三段本地声景由脚本确定性生成并按 SHA-256 校验；39 项单测、lint、Node 20/22 构建、静态资源冒烟再加独立 Browser E2E。CDP 冒烟覆盖桌面/320px 窄屏、馆藏筛选、搜索、收藏、播放器、登录、发布、控制台/网络错误与 CLS。\
-> 仍诚实保留边界：不承诺线上 Demo 或托管后端，第三方素材授权未核验，CI 浏览器回归只覆盖 Chromium 关键路径。欢迎可验证的小 PR。
+> 仍诚实保留边界：GitHub Pages 只是静态前端预览，不提供托管后端或账号服务；第三方素材授权未核验，CI 浏览器回归只覆盖 Chromium 关键路径。欢迎可验证的小 PR。
 
 **English**
 
 > Maintaining a legacy frontend is more than a new skin. LanZe replaces 36 legacy pages with six main tasks and independent Vue 3 components, removes Element Plus / Bootstrap / Lottie / APlayer / slider CAPTCHA, keeps legacy URL redirects, and restores one historical excerpt card as an explicit visual exception.\
 > Engineering: 9,350 offline poems load from 16 split volumes, three local soundscapes are deterministically generated and verified by SHA-256, and 39 unit tests, lint, Node 20/22 builds, static-asset smoke and a separate Browser E2E workflow guard the main flow. CDP smoke covers desktop/320px mobile, facets, search, saving, the player, login, publishing, console/network errors and CLS.\
-> Boundaries remain explicit: no hosted demo or backend, third-party asset licensing is not verified, and CI browser coverage is Chromium only. Small, verifiable PRs welcome.
+> Boundaries remain explicit: GitHub Pages is a static frontend preview only, with no hosted backend or account service; third-party asset licensing is not verified, and CI browser coverage is Chromium only. Small, verifiable PRs welcome.
 
 ## 5. Release / Discussion 联动风格
 
@@ -91,7 +91,7 @@
 ## 发布前核对
 
 - [ ] 仓库链接指向 `https://github.com/2648782102/LanZe`；若附 Release/Discussion，链接已实际创建并验证。
-- [ ] 没有附历史 MemFire / Vercel 演示地址，没有写「官网 / 线上体验 / 正式上线」。
+- [ ] 没有附历史 MemFire / Vercel 演示地址，没有写「官网 / 官方线上 Demo / 正式上线」；GitHub Pages 可称静态前端预览。
 - [ ] `v0.4.0` tag/Release 已存在；如附链接，先回读 `https://github.com/2648782102/LanZe/releases/tag/v0.4.0`。
 - [ ] 若提到演示数据，说明它仅保存在当前浏览器 `localStorage`，不是账号服务。
 - [ ] 配图来自 `public/og-image.png` 或真实本地录屏；画面不含密钥、真实账号或私人路径。

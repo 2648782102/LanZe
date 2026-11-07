@@ -27,7 +27,7 @@
 | 工程现代化 | Vite 6、ESM、相对 base、统一请求层、本地演示数据、会话与本地演示音源 | 远端优先、失败降级；发布时 23 项单测通过 |
 | 发布素材 | Release notes、Discussions 欢迎帖、中英文短帖 | 只描述已验证能力，不写线上 Demo |
 
-GitHub 侧历史配合：v0.2.0、v0.3.0 与 v0.4.0 Release 均已发布，Discussion #1 仍是 v0.2.0 首版；topics 已按当前实现整理，但 About 描述仍为 27 项单测旧口径、Website 字段为可访问但未核验归属的 Vercel 地址，社交预览图与 Pages 仍按 `docs/PROMOTION.md` 的实际写权限核对。`RELEASE_NOTES.md` 是 v0.4.0 发布说明，`ANNOUNCEMENT.md` 是当前欢迎帖文案，不回写历史 Release。
+GitHub 侧当前配合：v0.2.0、v0.3.0 与 v0.4.0 Release 均已发布，Discussion #1 仍是 v0.2.0 首版；topics 已按当前实现整理，About 描述已更新为 39 项单测、9,350 篇离线馆藏与三段本地声景，Website 指向已验证的 `https://2648782102.github.io/LanZe/`，Pages 静态站点与入口资源已回读 200。社交预览图与在线欢迎帖正文仍未同步；`RELEASE_NOTES.md` 是 v0.4.0 发布时快照，`ANNOUNCEMENT.md` 是仓库内当前欢迎帖文案，不回写历史 Release。
 
 ## 2. v0.3.0 — 青瓷数字诗馆（已发布）
 
@@ -54,7 +54,7 @@ GitHub 侧历史配合：v0.2.0、v0.3.0 与 v0.4.0 Release 均已发布，Discu
 | P0 | 默认离线摘录与可选远程源 | 装饰性摘录不应默认依赖第三方接口 | `VITE_POETRY_SOURCE=local` 使用本地摘录；`remote` 失败时回退并标注来源，CI 不依赖外部服务 |
 | P1 | 移动端与布局稳定性 | 窄屏筛选、固定播放器、底部导航容易互相遮挡 | 320–1440px 无页面级横向溢出，固定层不交叠，CLS 预算与吸底状态由 Browser E2E 覆盖 |
 | P1 | 三段可复现本地声景 | 单段 8 秒演示音缺少真实播放体验 | `npm run audio:generate` / `audio:verify`、播放列表、切轨、进度、音量、偏好记忆与错误重试可用且默认离线 |
-| P1 | 保存发布口径 | 公开描述仍停留 27 项单测与 v0.3.0 | README、Release notes、欢迎帖、宣发草稿、About 与 issue 按 39 项单测和 v0.4.0 实际状态更新 |
+| P1 | 保存发布口径 | 公开描述曾停留 27 项单测与 v0.3.0 | README、发布时 Release notes、欢迎帖、宣发草稿、About 与 issue 已按 39 项单测和 v0.4.0 实际状态保存；后续展示变更以维护日志和公开 API 为准 |
 | P2 | 跨浏览器 / 视觉回归 | 当前 CI 只覆盖 Chromium CDP 关键路径 | 后续补 Firefox/WebKit 与截图基线；本版本不以多浏览器矩阵冒充已完成 |
 | P2 | 素材授权核验 | 哈希只是身份证据 | 继续保留 #4 为真实未完成项；无法确认的历史字体/图片/favicon 不写成已获授权 |
 

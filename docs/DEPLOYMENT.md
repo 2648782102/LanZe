@@ -35,6 +35,8 @@
 - 项目站点地址为 `https://<owner>.github.io/<repo>/`；当前保留 hash 路由与相对资源 `base: './'`，首次部署后按下方清单实测。
 - 首次部署后用浏览器访问首页、刷新一个子路由、打开开发者工具确认静态资源没有 404。
 
+2026-11-07 实测记录：维护者在 Settings → Pages 启用 GitHub Actions 来源后，手动 workflow `42376966164` 在 head `6251b0d` success，`https://2648782102.github.io/LanZe/` 返回 200；入口 JS/CSS、`data/poetry/manifest.json` 与 `media/audio-manifest.json` 均返回 200。GitHub 仓库 Website 字段已改为同一 Pages URL 并经公开 API 回读。此结果只证明静态资源可访问与静态前端可渲染，不构成线上账号、托管后端、内容审核或维护者 SLA 承诺。
+
 回滚：重新运行 workflow 指向上一个已知良好 commit，或在 Pages 设置中恢复上一份 artifact；若只是环境变量错误，修正变量后重新构建，保留旧构建编号便于对照。
 
 ## 4. Vercel
@@ -91,7 +93,7 @@ npm run build
 - [ ] 演示模式下今日展厅/诗词索引/搜索有本地数据；关闭 mock 且后端不可用时自动降级并给出提示。
 - [ ] 移动端宽度下导航与滚动可用。
 - [ ] README / Release 中没有把本次部署写成「官方线上 Demo」，除非维护者实际验证并明确声明。
-- [ ] 记录部署 URL、commit SHA、构建日志链接与回滚步骤；如为该 GitHub 仓库启用 Pages，更新 About / Discussion 后再对外发布。
+- [ ] 记录部署 URL、commit SHA、构建日志链接与回滚步骤；如为该 GitHub 仓库启用 Pages，更新 About 后再对外发布。Welcome Discussion #1 正文仍是历史首版，不把 workflow success 写成公告已同步。
 
 ## 9. 不做的事
 

@@ -10,9 +10,9 @@
 
 不是。仓库不附带经维护者验证的线上服务、账号系统、数据库、内容审核或运营支持。登录、搜索结果、作品发布、用户头像等能力默认使用浏览器本地演示数据，也可配置 `VITE_API_BASE_URL` 连接自建 API；请把它当作一个本地可运行的前端与开源协作对象。
 
-### README 为什么没有在线 Demo？
+### README 为什么没有「完整线上 Demo」？
 
-旧 README 写过 `http://app.memfiredb.com/caqm0ri5g6h17oismvp0/`，代码里也散落过 MemFire/Vercel 域名。治理时无法验证它们仍可用，且与当前仓库代码是否一致也不清楚，因此删除了「项目展示地址」承诺。若未来有维护者明确托管并验证，可在 README 增加新地址，同时记录托管者、commit、部署方式与回滚步骤。
+旧 README 写过 `http://app.memfiredb.com/caqm0ri5g6h17oismvp0/`，代码里也散落过 MemFire/Vercel 域名。治理时无法验证它们仍可用，且与当前仓库代码是否一致也不清楚，因此删除了旧「项目展示地址」承诺。当前 GitHub Website 指向已验证的 GitHub Pages 静态预览 `https://2648782102.github.io/LanZe/`；它只发布前端、静态馆藏与本地声景，不提供账号、数据库、内容审核或维护者 SLA，所以 README 不把它写成完整线上 Demo。若未来有维护者明确托管后端并验证，需要同时记录托管者、commit、部署方式与回滚步骤。
 
 ### 为什么历史提交里写着 `1.0`、`2.0.0`，但 Release 叫 v0.2.0？
 
@@ -66,7 +66,7 @@
 
 ### 可以部署到 GitHub Pages / Vercel / Netlify 吗？
 
-可以部署 `npm run build` 的静态产物。当前 hash 路由不需要 history fallback；若未来切换 history 模式则需配置 `index.html` rewrite。`vite.config.js` 使用相对 `base: './'`，适合 GitHub Pages 项目站点，但仍应实测资源路径。步骤见 `docs/DEPLOYMENT.md`，本仓库的 Pages workflow 是手动触发，不会自动发布到旧域名。
+可以部署 `npm run build` 的静态产物。当前 hash 路由不需要 history fallback；若未来切换 history 模式则需配置 `index.html` rewrite。`vite.config.js` 使用相对 `base: './'`，适合 GitHub Pages 项目站点。本仓库已启用 GitHub Actions 来源并实测 `https://2648782102.github.io/LanZe/` 的入口资源；Pages workflow 仍是手动触发，不会自动发布到旧域名。步骤见 `docs/DEPLOYMENT.md`。
 
 ### 为什么 CI 用 `npm run test --if-present`？
 
@@ -74,7 +74,7 @@
 
 ### 仓库 About、topics、Release、Discussion 在哪里维护？
 
-GitHub About 描述与 topics 在仓库设置中维护；`v0.2.0` / `v0.3.0` 是历史 Release，`v0.4.0` 的发布说明与欢迎帖文案分别位于 `RELEASE_NOTES.md`、`ANNOUNCEMENT.md`，发布与展示清单见 `docs/PROMOTION.md`。如有变更，以仓库页面和 `CHANGELOG.md` 为准。
+GitHub About 描述、Website 与 topics 在仓库首页的 About 面板维护；当前描述与 Pages Website 已通过公开 API 回读。`v0.2.0` / `v0.3.0` 是历史 Release，`v0.4.0` 的发布说明与仓库内欢迎帖文案分别位于 `RELEASE_NOTES.md`、`ANNOUNCEMENT.md`，发布与展示清单见 `docs/PROMOTION.md`。在线 Discussion #1 仍是历史首版；如有后续展示变更，以仓库页面/公开 API、`CHANGELOG.md` 和维护日志为准，不回写已发布 Release 快照。
 
 ## 许可与内容
 

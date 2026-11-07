@@ -1,15 +1,15 @@
 # 展示与宣发清单
 
-> **状态：仓库内素材与 GitHub About 候选文案已更新，线上展示待核对。** `v0.2.0` 与 `v0.3.0` 均为已发布 Release；`RELEASE_NOTES.md`、`ANNOUNCEMENT.md`、`SOCIAL_POSTS.md` 已改为当前 `v0.4.0` 文案。GitHub About 描述仍为旧的 27 项单测口径；Website 字段当前为 `https://lan-ze-thau.vercel.app`，2026-11-07 20:15 回读首页与入口资源返回 200，但这不是仓库文档此前写过的「已清空」，也不等于完成 Pages 或维护者承诺的线上 Demo。社交预览图、Pages、在线欢迎帖正文、社交平台短帖、外部社区投稿和付费推广仍须按实际写权限与线上回读核对。最后整理：2026-11-07。
+> **状态：GitHub About、Website 与 Pages 静态预览已回读确认；外部投稿仍未执行。** `v0.2.0` / `v0.3.0` 为历史 Release，`v0.4.0` 已发布；`RELEASE_NOTES.md`、`ANNOUNCEMENT.md`、`SOCIAL_POSTS.md` 是对应版本的发布/宣发素材，已发布 Release 正文按当时快照保留，不回写后续展示变更。2026-11-07 21:57 CST 公开 API 回读 About 描述为 39 项单测、9,350 篇离线馆藏、三段本地声景，Website 为 `https://2648782102.github.io/LanZe/` 且 `has_pages=true`；Pages 首页、JS/CSS 入口、馆藏清单与音频清单均返回 200。该站点是静态前端预览，不代表线上账号、托管后端或维护者承诺的完整线上 Demo。社交预览图、在线 Discussion #1 正文、社交平台短帖、外部社区投稿和付费推广仍未执行或未同步。最后整理：2026-11-07。
 
 ## 1. 推荐仓库定位
 
-### 仓库描述（GitHub About，不超过 350 字）
+### 仓库描述参考（GitHub About，不超过 350 字）
 
-简体中文主版本：
+下列简体中文主版本为当前展示口径的仓库内参考；线上以 GitHub 页面/公开 API 回读为准。实际 About 描述保持「当前不承诺线上 Demo 或托管后端」的发布时措辞，Pages 链接由 Website 字段单独承载：
 
 ```text
-兰泽诗词（LanZe）是一个开源的中文古诗词前端：用 Vue 3、Vite 与自有组件呈现「青瓷数字诗馆」——今日展厅、单张历史摘录卡、9,350 篇离线馆藏、收藏、创作、我的诗卷与三段本地声景。始于 2022 年，2026 年重构为可本地安装、可复现构建、带 39 项单测与 CI Browser E2E 的社区维护仓库；支持离线馆藏/mock 约定、MIT 许可与中文贡献文档。当前不承诺线上 Demo 或托管后端，欢迎从文档、素材授权、跨浏览器回归与前端稳定性开始贡献。
+兰泽诗词（LanZe）是一个开源的中文古诗词前端：用 Vue 3、Vite 与自有组件呈现「青瓷数字诗馆」——今日展厅、单张历史摘录卡、9,350 篇离线馆藏、收藏、创作、我的诗卷与三段本地声景。始于 2022 年，2026 年重构为可本地安装、可复现构建、带 39 项单测与 CI Browser E2E 的社区维护仓库；支持离线馆藏/mock 约定、MIT 许可与中文贡献文档。当前提供 GitHub Pages 静态预览，但不承诺托管后端或完整线上 Demo，欢迎从文档、素材授权、跨浏览器回归与前端稳定性开始贡献。
 ```
 
 可选英文短版：
@@ -20,7 +20,7 @@ An open-source Vue 3 frontend for classical Chinese poetry, rebuilt as a “Cela
 
 ### Topics 建议
 
-主 agent 可在 GitHub About → Topics 中按需添加（GitHub 建议数量有限，按相关性排序）：
+GitHub About → Topics 当前保留 10 个相关标签；后续按需增删（GitHub 建议数量有限，按相关性排序）：
 
 ```text
 vue3, vite, javascript, frontend, chinese-poetry, poetry, classical-chinese, chinese-literature, open-source, static-site, design-system, mit-license, docs, github-actions, browser-testing, chinese, education, web-app
@@ -30,7 +30,8 @@ vue3, vite, javascript, frontend, chinese-poetry, poetry, classical-chinese, chi
 
 ### About / README 展示要点
 
-- Website 字段：公开 API 当前回读为 `https://lan-ze-thau.vercel.app`，不是文档此前记录的「已清空」；该地址的首页、JS/CSS 入口、`media/audio-manifest.json` 与 `data/poetry/manifest.json` 返回 200，但托管者、部署来源、更新频率与是否为本项目当前构建未由本轮核验。在写权限与归属确认前不擅自清空，也不把它写成维护者验证的官方 Demo；如启用 GitHub Pages，再实测资源路径后更新这里。
+- Website 字段：公开 API 回读为 `https://2648782102.github.io/LanZe/`。Pages workflow `42376966164` 在 head `6251b0d` success，首页返回 200，四项入口 JS/CSS、`data/poetry/manifest.json` 与 `media/audio-manifest.json` 均返回 200。它是仅前端的静态预览，无账号、数据库、内容审核或维护者 SLA；不使用历史 Vercel 地址，也不写成「官方线上 Demo」。
+- GitHub About：描述已同步为当前 v0.4.0 文案，公开 API 回读含 39 项单测、9,350 篇离线馆藏、三段本地声景；topics 保持 10 个当前相关标签。
 - Social preview：仓库已提供 `public/og-image.svg` 与由它渲染、目检过的 `public/og-image.png`（1200×630）。上传 GitHub Social preview 需要浏览器中的仓库设置写权限；在设置页实际保存并回读前，不把它写成已展示。
 - README 首屏：项目定位 → 当前状态表 → 快速开始 → 本地演示/变量 → 路线图 → 许可证。不要在首屏堆砌 star/badge 或虚假在线体验。
 - Badges：保留 MIT、CI、Browser E2E、Vue 3、Changelog 与 v0.4.0 Release；CI / E2E badge 的 workflow 文件名必须与 `.github/workflows/ci.yml`、`.github/workflows/browser-e2e.yml` 一致。
@@ -41,14 +42,14 @@ vue3, vite, javascript, frontend, chinese-poetry, poetry, classical-chinese, chi
 | 顺序 | 动作 | 依据文件 | 执行前核对 |
 | --- | --- | --- | --- |
 | 1 | 合并代码与文档改动，确认 `npm ci && npm run build && npm run test --if-present && npm run lint && npm run smoke && npm run smoke:browser` 通过 | `README.md`、`.github/workflows/ci.yml`、`.github/workflows/browser-e2e.yml` | CI 三 job 与独立 Browser E2E 均为绿色 |
-| 2 | 设置 About 描述、Website（留空或已验证 Pages URL）、topics、社交预览图 | 本文件第 1 节、`public/og-image.svg`、`public/og-image.png` | 不沿用旧展示域名 |
+| 2 | 核对 About 描述、Website（已验证 Pages URL）与 topics；社交预览图仍待人工上传 | 本文件第 1 节、`public/og-image.svg`、`public/og-image.png` | 不沿用旧展示域名，公开 API 回读 |
 | 3 | 启用 Discussions（如尚未启用），发布欢迎帖 | `ANNOUNCEMENT.md` | 将占位日期/链接替换为真实值 |
 | 4 | 创建 tag `v0.4.0` 与 GitHub Release，不覆盖历史 Release | `RELEASE_NOTES.md`、`.github/workflows/publish.yml` | 只描述已合并内容；tag 与 CI/Browser E2E 通过 |
-| 5 | 确认 CI 与 Pages 权限；Pages 按需手动触发（workflow 含 configure/upload/deploy 标准步骤） | `.github/workflows/ci.yml`、`.github/workflows/pages.yml`、`docs/DEPLOYMENT.md` | 不自动部署到失效域名；首次运行前在 Settings → Pages 选 GitHub Actions |
+| 5 | 确认 CI 与 Pages 权限；Pages 按需手动触发（workflow 含 configure/upload/deploy 标准步骤） | `.github/workflows/ci.yml`、`.github/workflows/pages.yml`、`docs/DEPLOYMENT.md` | 不自动部署到失效域名；GitHub Actions 来源已启用且 workflow 已验证 |
 | 6 | 给适合新人的 issue 加 `good first issue` / `help wanted` 标签 | `.github/ISSUE_TEMPLATE/*` | 先写清复现步骤或预期结果，避免空任务 |
 | 7 | 发布一条 Release/Discussion 公告，再按平台节奏发布短帖 | `SOCIAL_POSTS.md` | 不夸大 star、用户数、线上 Demo 或后端能力 |
 
-**执行记录：** `v0.2.0` 的第 3、4、6 项与 v0.2.0 Release/Discussion 已完成；`v0.3.0` 的第 1、4、6 项已完成。`v0.4.0` 的仓库文案、Release notes、欢迎帖文案、短帖草稿与发布 workflow 已同步到 39 项单测、9,350 篇离线馆藏和三段本地声景；`main` 推送与 CI/Browser E2E 已通过，#2/#3/#4 已按当前状态更新。tag/Release、GitHub About 描述更新、社交预览图、Pages、在线 Discussion #1 正文、短帖与外部社区投稿仍须按实际写权限或线上回读核对。
+**执行记录：** `v0.2.0` 的第 3、4、6 项与 v0.2.0 Release/Discussion 已完成；`v0.3.0` 的第 1、4、6 项已完成。`v0.4.0` 的仓库文案、Release notes、欢迎帖文案、短帖草稿与发布 workflow 已同步到 39 项单测、9,350 篇离线馆藏和三段本地声景；`main` 推送与 CI/Browser E2E 已通过，tag/Release 已发布并回读，#2/#3/#4 已按当前状态更新。2026-11-07 21:57 CST 通过浏览器保存并在公开 API 回读 GitHub About 描述与 Website；Pages workflow `42376966164` success，项目站点与入口资源 200；社交预览图、在线 Discussion #1 正文、外部短帖与社区投稿仍未执行或同步，不重复发帖、不付费推广。
 
 ### 社交预览图渲染复核
 
@@ -56,12 +57,15 @@ vue3, vite, javascript, frontend, chinese-poetry, poetry, classical-chinese, chi
 - 产物：`public/og-image.png`，1200×630 PNG，SHA-256 `34acbf01d0fbc94a5db478dcc99c7358921eaac5c413f0dbb8151b0349bfce4c`。
 - 本机使用 Chrome 按 1200×630 视口加载 SVG 并截图；画面按青瓷展厅的冷白瓷面、青灰线框、铜金索引色与馆藏诗意图绘制，已目检标题、诗句、页边规则线、GitHub 地址与四边留白，无裁切或缺失字形。Quick Look 的 `-s 1200` 会生成 1200×1200 方图，不适合作为社交预览图。
 - 两张图都是当前设计衍生插画，不是运行截图，且仍是仓库内待上传素材；在 GitHub Settings → Social preview 实际上传并回读前，不把「社交预览已更新」写成事实。当前二进制哈希也记录在 `docs/THIRD_PARTY_ASSETS.md`。
+- 2026-11-07 已具备浏览器设置写通道，但本轮只保存 About/Website；社交预览未上传、未回读，仍标为未展示。
 
 ## 3. GitHub Discussions 欢迎帖
 
 已发布 v0.2.0 欢迎帖：[欢迎参与兰泽诗词的重新整理 👋](https://github.com/2648782102/LanZe/discussions/1)。分类 `Announcements`，由 tag 发布 workflow 幂等创建并避免重复发帖。正文同步会比对现有内容；Actions 默认令牌对 `updateDiscussion` 缺少写权限时，workflow 会保留原帖并输出 warning，不把它误报为已更新。2026-11-07 20:17 读取公开 Discussions REST 数据，确认 v0.4.0 publish workflow 的 Discussion 步骤虽 success，线上正文仍是 2026-11-05 首版「新增 14 个单测和静态检查」；[`ANNOUNCEMENT.md`](../ANNOUNCEMENT.md) 才是仓库内 v0.4.0 当前文案，不把该帖写成已同步。后续在线更新需维护者明确授权且具备 Discussions 写权限的令牌，或人工编辑；浏览器人工修改公开帖还须在最终保存前单独确认；不重复发帖。
 
-欢迎帖应引导四类讨论：文档勘误、本地复现、mock/API 契约、素材授权；明确「暂无线上 Demo」与「社区维护、不承诺响应 SLA」。
+本轮仅保存仓库 About/Website，未编辑公开 Discussion #1；如需在线更新仍需写权限与最终保存前确认，不重复发帖。
+
+欢迎帖应引导四类讨论：文档勘误、本地复现、mock/API 契约、素材授权；明确「GitHub Pages 仅为静态前端预览，不提供线上账号/后端服务」与「社区维护、不承诺响应 SLA」。
 
 ### 新人入口
 
@@ -78,6 +82,8 @@ vue3, vite, javascript, frontend, chinese-poetry, poetry, classical-chinese, chi
 历史发布：[v0.2.0 Release](https://github.com/2648782102/LanZe/releases/tag/v0.2.0)，标题「兰泽诗词 v0.2.0 · 本地可运行的开源前端」。该 Release 固定描述当时版本，不用当前 [`RELEASE_NOTES.md`](../RELEASE_NOTES.md) 覆盖。
 
 当前发布：`v0.4.0 · 离线馆藏与声景曲库`，文案位于 `RELEASE_NOTES.md`；发布 workflow 仅由 `v0.4.0` tag push 触发。`v0.3.0` 的历史状态已回读：CI run `42354267725` 与 Browser E2E run `42354267756` 均为 success，publish run `42354434490` 为 success，公开 Release `437433058` 仍为正式发布；`v0.2.0` 保持独立历史 Release。v0.4.0 的 `54ca6b7` CI run `42371607288` 与 Browser E2E run `42371607294` 均为 success；publish run `42371739156` 为 success，公开 Release `437556989` 已回读，正文与 `RELEASE_NOTES.md` 仅末尾换行差异。发布后若再次移动 tag，须复核 Release 指向和验证记录。
+
+发布后展示状态以 GitHub 页面/公开 API、`CHANGELOG.md` 与维护日志为准；已发布 Release 正文按发布时快照保留，不回写后续设置变更。
 
 发布核对：
 
@@ -97,13 +103,13 @@ vue3, vite, javascript, frontend, chinese-poetry, poetry, classical-chinese, chi
 - 不写具体 star 数、下载量、用户量、性能提升百分比，除非有可复核来源。
 - 不同平台错开措辞，避免同一时段刷屏；发布后把有效反馈整理成 issue，而不是只在评论区讨论。
 
-## 6. 社区投稿与曝光清单（尚未执行）
+## 6. 渠道状态（仓库展示已核对，外部投稿未执行）
 
 | 渠道 | 最小可执行动作 | 前置条件 | 可信度要求 |
 | --- | --- | --- | --- |
-| GitHub Discussions | 发布欢迎帖、置顶、建立 3–4 个讨论分类 | 仓库启用 Discussions、主 agent 有权限 | 链接到已合并文件，不宣称已发布服务 |
+| GitHub Discussions | 欢迎帖已存在，正文仍是 v0.2.0 首版；不重复发帖 | 具备 Discussions 写权限并经人工确认 | 链接到已合并文件，不宣称已发布服务 |
 | GitHub Release | v0.4.0 已发布并关联 CHANGELOG | tag、CI 与 Browser E2E 通过 | 逐项可验证；不覆盖 v0.2.0 / v0.3.0 |
-| GitHub Topics / About | 设置描述、topics、社交预览图 | 合并完成 | 标签与项目实际相关 |
+| GitHub Topics / About | 描述、topics、Website 已保存并 API 回读；社交预览图未上传 | 合并完成 | 标签与项目实际相关；不把社交预览写成已展示 |
 | 即刻 / 微博 / 小红书 | 从 `SOCIAL_POSTS.md` 选 1 条中文短帖，配 hero 图 | 人工确认文案与图片授权 | 不买量、不刷互动、不虚构数据 |
 | X / Mastodon / LinkedIn | 从英文短帖选 1 条，附仓库链接 | 人工确认英文摘要 | 不夸大 production-ready |
 | Vue / 前端中文社区 | 投一篇「旧项目现代化：治理先行」的技术短文 | 至少完成 Vite 升级或请求层收敛，避免只宣发 | 写明已知限制与复现命令 |
@@ -122,7 +128,7 @@ vue3, vite, javascript, frontend, chinese-poetry, poetry, classical-chinese, chi
 | 18–32s | 今日展厅与换诗 | 「一首诗一展厅；先安静读完，再进入索引」 |
 | 32–45s | 诗词索引、搜索结果、窄屏布局 | 「以青瓷数字诗馆重排阅读、检索与创作流程」 |
 | 45–58s | `npm run build && npm run test && npm run lint && npm run audio:verify && npm run smoke:browser`、CI / Browser E2E workflow | 「可复现构建，Node 20/22 CI；39 项单测、静态扫描、曲库校验与 Chromium 冒烟都在 workflow 中」 |
-| 58–70s | CONTRIBUTING、ROADMAP、LICENSE | 「MIT、贡献指南、路线图；当前不承诺线上 Demo 或托管后端」 |
+| 58–70s | CONTRIBUTING、ROADMAP、LICENSE | 「MIT、贡献指南、路线图；GitHub Pages 是静态前端预览，不承诺托管后端或完整线上 Demo」 |
 
 录制前检查：终端不出现密钥/私人路径；浏览器不使用真实账号；若第三方 API 不可用，切换到 mock 或明确标注「演示数据」；字幕不出现 star 数或「正式上线」。
 

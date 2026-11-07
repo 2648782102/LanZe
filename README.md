@@ -17,7 +17,7 @@
 
 **简体中文**｜[English summary](#english-summary-1)
 
-> **30 秒阅读**：[快速开始](#快速开始) · [当前状态](#当前状态-2026-11-07) · [环境变量](#环境变量) · [贡献](#贡献)。本地运行只需 `npm ci && npm run dev`；默认使用演示数据，不承诺线上 Demo 或账号后端。
+> **30 秒阅读**：[快速开始](#快速开始) · [当前状态](#当前状态-2026-11-07) · [环境变量](#环境变量) · [贡献](#贡献)。本地运行只需 `npm ci && npm run dev`；默认使用演示数据，GitHub Pages 仅提供静态前端预览，不承诺账号后端或完整线上 Demo。
 
 ## 项目定位
 
@@ -27,7 +27,7 @@
 2. **可替换的数据适配层**：`VITE_API_BASE_URL` 优先连接自建 API；未配置或失败时自动降级到仓库内演示数据。
 3. **对新人友好的中文开源项目**：提供清晰的贡献、行为、安全、部署和发布文档，而不是只留下一份旧 README。
 
-这不是一个已经上线运营的诗词社区，也不提供经维护者验证的线上 Demo、账号服务、数据库或正式内容审核。旧 README 中的 MemFire Cloud 展示地址和 README/代码里的若干 Vercel 地址均属**历史链接**，请不要把它们当作当前可用服务。没有后端时，页面使用本地演示数据；演示账号与作品仅保存在当前浏览器 `localStorage`。
+这不是一个已经上线运营的诗词社区，也不提供线上账号服务、数据库或正式内容审核。仓库 Website 当前指向已验证的 [GitHub Pages 静态预览](https://2648782102.github.io/LanZe/)；该页面只发布前端，不代表托管后端或完整线上 Demo。旧 README 中的 MemFire Cloud 展示地址和 README/代码里的若干 Vercel 地址均属**历史链接**，请不要把它们当作当前可用服务。没有后端时，页面使用本地演示数据；演示账号与作品仅保存在当前浏览器 `localStorage`。
 
 ## 当前状态（2026-11-07）
 
@@ -35,7 +35,7 @@
 | --- | --- |
 | 历史基线 | 原 `main` 停在 `b4ea7f4`（2024-08-18）；2026-11-06 起进行现代化维护 |
 | 前端构建 | Vue 3 + Vue Router 4（hash 模式）+ 自有组件 + Vite 6（ESM 配置） |
-| 在线 Demo | 不承诺；旧展示地址仅保留在 `CHANGELOG.md` 与 `docs/FAQ.md` 的事实说明中 |
+| 静态预览 | GitHub Pages 项目站点已启用并验证入口资源；仅发布前端，不承诺托管后端、账号服务或正式线上 Demo |
 | 后端/账号 | 仓库不附带完整后端；默认使用本地演示数据，配置 `VITE_API_BASE_URL` 后可连接自建 API |
 | 测试 | `npm run test` 含 39 个 `node --test` 单测；Node 20/22 CI 与独立 Browser E2E workflow 覆盖构建与主要演示链路 |
 | 许可 | [MIT](LICENSE)，`Copyright (c) 2022-2026 LanZe contributors` |
@@ -204,7 +204,7 @@ LanZe/
 4. 在窄屏或浏览器设备模拟器中重复首页与底部导航。
 5. 回到终端运行 `npm run build && npm run test && npm run lint`，展示可复现构建与检查。
 
-在未实际录制、未验证托管地址之前，不要写「在线 Demo：…」。历史地址仅作为迁移背景记录。
+`public/og-image.svg` 与 `public/og-image.png` 是展示插画，不是运行截图。GitHub Pages 静态预览可作为当前构建的页面入口，但不要写成官方线上 Demo、账号服务或正式运营社区；历史地址仅作为迁移背景记录。
 
 ## 部署
 
@@ -212,7 +212,7 @@ LanZe/
 
 | 平台 | 构建命令 | 发布目录 | 关键配置 |
 | --- | --- | --- | --- |
-| GitHub Pages | `npm ci && npm run build` | `dist` | 使用 `.github/workflows/pages.yml` 手动 workflow；项目站点需设置正确的 `base`，不要自动部署到已失效域名 |
+| GitHub Pages | `npm ci && npm run build` | `dist` | 使用 `.github/workflows/pages.yml` 手动 workflow；GitHub Actions 来源已启用，`base: './'` 与静态资源路径已实测，不自动部署到历史失效域名 |
 | Vercel | `npm run build` | `dist` | Framework: Vite；用环境变量或 rewrites 配置 `/api/`；不要沿用历史 Vercel 函数域名 |
 | Netlify | `npm run build` | `dist` | Publish directory `dist`；用 redirects/proxy 指向自建 API；设置公开 `VITE_` 变量 |
 | 任意静态服务器 | `npm run build` | `dist` | 用 HTTPS 托管静态文件；后端同源代理或显式配置 CORS |
@@ -268,4 +268,4 @@ npm run lint
 npm run smoke
 ```
 
-The app is now organised as a compact digital poetry museum: a daily reading room, a searchable offline collection of 9,350 poems, poem sheets, a personal collection, a writing desk and a local demo login. It uses Vite 6, 39 unit tests, an independent Vue component system, three reproducible local soundscapes, a Chromium CDP smoke in CI and a configurable API layer: `VITE_API_BASE_URL` takes priority when configured, with automatic fallback to demo data. No public demo, hosted backend, account service or commercial support is promised; historical MemFire/Vercel links should be treated as migration context only. The code is MIT-licensed to `2022-2026 LanZe contributors`; third-party assets may have separate terms. See `docs/DESIGN_SYSTEM.md`, `CONTRIBUTING.md`, `docs/DEVELOPMENT.md` and `docs/ROADMAP.md` before opening a PR.
+The app is now organised as a compact digital poetry museum: a daily reading room, a searchable offline collection of 9,350 poems, poem sheets, a personal collection, a writing desk and a local demo login. It uses Vite 6, 39 unit tests, an independent Vue component system, three reproducible local soundscapes, a Chromium CDP smoke in CI and a configurable API layer: `VITE_API_BASE_URL` takes priority when configured, with automatic fallback to demo data. A verified GitHub Pages site provides a static frontend preview, but no hosted backend, account service or commercial support is promised; historical MemFire/Vercel links should be treated as migration context only. The code is MIT-licensed to `2022-2026 LanZe contributors`; third-party assets may have separate terms. See `docs/DESIGN_SYSTEM.md`, `CONTRIBUTING.md`, `docs/DEVELOPMENT.md` and `docs/ROADMAP.md` before opening a PR.
