@@ -408,9 +408,20 @@ const main = async () => {
   if (!await clickByText("寻诗")) throw new Error("Explore navigation link was not found");
   currentStep = "explore";
   await waitUntil("explore view", () => evaluate("Boolean(document.querySelector('#global-search'))"));
-  const explore = await evaluate("document.querySelector('#app')?.innerText || ''");
-  if (!explore.includes("全部诗目") || !explore.includes("唐诗") || !explore.includes("宋词")) {
+  await waitUntil("offline catalog loaded", () => evaluate(
+    "Boolean(document.querySelector('#app')?.innerText.includes('9,350'))",
+  ), 60);
+  const explore = await evaluate(`(() => ({
+    text: document.querySelector('#app')?.innerText || '',
+    rows: document.querySelectorAll('.poem-row').length,
+    facets: document.querySelectorAll('.facet__list button').length,
+    stats: document.querySelector('.index-banner__stats')?.innerText || '',
+  }))()`);
+  if (!explore.text.includes("全部馆藏") || !explore.text.includes("唐诗") || !explore.text.includes("宋词")) {
     throw new Error("Explore index or categories did not render");
+  }
+  if (explore.rows !== 24 || explore.facets < 12 || !explore.stats.includes("9,350")) {
+    throw new Error("Offline catalog, facets or pagination did not render");
   }
 
   if (!await setInput("#global-search", "李白")) throw new Error("Explore search input was not found");
@@ -419,8 +430,12 @@ const main = async () => {
   const desktopSearch = await waitUntil("desktop search results", () => evaluate(`(() => ({
     href: location.href,
     text: document.querySelector('#app')?.innerText || '',
+    rows: document.querySelectorAll('.poem-row').length,
+    summary: document.querySelector('.result-head__right')?.innerText || '',
   }))()`).then((value) => value.href.includes("q=") && value.text.includes("李白") ? value : null));
-  if (!desktopSearch.text.includes("找到")) throw new Error("Desktop search summary did not render");
+  if (!desktopSearch.text.includes("找到") || desktopSearch.rows !== 24 || !desktopSearch.summary.includes("找到")) {
+    throw new Error("Desktop search summary or pagination did not render");
+  }
 
   await send("Emulation.setDeviceMetricsOverride", {
     width: 390,
@@ -538,11 +553,8 @@ const main = async () => {
     ...unexpectedFailedRequests.map((event) => event.params.errorText),
   ];
   if (problems.length) throw new Error(`Browser reported problems: ${problems.join(" | ")}`);
-  if (!expectedPoetryFailures && !excerptCards.sourceLabel.includes("随机古诗词 API")) {
-    throw new Error("Intercepted poetry source was not used");
-  }
-  if (expectedPoetryFailures && !excerptCards.sourceLabel.includes("仓库内置摘录")) {
-    throw new Error("Poetry source failed but the page did not report the local fallback");
+  if (!excerptCards.sourceLabel.includes("诗句源：仓库内置摘录")) {
+    throw new Error("Local excerpt source was not reported in offline default mode");
   }
   const cumulativeLayoutShift = layoutShifts.reduce((total, score) => total + score, 0);
   if (cumulativeLayoutShift > 0.05) {

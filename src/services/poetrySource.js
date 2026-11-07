@@ -1,16 +1,20 @@
 import { demoExcerpts } from "../data/poems.js";
+import { getLibraryExcerpt } from "../data/poetryCatalog.js";
 import { poetrySourceConfig, normalizeExcerpt } from "../config/poetrySource.js";
 
 const makeLocalExcerpt = (index) => {
-  const source = demoExcerpts[Math.abs(index) % demoExcerpts.length];
+  const useLibrary = Math.abs(index) % 2 === 1;
+  const source = useLibrary
+    ? getLibraryExcerpt(Math.floor(Math.abs(index) / 2))
+    : demoExcerpts[Math.abs(index) % demoExcerpts.length];
   return {
     ...source,
-    id: `excerpt-${source.content}`,
+    id: `excerpt-${source.content || source.origin}`,
   };
 };
 
-const fetchRemoteExcerpt = async ({ signal, index }) => {
-  const response = await fetch(poetrySourceConfig.requestUrl(index), {
+const fetchRemoteExcerpt = async ({ signal, index, config }) => {
+  const response = await fetch(config.requestUrl(index), {
     signal,
     cache: "no-store",
     headers: { Accept: "application/json" },
@@ -22,16 +26,16 @@ const fetchRemoteExcerpt = async ({ signal, index }) => {
   return excerpt;
 };
 
-export const loadExcerptFromSource = async ({ index = 0, previousContent = "" } = {}) => {
+export const loadExcerptFromSource = async ({ index = 0, previousContent = "", config = poetrySourceConfig } = {}) => {
   const local = makeLocalExcerpt(index);
-  if (!poetrySourceConfig.enabled || typeof fetch !== "function") {
+  if (!config.enabled || typeof fetch !== "function") {
     return { excerpt: local, source: "local", reason: "disabled" };
   }
 
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), poetrySourceConfig.timeout);
+  const timer = setTimeout(() => controller.abort(), config.timeout);
   try {
-    const excerpt = await fetchRemoteExcerpt({ signal: controller.signal, index });
+    const excerpt = await fetchRemoteExcerpt({ signal: controller.signal, index, config });
     if (excerpt.content === previousContent) {
       return { excerpt: local, source: "local", reason: "duplicate" };
     }

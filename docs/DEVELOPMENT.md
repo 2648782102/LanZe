@@ -34,7 +34,7 @@ npm run dev
 ```bash
 npm run dev                  # 开发服务器
 npm run build                # 生产构建，输出到 dist/
-npm run test                 # 27 个 node --test 单测
+npm run test                 # 36 个 node --test 单测
 npm run lint                 # 静态扫描失效后端地址、硬编码服务与脆弱引用
 npm run preview              # 预览构建产物
 npm run smoke                # 启动预览服务并检查首页与入口静态资源
@@ -82,7 +82,7 @@ VITE_USE_MOCK=true
 
 ### 方案 A：演示数据（推荐给文档与 UI 贡献者）
 
-- 行为：设置 `VITE_USE_MOCK=true` 或未配置 API 时，随机摘录、分类、搜索、用户条目、登录和作品发布使用 `src/data/` 与 `src/services/mockApi.js`。
+- 行为：未配置业务 API 时，今日展厅使用 22 首精校短章；寻诗与读诗详情从 `public/data/poetry/` 按需加载 16 个分卷，共 9,328 篇 MIT 授权选段，合计 9,350 篇离线馆藏。首页摘录卡默认也只用本地摘录；显式开启 `VITE_POETRY_SOURCE=remote` 时才请求随机句接口，业务诗库不依赖它。
 - 演示数据不能包含真实用户、私人内容、生产密钥或未授权转载的全文数据集。
 - UI 应明确标注「演示数据」，并覆盖加载、空结果、请求失败三种状态。
 - 验收：断开外部业务 API 后首页、文库与搜索结果页仍可展示仓库内演示数据；播放器默认使用 `public/media/` 的本地音源/封面，自定义音源不可达时不应导致业务功能白屏。
@@ -154,7 +154,7 @@ VITE_USE_MOCK=true
 | `npm ci` 后 esbuild 二进制不可用 | 检查是否使用 `--ignore-scripts`；按实际错误运行 `npm rebuild esbuild` |
 | 页面打开即白屏 | 查看控制台、自定义音源配置是否阻断、hash 路径是否正确、`index.html` 是否加载 `/src/main.js` |
 | 搜索没有远端结果 | 检查 `VITE_USE_MOCK`、`VITE_API_BASE_URL` 与超时；默认会自动降级到演示数据 |
-| 摘录为空或来源不对 | 检查 `VITE_POETRY_SOURCE`、`VITE_POETRY_SOURCE_URL`、超时与页面来源状态；失败会自动回退内置摘录 |
+| 摘录为空或来源不对 | 默认应为「仓库内置摘录」；若显式开启远程源，检查 `VITE_POETRY_SOURCE`、`VITE_POETRY_SOURCE_URL`、超时与页面来源状态 |
 | GitHub Pages 子路径资源 404 | 检查 `base: './'` 与发布目录；hash 路由本身不需要 rewrite |
 | `npm run test` 失败 | 查看 `node --test` 输出；CI 使用 `npm run test --if-present` 兜底 |
 | `npm run smoke:browser` 找不到浏览器 | 安装 Chrome / Chromium，或用 `CHROME_PATH` 指向可执行文件；CI 使用 setup-chrome action 的输出 |

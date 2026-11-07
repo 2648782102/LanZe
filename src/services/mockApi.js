@@ -8,6 +8,7 @@ import {
   getRandomExcerpt as pickRandomExcerpt,
 } from "../data/poems.js";
 import { demoUser } from "../data/demoUser.js";
+import { getLibraryPage, getLibraryPoem, getRelatedLibraryPoems, poetryStats } from "../data/poetryCatalog.js";
 import { readStore, writeStore, removeStore } from "./browserStore.js";
 
 const USERS_KEY = "lanze_demo_users";
@@ -19,7 +20,7 @@ const makeId = () => {
   return `demo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 };
 
-export const result = (data, code = 200, msg = "ok") => ({ code, msg, data });
+export const result = (data, code = 200, msg = "ok", meta = {}) => ({ code, msg, data, ...meta });
 
 const getAccountField = (data = {}, ...keys) => {
   for (const key of keys) {
@@ -131,8 +132,11 @@ export const getMockData = (items = demoPoems) =>
     .filter((poem, index, all) => all.findIndex((item) => item.id === poem.id) === index);
 
 export const mockRandomPoem = (random = Math.random) => {
-  const poems = getMockData();
-  return result(poems[Math.floor(random() * poems.length) % poems.length]);
+  const value = random();
+  const page = Number.isFinite(value)
+    ? getLibraryPage({ page: Math.floor(value * (poetryStats.total - 1)) + 1, pageSize: 1 })
+    : getLibraryPage({ page: 1, pageSize: 1 });
+  return result(page.items[0] || normalizePoem(demoPoems[0]));
 };
 
 export const mockRandomExcerpt = (params = {}, random = Math.random) => {
@@ -146,13 +150,47 @@ export const mockRandomExcerpt = (params = {}, random = Math.random) => {
 
 export const mockSearchPoems = (params = {}) => {
   const keyword = params.keyword ?? params.q ?? params.search ?? "";
-  return result(searchPoems(getMockData(), keyword));
+  const page = Number(params.page) || 1;
+  const pageSize = Number(params.pageSize) || 24;
+  const dynasty = params.dynasty || "全部";
+  const genre = params.genre || params.category || "全部";
+  if (Number(pageSize) > 60 || Number(pageSize) < 1) return result(searchPoems(getMockData(), keyword));
+  const matched = getLibraryPage({ keyword, dynasty, genre, page, pageSize });
+  const works = getWorks().map(normalizePoem);
+  if (keyword) {
+    const matchingWorks = searchPoems(works, keyword);
+    if (matchingWorks.length && page === 1) matched.items = [...matchingWorks, ...matched.items].slice(0, pageSize);
+  }
+  return result(matched.items, 200, "ok", {
+    pageCount: matched.totalPages,
+    total: matched.total,
+    page: matched.page,
+    pageSize: matched.pageSize,
+  });
 };
+
+export const mockLibraryStats = () => result(poetryStats);
+
+export const mockLibraryPoem = (params = {}) => result(getLibraryPoem(params.id));
+
+export const mockRelatedPoems = (params = {}) =>
+  result(getRelatedLibraryPoems(getLibraryPoem(params.id), Number(params.limit) || 3));
 
 export const mockPoetryClass = (params = {}) => {
   const type = params.type ?? params.class ?? params.category ?? "";
-  const matched = getPoemsByClass(getMockData(), type);
-  return result(matched.length ? matched : getMockData());
+  const genreMap = {
+    tangshi300: "唐诗",
+    songci300: "宋词",
+    shijing: "诗经",
+    chuci: "楚辞",
+    caocao: "建安诗",
+    huajianji: "花间词",
+    nantang: "南唐词",
+    yuanqu: "元曲",
+  };
+  const genre = genreMap[type] || (type ? type : "全部");
+  const page = getLibraryPage({ genre, page: 1, pageSize: 60 });
+  return result(page.items.length ? page.items : getMockData());
 };
 
 export const mockHuajianjiIntro = () =>

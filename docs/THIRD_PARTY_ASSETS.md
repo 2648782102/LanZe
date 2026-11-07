@@ -22,7 +22,8 @@ find src/assets public -type f -print
 | 历史摘录卡字体 | `src/assets/excerpt/piaoYiSong-excerpt.woff2`、`hongLei-excerpt.woff2` | 由历史 `src/assets/ZiTi/piaoYiSong.ttf` 与 `hongLei.ttf` 按摘录卡可见字符生成的 WOFF2 子集 | 未核验；子集化不改变原字体授权 | 核对字体厂商、Web 嵌入与再分发条款；无法确认时替换为授权明确的字体 |
 | 已移除的历史素材 | `src/assets/ZiTi/*.ttf`、`src/assets/beijing/**`、`src/assets/LunBo/**`、`src/assets/hoad/**`、`src/assets/logo.png` | 2022–2024 年历史提交；原始文件仍可从 Git 历史追溯，当前仅按可见字符或展示尺寸重新派生所需子集 | 未核验 | 如需追溯来源或验证授权，先查阅历史提交；不要把原始大文件原样重新引入构建产物 |
 | OG / favicon | `public/og-image.svg`、`public/og-image.png`、`public/favicon.ico` | SVG 与 1200×630 PNG 为 2026-11-07 按当前青瓷展厅视觉绘制的展示素材；favicon 来自历史提交 | SVG/PNG 由仓库贡献者提供；favicon 未核验 | 确认 favicon 来源；如需在线启用社交预览图，具备仓库设置写权限后按 `docs/PROMOTION.md` 上传并回读 |
-| 诗词文本 | `src/data/poems.js` | 2022–2024 年历史内容与 2026 年演示数据 | 未核验 | 标注公版依据、底本与校勘来源；现代作品必须取得作者许可 |
+| 精校短章 | `src/data/poems.js` | 2022–2024 年历史内容与 2026 年演示数据 | 未核验 | 标注公版依据、底本与校勘来源；现代作品必须取得作者许可 |
+| 离线馆藏分卷 | `public/data/poetry/*.json` | `chinese-poetry/chinese-poetry@b8594f81a89752241442f2ce267d6f66f96704ee` 的 16 个选段，共 9,328 篇；许可证见 `public/data/poetry/LICENSE.chinese-poetry.txt` | 上游仓库 MIT；诗词底本/校勘与作品公版状态按用途另行核对 | 保留上游版权与许可证；繁简、异体、断句及长篇截取按上游形态标注 |
 
 当前源码已移除旧 Lottie 动画运行时与 `src/assets/lottieJSON/*.json`。历史版本曾引用 `https://assets9.lottiefiles.com/packages/lf20_gigyrcoy.json` 与 `https://assets6.lottiefiles.com/packages/lf20_ucbyrun5.json`；这些地址及其授权问题属于历史发布背景，当前构建不加载它们。若未来恢复任何动画素材，必须先补齐来源、作者、License 与再分发依据。
 
@@ -33,7 +34,7 @@ find src/assets public -type f -print
 | 运行时依赖 | `package.json` / `package-lock.json` | Vue、Vue Router、Axios、Vue Cookies、Supabase JS 与 Vite 工具链 | 当前不再引入 Bootstrap、Font Awesome、Element Plus、Lottie、APlayer 或滑块验证码；npm 包各自许可见 lock 元数据 | 升级时再次核对依赖许可与构建产物中的版权说明 |
 | 默认演示音源与封面 | `public/media/lanze-demo.wav`、`public/media/lanze-demo-cover.svg` | 2026-11-06 由本仓库脚本生成的合成 PCM 音与原创 SVG | 由仓库贡献者提供；不引入第三方录音或美术素材 | 保持默认离线可用；如替换仍需记录生成方式与权利来源 |
 | 可选自定义音源 | `src/config/audio.js`、`src/components/AudioDock.vue`、`VITE_AUDIO_TRACKS` | 部署者显式提供的音轨 URL / 封面 URL | 默认不含任何第三方媒体域；启用后版权、热链与隐私政策由配置者负责 | 仅在授权明确时设置 `VITE_AUDIO_SOURCE=custom`；无效配置自动回退并显示提示，不可达 URL 显示状态并允许重试 |
-| 首页诗句源 | `src/services/poetrySource.js`、`VITE_POETRY_SOURCE_URL` | 默认 `https://v1.jinrishici.com/all.json`，对应历史首页使用的公开随机诗句接口；请求带缓存破坏参数，重复结果回退内置摘录 | 第三方服务不随仓库托管，授权与稳定性未核验；不承诺 SLA | 可通过 `VITE_POETRY_SOURCE=false` 完全关闭，或换成自建兼容接口；公开部署前核查服务条款与内容授权 |
+| 首页诗句源 | `src/services/poetrySource.js`、`VITE_POETRY_SOURCE_URL` | 默认关闭；显式 `VITE_POETRY_SOURCE=remote` 时才请求 `https://v1.jinrishici.com/all.json` | 第三方服务不随仓库托管，授权与稳定性未核验；不承诺 SLA；默认构建不请求 | 可保持 `VITE_POETRY_SOURCE=local`，或换成自建兼容接口；公开部署前核查服务条款与内容授权 |
 | 徽章 | `README.md` | `img.shields.io`、GitHub Actions badge | 文档展示外链；不参与运行时核心功能 | 可保留，但离线文档不应依赖其加载 |
 | 文档链接 | 全仓库 | GitHub、Vue、Vite 等官方/项目链接 | 属说明性链接 | 定期检查失效链接，不把其承诺视为本项目能力 |
 
@@ -59,6 +60,8 @@ find src/assets public -type f -print
 | `public/og-image.svg` | `f3f1d2dc1af474ed3af7d2c513e6c688b296386da285f3c28d1551a870eeda04` |
 | `public/favicon.ico` | `44a67fa9fa240e75a263991a80936224e047603dd7a0b7189813b4938218fe0a` |
 
+离线馆藏分卷的 SHA-256、条目数与上游固定提交记录在 `public/data/poetry/manifest.json`、`SHA256SUMS.txt` 和各分卷 JSON；`scripts/download-poetry-corpus.mjs` 使用固定 commit 重建目录、manifest、分卷与校验清单，`scripts/verify-poetry-corpus.mjs` 由 CI、静态冒烟和单测复用。上游 MIT 许可证原文随 `public/data/poetry/LICENSE.chinese-poetry.txt` 分发；这些记录只说明字节身份、文件清单与许可证，不代替诗词底本的校勘核验。
+
 ## 待办
 
 - [ ] 为每类素材补「来源 URL / 作者 / License / 下载日期 / 文件哈希 / 是否允许再分发」字段。
@@ -67,4 +70,4 @@ find src/assets public -type f -print
 - [x] 已从当前工作树移除未被源码引用的历史字体、图片与头像文件；原始文件仍可由 Git 历史追溯。
 - [x] 默认音乐演示已提供离线、仓库自制的音源与封面；无效配置已有回退提示。
 - [x] 自定义音源 URL 不可达时，播放器显示可读状态并允许重试，不影响业务页面。
-- [ ] 核查首页诗句源的服务条款、内容版权与公开部署隐私边界；无法确认时使用 `VITE_POETRY_SOURCE=false` 或自建兼容接口。
+- [x] 首页诗句源默认关闭；只有显式启用远程接口时才需要核查服务条款、内容版权与公开部署隐私边界。

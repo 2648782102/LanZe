@@ -40,7 +40,7 @@
 
         <div class="poem-body">
           <header class="poem-head">
-            <p>{{ typeLabel }}</p>
+            <p>{{ sourceLabel }}</p>
             <h1>{{ poem.title }}</h1>
             <span>{{ poem.author }}</span>
           </header>
@@ -64,7 +64,7 @@
         </div>
       </article>
 
-      <section v-else-if="!loading" class="empty-state">
+      <section v-else class="empty-state">
         <h2>这首诗没有留在索引里</h2>
         <p>链接可能来自旧版页面，或数据只存在于创建它的浏览器中。</p>
         <router-link class="button button--solid" to="/explore">回到诗词索引</router-link>
@@ -99,12 +99,12 @@ import { computed, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import AppIcon from "../components/AppIcon.vue";
 import { normalizePoem } from "../data/poems.js";
-import { loadCatalog, useLibrary } from "../composables/useLibrary.js";
+import { loadCatalog, relatedLibraryPoems, useLibrary } from "../composables/useLibrary.js";
 import { notify } from "../composables/useNotices.js";
 import { normalizeDetails, parseJsonObject } from "../utils/poemQuery.js";
 
 const route = useRoute();
-const { catalog, loading, getPoem, isSaved, toggleSaved, recordRecent } = useLibrary();
+const { getPoem, isSaved, toggleSaved, recordRecent } = useLibrary();
 
 const legacyPoem = computed(() => {
   if (route.params.id !== "legacy") return null;
@@ -125,40 +125,19 @@ const legacyPoem = computed(() => {
 });
 
 const poem = computed(() => legacyPoem.value || getPoem(String(route.params.id || "")));
-const poemLines = computed(() => poem.value?.paragraphs || []);
+const poemLines = computed(() => poem.value?.paragraphs || [poem.value?.paragraph].filter(Boolean));
+const sourceLabel = computed(() =>
+  [poem.value?.dynasty, poem.value?.collection || poem.value?.source].filter(Boolean).join(" · ") || "馆藏",
+);
 const annotation = computed(() => {
   const value = poem.value?.titleNote;
   if (Array.isArray(value)) return value;
   return value ? [String(value)] : [];
 });
 const saved = computed(() => (poem.value ? isSaved(poem.value.id) : false));
-const typeLabel = computed(() => {
-  const labels = {
-    tangshi300: "唐诗",
-    songci300: "宋词",
-    shijing: "诗经",
-    chuci: "楚辞",
-    yuanqu: "元曲",
-    huajianji: "花间集",
-    nantang: "南唐词",
-    caocao: "魏晋",
-    customgushici: "用户作品",
-    legacy: "旧版摘录",
-  };
-  return labels[poem.value?.type] || poem.value?.category || "读诗";
-});
 const related = computed(() => {
   if (!poem.value) return [];
-  const sameCategory = catalog.value.filter(
-    (item) => item.id !== poem.value.id && item.category === poem.value.category,
-  );
-  const sameTag = catalog.value.filter(
-    (item) =>
-      item.id !== poem.value.id &&
-      item.category !== poem.value.category &&
-      item.tags?.some((tag) => poem.value.tags?.includes(tag)),
-  );
-  return [...sameCategory, ...sameTag].slice(0, 3);
+  return relatedLibraryPoems(poem.value, 3);
 });
 
 const toggleSave = () => {
@@ -199,6 +178,7 @@ watch(
 );
 
 onMounted(loadCatalog);
+
 </script>
 
 <style scoped>

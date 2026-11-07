@@ -4,7 +4,7 @@
       <span class="poem-row__number">{{ index }}</span>
       <div class="poem-row__title">
         <h3>{{ poem.title }}</h3>
-        <p>{{ poem.author }} · {{ poem.category }}</p>
+        <p>{{ poem.dynasty || "未编年" }} · {{ poem.author }} · {{ poem.category }}</p>
       </div>
       <p class="poem-row__line">{{ firstLine }}</p>
       <AppIcon class="poem-row__arrow" name="arrow-right" :size="17" />
@@ -44,13 +44,14 @@ const firstLine = computed(() =>
   display: grid;
   grid-template-columns: minmax(0, 1fr) 40px;
   align-items: center;
+  min-height: 78px;
   border-bottom: 1px solid var(--line);
 }
 
 .poem-row__main {
   display: grid;
   min-width: 0;
-  grid-template-columns: 46px minmax(160px, 0.9fr) minmax(160px, 1.2fr) auto;
+  grid-template-columns: 52px minmax(180px, 0.9fr) minmax(180px, 1.2fr) auto;
   align-items: center;
   gap: 20px;
   padding: 20px 0;
@@ -63,17 +64,23 @@ const firstLine = computed(() =>
 }
 
 .poem-row__title h3 {
+  overflow: hidden;
   margin: 0;
   font-family: var(--font-poem);
   font-size: 20px;
   font-weight: 400;
   letter-spacing: 0.05em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .poem-row__title p {
+  overflow: hidden;
   margin: 4px 0 0;
   color: var(--ink-faint);
   font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .poem-row__line {
@@ -126,6 +133,10 @@ const firstLine = computed(() =>
 }
 
 @media (max-width: 700px) {
+  .poem-row {
+    min-height: 86px;
+  }
+
   .poem-row__main {
     grid-template-columns: 32px 1fr auto;
     gap: 8px 12px;

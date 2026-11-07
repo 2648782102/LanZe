@@ -7,11 +7,13 @@ import {
   normalizeExcerpt,
 } from "./poetrySource.node.js";
 
-test("uses the historical poetry source by default and allows opting out", () => {
+test("keeps local excerpts by default and allows opting into a remote source", () => {
   const config = createPoetrySourceConfig({});
-  assert.equal(config.enabled, true);
+  assert.equal(config.enabled, false);
   assert.equal(config.url, POETRY_SOURCE_URL);
   assert.equal(config.timeout, 4000);
+  assert.equal(createPoetrySourceConfig({ VITE_POETRY_SOURCE: "remote" }).enabled, true);
+  assert.equal(createPoetrySourceConfig({ VITE_POETRY_SOURCE: "jinrishici" }).enabled, true);
   assert.equal(createPoetrySourceConfig({ VITE_POETRY_SOURCE: "false" }).enabled, false);
   assert.equal(createPoetrySourceConfig({ VITE_POETRY_SOURCE: "local" }).enabled, false);
   assert.equal(

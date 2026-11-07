@@ -7,32 +7,45 @@
           <p>诗词索引</p>
         </div>
         <div class="index-banner__copy">
-          <h1>在诗名、作者<br />与句子之间寻找</h1>
-          <p>当前索引来自仓库内置演示诗目与本机作品。分类数量按实际条目显示。</p>
+          <h1>一座可以翻检的<br />离线诗馆</h1>
+          <p>
+            馆藏来自仓库内的古典诗词选段，按朝代、体裁与字句编排；
+            不依赖外部诗词 API，也不需要联网账号。
+          </p>
         </div>
-        <div class="index-banner__total">
-          <strong>{{ String(catalog.length).padStart(2, "0") }}</strong>
-          <span>首可检索诗目</span>
-        </div>
+        <dl class="index-banner__stats">
+          <div>
+            <dt>馆藏篇目</dt>
+            <dd>{{ stats.total.toLocaleString("zh-CN") }}</dd>
+          </div>
+          <div>
+            <dt>署名作者</dt>
+            <dd>{{ stats.authors.toLocaleString("zh-CN") }}</dd>
+          </div>
+          <div>
+            <dt>精校短章</dt>
+            <dd>{{ String(stats.curated).padStart(2, "0") }}</dd>
+          </div>
+        </dl>
       </div>
     </section>
 
     <section class="search-room">
       <div class="shell">
-        <form class="index-search" role="search" @submit.prevent="syncRoute">
+        <form class="index-search" role="search" @submit.prevent="submitSearch">
           <label class="sr-only" for="global-search">搜索诗词</label>
           <AppIcon name="search" :size="23" />
           <input
             id="global-search"
-            v-model="query"
+            v-model="draftQuery"
             type="search"
-            placeholder="输入诗名、作者、体裁或一句诗"
+            placeholder="输入诗名、作者、体裁、朝代或一句诗"
             autocomplete="off"
           />
-          <button v-if="query" class="index-search__clear" type="button" aria-label="清空搜索" @click="clearSearch">
+          <button v-if="draftQuery" class="index-search__clear" type="button" aria-label="清空搜索" @click="clearSearch">
             <AppIcon name="close" :size="16" />
           </button>
-          <button class="index-search__button" type="submit">检索</button>
+          <button class="index-search__button" type="submit">翻检</button>
         </form>
         <div class="quick-terms">
           <span>常见入口</span>
@@ -43,22 +56,50 @@
 
     <section class="index-content">
       <div class="shell index-grid">
-        <aside class="filter-wall">
-          <p class="eyebrow">体裁 / CLASS</p>
-          <div class="filter-list" role="group" aria-label="按体裁筛选">
-            <button
-              v-for="item in categories"
-              :key="item.name"
-              type="button"
-              :class="{ 'is-active': category === item.name }"
-              :aria-pressed="category === item.name"
-              @click="selectCategory(item.name)"
-            >
-              <span>{{ item.name }}</span>
-              <em>{{ String(item.count).padStart(2, "0") }}</em>
-            </button>
-          </div>
-          <p class="filter-note">索引只列出已有诗目。未收录的体裁不显示为可点入口。</p>
+        <aside class="filter-wall" aria-label="馆藏筛选">
+          <section class="facet">
+            <div class="facet__head">
+              <p class="eyebrow">朝代 / DYNASTY</p>
+              <button v-if="dynasty !== '全部'" type="button" @click="resetFacet('dynasty')">重置</button>
+            </div>
+            <div class="facet__list" role="group" aria-label="按朝代筛选">
+              <button
+                v-for="item in dynasties"
+                :key="item.name"
+                type="button"
+                :class="{ 'is-active': dynasty === item.name }"
+                :aria-pressed="dynasty === item.name"
+                @click="selectFacet('dynasty', item.name)"
+              >
+                <span>{{ item.name }}</span>
+                <em>{{ item.count.toLocaleString("zh-CN") }}</em>
+              </button>
+            </div>
+          </section>
+
+          <section class="facet">
+            <div class="facet__head">
+              <p class="eyebrow">体裁 / FORM</p>
+              <button v-if="genre !== '全部'" type="button" @click="resetFacet('genre')">重置</button>
+            </div>
+            <div class="facet__list" role="group" aria-label="按体裁筛选">
+              <button
+                v-for="item in genres"
+                :key="item.name"
+                type="button"
+                :class="{ 'is-active': genre === item.name }"
+                :aria-pressed="genre === item.name"
+                @click="selectFacet('genre', item.name)"
+              >
+                <span>{{ item.name }}</span>
+                <em>{{ item.count.toLocaleString("zh-CN") }}</em>
+              </button>
+            </div>
+          </section>
+
+          <p class="filter-note">
+            数量为全馆计数；两轴筛选会缩小当前结果。馆藏是阅读选段，不是校勘定本。
+          </p>
         </aside>
 
         <section class="result-room" aria-labelledby="result-heading">
@@ -69,26 +110,59 @@
             </div>
             <div class="result-head__right">
               <span>{{ resultSummary }}</span>
-              <button v-if="query || category !== '全部'" type="button" @click="resetFilters">清除条件</button>
+              <button v-if="hasFilters" type="button" @click="resetFilters">清除条件</button>
             </div>
           </header>
 
-          <div v-if="loading" class="catalog-loading" role="status">正在整理诗目……</div>
-          <div v-else-if="results.length" class="poem-list">
+          <p v-if="catalogError" class="catalog-notice" role="status">{{ catalogError }}</p>
+
+          <div v-if="hasFilters" class="active-filters">
+            <button v-if="query" type="button" @click="clearSearch">
+              <span>字句</span>{{ query }}<AppIcon name="close" :size="12" />
+            </button>
+            <button v-if="dynasty !== '全部'" type="button" @click="resetFacet('dynasty')">
+              <span>朝代</span>{{ dynasty }}<AppIcon name="close" :size="12" />
+            </button>
+            <button v-if="genre !== '全部'" type="button" @click="resetFacet('genre')">
+              <span>体裁</span>{{ genre }}<AppIcon name="close" :size="12" />
+            </button>
+          </div>
+
+          <div v-if="result.items.length" class="poem-list">
             <PoemRow
-              v-for="(poem, index) in results"
+              v-for="(poem, index) in result.items"
               :key="poem.id"
               :poem="poem"
-              :index="String(index + 1).padStart(2, '0')"
+              :index="rowNumber(index)"
               :saved="isSaved(poem.id)"
               @toggle="savePoem"
             />
           </div>
           <div v-else class="empty-state">
-            <h2>没有找到相合的诗句</h2>
-            <p>换一个作者名，或减少关键词；也可以清除体裁筛选后再看一次。</p>
-            <button class="button" type="button" @click="resetFilters">查看全部诗目</button>
+            <h2>这一格暂时空着</h2>
+            <p>换一个作者名，或减少朝代、体裁条件；也可以清除全部条件再翻检。</p>
+            <button class="button" type="button" @click="resetFilters">查看全部馆藏</button>
           </div>
+
+          <nav v-if="result.totalPages > 1" class="pagination" aria-label="检索结果分页">
+            <button type="button" :disabled="result.page <= 1" aria-label="上一页" @click="goToPage(result.page - 1)">
+              <AppIcon name="arrow-left" :size="16" />
+            </button>
+            <span>第 {{ result.page }} / {{ result.totalPages }} 页</span>
+            <button
+              type="button"
+              :disabled="result.page >= result.totalPages"
+              aria-label="下一页"
+              @click="goToPage(result.page + 1)"
+            >
+              <AppIcon name="arrow-right" :size="16" />
+            </button>
+          </nav>
+
+          <p class="corpus-note">
+            语料来自 <code>chinese-poetry/chinese-poetry</code> 固定提交的 MIT 授权选段与兰泽精校短章；
+            繁简、异体与断句保持上游形态，引用前请核对底本。
+          </p>
         </section>
       </div>
     </section>
@@ -100,70 +174,112 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import AppIcon from "../components/AppIcon.vue";
 import PoemRow from "../components/PoemRow.vue";
-import { loadCatalog, useLibrary } from "../composables/useLibrary.js";
+import {
+  getLibraryFacets,
+  getLibraryStats,
+  useLibrary,
+  useCatalogVersion,
+  loadCatalog,
+  queryCatalog,
+} from "../composables/useLibrary.js";
 import { notify } from "../composables/useNotices.js";
 
 const route = useRoute();
 const router = useRouter();
-const { catalog, loading, isSaved, toggleSaved, queryPoems } = useLibrary();
+const { isSaved, toggleSaved, catalogError } = useLibrary();
+const catalogVersion = useCatalogVersion();
+const hints = ["月亮", "李白", "宋词", "春天", "关雎"];
+const pageSize = 24;
+
+const stats = computed(() => ({ ...getLibraryStats(), version: catalogVersion.value }));
+const facets = computed(() => ({ ...getLibraryFacets(), version: catalogVersion.value }));
+const draftQuery = ref(String(route.query.q || ""));
 const query = ref(String(route.query.q || ""));
-const category = ref(String(route.query.category || "全部"));
-const hints = ["月亮", "李白", "宋词", "春天"];
+const dynasty = ref(String(route.query.dynasty || "全部"));
+const genre = ref(String(route.query.genre || route.query.category || "全部"));
+const page = ref(Math.max(1, Number(route.query.page) || 1));
 
-const categoryOrder = ["唐诗", "宋词", "诗经", "楚辞", "元曲", "花间集", "南唐词", "魏晋", "用户作品"];
-const categories = computed(() => {
-  const counts = new Map();
-  for (const poem of catalog.value) {
-    counts.set(poem.category, (counts.get(poem.category) || 0) + 1);
-  }
-  const names = [...counts.keys()].sort((left, right) => {
-    const leftIndex = categoryOrder.indexOf(left);
-    const rightIndex = categoryOrder.indexOf(right);
-    return (leftIndex < 0 ? 99 : leftIndex) - (rightIndex < 0 ? 99 : rightIndex);
+const withAll = (items) => [{ name: "全部", count: stats.value.total }, ...items];
+const dynasties = computed(() => withAll(facets.value.dynasties));
+const genres = computed(() => withAll(facets.value.genres));
+
+const result = computed(() => {
+  catalogVersion.value;
+  return queryCatalog({
+    keyword: query.value,
+    dynasty: dynasty.value,
+    genre: genre.value,
+    page: page.value,
+    pageSize,
   });
-  return [
-    { name: "全部", count: catalog.value.length },
-    ...names.map((name) => ({ name, count: counts.get(name) })),
-  ];
 });
-
-const results = computed(() => queryPoems(query.value, category.value));
+const hasFilters = computed(() => Boolean(query.value.trim()) || dynasty.value !== "全部" || genre.value !== "全部");
 const resultHeading = computed(() => {
   if (query.value.trim()) return `“${query.value.trim()}”`;
-  if (category.value !== "全部") return category.value;
-  return "全部诗目";
+  if (dynasty.value !== "全部" && genre.value !== "全部") return `${dynasty.value} · ${genre.value}`;
+  if (dynasty.value !== "全部") return dynasty.value;
+  if (genre.value !== "全部") return genre.value;
+  return "全部馆藏";
 });
-const resultSummary = computed(() => {
-  const scope = category.value === "全部" ? "全部体裁" : category.value;
-  return `${scope} · 找到 ${results.value.length} 首`;
-});
+const resultSummary = computed(() =>
+  `找到 ${result.value.total.toLocaleString("zh-CN")} 篇 · 本页 ${result.value.items.length} 篇`,
+);
 
-const syncRoute = () => {
+const rowNumber = (index) =>
+  String((result.value.page - 1) * result.value.pageSize + index + 1).padStart(2, "0");
+
+const syncRoute = ({ resetPage = false } = {}) => {
   const nextQuery = {};
   if (query.value.trim()) nextQuery.q = query.value.trim();
-  if (category.value !== "全部") nextQuery.category = category.value;
+  if (dynasty.value !== "全部") nextQuery.dynasty = dynasty.value;
+  if (genre.value !== "全部") nextQuery.genre = genre.value;
+  if (!resetPage && page.value > 1) nextQuery.page = page.value;
   router.replace({ name: "explore", query: nextQuery });
 };
 
+const submitSearch = () => {
+  query.value = draftQuery.value.trim();
+  page.value = 1;
+  syncRoute({ resetPage: true });
+};
+
 const pickHint = (hint) => {
+  draftQuery.value = hint;
   query.value = hint;
-  syncRoute();
+  page.value = 1;
+  syncRoute({ resetPage: true });
 };
 
 const clearSearch = () => {
+  draftQuery.value = "";
   query.value = "";
-  syncRoute();
+  page.value = 1;
+  syncRoute({ resetPage: true });
 };
 
-const selectCategory = (name) => {
-  category.value = name;
-  syncRoute();
+const selectFacet = (key, name) => {
+  if (key === "dynasty") dynasty.value = name;
+  if (key === "genre") genre.value = name;
+  page.value = 1;
+  syncRoute({ resetPage: true });
 };
+
+const resetFacet = (key) => selectFacet(key, "全部");
 
 const resetFilters = () => {
+  draftQuery.value = "";
   query.value = "";
-  category.value = "全部";
+  dynasty.value = "全部";
+  genre.value = "全部";
+  page.value = 1;
+  syncRoute({ resetPage: true });
+};
+
+const goToPage = (nextPage) => {
+  page.value = Math.max(1, Math.min(result.value.totalPages, nextPage));
   syncRoute();
+  const top = document.querySelector(".result-room")?.getBoundingClientRect().top;
+  if (typeof top === "number" && top < 0) window.scrollTo({ top: window.scrollY + top - 96, behavior: "smooth" });
 };
 
 const savePoem = (poem) => {
@@ -171,19 +287,26 @@ const savePoem = (poem) => {
   notify(added ? `已收藏《${poem.title}》` : `已取消收藏《${poem.title}》`, added ? "success" : "info");
 };
 
-watch(() => route.query.q, (value) => {
-  if (String(value || "") !== query.value) query.value = String(value || "");
-});
-watch(() => route.query.category, (value) => {
-  if (String(value || "全部") !== category.value) category.value = String(value || "全部");
+watch(() => route.query, (value) => {
+  const nextQuery = String(value.q || "");
+  const nextDynasty = String(value.dynasty || "全部");
+  const nextGenre = String(value.genre || value.category || "全部");
+  const nextPage = Math.max(1, Number(value.page) || 1);
+  if (nextQuery !== query.value) {
+    query.value = nextQuery;
+    draftQuery.value = nextQuery;
+  }
+  if (nextDynasty !== dynasty.value) dynasty.value = nextDynasty;
+  if (nextGenre !== genre.value) genre.value = nextGenre;
+  if (nextPage !== page.value) page.value = nextPage;
+}, { deep: true });
+
+watch([dynasty, genre], () => {
+  if (dynasty.value !== "全部" && !facets.value.dynasties.some((item) => item.name === dynasty.value)) dynasty.value = "全部";
+  if (genre.value !== "全部" && !facets.value.genres.some((item) => item.name === genre.value)) genre.value = "全部";
 });
 
-onMounted(async () => {
-  await loadCatalog();
-  if (category.value !== "全部" && !categories.value.some((item) => item.name === category.value)) {
-    category.value = "全部";
-  }
-});
+onMounted(loadCatalog);
 </script>
 
 <style scoped>
@@ -239,30 +362,39 @@ onMounted(async () => {
 }
 
 .index-banner__copy > p {
+  max-width: 48em;
   margin: 20px 0 0;
   color: var(--ink-soft);
   font-size: 12px;
   line-height: 1.9;
 }
 
-.index-banner__total {
+.index-banner__stats {
   display: grid;
-  justify-items: end;
+  grid-template-columns: repeat(3, minmax(84px, auto));
+  gap: 0;
+  margin: 0;
   padding-bottom: 6px;
 }
 
-.index-banner__total strong {
-  color: var(--celadon-deep);
-  font-family: var(--font-number);
-  font-size: clamp(52px, 7vw, 90px);
-  font-weight: 300;
-  line-height: 1;
+.index-banner__stats > div {
+  padding: 0 18px;
+  border-left: 1px solid var(--line);
 }
 
-.index-banner__total span {
+.index-banner__stats dt {
   color: var(--ink-faint);
   font-size: 10px;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
+}
+
+.index-banner__stats dd {
+  margin: 8px 0 0;
+  color: var(--celadon-deep);
+  font-family: var(--font-number);
+  font-size: 32px;
+  font-weight: 300;
+  line-height: 1;
 }
 
 .search-room {
@@ -363,7 +495,7 @@ onMounted(async () => {
 
 .index-grid {
   display: grid;
-  grid-template-columns: 190px minmax(0, 1fr);
+  grid-template-columns: 210px minmax(0, 1fr);
   gap: clamp(50px, 8vw, 120px);
   min-width: 0;
 }
@@ -375,19 +507,49 @@ onMounted(async () => {
   min-width: 0;
 }
 
-.filter-list {
+.facet + .facet {
+  margin-top: 34px;
+}
+
+.facet__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.facet__head p {
+  margin: 0;
+}
+
+.facet__head button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-faint);
+  font-size: 10px;
+}
+
+.facet__head button:hover {
+  color: var(--brass);
+}
+
+.facet__list {
   display: grid;
   margin-top: 14px;
   border-top: 1px solid var(--line-strong);
   min-width: 0;
+  max-height: 336px;
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 
-.filter-list button {
+.facet__list button {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 12px 0;
+  padding: 10px 0;
   border: 0;
   border-bottom: 1px solid var(--line);
   background: transparent;
@@ -396,16 +558,16 @@ onMounted(async () => {
   text-align: left;
 }
 
-.filter-list button:hover,
-.filter-list button.is-active {
+.facet__list button:hover,
+.facet__list button.is-active {
   color: var(--brass);
 }
 
-.filter-list button.is-active span {
+.facet__list button.is-active span {
   font-weight: 600;
 }
 
-.filter-list em {
+.facet__list em {
   color: var(--ink-faint);
   font-family: var(--font-number);
   font-size: 9px;
@@ -413,7 +575,7 @@ onMounted(async () => {
 }
 
 .filter-note {
-  margin: 18px 0 0;
+  margin: 24px 0 0;
   color: var(--ink-faint);
   font-size: 10px;
   line-height: 1.8;
@@ -458,13 +620,109 @@ onMounted(async () => {
   color: var(--brass);
 }
 
-.catalog-loading {
-  padding: 72px 0;
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 18px 0 6px;
+}
+
+.catalog-notice {
+  margin: 18px 0 0;
+  padding: 10px 14px;
+  border-left: 2px solid var(--brass);
+  background: var(--porcelain-deep);
   color: var(--ink-soft);
+  font-size: 11px;
+}
+
+.active-filters button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  background: var(--porcelain-panel);
+  color: var(--ink-soft);
+  font-size: 11px;
+}
+
+.active-filters button span {
+  color: var(--ink-faint);
+  font-size: 9px;
+}
+
+.active-filters button:hover {
+  border-color: var(--celadon-deep);
+  color: var(--celadon-deep);
 }
 
 .poem-list {
   border-bottom: 1px solid var(--line);
+}
+
+.empty-state {
+  min-height: 320px;
+  display: grid;
+  place-content: center;
+  justify-items: start;
+  gap: 14px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-soft);
+}
+
+.empty-state h2 {
+  margin: 0;
+  font-family: var(--font-poem);
+  font-size: 30px;
+  font-weight: 400;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 12px;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  min-height: 76px;
+  color: var(--ink-faint);
+  font-size: 11px;
+}
+
+.pagination button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink-soft);
+}
+
+.pagination button:disabled {
+  opacity: 0.35;
+}
+
+.pagination button:not(:disabled):hover {
+  border-color: var(--celadon-deep);
+  color: var(--celadon-deep);
+}
+
+.corpus-note {
+  margin: 18px 0 0;
+  color: var(--ink-faint);
+  font-size: 10px;
+  line-height: 1.8;
+}
+
+.corpus-note code {
+  font-family: var(--font-ui);
+  font-size: 10px;
 }
 
 @media (max-width: 900px) {
@@ -473,8 +731,23 @@ onMounted(async () => {
     gap: 22px;
   }
 
-  .index-banner__total {
-    display: none;
+  .index-banner__stats {
+    grid-column: 2;
+    grid-template-columns: repeat(3, 1fr);
+    padding-top: 12px;
+  }
+
+  .index-banner__stats > div {
+    padding: 0 10px;
+  }
+
+  .index-banner__stats > div:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .index-banner__stats dd {
+    font-size: 24px;
   }
 
   .index-grid {
@@ -485,25 +758,27 @@ onMounted(async () => {
 
   .filter-wall {
     position: static;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
   }
 
-  .filter-list {
+  .facet + .facet {
+    margin-top: 0;
+  }
+
+  .facet__list {
     display: flex;
-    width: 100%;
-    max-width: 100%;
+    max-height: 112px;
+    flex-wrap: wrap;
+    align-content: start;
     gap: 8px;
     overflow-x: auto;
-    overscroll-behavior-inline: contain;
-    scrollbar-width: none;
-    padding-bottom: 4px;
+    overflow-y: hidden;
     border-top: 0;
   }
 
-  .filter-list::-webkit-scrollbar {
-    display: none;
-  }
-
-  .filter-list button {
+  .facet__list button {
     flex: 0 0 auto;
     gap: 8px;
     padding: 7px 11px;
@@ -511,58 +786,51 @@ onMounted(async () => {
     white-space: nowrap;
   }
 
-  .filter-list button.is-active {
+  .facet__list button.is-active {
     border-color: var(--ink);
     background: var(--ink);
     color: var(--porcelain-panel);
   }
 
-  .filter-list button.is-active em {
-    color: rgba(251, 252, 249, 0.58);
+  .facet__list button.is-active em {
+    color: inherit;
   }
 
   .filter-note {
-    display: none;
-  }
-
-  .result-room {
-    width: 100%;
-    min-width: 0;
+    grid-column: 1 / -1;
+    margin-top: 0;
   }
 }
 
-@media (max-width: 600px) {
-  .index-banner {
-    padding-block: 38px 32px;
-  }
-
-  .index-label span {
-    font-size: 30px;
-  }
-
-  .index-label p {
-    display: none;
-  }
-
-  .index-banner__copy h1 {
-    font-size: 40px;
-  }
-
+@media (max-width: 560px) {
   .index-search {
     grid-template-columns: auto 1fr auto;
-    padding-left: 14px;
+    gap: 8px;
+    padding-left: 12px;
   }
 
   .index-search__button {
-    display: none;
+    min-width: 64px;
   }
 
-  .index-content {
-    padding-block: 44px 70px;
+  .filter-wall {
+    grid-template-columns: 1fr;
+  }
+
+  .facet__list {
+    max-height: none;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 
   .result-head {
     align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .result-head__right {
+    justify-items: start;
   }
 }
 </style>

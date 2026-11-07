@@ -12,10 +12,10 @@
 - [ ] `npm ci && npm run build && npm run test && npm run lint && npm run smoke` 通过。
 - [ ] 桌面/窄屏与登录发布冒烟 `npm run smoke:browser` 通过；本机需 Chrome / Chromium，CI 的 Browser E2E workflow 在 Ubuntu 自动安装同款浏览器并执行同一脚本。
 - [ ] 明确本次部署是「仅前端 + 浏览器本地演示数据」还是「前端 + 自建 API」。
-- [ ] 生产环境变量只含公开配置；`VITE_USE_MOCK` 按需求设置，避免把演示数据误写成正式账号服务。若使用默认首页诗句源，确认其服务条款、隐私边界与 CSP；离线部署设置 `VITE_POETRY_SOURCE=false`。
+- [ ] 生产环境变量只含公开配置；`VITE_USE_MOCK` 按需求设置，避免把演示数据误写成正式账号服务。默认首页诗句源离线；若显式启用远程源，确认其服务条款、隐私边界与 CSP；离线部署保持 `VITE_POETRY_SOURCE=local`。
 - [ ] 若关闭 mock，`VITE_API_BASE_URL` 指向可访问的 HTTPS API 或同源 `/api/`；后端已配置 CORS/鉴权/限流。远端失败时前端会自动降级。
 - [ ] MemFire/Vercel 历史地址不再作为生产依赖；源码中不再包含历史硬编码 anon key。
-- [ ] WOFF2 字体子集、压缩展品图、自定义音源/封面与诗词文本的使用符合其授权与隐私要求；默认 `VITE_AUDIO_SOURCE=local` 使用仓库自制演示资源，自定义音源不可达时会显示可重试状态，默认 `VITE_POETRY_SOURCE` 会请求第三方公开诗句接口。
+- [ ] WOFF2 字体子集、压缩展品图、自定义音源/封面与诗词文本的使用符合其授权与隐私要求；默认 `VITE_AUDIO_SOURCE=local` 使用仓库自制演示资源，自定义音源不可达时会显示可重试状态，默认 `VITE_POETRY_SOURCE=local` 不请求第三方公开诗句接口。
 - [ ] 记录 commit SHA、构建命令、变量清单与回滚方式。
 
 ## 3. GitHub Pages（手动 workflow）
@@ -69,7 +69,7 @@ npm run build
 - 用 HTTPS 提供静态文件；不要把 `dist/` 提交进 Git。
 - 若 API 与前端不同源，后端需允许站点 Origin；优先同源 `/api/` 反向代理。
 - 缓存 `index.html` 时使用较短 TTL，静态资源可长缓存并带内容哈希。
-- 默认音源、封面、核心样式、WOFF2 字体子集与 SVG 图标均随构建产物本地分发；只有显式启用 `custom` 音源时，才需要把相应域加入 CSP 白名单，且不可达时的状态不会阻断业务页面。首页默认诗句源若保留，也需在 CSP 中允许 `VITE_POETRY_SOURCE_URL` 的 `connect-src`；设置 `VITE_POETRY_SOURCE=false` 可完全关闭此请求。
+- 默认音源、封面、核心样式、WOFF2 字体子集与 SVG 图标均随构建产物本地分发；只有显式启用 `custom` 音源时，才需要把相应域加入 CSP 白名单，且不可达时的状态不会阻断业务页面。首页诗句源默认离线，不需要为它放宽 CSP；显式设置 `VITE_POETRY_SOURCE=remote` 时才需在 CSP 中允许 `VITE_POETRY_SOURCE_URL` 的 `connect-src`。
 
 ## 7. 环境变量与构建矩阵
 

@@ -10,9 +10,10 @@
       <div class="shell room-grid">
         <header class="room-head">
           <p class="eyebrow">今日展厅 · {{ dateLabel }}</p>
+          <p class="room-archive">今日展厅 · 十首精校短章</p>
           <div class="room-count">
-            <span>{{ String((page % Math.max(catalog.length, 1)) + 1).padStart(2, "0") }}</span>
-            <em>/ {{ String(Math.max(catalog.length, 1)).padStart(2, "0") }}</em>
+            <span>{{ String((page % featured.length) + 1).padStart(2, "0") }}</span>
+            <em>/ {{ String(featured.length).padStart(2, "0") }}</em>
           </div>
         </header>
 
@@ -84,7 +85,7 @@
           <p class="eyebrow">余韵 · 一则</p>
           <p class="sr-only">余韵 · 三则</p>
           <h2>读完一首，<br />让句子再走一段。</h2>
-          <p>按历史首页的白色摘录卡等比还原：旋转收藏角标、竖排诗句、作者与扇舟图都保留。纸面层次、长句字距与收藏态做了细节打磨；诗句默认来自随机古诗词源，不可用时回退仓库内置摘录。</p>
+          <p>按历史首页的白色摘录卡等比还原：旋转收藏角标、竖排诗句、作者与扇舟图都保留。纸面层次、长句字距与收藏态做了细节打磨；默认只取仓库内置摘录与精校馆藏短句，不请求外部诗句服务。</p>
           <div class="strip-actions">
             <router-link class="button" to="/explore">
               进入诗词索引
@@ -116,11 +117,16 @@ import AppIcon from "../components/AppIcon.vue";
 import ExcerptCard from "../components/ExcerptCard.vue";
 import { readStore, writeStore } from "../services/browserStore.js";
 import { loadExcerptFromSource } from "../services/poetrySource.js";
-import { loadCatalog, useLibrary } from "../composables/useLibrary.js";
+import { useLibrary } from "../composables/useLibrary.js";
 import { notify } from "../composables/useNotices.js";
+import { curatedPoems, getDailyLibraryPoem, asLibraryPoem } from "../data/poetryCatalog.js";
 import exhibitImage from "../assets/exhibit/songci300-768.jpg";
 
-const { catalog, isSaved, toggleSaved } = useLibrary();
+const { isSaved, toggleSaved } = useLibrary();
+const getFeaturedPoems = () => [
+  getDailyLibraryPoem(),
+  ...curatedPoems.slice(1, 10).map(asLibraryPoem),
+];
 const now = new Date();
 const dateLabel = new Intl.DateTimeFormat("zh-CN", {
   year: "numeric",
@@ -128,7 +134,8 @@ const dateLabel = new Intl.DateTimeFormat("zh-CN", {
   day: "numeric",
 }).format(now);
 const dayIndex = Math.floor(Date.now() / 86400000);
-const page = ref(dayIndex % 10);
+const featured = getFeaturedPoems();
+const page = ref(dayIndex % featured.length);
 const excerptPage = ref(dayIndex);
 const excerpt = ref(null);
 const excerptStatus = ref("loading");
@@ -139,7 +146,7 @@ const excerptSaved = ref(Array.isArray(storedExcerptSaves) ? storedExcerptSaves.
 const isSwitching = ref(false);
 let switchTimer;
 
-const poem = computed(() => catalog.value[page.value % Math.max(catalog.value.length, 1)] || {});
+const poem = computed(() => featured[page.value % featured.length] || getDailyLibraryPoem());
 const poemLines = computed(() => poem.value.paragraphs || [poem.value.paragraph || "正在展开诗笺……"]);
 const titleScale = computed(() => {
   const length = String(poem.value.title || "").length;
@@ -199,7 +206,7 @@ const nextPoem = () => {
   isSwitching.value = true;
   window.clearTimeout(switchTimer);
   switchTimer = window.setTimeout(() => {
-    page.value = (page.value + 1) % Math.max(catalog.value.length, 1);
+    page.value = (page.value + 1) % featured.length;
     switchTimer = window.setTimeout(() => { isSwitching.value = false; }, reducedMotion ? 0 : 140);
   }, reducedMotion ? 0 : 120);
 };
@@ -242,7 +249,6 @@ const speakPoem = () => {
 };
 
 onMounted(() => {
-  loadCatalog();
   loadExcerpt();
 });
 onBeforeUnmount(() => window.clearTimeout(switchTimer));
@@ -329,9 +335,17 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
 .room-head {
   display: flex;
   grid-column: 1 / -1;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
+  gap: 20px;
   min-width: 0;
+}
+
+.room-archive {
+  margin: 0 auto 0 24px;
+  color: var(--ink-faint);
+  font-size: 10px;
+  letter-spacing: 0.06em;
 }
 
 .room-count {
@@ -717,6 +731,10 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
   .room-head {
     padding-top: 4px;
     overflow: hidden;
+  }
+
+  .room-archive {
+    display: none;
   }
 
   .room-count {

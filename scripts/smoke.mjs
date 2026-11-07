@@ -1,6 +1,7 @@
 import { spawn } from "node:child_process";
 import { readFile, readdir } from "node:fs/promises";
 import { setTimeout as delay } from "node:timers/promises";
+import { verifyPoetryCorpus } from "./verify-poetry-corpus.mjs";
 
 const port = Number(process.env.SMOKE_PORT || 4179);
 const origin = `http://127.0.0.1:${port}`;
@@ -70,6 +71,15 @@ try {
   const mediaAssets = ["media/lanze-demo.wav", "media/lanze-demo-cover.svg"];
   for (const asset of mediaAssets) await expectOk(`/${asset}`);
 
+  const manifest = await (await fetch(`${origin}/data/poetry/manifest.json`)).json();
+  const corpusAssets = ["data/poetry/manifest.json", "data/poetry/SHA256SUMS.txt", "data/poetry/LICENSE.chinese-poetry.txt"];
+  if (!Array.isArray(manifest.collections) || manifest.collections.length < 16) {
+    throw new Error("Offline poetry manifest is missing collections");
+  }
+  for (const entry of manifest.collections) corpusAssets.push(`data/poetry/${entry.id}.json`);
+  for (const asset of corpusAssets) await expectOk(`/${asset}`);
+  await verifyPoetryCorpus();
+
   const cssFiles = (await readdir("dist/assets")).filter((name) => name.endsWith(".css"));
   const cssText = await Promise.all(
     cssFiles.map((name) => readFile(`dist/assets/${name}`, "utf8")),
@@ -84,7 +94,7 @@ try {
 
   await expectOk("/");
   for (const asset of uniqueAssets) await expectOk(`/${asset.replace(/^\.\//, "")}`);
-  console.log(`Smoke passed: ${uniqueAssets.length + mediaAssets.length} local assets returned 200.`);
+  console.log(`Smoke passed: ${uniqueAssets.length + mediaAssets.length + corpusAssets.length} local assets returned 200.`);
 } catch (error) {
   console.error(error instanceof Error ? error.message : error);
   process.exitCode = 1;

@@ -9,13 +9,13 @@
 简体中文主版本：
 
 ```text
-兰泽诗词（LanZe）是一个开源的中文古诗词前端：用 Vue 3、Vite 与自有组件呈现「青瓷数字诗馆」——今日展厅、单张历史摘录卡、诗词索引、收藏、创作与我的诗卷。始于 2022 年，2026 年重构为可本地安装、可复现构建、带 27 项单测与 CI Browser E2E 的社区维护仓库；支持演示数据/mock 约定、MIT 许可与中文贡献文档。当前不承诺线上 Demo 或托管后端，欢迎从文档、素材授权、跨浏览器回归与前端稳定性开始贡献。
+兰泽诗词（LanZe）是一个开源的中文古诗词前端：用 Vue 3、Vite 与自有组件呈现「青瓷数字诗馆」——今日展厅、单张历史摘录卡、离线诗词索引、收藏、创作与我的诗卷。始于 2022 年，2026 年重构为可本地安装、可复现构建、带 36 项单测与 CI Browser E2E 的社区维护仓库；支持离线馆藏/mock 约定、MIT 许可与中文贡献文档。当前不承诺线上 Demo 或托管后端，欢迎从文档、素材授权、跨浏览器回归与前端稳定性开始贡献。
 ```
 
 可选英文短版：
 
 ```text
-An open-source Vue 3 frontend for classical Chinese poetry, rebuilt as a “Celadon Poetry Room”: a daily reading room, one restored excerpt card, a searchable index, saved poems, a writing desk and a personal collection. Locally buildable, documented in Chinese, MIT-licensed, with 27 unit tests and Chromium CI E2E. No hosted backend or public demo is promised.
+An open-source Vue 3 frontend for classical Chinese poetry, rebuilt as a “Celadon Poetry Room”: a daily reading room, one restored excerpt card, a searchable offline index, saved poems, a writing desk and a personal collection. Locally buildable, documented in Chinese, MIT-licensed, with 36 unit tests and Chromium CI E2E. No hosted backend or public demo is promised.
 ```
 
 ### Topics 建议
@@ -67,7 +67,7 @@ vue3, vite, javascript, frontend, chinese-poetry, poetry, classical-chinese, chi
 
 已创建 3 个范围明确、带验收标准的 open issue，均标记 `good first issue` 与 `help wanted`：
 
-- [#2 为本地演示 API 补充边界单测](https://github.com/2648782102/LanZe/issues/2)（当前 27 项单测中 5 项覆盖演示 API 边界；保留花间集分卷、资料回退、错误传播、存储降级等后续入口）
+- [#2 为本地演示 API 补充边界单测](https://github.com/2648782102/LanZe/issues/2)（当前 36 项单测中 6 项覆盖演示 API 的随机诗、分类、搜索与合并边界；保留资料回退、错误传播、存储降级等后续入口）
 - [#3 复核浏览器回归、音源状态与展示一致性](https://github.com/2648782102/LanZe/issues/3)（CI Browser E2E 与不可达音源状态已落地；保留跨浏览器/视觉回归、视觉截图、真实后端契约与 GitHub 展示核对）
 - [#4 核验历史素材、favicon 与展示图授权](https://github.com/2648782102/LanZe/issues/4)（当前树已移除 Lottie JSON；保留字体/图片/favicon/诗词文本授权核验）
 
@@ -82,7 +82,7 @@ vue3, vite, javascript, frontend, chinese-poetry, poetry, classical-chinese, chi
 发布核对：
 
 - [x] 合并后的 README 与 `LICENSE` 都为 MIT 且年份/贡献者一致。
-- [x] CI / Browser E2E / Release badge 指向真实 workflow 或 Release；27 项单测、lint、构建冒烟与浏览器冒烟结果与 Release 描述一致。
+- [x] CI / Browser E2E / Release badge 指向真实 workflow 或 Release；已发布 Release 的 27 项单测描述按历史文案保留；当前 `main` 的离线馆藏与 36 项单测属于 v0.3.0 之后的待发布改动。
 - [x] `CHANGELOG.md` 的 `v0.3.0` 段对应已发布内容，并保留新的 `Unreleased` 区。
 - [x] 不写「线上 Demo 已恢复」「后端已上线」「已通过安全审计」等未验证表述。
 - [x] 说明历史代码限制、第三方资源授权、Discussion #1 与后续路线图入口。

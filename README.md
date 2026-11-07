@@ -37,7 +37,7 @@
 | 前端构建 | Vue 3 + Vue Router 4（hash 模式）+ 自有组件 + Vite 6（ESM 配置） |
 | 在线 Demo | 不承诺；旧展示地址仅保留在 `CHANGELOG.md` 与 `docs/FAQ.md` 的事实说明中 |
 | 后端/账号 | 仓库不附带完整后端；默认使用本地演示数据，配置 `VITE_API_BASE_URL` 后可连接自建 API |
-| 测试 | `npm run test` 含 27 个 `node --test` 单测；Node 20/22 CI 与独立 Browser E2E workflow 覆盖构建与主要演示链路 |
+| 测试 | `npm run test` 含 36 个 `node --test` 单测；Node 20/22 CI 与独立 Browser E2E workflow 覆盖构建与主要演示链路 |
 | 许可 | [MIT](LICENSE)，`Copyright (c) 2022-2026 LanZe contributors` |
 | 发布 | `v0.2.0` 是历史 Release；`v0.3.0` 已发布，说明见 `RELEASE_NOTES.md` 与 `ANNOUNCEMENT.md` |
 | 设计契约 | [青瓷数字诗馆](docs/DESIGN_SYSTEM.md)：冷白瓷面、青灰线框、铜金索引色与「一首诗一展厅」的信息架构 |
@@ -45,13 +45,13 @@
 ## 主要特性
 
 - 📜 **今日展厅**：整首读诗、词牌长题分行、换诗、收藏态、朗读、按旧版样式等比还原的单张余韵摘录卡与详情页入口。
-- 🏛 **诗词索引**：按诗句、作者、体裁或标签检索；分类计数来自实际演示诗目。
+- 🏛 **诗词索引**：9,350 篇离线馆藏，按朝代、体裁、诗名、作者或字句检索；分卷按需加载，结果分页。
 - 🔎 **读诗详情**：居中诗笺、标签、笺注、相关诗目与朗读/复制链接。
 - ✍️ **写作台**：本地草稿、实时预览、资料编辑与作品发布；登录状态由浏览器本地存储支持。
 - 👤 **我的诗卷**：收藏、最近读过与本机作品三类内容，空状态给出下一步。
 - 🎵 **音乐播放**：浏览器原生音频默认加载仓库自制 WAV / SVG 演示资源；可通过公开配置接入授权明确的自定义音源，不可达时显示状态并允许重试。
 - 📱 **响应式布局**：包含移动端底部导航与大屏布局，仍需持续无障碍/布局回归。
-- 🧩 **现代前端栈**：Vue 3、Vue Router 4、Axios、原生浏览器能力，配合 Vite 6 构建与 27 项单测。
+- 🧩 **现代前端栈**：Vue 3、Vue Router 4、Axios、原生浏览器能力，配合 Vite 6 构建与 36 项单测。
 - 📚 **开源治理**：MIT、贡献/行为/安全政策、变更日志、CI、issue/PR 模板、发布与宣发文案。
 
 「特性」描述的是仓库中已有界面与默认演示数据能力，不等于提供线上账号、持久化服务或正式内容审核。逐项可信度见 `docs/FAQ.md`。
@@ -63,7 +63,7 @@
 | 视图 | Vue 3、Vue Router 4（当前 hash history）、仓库自有 Vue 组件 |
 | 构建 | Vite 6 + `@vitejs/plugin-vue`，`package.json` 使用 `"type": "module"`，`base: './'` |
 | 语言 | JavaScript / Vue SFC；npm 脚本使用 `node --test` 与 ESM |
-| 数据 | `src/config/runtime.js` 统一公开配置，`src/apis/request.js` 在真实 API 与 `src/services/mockApi.js` 之间切换 |
+| 数据 | `src/data/poetryCatalog.js` 统一离线馆藏读取，`public/data/poetry/` 提供 16 个静态分卷；`src/apis/request.js` 仍用于可选自建 API |
 | 动效与媒体 | 浏览器原生音频、CSS/SVG 图标与 `public/media/` 自制演示音源/封面 |
 | 样式 | `src/styles/base.css` 设计 token、组件内 CSS 与 `src/components/` 自有组件 |
 | 字体与素材 | WOFF2 字体子集与压缩展品图；派生来源与授权审查见 `docs/THIRD_PARTY_ASSETS.md` |
@@ -95,7 +95,7 @@ npm run dev
 
 ```bash
 npm run build        # 生成 dist/
-npm run test         # 27 个 node --test 单测
+npm run test         # 36 个 node --test 单测
 npm run lint         # 静态检查：失效后端地址、硬编码服务与脆弱引用
 npm run preview      # 预览 dist/
 npm run smoke        # 预览服务与入口静态资源 HTTP 冒烟
@@ -123,7 +123,7 @@ CI workflow 在 Node 20/22 执行 `npm ci && npm run build && npm run test --if-
 | `VITE_API_BASE_URL` | 否 | `/api/` | 业务 API 前缀；运行时自动补全末尾斜杠。生产环境建议使用同源 `/api/`，由托管平台反向代理 |
 | `VITE_API_TIMEOUT` | 否 | `4000` | 远端请求超时（毫秒） |
 | `VITE_USE_MOCK` | 否 | `true` | 未配置 API 时自动为 `true`；显式关闭后才会请求远端 |
-| `VITE_POETRY_SOURCE` | 否 | `jinrishici` | 首页摘录卡的诗句源；设为 `false` 或 `local` 时只用仓库内置摘录，不请求外部诗句服务 |
+| `VITE_POETRY_SOURCE` | 否 | `local` | 首页摘录卡默认只用仓库内置摘录；设为 `remote` / `jinrishici` 时才请求外部诗句服务 |
 | `VITE_POETRY_SOURCE_URL` | 否 | `https://v1.jinrishici.com/all.json` | 兼容 `content` / `origin` / `author` / `category` 字段的随机诗句接口，可替换为自建服务 |
 | `VITE_POETRY_SOURCE_TIMEOUT` | 否 | `4000` | 诗句源超时（毫秒）；失败或超时会回退内置摘录并显示来源状态 |
 | `VITE_SUPABASE_URL` | 否 | `https://example.supabase.co` | 可选；需与 `VITE_SUPABASE_ANON_KEY` 同时配置，否则使用本地适配器 |
@@ -140,7 +140,7 @@ VITE_AUDIO_TRACKS=[{"name":"示例","artist":"作者","url":"/media/example.mp3"
 
 音源与封面的版权、可用性、防盗链与隐私政策由配置者自行负责；配置缺失或 JSON 无效时自动回退到本地演示音并显示一次可读提示，URL 不可达或播放失败时播放器会显示「音源不可达」并允许重试。`VITE_` 变量会进入浏览器产物，不要填入私密地址或凭据。
 
-首页摘录卡默认会向 `VITE_POETRY_SOURCE_URL` 请求一句随机诗词，这是旧版首页使用的同类公开诗句源。该请求只读取公开 JSON、不需要密钥，且允许通过 `VITE_POETRY_SOURCE=false` 完全关闭；接口失败、超时、返回空内容或重复当前诗句时会自动回退到 `src/data/poems.js` 的内置摘录，并在页面标注当前来源。该服务不由本仓库托管，也不承诺 SLA；部署者可把 URL 换成自建兼容接口，或设置 CSP / 离线变量。摘录收藏按诗句内容保存在当前浏览器，不依赖随机接口返回的标识。
+首页摘录卡默认只使用 `src/data/poems.js` 的内置摘录与精校馆藏短句，不发起外部请求；业务诗库来自 `public/data/poetry/` 的离线分卷。仅当显式设置 `VITE_POETRY_SOURCE=remote` 时才请求 `VITE_POETRY_SOURCE_URL`；接口失败、超时、返回空内容或重复当前诗句会自动回退本地摘录，并在页面标注来源。该服务不由本仓库托管，也不承诺 SLA；部署者可换成自建兼容接口。摘录收藏按诗句内容保存在当前浏览器，不依赖随机接口返回的标识。
 
 可创建 `.env.local`（已被 `.gitignore` 忽略）：
 
@@ -165,7 +165,8 @@ LanZe/
 │   ├── components/          # 展馆壳层、图标、列表行与自有反馈组件
 │   ├── composables/         # 会话、诗库与通知状态
 │   ├── config/              # 运行时环境变量解析
-│   ├── data/                # 本地演示诗词与演示用户
+│   ├── data/                # 精校短章、馆藏索引与演示用户
+│   ├── public/data/poetry/  # 离线馆藏分卷、目录、校验清单与上游 MIT 许可证
 │   ├── function/            # Supabase 兼容适配器
 │   ├── router/              # 三段式路由与旧 URL 重定向
 │   ├── services/            # 演示数据 API 与浏览器存储

@@ -1,13 +1,16 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { demoUser } from "../data/demoUser.js";
 import { demoExcerpts } from "../data/poems.js";
+import { loadPoetryCatalog } from "../data/poetryCatalog.js";
 import {
   getMockData,
   mockDeleteUser,
   mockLogin,
   mockPoetryClass,
   mockPublishPoem,
+  mockRandomPoem,
   mockRandomExcerpt,
   mockRegister,
   mockSearchPoems,
@@ -17,6 +20,23 @@ import {
   normalizeRegistrationPayload,
   resetDemoStore,
 } from "./mockApi.js";
+
+const manifest = JSON.parse(await readFile("public/data/poetry/manifest.json", "utf8"));
+const collections = await Promise.all(
+  manifest.collections.map(async (entry) =>
+    JSON.parse(await readFile(`public/data/poetry/${entry.id}.json`, "utf8")),
+  ),
+);
+const originalFetch = globalThis.fetch;
+globalThis.fetch = async (url) => {
+  const name = String(url).split("/").pop();
+  const payload = name === "manifest.json"
+    ? manifest
+    : collections[manifest.collections.findIndex((entry) => `${entry.id}.json` === name)];
+  return { ok: Boolean(payload), json: async () => payload };
+};
+await loadPoetryCatalog({ force: true });
+globalThis.fetch = originalFetch;
 
 test("normalizes legacy and modern account field names", () => {
   assert.deepEqual(normalizeLoginPayload({ user: "poet", password: "123456" }), {
@@ -83,6 +103,19 @@ test("random excerpt supports deterministic indexes, bounds and omitted params",
   assert.equal(missing.data.content, demoExcerpts[3].content);
 });
 
+test("random poem reads a deterministic catalog page once", () => {
+  let calls = 0;
+  const response = mockRandomPoem(() => {
+    calls += 1;
+    return 0.5;
+  });
+
+  assert.equal(calls, 1);
+  assert.equal(response.code, 200);
+  assert.ok(response.data.id);
+  assert.ok(response.data.paragraphs.length > 0);
+});
+
 test("poetry class returns matching poems and falls back for unknown classes", () => {
   resetDemoStore();
   const matched = mockPoetryClass({ type: "tangshi300" });
@@ -91,10 +124,24 @@ test("poetry class returns matching poems and falls back for unknown classes", (
 
   assert.equal(matched.code, 200);
   assert.ok(matched.data.length > 0);
-  assert.ok(matched.data.every((poem) => poem.type === "tangshi300"));
-  assert.equal(unknown.data.length, all.data.length);
-  assert.deepEqual(unknown.data, all.data);
-  assert.ok(unknown.data.length > matched.data.length);
+  assert.ok(matched.data.every((poem) => poem.category === "唐诗"));
+  assert.equal(matched.data.length, 60);
+  assert.equal(unknown.data.length, 22);
+  assert.ok(all.data.length > unknown.data.length);
+  assert.equal(all.data.length, 60);
+});
+
+test("search returns paginated offline catalog metadata", () => {
+  resetDemoStore();
+  const response = mockSearchPoems({ keyword: "李白", page: 1, pageSize: 12 });
+  const secondPage = mockSearchPoems({ keyword: "李白", page: 2, pageSize: 12 });
+
+  assert.ok(response.total > 12);
+  assert.ok(response.pageCount > 1);
+  assert.equal(response.data.length, 12);
+  assert.equal(secondPage.page, 2);
+  assert.ok(response.data.every((poem) => poem.paragraphs.length > 0));
+  assert.ok(response.data.some((poem) => poem.collection));
 });
 
 test("search normalizes whitespace and includes a newly published work once", () => {
