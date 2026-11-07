@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { offlineCatalogFixture, offlineCatalogManifest } from "./offlineCatalogFixture.mjs";
 import {
   loadPoetryCatalog,
   getDailyLibraryPoem,
@@ -10,28 +10,18 @@ import {
   getRelatedLibraryPoems,
 } from "./poetryCatalog.js";
 
-const manifest = JSON.parse(await readFile("public/data/poetry/manifest.json", "utf8"));
-const collections = await Promise.all(
-  manifest.collections.map(async (entry) =>
-    JSON.parse(await readFile(`public/data/poetry/${entry.id}.json`, "utf8")),
-  ),
-);
-
 test("loads offline corpus from split collections", async () => {
   const originalFetch = globalThis.fetch;
   const requests = [];
   globalThis.fetch = async (url) => {
     const name = String(url).split("/").pop();
     requests.push(name);
-    const payload = name === "manifest.json"
-      ? manifest
-      : collections[manifest.collections.findIndex((entry) => `${entry.id}.json` === name)];
-    return { ok: Boolean(payload), json: async () => payload };
+    return offlineCatalogFixture(name);
   };
   try {
     const catalog = await loadPoetryCatalog({ force: true });
     assert.equal(requests[0], "manifest.json");
-    assert.equal(requests.length, manifest.collections.length + 1);
+    assert.equal(requests.length, offlineCatalogManifest.collections.length + 1);
     assert.ok(catalog.length > 9000);
     assert.equal(catalog[0].id, "demo-jingyesi");
     assert.ok(catalog.some((poem) => poem.category === "宋词"));

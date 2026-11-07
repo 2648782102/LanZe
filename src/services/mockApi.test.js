@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
 import { demoUser } from "../data/demoUser.js";
 import { demoExcerpts } from "../data/poems.js";
+import { offlineCatalogFixture } from "../data/offlineCatalogFixture.mjs";
 import { loadPoetryCatalog } from "../data/poetryCatalog.js";
 import {
   getMockData,
@@ -21,20 +21,8 @@ import {
   resetDemoStore,
 } from "./mockApi.js";
 
-const manifest = JSON.parse(await readFile("public/data/poetry/manifest.json", "utf8"));
-const collections = await Promise.all(
-  manifest.collections.map(async (entry) =>
-    JSON.parse(await readFile(`public/data/poetry/${entry.id}.json`, "utf8")),
-  ),
-);
 const originalFetch = globalThis.fetch;
-globalThis.fetch = async (url) => {
-  const name = String(url).split("/").pop();
-  const payload = name === "manifest.json"
-    ? manifest
-    : collections[manifest.collections.findIndex((entry) => `${entry.id}.json` === name)];
-  return { ok: Boolean(payload), json: async () => payload };
-};
+globalThis.fetch = (url) => offlineCatalogFixture(String(url).split("/").pop());
 await loadPoetryCatalog({ force: true });
 globalThis.fetch = originalFetch;
 

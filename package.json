@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "smoke": "node scripts/smoke.mjs",
     "smoke:browser": "node scripts/smoke.browser.mjs",
-    "test": "node --test scripts/*.test.mjs src/config/*.test.js src/data/*.test.js src/services/*.test.js src/utils/*.test.js",
+    "test": "node --test --test-concurrency=1 scripts/*.test.mjs src/config/*.test.js src/data/*.test.js src/services/*.test.js src/utils/*.test.js",
     "lint": "node src/utils/lint.mjs"
   },
   "dependencies": {
