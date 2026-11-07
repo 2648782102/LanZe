@@ -1,7 +1,7 @@
 import axios from "axios";
-import { ElMessage } from "element-plus/es/components/message/index.mjs";
 import { apiConfig, baseUrl } from "./env.js";
 import { failure, isSuccess, normalizePoemPayload } from "../utils/response.js";
+import { notify } from "../composables/useNotices.js";
 import {
   mockCollectionPoems,
   mockCustomPoems,
@@ -27,11 +27,7 @@ let fallbackNoticeShown = false;
 const showFallbackNotice = (message) => {
   if (fallbackNoticeShown || typeof document === "undefined") return;
   fallbackNoticeShown = true;
-  ElMessage({
-    duration: 3500,
-    message: `${message}，已切换为本地演示数据`,
-    type: "warning",
-  });
+  notify(`${message}，已切换为本地演示数据`, "warning", 4200);
 };
 
 const getMockResponse = (url, method, data, params) => {

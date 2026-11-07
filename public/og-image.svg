@@ -1,33 +1,42 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="兰泽诗词：以折页与竖排文字重新呈现的古诗词前端">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="兰泽：青瓷数字诗馆，读诗的地方">
   <defs>
-    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#f7f4ec"/>
-      <stop offset="1" stop-color="#ded7c9"/>
+    <linearGradient id="porcelain" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbfcf9"/>
+      <stop offset="1" stop-color="#e8ece5"/>
     </linearGradient>
-    <pattern id="fiber" width="36" height="36" patternUnits="userSpaceOnUse">
-      <path d="M0 0H36M0 18H36" stroke="#2f5d50" stroke-opacity=".045"/>
-      <path d="M18 0V36" stroke="#2f5d50" stroke-opacity=".025"/>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M0 0H48M0 0V48" fill="none" stroke="#517a70" stroke-opacity=".08" stroke-width="1"/>
     </pattern>
   </defs>
-  <rect width="1200" height="630" fill="url(#paper)"/>
-  <rect width="1200" height="630" fill="url(#fiber)"/>
-  <path d="M74 74H1126M74 556H1126" stroke="#2f5d50" stroke-opacity=".35"/>
-  <path d="M74 74V556M1126 74V556" stroke="#2f5d50" stroke-opacity=".35"/>
-  <g fill="#26352f" font-family="Songti SC, Noto Serif CJK SC, serif" text-anchor="middle">
-    <text x="600" y="164" font-size="38" letter-spacing="18">兰 泽 诗 词</text>
-    <text x="600" y="210" font-size="16" letter-spacing="7" fill="#5a655d">LANZE · CLASSICAL CHINESE POETRY</text>
+  <rect width="1200" height="630" fill="url(#porcelain)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <circle cx="990" cy="160" r="330" fill="none" stroke="#a8c4b8" stroke-opacity=".34" stroke-width="1"/>
+  <circle cx="990" cy="160" r="230" fill="none" stroke="#a88245" stroke-opacity=".2" stroke-width="1"/>
+  <path d="M76 76H1124M76 554H1124" stroke="#162c2b" stroke-opacity=".22" stroke-width="1"/>
+  <g fill="none" stroke="#a88245" stroke-width="2">
+    <path d="M80 140V94"/>
+    <path d="M92 140V112"/>
+    <path d="M104 140V102"/>
   </g>
-  <g fill="#26352f" font-family="Songti SC, Noto Serif CJK SC, serif" font-size="32" text-anchor="middle">
-    <text x="410" y="292">山</text><text x="410" y="330">有</text><text x="410" y="368">木</text><text x="410" y="406">兮</text><text x="410" y="444">木</text><text x="410" y="482">有</text><text x="410" y="520">枝</text>
-    <text x="482" y="292">心</text><text x="482" y="330">悦</text><text x="482" y="368">君</text><text x="482" y="406">兮</text><text x="482" y="444">君</text><text x="482" y="482">不</text><text x="482" y="520">知</text>
-    <text x="594" y="292">海</text><text x="594" y="330">上</text><text x="594" y="368">生</text><text x="594" y="406">明</text><text x="594" y="444">月</text>
-    <text x="666" y="292">天</text><text x="666" y="330">涯</text><text x="666" y="368">共</text><text x="666" y="406">此</text><text x="666" y="444">时</text>
+  <text x="126" y="132" fill="#162c2b" font-family="Songti SC, Noto Serif CJK SC, serif" font-size="34" letter-spacing="14">兰泽</text>
+  <text x="126" y="160" fill="#809793" font-family="Avenir Next, PingFang SC, sans-serif" font-size="12" letter-spacing="6">LANZE · POETRY ROOM</text>
+  <text x="80" y="235" fill="#a88245" font-family="Avenir Next, sans-serif" font-size="13" letter-spacing="5">01 / 今日展厅</text>
+  <text x="80" y="326" fill="#162c2b" font-family="Songti SC, Noto Serif CJK SC, serif" font-size="78" letter-spacing="9">海上生明月</text>
+  <text x="80" y="414" fill="#162c2b" font-family="Songti SC, Noto Serif CJK SC, serif" font-size="78" letter-spacing="9">天涯共此时</text>
+  <path d="M80 456H710" stroke="#a88245" stroke-opacity=".55" stroke-width="1"/>
+  <text x="80" y="498" fill="#536b68" font-family="Songti SC, Noto Serif CJK SC, serif" font-size="21" letter-spacing="7">张九龄 · 望月怀远</text>
+  <rect x="838" y="164" width="252" height="316" fill="#fbfcf9" stroke="#162c2b" stroke-opacity=".16"/>
+  <rect x="846" y="172" width="236" height="300" fill="none" stroke="#a88245" stroke-opacity=".45"/>
+  <circle cx="964" cy="276" r="72" fill="#eef2ed" stroke="#a8c4b8" stroke-width="1"/>
+  <circle cx="996" cy="254" r="50" fill="#fbfcf9"/>
+  <path d="M852 420C902 384 934 396 972 354C1008 314 1042 326 1080 286" fill="none" stroke="#517a70" stroke-opacity=".45" stroke-width="2"/>
+  <path d="M852 444C906 414 944 430 984 392C1020 358 1044 368 1080 340" fill="none" stroke="#a8c4b8" stroke-opacity=".8" stroke-width="2"/>
+  <g fill="#a8c4b8" opacity=".85">
+    <circle cx="1024" cy="398" r="8"/><circle cx="1040" cy="384" r="5"/><circle cx="1010" cy="414" r="5"/>
+    <circle cx="904" cy="402" r="6"/><circle cx="922" cy="390" r="4"/>
   </g>
-  <g stroke="#9e3b2f" stroke-width="3" fill="none">
-    <rect x="820" y="386" width="88" height="88" rx="2"/>
-  </g>
-  <g fill="#9e3b2f" font-family="Songti SC, serif" font-size="28" text-anchor="middle">
-    <text x="864" y="424">兰</text><text x="864" y="458">泽</text>
-  </g>
-  <text x="600" y="602" fill="#5a655d" font-family="Songti SC, serif" font-size="17" letter-spacing="4" text-anchor="middle">github.com/2648782102/LanZe</text>
+  <rect x="838" y="480" width="252" height="1" fill="#162c2b" opacity=".16"/>
+  <text x="838" y="510" fill="#809793" font-family="Avenir Next, PingFang SC, sans-serif" font-size="10" letter-spacing="3">VISUAL NOTE · 馆藏诗意图</text>
+  <text x="80" y="592" fill="#809793" font-family="Avenir Next, PingFang SC, sans-serif" font-size="14" letter-spacing="4">读一首诗，收进自己的诗卷</text>
+  <text x="1124" y="592" text-anchor="end" fill="#536b68" font-family="Avenir Next, sans-serif" font-size="14" letter-spacing="3">GITHUB.COM/2648782102/LANZE</text>
 </svg>

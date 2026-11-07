@@ -1,6 +1,6 @@
 # 宣发短帖（中英文）
 
-> 本文件是仓库内可复核的文案素材。当前不连接到外部社媒，也不自动群发；如人工发布，请附真实仓库、Release 或 Discussion 链接，不写 star 数、用户数、性能百分比、线上 Demo 或付费推广。到 2026-11-06 08:00 前仅维护项目自有 GitHub 渠道。
+> 本文件是仓库内可复核的文案素材。当前不连接到外部社媒，也不自动群发；如人工发布，请附真实仓库、Release 或 Discussion 链接，不写 star 数、用户数、性能百分比、线上 Demo 或付费推广。当前仅维护项目自有 GitHub 渠道，外部发布均需人工确认。
 
 ## 使用约定
 
@@ -16,26 +16,26 @@
 
 **中文**
 
-> 把 2022 年留下的「兰泽诗词」重新整理成可参与的开源前端：README、MIT、贡献指南、安全政策、架构/部署文档、Node 20/22 CI、issue 模板都补齐了。Vue 3 + Vite 6，本地 `npm ci && npm run dev` 就能看摘录、文库、搜索与茶楼界面。  
-> 不承诺线上 Demo 或托管后端，先从可复现、23 项单测和本地演示数据开始。欢迎文档勘误、API 适配、交互回归与前端稳定性 PR。  
+> 把 2022 年留下的「兰泽诗词」重新整理成可参与的开源前端：README、MIT、贡献指南、安全政策、架构/部署文档、Node 20/22 CI、issue 模板都补齐了。Vue 3 + Vite 6，本地 `npm ci && npm run dev` 就能进入今日展厅、诗词索引、诗卷与写作台。\
+> 当前以「青瓷数字诗馆」为目标模式完整重做信息架构与自有组件；不承诺线上 Demo 或托管后端，先从可复现、23 项单测和本地演示数据开始。欢迎文档勘误、API 适配、交互回归与前端稳定性 PR。\
 > #开源 #Vue3 #古诗词
 
 **English**
 
-> Reopening LanZe, a 2022 Chinese poetry frontend, as a maintainable open-source repo: rewritten README, MIT license, contributing/security docs, architecture & deployment notes, Node 20/22 CI, and issue templates. Built with Vue 3 + Vite 6; `npm ci && npm run dev` runs excerpts, library, search and community UI locally with built-in demo data.  
-> No hosted demo or backend is promised—reproducible builds, 23 unit tests and local data come first. Docs, API and frontend fixes welcome.  
+> Reopening LanZe, a 2022 Chinese poetry frontend, as a maintainable open-source repo: rewritten README, MIT license, contributing/security docs, architecture & deployment notes, Node 20/22 CI, and issue templates. Built with Vue 3 + Vite 6; `npm ci && npm run dev` opens a daily reading room, searchable index, personal collection and writing desk with built-in demo data.\
+> Its “Celadon Poetry Room” interface is a complete rebuild around independent components; no hosted demo or backend is promised—reproducible builds, 23 unit tests and local data come first. Docs, API and frontend fixes welcome.\
 > #opensource #Vue3 #ChinesePoetry
 
 ## 2. 微博 / 即刻风格：中文项目与新人友好
 
 **中文**
 
-> 一个适合慢慢读、也适合第一次参与开源的中文项目：兰泽诗词。古诗词摘录、分类文库、茶楼创作界面，用 Vue 3 写成；这次把 README、MIT、贡献指南、FAQ、路线图与 CI 整理清楚，也补了本地演示数据和测试。  
+> 一个适合慢慢读、也适合第一次参与开源的中文项目：兰泽诗词。它用 Vue 3 写成一间「青瓷数字诗馆」：先读今日的一首诗，再去索引里寻诗、收进诗卷，或到写作台起草自己的作品；这次也把 README、MIT、贡献指南、FAQ、路线图与 CI 整理清楚，补了本地演示数据和测试。\
 > 项目不依赖「先看线上 demo」：Node 20/22 本地安装即可运行前端，未配置后端也能用演示账号体验主要界面。不会写代码也能从文档勘误、素材授权、移动端检查开始。
 
 **English**
 
-> LanZe is a Chinese-language open-source frontend for classical poetry—excerpts, category browsing and a community prototype in Vue 3. We rewrote the README, added MIT licensing, contribution/security docs, FAQ, roadmap, CI, unit tests and local demo data.  
+> LanZe is a Chinese-language open-source frontend for classical poetry—a quiet reading room, searchable index, personal collection and writing desk built with Vue 3. We rewrote the README, added MIT licensing, contribution/security docs, FAQ, roadmap, CI, unit tests and local demo data.\
 > No public demo is required to try the frontend: install with Node 20/22 and run it locally; built-in demo data works without a backend. Docs, licensing checks and mobile QA are great first contributions.
 
 ## 3. 小红书风格：轻介绍（不夸大）
@@ -43,7 +43,8 @@
 **中文**
 
 > 📜 发现一个中文古诗词开源前端：兰泽诗词  
-> · Vue 3 + Vite 6，摘录 / 文库 / 搜索 / 茶楼界面  
+> · Vue 3 + Vite 6，今日展厅 / 诗词索引 / 我的诗卷 / 写作台\
+> · 冷白瓷面、青灰线框与铜金索引色；每次先安静读完一首诗\
 > · 本地 `npm run dev` 可看，内置演示数据，MIT 开源，README 与贡献指南都换成了清楚的中文  
 > · 目前整理的是前端与文档，不承诺线上账号服务；演示数据不是正式社区  
 > 想练手的话，文档校对、移动端布局、空状态/错误态、交互回归都很适合作为第一个 PR。把旧项目一点点修好，也挺浪漫的。🌿
@@ -51,7 +52,8 @@
 **English**
 
 > 📜 LanZe: an open-source Chinese poetry frontend  
-> · Vue 3 + Vite 6: excerpts, library, search and community screens  
+> · Vue 3 + Vite 6: a daily reading room, searchable index, personal collection and writing desk\
+> · Cool porcelain surfaces, celadon rules and brass index marks; one poem at a time\
 > · Runs locally with `npm run dev`; built-in demo data, MIT-licensed, with a clear Chinese README and contributing guide  
 > · Frontend/docs first—no hosted account service is promised; demo data is not a production community  
 > Good first PRs: docs, mobile layout, empty/error states and interaction QA. Quietly restoring an old project can be lovely. 🌿
@@ -61,13 +63,13 @@
 **中文**
 
 > 旧前端项目怎么重新开放？我们没有先堆功能，而是先处理「别人能不能跑起来、能不能相信文档」：  
-> ① README 删除失效托管/演示承诺；② MIT + 贡献/行为/安全政策；③ 把 Vite 升到 6，统一 ESM 与相对 base；④ 用 `VITE_API_BASE_URL` + `VITE_USE_MOCK` 收敛请求层，未配置后端时自动使用本地演示数据；⑤ Node 20/22 CI 跑 `npm ci`、`npm run build`、`npm run test --if-present`，Documentation checks 跑 `npm run lint`，另有 23 项单测；⑥ 默认音源/封面本地化，Pages 只手动触发，不自动发到旧域名。  
-> 兰泽诗词的下一段是把可选本机浏览器冒烟沉淀为 CI 可复现的 E2E，继续拆分大体积依赖并补素材授权清单。欢迎来提可验证的小 PR。
+> ① README 删除失效托管/演示承诺；② MIT + 贡献/行为/安全政策；③ 把 Vite 升到 6，统一 ESM 与相对 base；④ 用 `VITE_API_BASE_URL` + `VITE_USE_MOCK` 收敛请求层，未配置后端时自动使用本地演示数据；⑤ Node 20/22 CI 跑 `npm ci`、`npm run build`、`npm run test --if-present`，Documentation checks 跑 `npm run lint`，另有 23 项单测；⑥ 视图层按「青瓷数字诗馆」完全重构为自有组件，默认音源/封面本地化，Pages 只手动触发，不自动发到旧域名。\
+> 兰泽诗词的下一段是把可选本机浏览器冒烟沉淀为 CI 可复现的 E2E，继续收敛静态素材体积并补授权清单。欢迎来提可验证的小 PR。
 
 **English**
 
-> How do you reopen a dormant frontend? Start with trust, not features: remove stale demo claims; add MIT + contribution/security policies; upgrade to Vite 6 with one ESM config and a relative base; converge requests behind `VITE_API_BASE_URL` + `VITE_USE_MOCK`, with local demo data as the no-backend fallback; run Node 20/22 CI with `npm ci`, `npm run build` and `npm run test --if-present`, add `npm run lint` in Documentation checks, plus 23 unit tests; use a repository-generated local audio demo by default; keep Pages manual and away from dead domains.  
-> Next for LanZe: turn the optional local browser smoke into repeatable CI E2E, keep splitting bundles, and finish third-party asset licensing. Small, verifiable PRs welcome.
+> How do you reopen a dormant frontend? Start with trust, not features: remove stale demo claims; add MIT + contribution/security policies; upgrade to Vite 6 with one ESM config and a relative base; converge requests behind `VITE_API_BASE_URL` + `VITE_USE_MOCK`, with local demo data as the no-backend fallback; run Node 20/22 CI with `npm ci`, `npm run build` and `npm run test --if-present`, add `npm run lint` in Documentation checks, plus 23 unit tests; rebuild the interface as an independent “Celadon Poetry Room” component system; use a repository-generated local audio demo by default; keep Pages manual and away from dead domains.\
+> Next for LanZe: turn the optional local browser smoke into repeatable CI E2E, keep reducing static asset weight, and finish third-party licensing. Small, verifiable PRs welcome.
 
 ## 5. Release / Discussion 联动风格
 

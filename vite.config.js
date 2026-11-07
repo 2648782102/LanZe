@@ -22,9 +22,7 @@ export default defineConfig({
         manualChunks(id) {
           if (!id.includes("node_modules")) return;
           if (/node_modules\/(vue|vue-router|@vue)\//.test(id)) return "vue-vendor";
-          if (/node_modules\/(element-plus|@element-plus)\//.test(id)) return "element-vendor";
-          if (/node_modules\/(axios|@supabase|nanoid|vue-cookies)\//.test(id)) return "data-vendor";
-          if (/node_modules\/(lottie-web|vue3-lottie|@lottiefiles)\//.test(id)) return "lottie-vendor";
+          if (/node_modules\/(axios|@supabase|vue-cookies)\//.test(id)) return "data-vendor";
         },
       },
     },

@@ -1,0 +1,153 @@
+<template>
+  <article class="poem-row">
+    <router-link class="poem-row__main" :to="{ name: 'poem', params: { id: poem.id } }">
+      <span class="poem-row__number">{{ index }}</span>
+      <div class="poem-row__title">
+        <h3>{{ poem.title }}</h3>
+        <p>{{ poem.author }} · {{ poem.category }}</p>
+      </div>
+      <p class="poem-row__line">{{ firstLine }}</p>
+      <AppIcon class="poem-row__arrow" name="arrow-right" :size="17" />
+    </router-link>
+    <button
+      class="poem-row__save"
+      type="button"
+      :class="{ 'is-saved': saved }"
+      :aria-label="saved ? `取消收藏${poem.title}` : `收藏${poem.title}`"
+      :aria-pressed="saved"
+      @click="$emit('toggle', poem)"
+    >
+      <AppIcon name="bookmark" :size="17" />
+    </button>
+  </article>
+</template>
+
+<script setup>
+import { computed } from "vue";
+import AppIcon from "./AppIcon.vue";
+
+const props = defineProps({
+  poem: { type: Object, required: true },
+  saved: { type: Boolean, default: false },
+  index: { type: String, default: "—" },
+});
+
+defineEmits(["toggle"]);
+
+const firstLine = computed(() =>
+  props.poem.paragraph || props.poem.paragraphs?.[0] || props.poem.content || "暂未收录正文",
+);
+</script>
+
+<style scoped>
+.poem-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+}
+
+.poem-row__main {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 46px minmax(160px, 0.9fr) minmax(160px, 1.2fr) auto;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.poem-row__number {
+  color: var(--brass);
+  font-family: var(--font-number);
+  font-size: 11px;
+}
+
+.poem-row__title h3 {
+  margin: 0;
+  font-family: var(--font-poem);
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+
+.poem-row__title p {
+  margin: 4px 0 0;
+  color: var(--ink-faint);
+  font-size: 10px;
+}
+
+.poem-row__line {
+  overflow: hidden;
+  margin: 0;
+  color: var(--ink-soft);
+  font-family: var(--font-poem);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.poem-row__arrow {
+  color: var(--ink-faint);
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.poem-row__main:hover .poem-row__arrow {
+  color: var(--brass);
+  transform: translateX(3px);
+}
+
+.poem-row__main:hover h3 {
+  color: var(--brass);
+}
+
+.poem-row__save {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink-faint);
+}
+
+.poem-row__save:hover {
+  background: rgba(81, 122, 112, 0.1);
+  color: var(--brass);
+}
+
+.poem-row__save.is-saved {
+  color: var(--brass);
+}
+
+.poem-row__save.is-saved :deep(svg) {
+  fill: currentColor;
+}
+
+@media (max-width: 700px) {
+  .poem-row__main {
+    grid-template-columns: 32px 1fr auto;
+    gap: 8px 12px;
+    padding: 17px 0;
+  }
+
+  .poem-row__title {
+    grid-column: 2;
+  }
+
+  .poem-row__title h3 {
+    font-size: 18px;
+  }
+
+  .poem-row__line {
+    grid-column: 2 / 4;
+    font-size: 12px;
+  }
+
+  .poem-row__arrow {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}
+</style>

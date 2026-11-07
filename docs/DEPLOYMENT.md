@@ -4,7 +4,7 @@
 
 `npm run build` 生成的是**静态前端**。部署前端不等于自动获得后端、账号、诗词数据库或已验证的线上 Demo。所有公开环境变量都会进入浏览器产物；需要保密的配置应留在你自己的 API 服务端。
 
-当前仓库使用 `createWebHashHistory()`，形如 `https://example.com/#/home` 的路由不需要服务器 rewrite。若未来切换 history 模式，必须配置 `index.html` fallback。`vite.config.js` 使用 `base: './'`，适合相对路径的 GitHub Pages 项目站点；部署后仍需实测静态资源路径。
+当前仓库使用 `createWebHashHistory()`，形如 `https://example.com/#/explore` 的路由不需要服务器 rewrite。若未来切换 history 模式，必须配置 `index.html` fallback。`vite.config.js` 使用 `base: './'`，适合相对路径的 GitHub Pages 项目站点；部署后仍需实测静态资源路径。
 
 ## 2. 发布前清单
 
@@ -85,9 +85,9 @@ npm run build
 
 ## 8. 部署验收
 
-- [ ] 根路径可以访问，静态资源无 404；刷新 `/#/home` 仍可打开。
+- [ ] 根路径可以访问，静态资源无 404；刷新 `/#/explore` 仍可打开。
 - [ ] 浏览器控制台没有敏感信息、重复请求或阻断的第三方脚本导致白屏。
-- [ ] 演示模式下首页/文库/搜索有本地数据；关闭 mock 且后端不可用时自动降级并给出提示。
+- [ ] 演示模式下今日展厅/诗词索引/搜索有本地数据；关闭 mock 且后端不可用时自动降级并给出提示。
 - [ ] 移动端宽度下导航与滚动可用。
 - [ ] README / Release 中没有把本次部署写成「官方线上 Demo」，除非维护者实际验证并明确声明。
 - [ ] 记录部署 URL、commit SHA、构建日志链接与回滚步骤；如为该 GitHub 仓库启用 Pages，更新 About / Discussion 后再对外发布。

@@ -1,210 +1,89 @@
-import { createRouter, createWebHashHistory } from "vue-router"
+import { createRouter, createWebHashHistory } from "vue-router";
+
+const routes = [
+  {
+    path: "/",
+    name: "read",
+    component: () => import("../views/ReadView.vue"),
+    meta: { title: "今日展厅" },
+  },
+  {
+    path: "/explore",
+    name: "explore",
+    component: () => import("../views/ExploreView.vue"),
+    meta: { title: "寻诗" },
+  },
+  {
+    path: "/poem/:id",
+    name: "poem",
+    component: () => import("../views/PoemView.vue"),
+    meta: { title: "读诗" },
+  },
+  {
+    path: "/collection",
+    name: "collection",
+    component: () => import("../views/CollectionView.vue"),
+    meta: { title: "我的诗卷" },
+  },
+  {
+    path: "/compose",
+    name: "compose",
+    component: () => import("../views/ComposeView.vue"),
+    meta: { title: "写一首诗" },
+  },
+  {
+    path: "/login",
+    name: "login",
+    component: () => import("../views/AuthView.vue"),
+    meta: { title: "登录", bare: true },
+  },
+  {
+    path: "/register",
+    name: "register",
+    component: () => import("../views/AuthView.vue"),
+    meta: { title: "创建账号", bare: true },
+  },
+  { path: "/home", redirect: "/" },
+  { path: "/zhailu", redirect: "/" },
+  { path: "/wenku", redirect: "/explore" },
+  { path: "/gushi", redirect: "/explore" },
+  { path: "/searchul", redirect: (to) => ({ path: "/explore", query: to.query }) },
+  { path: "/details", redirect: (to) => ({ path: "/poem/legacy", query: to.query }) },
+  { path: "/chalou", redirect: "/explore" },
+  { path: "/jingxuan", redirect: "/explore" },
+  { path: "/fengya", redirect: "/explore" },
+  { path: "/feihua", redirect: "/explore" },
+  { path: "/xiandai", redirect: "/explore" },
+  { path: "/duxue", redirect: "/collection" },
+  { path: "/personal", redirect: "/collection" },
+  { path: "/personalhome", redirect: "/collection" },
+  { path: "/personalziLiao", redirect: "/collection" },
+  { path: "/datamessage", redirect: "/collection" },
+  { path: "/favorite", redirect: "/collection" },
+  { path: "/samplereels", redirect: "/collection" },
+  { path: "/attention", redirect: "/collection" },
+  { path: "/complaint", redirect: "/collection" },
+  { path: "/shezhi", redirect: "/collection" },
+  { path: "/publishpoem", redirect: "/compose" },
+  { path: "/loginindex", redirect: "/login" },
+  { path: "/adduser", redirect: "/register" },
+  { path: "/datauser", redirect: "/login" },
+  { path: "/deleteuser", redirect: "/login" },
+  { path: "/audio", redirect: "/" },
+  { path: "/kongbai", redirect: "/" },
+  { path: "/:pathMatch(.*)*", redirect: "/" },
+];
 
 const router = createRouter({
-    // 路由模式
-    history: createWebHashHistory(),
-    routes: [
-        // 配置默认页面
-    {
-        path:'/',
-        redirect:'/home',
-    },
-    {
-        name: 'loginindex',  //登录页面父组件
-        path: '/loginindex',
-        component:() => import('../pages/login/loginIndex.vue'),
-        meta:{title: '登录页面'},
-        redirect: '/login',
-        children:[
-            {
-                name: 'login',  //登录
-                path: '/login',
-                component:() => import('../pages/login/login.vue'),
-                meta:{title: '登录'},
-            },
-            {
-                name: 'adduser',  //注册
-                path: '/adduser',
-                component:() => import('../pages/login/addUser.vue'),
-                meta:{title: '注册'},
-            },
-            {
-                name: 'datauser',  //修改
-                path: '/datauser',
-                component:() => import('../pages/login/dataUser.vue'),
-                meta:{title: '修改'},
-            },
-            {
-                name: 'deleteuser',  //注销
-                path: '/deleteuser',
-                component:() => import('../pages/login/deleteUser.vue'),
-                meta:{title: '注销'},
-            },
-        ]
-    },
-    {
-        name: 'home',  //首页/摘录
-        path: '/home',
-        component:() => import('../pages/Home.vue'),
-        meta:{title: '首页/摘录'},
-        redirect:'/zhailu',
-        children:[
-            {
-                name: 'zhailu',  //摘录
-                path: '/zhailu',
-                component:() => import('../pages/ZhaiLu/ZhaiLu.vue'),
-                meta: {title: '摘录'}
-            },
-            {
-                name: 'wenku',  //文库
-                path: '/wenku',
-                component:() => import('../pages/WenKu/WenKu.vue'),
-                meta: {title: '文库'},
-                redirect: '/gushi',
-                children:[
-                    {
-                        name: 'gushi',  //古诗类
-                        path: '/gushi',
-                        component:() => import('../pages/WenKu/GuShi.vue'),
-                        meta: {title: '古诗类'}
-                    }
-                ]
-            },
-            {
-                name: 'chalou',  //茶社
-                path: '/chalou',
-                component:() => import('../pages/ChaLou/ChaLou.vue'),
-                meta: {title: '茶社'},
-                redirect: '/jingxuan',
-                children:[
-                    {
-                        name: 'feihua',  //飞花接龙
-                        path: '/feihua',
-                        component:() => import('../pages/ChaLou/FeiHua.vue'),
-                        meta: {title: '飞花接龙'}
-                    },
-                    { 
-                        name: 'fengya',  //风俗雅文
-                        path: '/fengya',
-                        component:() => import('../pages/ChaLou/FengYa.vue'),
-                        meta: {title: '风俗雅文'}
-                    },
-                    {
-                        name: 'jingxuan',  //精选诗文
-                        path: '/jingxuan',
-                        component:() => import('../pages/ChaLou/JingXuan.vue'),
-                        meta: {title: '精选诗文'}
-                    },
-                    {
-                        name: 'xiandai',  //现代诗歌
-                        path: '/xiandai',
-                        component:() => import('../pages/ChaLou/XianDai.vue'),
-                        meta: {title: '现代诗歌'}
-                    },
-                    
-                ]
-            },
-            {
-                name: 'duxue',  //笃学
-                path: '/duxue',
-                component:() => import('../pages/DuXue/DuXue.vue'),
-                meta: {title: '笃学'}
-            },
-            {
-                name: 'personal',  //个人中心
-                path: '/personal',
-                component:() => import('../pages/Personal/Personal.vue'),
-                meta: {title: '个人中心'},
-                redirect: '/personalziLiao',
-                children:[
-                    {
-                        name: 'personalhome',  //个人中心首页
-                        path: '/personalhome',
-                        component:() => import('../pages/Personal/PersonalHome.vue'),
-                        meta: {title: '个人中心首页'}
-                    },
-                    {
-                        name: 'personalziLiao',  //个人资料
-                        path: '/personalziLiao',
-                        component:() => import('../pages/Personal/PersonalZiLiao.vue'),
-                        meta: {title: '个人资料'}
-                    },
-                    {
-                        name: 'datamessage',  //修改资料
-                        path: '/datamessage',
-                        component:() => import('../pages/Personal/son/dataMessage.vue'),
-                        meta: {title: '修改资料'}
-                    },
-                    {
-                        name: 'samplereels',  //作品
-                        path: '/samplereels',
-                        component:() => import('../pages/Personal/SampleReels.vue'),
-                        meta: {title: '作品'}
-                    },
-                    {
-                        name: 'publishpoem',  //作品
-                        path: '/publishpoem',
-                        component:() => import('../pages/Personal/son/publishPoem.vue'),
-                        meta: {title: '发布作品'}
-                    },
-                    {
-                        name: 'favorite',  //收藏
-                        path: '/favorite',
-                        component:() => import('../pages/Personal/Favorite.vue'),
-                        meta: {title: '收藏'}
-                    },
-                    {
-                        name: 'complaint',  //投诉意见
-                        path: '/complaint',
-                        component:() => import('../pages/Personal/Complaint.vue'),
-                        meta: {title: '投诉意见'}
-                    },
-                    {
-                        name: 'shezhi',  //设置
-                        path: '/shezhi',
-                        component:() => import('../pages/Personal/SheZhi.vue'),
-                        meta: {title: '设置'}
-                    },
-                    {
-                        name: 'attention',  //关注
-                        path: '/attention',
-                        component:() => import('../pages/Personal/Attention.vue'),
-                        meta: {title: '关注'}
-                    }
-                ]
-            },
-            {
-                name:'details',
-                path:'/details',
-                component:() => import('../pages/details.vue'),
-                meta: {title: '详情'}
-            },
-            {
-                name:'searchul',
-                path:'/searchul',
-                component:() => import('../pages/searchUl.vue'),
-                meta: {title: '搜索结果'}
-            },
-            {
-                name:'kongbai',
-                path:'/kongbai',
-                component:() => import('../pages/kongbai.vue'),
-                meta: {title: '空白页'}
-            },
-            {
-                name:'audio',
-                path: '/audio',
-                component:() => import('../pages/Audio.vue'),
-                meta: {title: '音乐播放器'}
-            }
-        ]
-    }
-    ]
-})
-
+  history: createWebHashHistory(),
+  routes,
+  scrollBehavior() {
+    return { top: 0 };
+  },
+});
 
 router.afterEach((to) => {
-    document.title = to.meta.title ? `${to.meta.title} · 兰泽诗词` : "兰泽诗词";
+  document.title = to.meta.title ? `${to.meta.title} · 兰泽` : "兰泽 · 读诗的地方";
 });
 
 export default router;

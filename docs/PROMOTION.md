@@ -1,6 +1,6 @@
 # 展示与宣发清单
 
-> **状态：部分已执行。** 本文件最初由治理子任务写入；主 agent 已核对并执行仓库自有渠道中的 Release、Discussions 欢迎帖、About 描述与 topics。社交预览图、Pages、社交平台短帖、外部社区投稿和付费推广均未执行。最后整理：2026-11-06。
+> **状态：部分已执行。** 本文件最初由治理子任务写入；主 agent 已核对并执行仓库自有渠道中的 Release、Discussions 欢迎帖、About 描述与 topics。社交预览图、Pages、社交平台短帖、外部社区投稿和付费推广均未执行。最后整理：2026-11-07。
 
 ## 1. 推荐仓库定位
 
@@ -9,13 +9,13 @@
 简体中文主版本：
 
 ```text
-兰泽诗词（LanZe）是一个开源的中文古诗词前端：用 Vue 3 + Vite + Element Plus 呈现摘录、文库、搜索、茶楼创作、笃学与个人中心。项目始于 2022 年，2026 年重新整理为可本地安装、可复现构建、可逐步替换数据源的社区维护仓库；支持演示数据/mock 约定、MIT 许可与中文贡献文档。当前不承诺线上 Demo 或托管后端，欢迎从文档、CI、前端稳定性与诗词内容体验开始贡献。
+兰泽诗词（LanZe）是一个开源的中文古诗词前端：用 Vue 3、Vite 与自有组件呈现今日展厅、诗词索引、收藏、创作与我的诗卷。项目始于 2022 年，2026 年重新整理为可本地安装、可复现构建、可逐步替换数据源的社区维护仓库；支持演示数据/mock 约定、MIT 许可与中文贡献文档。当前不承诺线上 Demo 或托管后端，欢迎从文档、CI、前端稳定性与诗词内容体验开始贡献。
 ```
 
 可选英文短版：
 
 ```text
-An open-source Vue 3 frontend for classical Chinese poetry: excerpts, category browsing, search, community prototypes and a personal centre. Locally buildable, documented in Chinese, MIT-licensed, and moving toward configurable APIs with demo data. No hosted backend or public demo is promised.
+An open-source Vue 3 frontend for classical Chinese poetry: a daily reading room, searchable index, saved poems, a writing desk and a personal collection. Locally buildable, documented in Chinese, MIT-licensed, and moving toward configurable APIs with demo data. No hosted backend or public demo is promised.
 ```
 
 ### Topics 建议
@@ -23,10 +23,10 @@ An open-source Vue 3 frontend for classical Chinese poetry: excerpts, category b
 主 agent 可在 GitHub About → Topics 中按需添加（GitHub 建议数量有限，按相关性排序）：
 
 ```text
-vue3, vite, element-plus, javascript, frontend, chinese-poetry, poetry, classical-chinese, chinese-literature, open-source, hacktoberfest, static-site, axios, lottie, mit-license, docs, github-actions, chinese, education, web-app
+vue3, vite, javascript, frontend, chinese-poetry, poetry, classical-chinese, chinese-literature, open-source, static-site, axios, mit-license, docs, github-actions, chinese, education, web-app
 ```
 
-优先组合：`vue3, vite, element-plus, chinese-poetry, poetry, frontend, javascript, open-source, static-site, mit-license`。`hacktoberfest` 仅在维护者准备参与相关活动且 issue 已标记时使用；不要为曝光添加与项目无关的热门标签。
+优先组合：`vue3, vite, chinese-poetry, poetry, frontend, javascript, open-source, static-site, mit-license`。不要为曝光添加与项目无关的热门标签。
 
 ### About / README 展示要点
 
@@ -52,10 +52,10 @@ vue3, vite, element-plus, javascript, frontend, chinese-poetry, poetry, classica
 
 ### 社交预览图渲染复核
 
-- 来源：`public/og-image.svg`（1200×630），SHA-256 `f5bf79d04459e22b26be99b3b6cdd296c52e6838848ee61b825abe20719ad19c`。
-- 产物：`public/og-image.png`，1200×630 RGB PNG，SHA-256 `254351fc40a230ee16e8ba14ac2467691e3439743c6c06dcce2149170da0ff0b`。
-- 本机使用 Chrome 按 1200×630 视口加载 SVG 并截图；新版按逐字定位排布竖排诗句，已目检标题、诗句、印章、GitHub 地址与四边留白，无裁切或缺失字形。Quick Look 的 `-s 1200` 会生成 1200×1200 方图，不适合作为社交预览图。
-- 当前只是仓库内候选素材；在 GitHub Settings → Social preview 实际上传并回读前，不把「社交预览已更新」写成事实。
+- 来源：`public/og-image.svg`（1200×630），SHA-256 `f3f1d2dc1af474ed3af7d2c513e6c688b296386da285f3c28d1551a870eeda04`。
+- 产物：`public/og-image.png`，1200×630 PNG，SHA-256 `34acbf01d0fbc94a5db478dcc99c7358921eaac5c413f0dbb8151b0349bfce4c`。
+- 本机使用 Chrome 按 1200×630 视口加载 SVG 并截图；画面按青瓷展厅的冷白瓷面、青灰线框、铜金索引色与馆藏诗意图绘制，已目检标题、诗句、页边规则线、GitHub 地址与四边留白，无裁切或缺失字形。Quick Look 的 `-s 1200` 会生成 1200×1200 方图，不适合作为社交预览图。
+- 两张图都是当前设计衍生插画，不是运行截图，且仅为仓库内候选素材；在 GitHub Settings → Social preview 实际上传并回读前，不把「社交预览已更新」写成事实。
 
 ## 3. GitHub Discussions 欢迎帖
 
@@ -117,8 +117,8 @@ vue3, vite, element-plus, javascript, frontend, chinese-poetry, poetry, classica
 | --- | --- | --- |
 | 0–8s | README 首屏、hero 图 | 「兰泽诗词：一个本地可运行的中文古诗词开源前端」 |
 | 8–18s | 终端 `npm ci && npm run dev` | 「Node 20/22，按锁文件安装，启动本地开发服务器」 |
-| 18–32s | 首页/三折经卷摘录切换 | 「摘录、文库、搜索、茶楼等界面；演示数据可替换外部 API」 |
-| 32–45s | 文库分类、搜索结果、窄屏布局 | 「以竹纸墨绿重排原有中文界面，逐步收敛数据层与错误态」 |
+| 18–32s | 今日展厅与换诗 | 「一首诗一展厅；先安静读完，再进入索引」 |
+| 32–45s | 诗词索引、搜索结果、窄屏布局 | 「以青瓷数字诗馆重排阅读、检索与创作流程」 |
 | 45–58s | `npm run build && npm run test --if-present && npm run lint`、CI workflow | 「可复现构建，Node 20/22 CI；测试与静态扫描都在 workflow 中」 |
 | 58–70s | CONTRIBUTING、ROADMAP、LICENSE | 「MIT、贡献指南、路线图；当前不承诺线上 Demo 或托管后端」 |
 

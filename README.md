@@ -17,7 +17,7 @@
 
 ## 项目定位
 
-兰泽诗词始于 2022 年，最初是一个以 Vue 3 + Vite 构建的古诗词学习与交流界面：随机摘录、分类文库、诗词搜索、茶楼创作、笃学、个人中心与音乐播放。2026 年重新整理后，本仓库的定位是：
+兰泽诗词始于 2022 年，最初是一个以 Vue 3 + Vite 构建的古诗词学习与交流界面：今日读诗、诗词索引、搜索、收藏、创作与本地演示音源。2026 年重新整理后，本仓库的定位是：
 
 1. **可本地运行的开源前端**：`npm ci` → `npm run dev`，无需依赖历史托管平台即可查看界面。
 2. **可替换的数据适配层**：`VITE_API_BASE_URL` 优先连接自建 API；未配置或失败时自动降级到仓库内演示数据。
@@ -25,28 +25,29 @@
 
 这不是一个已经上线运营的诗词社区，也不提供经维护者验证的线上 Demo、账号服务、数据库或正式内容审核。旧 README 中的 MemFire Cloud 展示地址和 README/代码里的若干 Vercel 地址均属**历史链接**，请不要把它们当作当前可用服务。没有后端时，页面使用本地演示数据；演示账号与作品仅保存在当前浏览器 `localStorage`。
 
-## 当前状态（2026-11-06）
+## 当前状态（2026-11-07）
 
 | 项目 | 状态 |
 | --- | --- |
 | 历史基线 | 原 `main` 停在 `b4ea7f4`（2024-08-18）；2026-11-06 起进行现代化维护 |
-| 前端构建 | Vue 3 + Vue Router 4（hash 模式）+ Element Plus + Vite 6（ESM 配置） |
+| 前端构建 | Vue 3 + Vue Router 4（hash 模式）+ 自有组件 + Vite 6（ESM 配置） |
 | 在线 Demo | 不承诺；旧展示地址仅保留在 `CHANGELOG.md` 与 `docs/FAQ.md` 的事实说明中 |
 | 后端/账号 | 仓库不附带完整后端；默认使用本地演示数据，配置 `VITE_API_BASE_URL` 后可连接自建 API |
 | 测试 | `npm run test` 含 23 个 `node --test` 单测；CI 在 Node 20/22 执行构建与测试 |
 | 许可 | [MIT](LICENSE)，`Copyright (c) 2022-2026 LanZe contributors` |
 | 发布 | `v0.2.0` 的 Release notes 与 Discussions 欢迎帖见 `RELEASE_NOTES.md`、`ANNOUNCEMENT.md` |
+| 设计契约 | [青瓷数字诗馆](docs/DESIGN_SYSTEM.md)：冷白瓷面、青灰线框、铜金索引色与「一首诗一展厅」的信息架构 |
 
 ## 主要特性
 
-- 📜 **摘录与随机诗句**：三折经卷式竖排摘录、翻页切换、朱印收藏态与详情页入口。
-- 🏛 **分类文库**：唐诗、宋词、元曲、南唐、花间集、诗经/楚辞等分类界面与鉴赏入口。
-- 🔎 **搜索与详情**：按关键词检索并跳转到搜索结果/详情；默认检索仓库内演示数据，也可接自建 API。
-- 🍵 **茶楼与创作**：现代诗、精选诗文、飞花接龙、作品发布等社区界面原型。
-- 👤 **个人中心**：登录/注册/资料/作品/收藏/设置等页面，演示态由浏览器本地存储支持。
-- 🎵 **音乐播放**：APlayer 默认加载仓库自制 WAV / SVG 演示资源；可通过公开配置接入授权明确的自定义音源。
+- 📜 **今日展厅**：整首读诗、词牌长题分行、换诗、收藏态、朗读、余韵摘录与详情页入口。
+- 🏛 **诗词索引**：按诗句、作者、体裁或标签检索；分类计数来自实际演示诗目。
+- 🔎 **读诗详情**：居中诗笺、标签、笺注、相关诗目与朗读/复制链接。
+- ✍️ **写作台**：本地草稿、实时预览、资料编辑与作品发布；登录状态由浏览器本地存储支持。
+- 👤 **我的诗卷**：收藏、最近读过与本机作品三类内容，空状态给出下一步。
+- 🎵 **音乐播放**：浏览器原生音频默认加载仓库自制 WAV / SVG 演示资源；可通过公开配置接入授权明确的自定义音源。
 - 📱 **响应式布局**：包含移动端底部导航与大屏布局，仍需持续无障碍/布局回归。
-- 🧩 **现代前端栈**：Vue 3、Vue Router 4、Element Plus、Axios、Lottie，配合 Vite 6 构建与 23 项单测。
+- 🧩 **现代前端栈**：Vue 3、Vue Router 4、Axios、原生浏览器能力，配合 Vite 6 构建与 23 项单测。
 - 📚 **开源治理**：MIT、贡献/行为/安全政策、变更日志、CI、issue/PR 模板、发布与宣发文案。
 
 「特性」描述的是仓库中已有界面与默认演示数据能力，不等于提供线上账号、持久化服务或正式内容审核。逐项可信度见 `docs/FAQ.md`。
@@ -55,13 +56,14 @@
 
 | 层次 | 当前实现 |
 | --- | --- |
-| 视图 | Vue 3、Vue Router 4（当前 hash history）、Element Plus、Element Plus Icons |
+| 视图 | Vue 3、Vue Router 4（当前 hash history）、仓库自有 Vue 组件 |
 | 构建 | Vite 6 + `@vitejs/plugin-vue`，`package.json` 使用 `"type": "module"`，`base: './'` |
 | 语言 | JavaScript / Vue SFC；npm 脚本使用 `node --test` 与 ESM |
 | 数据 | `src/config/runtime.js` 统一公开配置，`src/apis/request.js` 在真实 API 与 `src/services/mockApi.js` 之间切换 |
-| 动效与媒体 | 本地 `@lottiefiles/lottie-player`、仓库内 Lottie JSON、APlayer 与 `public/media/` 自制演示音源/封面 |
-| 样式 | `src/styles/lanze-pages.css` 设计 token、组件内 CSS、Element Plus、锁定版本的本地 Bootstrap 5.1.1 / Font Awesome 5.13.0 |
-| 字体与素材 | `src/assets/` 下的字体、图片与背景；授权审查见 `docs/FAQ.md` |
+| 动效与媒体 | 浏览器原生音频、CSS/SVG 图标与 `public/media/` 自制演示音源/封面 |
+| 样式 | `src/styles/base.css` 设计 token、组件内 CSS 与 `src/components/` 自有组件 |
+| 字体与素材 | 本地宋体字体与馆内图像；授权审查见 `docs/THIRD_PARTY_ASSETS.md` |
+| 设计系统 | `src/styles/base.css` 与 `docs/DESIGN_SYSTEM.md`；组件、状态与响应式规则集中定义 |
 | 工具链 | npm、Node.js 20/22、GitHub Actions、`npm run test`、`npm run lint` |
 | 部署 | `vite build` 产物，可部署到 GitHub Pages / Vercel / Netlify 等静态托管 |
 
@@ -96,7 +98,7 @@ npm run smoke        # 预览服务与入口静态资源 HTTP 冒烟
 npm run smoke:browser # 可选：本机 Chrome 桌面/窄屏与登录发布冒烟
 ```
 
-CI 在 Node 20/22 执行 `npm ci && npm run build && npm run test --if-present && npm run smoke`，Documentation checks 另执行 `npm run lint`；`--if-present` 保留为兼容旧工作流的兜底写法。可选浏览器冒烟需要 macOS 上的本机 Chrome，不进入 CI 矩阵；它用独立临时 profile 验证桌面/窄屏搜索、窄屏导航、演示登录（含滑块验证）、作品发布、本地音源挂载与控制台/网络错误，不替代跨浏览器、真实后端或正式 E2E 套件。
+CI 在 Node 20/22 执行 `npm ci && npm run build && npm run test --if-present && npm run smoke`，Documentation checks 另执行 `npm run lint`；`--if-present` 保留为兼容旧工作流的兜底写法。可选浏览器冒烟需要 macOS 上的本机 Chrome，不进入 CI 矩阵；它用独立临时 profile 验证今日展厅、桌面/窄屏搜索、窄屏导航、本地收藏、演示登录、作品发布、本地音源挂载与控制台/网络错误，不替代跨浏览器、真实后端或正式 E2E 套件。
 
 ### 本地演示 / mock 模式
 
@@ -150,16 +152,17 @@ LanZe/
 ├── public/                  # favicon、SVG/PNG 展示素材与本地演示音源/封面
 ├── src/
 │   ├── apis/                # Axios 请求封装与业务 API 列表
-│   ├── assets/              # 字体、图片、Lottie JSON
-│   ├── components/          # 可复用组件
-│   ├── composables/         # 会话、路由切换等组合式函数
+│   ├── assets/              # 字体、馆内图像与媒体资源
+│   ├── components/          # 展馆壳层、图标、列表行与自有反馈组件
+│   ├── composables/         # 会话、诗库与通知状态
 │   ├── config/              # 运行时环境变量解析
 │   ├── data/                # 本地演示诗词与演示用户
 │   ├── function/            # Supabase 兼容适配器
-│   ├── pages/               # 路由页面：首页/摘录、文库、茶楼、笃学、个人中心等
-│   ├── router/              # Vue Router 配置（当前 hash 模式）
+│   ├── router/              # 三段式路由与旧 URL 重定向
 │   ├── services/            # 演示数据 API 与浏览器存储
+│   ├── styles/              # 设计 token、全局基础样式
 │   ├── utils/               # 响应归一化、查询解析、lint 与单测
+│   ├── views/               # 今日展厅、寻诗、读诗、诗卷、写作台、登录
 │   ├── App.vue              # 根组件
 │   └── main.js              # 应用入口与全局插件
 ├── index.html               # Vite HTML 入口（本地 favicon 与全局样式）
@@ -177,17 +180,17 @@ LanZe/
 └── SOCIAL_POSTS.md          # 中英文宣发短帖素材
 ```
 
-`src/pages/` 下既有可用页面，也有占位页和被注释的历史实现；请以 `src/router/index.js` 的实际路由为准，不要从目录名推断线上能力。
+信息架构以 `src/router/index.js` 与 `docs/DESIGN_SYSTEM.md` 为准；旧版路由保留为兼容重定向，不再对应独立的旧页面。
 
 ## 演示与截图
 
-仓库提供 `public/og-image.svg` 作为文档 hero，并提供由它渲染的 `public/og-image.png`（1200×630）作为 GitHub 社交预览候选。两者采用与新版界面一致的竹纸、墨绿与朱砂视觉，不是运行截图，也不包含真实用户数据；上传与核验步骤见 `docs/PROMOTION.md`。
+`public/og-image.svg` 与 `public/og-image.png` 是按当前青瓷数字诗馆设计绘制的展示插画，不是运行截图；上传与更新步骤见 `docs/PROMOTION.md`。当前界面的可复核预览请运行 `npm run dev` 或 `npm run preview`。
 
 本地演示建议录屏脚本：
 
 1. `npm ci && npm run dev`，等待页面出现在浏览器。
-2. 打开首页/摘录，展示内置随机诗句与切换动画。
-3. 进入文库分类、搜索结果、茶楼与个人中心，展示响应式布局。
+2. 打开今日展厅，展示整首诗、余韵摘录与换诗。
+3. 进入诗词索引、详情页、我的诗卷与写作台，展示响应式布局。
 4. 在窄屏或浏览器设备模拟器中重复首页与底部导航。
 5. 回到终端运行 `npm run build && npm run test`，展示可复现构建与单测。
 
@@ -210,7 +213,8 @@ LanZe/
 
 简要版本（完整优先级与验收标准见 `docs/ROADMAP.md`）：
 
-- **v0.2.0（当前）**：Vite 6、本地演示数据、23 项单测、lint、README/许可证/治理文档、CI、模板、发布与宣发文案，以及可选的桌面/窄屏与登录发布浏览器冒烟；Element Plus 按需注册、手工 vendor 分包、Lottie 动画、核心样式/图标与默认演示音源本地化。
+- **v0.2.0（已发布）**：Vite 6、本地演示数据、23 项单测、lint、README/许可证/治理文档、CI、模板、发布与宣发文案，以及可选的桌面/窄屏与登录发布浏览器冒烟。
+- **Unreleased（当前）**：按「青瓷数字诗馆」目标模式完全重构信息架构与视图层；移除旧 UI 套件、占位页和动画运行时，改为今日展厅、诗词索引、读诗、我的诗卷、写作台与登录六类页面。
 - **v0.3.x（工程优化）**：把可选本机冒烟进一步扩展为 CI 可复现的浏览器 E2E，完善错误/空状态与不可达自定义音源提示，并核验第三方素材授权。
 - **v0.4.x（体验与内容）**：响应式与无障碍回归、素材授权清单、演示录屏、可选后端契约。
 - **后续（社区化）**：按真实贡献推进 i18n、内容版本依据与社区讨论，不预设交付期限。
@@ -224,6 +228,7 @@ LanZe/
 - [贡献指南](CONTRIBUTING.md)：环境、验证清单、PR 规范
 - [行为准则](CODE_OF_CONDUCT.md)：协作约定
 - [安全政策](SECURITY.md)：私密报告流程与已知风险
+- [设计系统](docs/DESIGN_SYSTEM.md)：目标模式、视觉 token 与页面契约
 - [开发文档](docs/DEVELOPMENT.md)：变量、QA、常见故障
 - [架构文档](docs/ARCHITECTURE.md)：边界、数据流与迁移方向
 
@@ -236,7 +241,7 @@ LanZe/
 ## 致谢
 
 - 感谢 2022–2024 年间的原作者与早期贡献者留下的界面、素材、路由和 `git` 历史。
-- 感谢 Vue.js、Vite、Element Plus、Axios、Lottie、APlayer 等开源项目及其维护者；默认演示音源与封面由本仓库生成，其他历史素材来源仍在核验。
+- 感谢 Vue.js、Vite、Axios 等开源项目及其维护者；默认演示音源与封面由本仓库生成，馆内图像与历史素材来源仍在核验。
 - 感谢所有通过 issue、Discussion、PR、文档勘误与本地验证参与社区维护的人。
 - 第三方诗词/音乐/字体服务与上游 npm 包仅按实际用途被提及，不代表其运营方或作者与本仓库有隶属或背书关系。
 
@@ -253,4 +258,4 @@ npm run lint
 npm run smoke
 ```
 
-The app includes poetry excerpts, category browsing, search, a community/creation area, a personal centre and a player prototype. It uses Vite 6, built-in local demo data, 14 unit tests and a configurable API layer: `VITE_API_BASE_URL` takes priority when configured, with automatic fallback to demo data. No public demo, hosted backend, account service or commercial support is promised; historical MemFire/Vercel links should be treated as migration context only. The code is MIT-licensed to `2022-2026 LanZe contributors`; third-party assets may have separate terms. See `CONTRIBUTING.md`, `docs/DEVELOPMENT.md` and `docs/ROADMAP.md` before opening a PR.
+The app is now organised as a compact digital poetry museum: a daily reading room, a searchable index, poem sheets, a personal collection, a writing desk and a local demo login. It uses Vite 6, built-in local demo data, 23 unit tests, an independent Vue component system and a configurable API layer: `VITE_API_BASE_URL` takes priority when configured, with automatic fallback to demo data. No public demo, hosted backend, account service or commercial support is promised; historical MemFire/Vercel links should be treated as migration context only. The code is MIT-licensed to `2022-2026 LanZe contributors`; third-party assets may have separate terms. See `docs/DESIGN_SYSTEM.md`, `CONTRIBUTING.md`, `docs/DEVELOPMENT.md` and `docs/ROADMAP.md` before opening a PR.

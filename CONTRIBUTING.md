@@ -29,7 +29,7 @@
 - 保持事实准确：不写「线上 Demo 已可用」，不引用未验证的演示域名。
 - 命令必须可复制：`npm ci`、`npm run dev`、`npm run build`、`npm run test`、`npm run lint`。
 - 构建产物建议继续执行 `npm run smoke`，确认预览服务与入口静态资源可访问。
-- 在有本机 Chrome 的 macOS 环境，可额外运行 `npm run smoke:browser`，检查首页/文库、桌面与窄屏搜索、窄屏导航、演示登录、作品发布与本地演示音源；该脚本使用独立临时浏览器 profile，不覆盖日常浏览器状态。
+- 在有本机 Chrome 的 macOS 环境，可额外运行 `npm run smoke:browser`，检查今日展厅、本地收藏、桌面与窄屏搜索、窄屏导航、演示登录、作品发布与本地演示音源；该脚本使用独立临时浏览器 profile，不覆盖日常浏览器状态。
 - 新增环境变量时同时更新 README、开发文档与部署文档，并说明它是公开配置还是私密配置。
 - 更新用户可见行为时，在 `CHANGELOG.md` 的 `Unreleased` 区追加一条。
 

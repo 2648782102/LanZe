@@ -11,6 +11,7 @@ const chromePath = process.env.CHROME_PATH
   || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const origin = `http://127.0.0.1:${port}`;
 const processes = [];
+let currentStep = "boot";
 
 const stopAll = () => {
   for (const child of processes) {
@@ -31,7 +32,7 @@ const waitFor = async (url) => {
   throw new Error(`Timed out waiting for ${url}`);
 };
 
-const waitUntil = async (label, check, attempts = 24) => {
+const waitUntil = async (label, check, attempts = 32) => {
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     const value = await check();
     if (value) return value;
@@ -105,7 +106,14 @@ const main = async () => {
       returnByValue: true,
       awaitPromise: true,
     });
-    if (result.exceptionDetails) throw new Error(result.exceptionDetails.text);
+    if (result.exceptionDetails) {
+      const details = result.exceptionDetails;
+      throw new Error([
+        details.text,
+        details.exception?.description,
+        `${details.url || "inline"}:${(details.lineNumber ?? -1) + 1}`,
+      ].filter(Boolean).join(" | "));
+    }
     return result.result.value;
   };
   const clickByText = (text) => evaluate(`(() => {
@@ -127,12 +135,24 @@ const main = async () => {
     input.dispatchEvent(new Event('change', { bubbles: true }));
     return true;
   })()`);
-
-  const failureCount = () => events.filter((event) => (
-    (event.method === "Runtime.consoleAPICalled" && event.params.type === "error")
-    || event.method === "Runtime.exceptionThrown"
-    || event.method === "Network.loadingFailed"
-  )).length;
+  const clearLocalState = () => evaluate(`(() => {
+    try {
+      for (const key of [
+        'lanze_demo_users',
+        'lanze_demo_works',
+        'lanze_demo_profile',
+        'lanze_saved_poems',
+        'lanze_recent_poems',
+        'lanze_compose_draft',
+      ]) {
+        localStorage.removeItem(key);
+      }
+    } catch {}
+    for (const key of ['lanze_user', 'lanze_upload']) {
+      document.cookie = key + '=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    }
+    return true;
+  })()`);
 
   await send("Page.enable");
   await send("Runtime.enable");
@@ -144,64 +164,52 @@ const main = async () => {
     deviceScaleFactor: 1,
     mobile: false,
   });
-  const initialFailureCount = failureCount();
-  await send("Page.navigate", { url: `${origin}/#/home` });
-  await delay(4000);
+
+  currentStep = "today";
+  await send("Page.navigate", { url: `${origin}/#/` });
+  await waitUntil("today's reading view", () => evaluate("Boolean(document.querySelector('.poem-plinth'))"));
 
   const home = await evaluate(`(() => ({
     href: location.href,
     title: document.title,
-    appText: document.querySelector('#app')?.innerText || '',
-    audioPlayers: document.querySelectorAll('.aplayer').length,
-    audioTitle: document.querySelector('.aplayer-title')?.textContent?.trim() || '',
+    text: document.querySelector('#app')?.innerText || '',
+    audioDocks: document.querySelectorAll('.audio-dock').length,
+    audioTitle: document.querySelector('.audio-dock__title')?.textContent?.trim() || '',
+    navCount: document.querySelectorAll('.main-nav a').length,
   }))()`);
-  if (!home.appText.includes("山有木兮木有枝")) throw new Error("Home excerpt did not render");
-  if (home.audioPlayers !== 1) throw new Error("Expected one local audio player");
+  if (!home.text.includes("余韵 · 三则")) throw new Error("Today's reading page did not render");
+  if (home.audioDocks !== 1) throw new Error("Expected one native local audio dock");
   if (!home.audioTitle.includes("兰泽 · 本地演示音")) throw new Error("Local demo audio was not selected");
+  if (home.navCount !== 3) throw new Error("Primary navigation did not render");
 
-  const clicked = await evaluate(`(() => {
-    const links = [...document.querySelectorAll('a')];
-    const target = links.find(a => /文库/.test(a.innerText))
-      || links.find(a => (a.getAttribute('href') || '').includes('wenku'));
-    if (!target) return false;
-    target.click();
-    return true;
-  })()`);
-  if (!clicked) throw new Error("Library navigation link was not found");
-  await delay(1200);
+  if (!await clickByText("收入诗卷")) throw new Error("Save-to-collection button was not found");
+  currentStep = "save";
+  const savedCount = await waitUntil("saved poem in local storage", () => evaluate(`(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('lanze_saved_poems') || '[]');
+      return Array.isArray(saved) ? saved.length : 0;
+    } catch {
+      return 0;
+    }
+  })()`).then((value) => value > 0 && value));
+  if (!savedCount) throw new Error("Saving a poem did not persist locally");
 
-  const library = await evaluate(`(() => ({
-    href: location.href,
-    title: document.title,
-    appText: document.querySelector('#app')?.innerText || '',
-  }))()`);
-  if (!library.appText.includes("唐诗三百") || !library.appText.includes("宋词三百")) {
-    throw new Error("Library categories did not render");
+  if (!await clickByText("寻诗")) throw new Error("Explore navigation link was not found");
+  currentStep = "explore";
+  await waitUntil("explore view", () => evaluate("Boolean(document.querySelector('#global-search'))"));
+  const explore = await evaluate("document.querySelector('#app')?.innerText || ''");
+  if (!explore.includes("全部诗目") || !explore.includes("唐诗") || !explore.includes("宋词")) {
+    throw new Error("Explore index or categories did not render");
   }
 
-  await send("Page.navigate", { url: `${origin}/#/home` });
-  await delay(1500);
-  await waitUntil("desktop search input", () => evaluate("Boolean(document.querySelector('#home-search-desktop'))"));
-  if (!await setInput("#home-search-desktop", "李白")) {
-    throw new Error("Desktop search input was not found");
-  }
-  await evaluate(`document.querySelector('#home-search-desktop')
-    .dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', bubbles: true }))`);
+  if (!await setInput("#global-search", "李白")) throw new Error("Explore search input was not found");
+  currentStep = "desktop search";
+  await evaluate("document.querySelector('#global-search').closest('form').requestSubmit()");
   const desktopSearch = await waitUntil("desktop search results", () => evaluate(`(() => ({
     href: location.href,
     text: document.querySelector('#app')?.innerText || '',
-  }))()`).then((value) => value && value.href.includes("searchul") && value.text.includes("李白") ? value : null));
-  if (!desktopSearch.text.includes("搜索内容")) throw new Error("Desktop search results header did not render");
-
-  await evaluate(`(() => {
-    for (const key of ['lanze_demo_users', 'lanze_demo_works', 'lanze_demo_profile']) {
-      localStorage.removeItem(key);
-    }
-    for (const key of ['lanze_user', 'lanze_upload']) {
-      document.cookie = key + '=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-    }
-    return true;
-  })()`);
+  }))()`).then((value) => value.href.includes("q=") && value.text.includes("李白") ? value : null));
+  if (!desktopSearch.text.includes("找到")) throw new Error("Desktop search summary did not render");
 
   await send("Emulation.setDeviceMetricsOverride", {
     width: 390,
@@ -209,27 +217,25 @@ const main = async () => {
     deviceScaleFactor: 1,
     mobile: true,
   });
-  await send("Page.navigate", { url: `${origin}/#/home` });
-  await waitUntil("mobile search input", () => evaluate("Boolean(document.querySelector('#home-search-mobile'))"));
+  await send("Page.navigate", { url: `${origin}/#/explore` });
+  currentStep = "mobile layout";
+  await waitUntil("mobile search input", () => evaluate("Boolean(document.querySelector('#global-search'))"));
   const mobileLayout = await evaluate(`(() => ({
-    bottomNav: getComputedStyle(document.querySelector('.min-tab-bottom')).display,
-    desktopNav: getComputedStyle(document.querySelector('.tab-top')).display,
-    audioPlayer: document.querySelectorAll('.aplayer').length,
+    mobileDock: getComputedStyle(document.querySelector('.mobile-dock')).display,
+    desktopNav: getComputedStyle(document.querySelector('.main-nav')).display,
   }))()`);
-  if (mobileLayout.bottomNav === "none" || mobileLayout.desktopNav !== "none") {
+  if (mobileLayout.mobileDock === "none" || mobileLayout.desktopNav !== "none") {
     throw new Error("Mobile navigation layout did not switch as expected");
   }
-  if (!await setInput("#home-search-mobile", "春晓")) {
-    throw new Error("Mobile search input was not found");
-  }
-  await evaluate(`document.querySelector('#home-search-mobile')
-    .dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', bubbles: true }))`);
-  const mobileSearch = await waitUntil("mobile search results", () => evaluate(`(() => ({
-    href: location.href,
-    text: document.querySelector('#app')?.innerText || '',
-  }))()`).then((value) => value.href.includes("searchul") ? value : null));
-  if (!mobileSearch.text.includes("搜索内容")) throw new Error("Mobile search results header did not render");
+  if (!await setInput("#global-search", "春晓")) throw new Error("Mobile search input was not found");
+  currentStep = "mobile search";
+  await evaluate("document.querySelector('#global-search').closest('form').requestSubmit()");
+  const mobileSearch = await waitUntil("mobile search results", () => evaluate(
+    `document.querySelector('#app')?.innerText.includes('春晓')`,
+  ));
+  if (!mobileSearch) throw new Error("Mobile search did not return the expected poem");
 
+  await clearLocalState();
   await send("Emulation.setDeviceMetricsOverride", {
     width: 1280,
     height: 800,
@@ -237,6 +243,7 @@ const main = async () => {
     mobile: false,
   });
   await send("Page.navigate", { url: `${origin}/#/login` });
+  currentStep = "login";
   await waitUntil("login form", () => evaluate(`(() => {
     return Boolean(document.querySelector('input[aria-label="登录账号"]'))
       && Boolean(document.querySelector('input[aria-label="登录密码"]'));
@@ -247,86 +254,31 @@ const main = async () => {
   if (!await setInput('input[aria-label="登录密码"]', "lanze2026")) {
     throw new Error("Login password input was not found");
   }
-  if (!await clickByText("验证")) throw new Error("Login verification button was not found");
-  await waitUntil("login slider", () => evaluate("Boolean(document.querySelector('.range-btn'))"));
-  await evaluate(`(() => {
-    const originalRandom = Math.random;
-    Math.random = () => 0.5;
-    window.__restoreRandom = () => { Math.random = originalRandom; };
-    document.querySelector('.reset_')?.click();
-    return true;
-  })()`);
-  const sliderTarget = await evaluate(`(() => {
-    const canvas = document.querySelector('.auth-canvas2_');
-    const box = document.querySelector('.range-box');
-    const button = document.querySelector('.range-btn');
-    if (!canvas || !box || !button) return null;
-    const canvasRect = canvas.getBoundingClientRect();
-    const boxRect = box.getBoundingClientRect();
-    const buttonRect = button.getBoundingClientRect();
-    const canvasWidth = Number(document.querySelector('.auth-body_')?.style.width.replace("px", "")) || 310;
-    const sliderSize = buttonRect.width || 50;
-    const puzzleWidth = canvasRect.width || 59;
-    const pinX = Math.ceil((canvasWidth - puzzleWidth - 10 + (puzzleWidth + 20)) / 2);
-    const move = (pinX - 3) * (canvasWidth - sliderSize) / (canvasWidth - puzzleWidth);
-    return {
-      left: buttonRect.left + buttonRect.width / 2,
-      y: buttonRect.top + buttonRect.height / 2,
-      move,
-    };
-  })()`);
-  if (!sliderTarget) throw new Error("Login slider geometry was not available");
-  await send("Input.dispatchMouseEvent", {
-    type: "mousePressed",
-    x: sliderTarget.left,
-    y: sliderTarget.y,
-    button: "left",
-    clickCount: 1,
-  });
-  await send("Input.dispatchMouseEvent", {
-    type: "mouseMoved",
-    x: sliderTarget.left + sliderTarget.move,
-    y: sliderTarget.y,
-    button: "left",
-    buttons: 1,
-  });
-  await send("Input.dispatchMouseEvent", {
-    type: "mouseReleased",
-    x: sliderTarget.left + sliderTarget.move,
-    y: sliderTarget.y,
-    button: "left",
-    clickCount: 1,
-  });
-  await waitUntil("login verification", () => evaluate(
-    `document.querySelector('.info-box_')?.textContent?.includes('验证通过')`,
-  ));
-  await delay(1000);
-  await evaluate("window.__restoreRandom?.()");
   if (!await evaluate(`(() => {
-    const button = [...document.querySelectorAll('button')]
-      .find((node) => node.getAttribute('aria-label') === '提交登录');
+    const button = document.querySelector('button[aria-label="提交登录"]');
     if (!button) return false;
     button.click();
     return true;
   })()`)) throw new Error("Login submit button was not found");
   await waitUntil("login success", () => evaluate(
-    `document.cookie.includes('lanze_user') && location.href.includes('shezhi')`,
+    `document.cookie.includes('lanze_user') && location.href.includes('collection')`,
   ));
 
-  await send("Page.navigate", { url: `${origin}/#/publishpoem` });
-  await waitUntil("publish form", () => evaluate("Boolean(document.querySelector('#origin'))"));
+  await send("Page.navigate", { url: `${origin}/#/compose` });
+  currentStep = "compose";
+  await waitUntil("compose form", () => evaluate("Boolean(document.querySelector('#poem-title'))"));
   const work = createDemoBrowserWork();
   for (const [selector, value] of [
-    ["#origin", work.origin],
-    ["#author", work.author],
-    ["#category", work.category],
-    ["#content", work.content],
-    ["#title", work.title],
+    ["#poem-title", work.origin],
+    ["#poem-author", work.author],
+    ["#poem-category", work.category],
+    ["#poem-content", work.content],
+    ["#poem-note", work.title],
   ]) {
-    if (!await setInput(selector, value)) throw new Error(`Publish input ${selector} was not found`);
+    if (!await setInput(selector, value)) throw new Error(`Compose input ${selector} was not found`);
   }
-  if (!await clickByText("提交")) throw new Error("Publish submit button was not found");
-  const publishedWork = await waitUntil("published local demo work", () => evaluate(`(() => {
+  if (!await clickByText("发布到我的诗卷")) throw new Error("Publish button was not found");
+  const publishedWork = await waitUntil("published local work", () => evaluate(`(() => {
     let works = [];
     try { works = JSON.parse(localStorage.getItem('lanze_demo_works') || '[]'); } catch {}
     return (Array.isArray(works) ? works : []).find((item) => item.title === ${JSON.stringify(work.origin)}) || null;
@@ -334,21 +286,14 @@ const main = async () => {
   if (publishedWork.textBody !== work.content && publishedWork.content !== work.content) {
     throw new Error("Published work did not retain its content");
   }
-  await waitUntil("works page navigation", () => evaluate("location.href.includes('samplereels')"));
-  const worksPage = await waitUntil("published work on works page", () => evaluate(
+  await waitUntil("works page navigation", () => evaluate("location.href.includes('collection')"));
+  const worksPage = await waitUntil("published work on collection page", () => evaluate(
     `document.querySelector('#app')?.innerText.includes(${JSON.stringify(work.origin)})`,
   ));
-  if (!worksPage) throw new Error("Published work was not rendered on the works page");
+  if (!worksPage) throw new Error("Published work was not rendered on the collection page");
 
-  await evaluate(`(() => {
-    for (const key of ['lanze_demo_users', 'lanze_demo_works', 'lanze_demo_profile']) {
-      localStorage.removeItem(key);
-    }
-    for (const key of ['lanze_user', 'lanze_upload']) {
-      document.cookie = key + '=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-    }
-    return true;
-  })()`);
+  currentStep = "final assertions";
+  await clearLocalState();
 
   const consoleErrors = events
     .filter((event) => event.method === "Runtime.consoleAPICalled" && event.params.type === "error")
@@ -360,39 +305,33 @@ const main = async () => {
       const frames = (details.stackTrace?.callFrames || [])
         .slice(0, 3)
         .map((frame) => `${frame.functionName || "anonymous"}@${frame.url}:${frame.lineNumber + 1}`);
-      return [
-        details.text,
-        details.exception?.description,
-        frames.join(" ← "),
-      ].filter(Boolean).join(" | ");
+      return [details.text, details.exception?.description, frames.join(" ← ")]
+        .filter(Boolean)
+        .join(" | ");
     });
   const failedRequests = events
     .filter((event) => event.method === "Network.loadingFailed")
     .map((event) => event.params.errorText);
-  const problems = [
-    ...consoleErrors,
-    ...exceptions,
-    ...failedRequests,
-    ...(failureCount() > initialFailureCount ? ["Unexpected browser failures during extended smoke"] : []),
-  ];
+  const problems = [...consoleErrors, ...exceptions, ...failedRequests];
   if (problems.length) throw new Error(`Browser reported problems: ${problems.join(" | ")}`);
 
   socket.close();
   console.log([
     "Browser smoke passed:",
-    `${home.title} → ${library.title},`,
+    `${home.title} → ${desktopSearch.href},`,
+    "local save,",
     "desktop/mobile search,",
-    "narrow-screen navigation,",
-    "local demo publish path,",
-    "one local audio player,",
+    "native audio dock,",
+    "login and publish flow,",
     "no console or network errors.",
   ].join(" "));
+  currentStep = "complete";
 };
 
 try {
   await main();
 } catch (error) {
-  console.error(error instanceof Error ? error.message : error);
+  console.error(`[${currentStep}] ${error instanceof Error ? error.message : error}`);
   process.exitCode = 1;
 } finally {
   stopAll();
