@@ -78,12 +78,12 @@
 
 **中文**
 
-> `v0.3.0` 候选整理好了：青瓷数字诗馆视图重构、单张历史摘录卡、可回退诗句源、吸底播放器与音源错误态、静态资源/布局稳定性、27 项单测、CI Browser E2E，以及同步后的中文文档与素材哈希清单。它是一个可本地复核的开源前端版本，不是「诗词社区正式上线」的公告。\
+> `v0.3.0` 已发布：青瓷数字诗馆视图重构、单张历史摘录卡、可回退诗句源、吸底播放器与音源错误态、静态资源/布局稳定性、27 项单测、CI Browser E2E，以及同步后的中文文档与素材哈希清单。它是一个可本地复核的开源前端版本，不是「诗词社区正式上线」的公告。\
 > 当前最需要的是跨浏览器/视觉回归、素材授权核验、可选后端契约与内容版本依据。路线图与 FAQ 都写清了已知限制；如果没有后端，请用本地演示理解界面。仓库见链接 👇
 
 **English**
 
-> The `v0.3.0` candidate is ready: a rebuilt Celadon Poetry Room interface, one restored historical excerpt card, a poetry source with local fallback, a pinned player with readable audio errors, smaller assets, 27 unit tests, Chromium CI E2E, updated Chinese docs and asset hashes. It is a locally verifiable frontend release—not a launch notice for a hosted poetry community.\
+> LanZe `v0.3.0` is published: a rebuilt Celadon Poetry Room interface, one restored historical excerpt card, a poetry source with local fallback, a pinned player with readable audio errors, smaller assets, 27 unit tests, Chromium CI E2E, updated Chinese docs and asset hashes. It is a locally verifiable frontend release—not a launch notice for a hosted poetry community.\
 > Most useful next: cross-browser/visual regression, asset licensing, optional backend contracts and content provenance. Known limits are in the roadmap and FAQ; built-in demo data works when no backend is configured. Repo in the link 👇
 
 ---
@@ -92,7 +92,7 @@
 
 - [ ] 仓库链接指向 `https://github.com/2648782102/LanZe`；若附 Release/Discussion，链接已实际创建并验证。
 - [ ] 没有附历史 MemFire / Vercel 演示地址，没有写「官网 / 线上体验 / 正式上线」。
-- [ ] 若提到 `v0.3.0`，tag/Release 已存在；否则改成「重构改动已合并到 main」。
+- [ ] `v0.3.0` tag/Release 已存在；如附链接，先回读 `https://github.com/2648782102/LanZe/releases/tag/v0.3.0`。
 - [ ] 若提到演示数据，说明它仅保存在当前浏览器 `localStorage`，不是账号服务。
 - [ ] 配图来自 `public/og-image.png` 或真实本地录屏；画面不含密钥、真实账号或私人路径。
 - [ ] 没有 star、fork、用户数、增长或性能数字；没有购买推广/刷互动。

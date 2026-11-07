@@ -74,7 +74,7 @@
 
 ### 仓库 About、topics、Release、Discussion 在哪里维护？
 
-GitHub About 描述与 topics 在仓库设置中维护；`v0.2.0` 是历史 Release，当前 `v0.3.0` 候选文案分别位于 `RELEASE_NOTES.md`、`ANNOUNCEMENT.md`，发布与展示清单见 `docs/PROMOTION.md`。如有变更，以仓库页面和 `CHANGELOG.md` 为准。
+GitHub About 描述与 topics 在仓库设置中维护；`v0.2.0` 是历史 Release，`v0.3.0` 已发布，发布说明与欢迎帖文案分别位于 `RELEASE_NOTES.md`、`ANNOUNCEMENT.md`，发布与展示清单见 `docs/PROMOTION.md`。如有变更，以仓库页面和 `CHANGELOG.md` 为准。
 
 ## 许可与内容
 

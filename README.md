@@ -10,6 +10,7 @@
   <a href="https://github.com/2648782102/LanZe/actions/workflows/browser-e2e.yml"><img alt="Browser E2E" src="https://github.com/2648782102/LanZe/actions/workflows/browser-e2e.yml/badge.svg" /></a>
   <a href="https://vuejs.org/"><img alt="Vue 3" src="https://img.shields.io/badge/Vue-3-42b883.svg" /></a>
   <a href="CHANGELOG.md"><img alt="Changelog" src="https://img.shields.io/badge/changelog-keep%20a%20changelog-orange.svg" /></a>
+  <a href="https://github.com/2648782102/LanZe/releases/tag/v0.3.0"><img alt="Release v0.3.0" src="https://img.shields.io/badge/release-v0.3.0-2f6f62.svg" /></a>
 </p>
 
 > **English summary:** LanZe is a community-maintained Vue 3 frontend for reading, browsing and sharing classical Chinese poetry. It runs locally with built-in demo data, includes documentation, CI and tests, and does not promise a verified public demo or hosted account backend.
@@ -38,7 +39,7 @@
 | 后端/账号 | 仓库不附带完整后端；默认使用本地演示数据，配置 `VITE_API_BASE_URL` 后可连接自建 API |
 | 测试 | `npm run test` 含 27 个 `node --test` 单测；Node 20/22 CI 与独立 Browser E2E workflow 覆盖构建与主要演示链路 |
 | 许可 | [MIT](LICENSE)，`Copyright (c) 2022-2026 LanZe contributors` |
-| 发布 | `v0.2.0` 是历史 Release；当前 `v0.3.0` 候选文案见 `RELEASE_NOTES.md`、`ANNOUNCEMENT.md` |
+| 发布 | `v0.2.0` 是历史 Release；`v0.3.0` 已发布，说明见 `RELEASE_NOTES.md` 与 `ANNOUNCEMENT.md` |
 | 设计契约 | [青瓷数字诗馆](docs/DESIGN_SYSTEM.md)：冷白瓷面、青灰线框、铜金索引色与「一首诗一展厅」的信息架构 |
 
 ## 主要特性
@@ -183,8 +184,8 @@ LanZe/
 ├── SECURITY.md              # 安全政策
 ├── CHANGELOG.md             # 变更日志
 ├── LICENSE                  # MIT
-├── RELEASE_NOTES.md         # v0.3.0 候选 Release notes
-├── ANNOUNCEMENT.md          # GitHub Discussions 欢迎帖候选文案
+├── RELEASE_NOTES.md         # v0.3.0 Release notes
+├── ANNOUNCEMENT.md          # GitHub Discussions 欢迎帖当前文案
 └── SOCIAL_POSTS.md          # 中英文宣发短帖素材
 ```
 
@@ -222,7 +223,7 @@ LanZe/
 简要版本（完整优先级与验收标准见 `docs/ROADMAP.md`）：
 
 - **v0.2.0（已发布）**：Vite 6、本地演示数据、23 项单测、lint、README/许可证/治理文档、CI、模板、发布与宣发文案。
-- **v0.3.0（候选）**：按「青瓷数字诗馆」目标模式完全重构信息架构与视图层；移除旧 UI 套件，保留单张历史样式摘录卡，收敛静态素材与布局位移，加入 27 项单测、CI Browser E2E 和音源不可达状态。
+- **v0.3.0（已发布）**：按「青瓷数字诗馆」目标模式完全重构信息架构与视图层；移除旧 UI 套件，保留单张历史样式摘录卡，收敛静态素材与布局位移，加入 27 项单测、CI Browser E2E 和音源不可达状态。
 - **v0.4.x（体验与内容）**：跨浏览器/视觉回归、素材授权核验、演示录屏、可选后端契约与内容版本依据。
 - **后续（社区化）**：按真实贡献推进 i18n、内容版本依据与社区讨论，不预设交付期限。
 

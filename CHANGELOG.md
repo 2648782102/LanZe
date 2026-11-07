@@ -2,9 +2,13 @@
 
 本文件按「待发布 → 历史里程碑」组织，历史部分依据仓库 `git log` 归纳，并非逐条完整提交记录。历史基线停在 42 次提交，首个提交为 `74b4186`（2022-06-03），最后一段历史基线提交为 `b4ea7f4`（2024-08-18）；v0.2.0 之前没有 Git tag 或已发布 Release。历史提交信息中的 `1.0`、`1.1`、`2.0.0` 是开发标记，不代表本仓库存在对应正式发行版。
 
-## [v0.3.0] — 2026-11-07（候选，待 tag / Release）
+## [Unreleased]
 
-> 本段汇总 `v0.2.0` 之后合并到 `main` 的视图重构、体验完善与工程验证；发布前以 CI、Browser E2E 与本地验证为准。`v0.2.0` 仍是独立历史 Release。
+> 记录 `v0.3.0` 之后、尚未发布的改动。
+
+## [v0.3.0] — 2026-11-07（已发布）
+
+> 本段汇总 `v0.2.0` 之后合并到 `main` 的视图重构、体验完善与工程验证；`v0.3.0` 已打 tag 并发布 Release，CI、Browser E2E 与本地验证均通过。`v0.2.0` 仍是独立历史 Release。
 
 ### Added — CI Browser E2E 与音源错误态
 
@@ -34,9 +38,9 @@
 
 ### Changed — 文档、发布素材与素材证据
 
-- README、贡献/安全政策、架构/开发/部署/FAQ/路线图/素材清单同步为当前 27 项单测、自有组件、可配置诗句源、CI Browser E2E、不可达音源状态与 v0.3.0 候选；不把候选写成已发布 Release或已验证线上 Demo。
+- README、贡献/安全政策、架构/开发/部署/FAQ/路线图/素材清单同步为当前 27 项单测、自有组件、可配置诗句源、CI Browser E2E、不可达音源状态与 v0.3.0 发布说明；不把静态部署写成已验证线上 Demo。
 - `RELEASE_NOTES.md`、`ANNOUNCEMENT.md`、`SOCIAL_POSTS.md` 重写为当前设计、验证边界和后续贡献入口；`SOCIAL_POSTS.md` 仍是草稿，不自动群发，不含增长数字或付费推广。
-- `.github/workflows/publish.yml` 改由 `v0.3.0` tag / `workflow_dispatch` 触发，Release 标题与 checkout ref 跟随真实 tag；不覆盖 `v0.2.0` 历史 Release。
+- `.github/workflows/publish.yml` 改由 `v0.3.0` tag push 触发，Release 标题与 checkout ref 跟随真实 tag；不覆盖 `v0.2.0` 历史 Release。
 - `docs/THIRD_PARTY_ASSETS.md` 补当前 WOFF2 子集、压缩展品图、摘录卡字体/图片、自制媒体、展示图与 favicon 的 SHA-256；明确哈希只是身份证据，授权仍未核验。
 
 ### Known limitations

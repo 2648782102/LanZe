@@ -1,6 +1,6 @@
 # 路线图
 
-> 路线图是公开优先级与验收思路，不是发布日期、商业承诺或维护者 SLA。最后更新：2026-11-07。v0.2.0 已完成现代化；当前 `v0.3.0` 候选已完成视图层重构、静态资源收敛、CI Browser E2E 与不可达音源状态。
+> 路线图是公开优先级与验收思路，不是发布日期、商业承诺或维护者 SLA。最后更新：2026-11-07。v0.2.0 已完成现代化；v0.3.0 已发布，完成视图层重构、静态资源收敛、CI Browser E2E 与不可达音源状态。
 
 ## 0. 当前判断
 
@@ -27,11 +27,11 @@
 | 工程现代化 | Vite 6、ESM、相对 base、统一请求层、本地演示数据、会话与本地演示音源 | 远端优先、失败降级；发布时 23 项单测通过 |
 | 发布素材 | Release notes、Discussions 欢迎帖、中英文短帖 | 只描述已验证能力，不写线上 Demo |
 
-GitHub 侧历史配合：v0.2.0 Release 与 Discussions 欢迎帖已发布；当前候选的 About、topics、社交预览图与 Pages 仍按 `docs/PROMOTION.md` 的实际写权限核对。`RELEASE_NOTES.md`、`ANNOUNCEMENT.md` 描述当前 v0.3.0 候选，不回写 v0.2.0 历史 Release。
+GitHub 侧历史配合：v0.2.0 与 v0.3.0 Release 均已发布，Discussion #1 仍是 v0.2.0 首版；v0.3.0 的 About、topics、社交预览图与 Pages 仍按 `docs/PROMOTION.md` 的实际写权限核对。`RELEASE_NOTES.md` 是 v0.3.0 发布说明，`ANNOUNCEMENT.md` 是当前欢迎帖文案，不回写 v0.2.0 历史 Release。
 
-## 2. v0.3.0 — 青瓷数字诗馆（候选）
+## 2. v0.3.0 — 青瓷数字诗馆（已发布）
 
-> 当前 `main` 已完成下列工程事项；发布前以 CI、Browser E2E 与本地验证为准，不把候选写成已发布 Release。
+> v0.3.0 已发布；下列工程事项均经 CI、Browser E2E 与本地验证，静态部署和线上 Demo 仍不属于发布承诺。
 
 | 优先级 | 事项 | 为什么 | 验收标准 |
 | --- | --- | --- | --- |

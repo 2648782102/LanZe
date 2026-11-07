@@ -108,6 +108,16 @@ jobs:
             exit 1
           fi
 
+      - name: Reject stale release wording
+        shell: bash
+        run: |
+          if grep -nE 'v0\.3\.0 候选|候选，待 tag / Release|候选文案|候选整理好了|tag/Release 尚未创建|发布后方可增加 v0\.3\.0' \
+            README.md CHANGELOG.md RELEASE_NOTES.md ANNOUNCEMENT.md SOCIAL_POSTS.md SECURITY.md \
+            docs/FAQ.md docs/ROADMAP.md docs/PROMOTION.md; then
+            echo 'Current release wording still describes v0.3.0 as an unpublished candidate.' >&2
+            exit 1
+          fi
+
       - name: Reject legacy UI dependencies
         shell: bash
         run: |
