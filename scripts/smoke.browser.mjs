@@ -244,7 +244,11 @@ const main = async () => {
   const excerptCards = await evaluate(`(() => {
     const cards = [...document.querySelectorAll('.legacy-card')];
     const box = cards[0]?.querySelector('.legacy-card__box');
+    const verse = cards[0]?.querySelector('.legacy-card__verse');
     const art = cards[0]?.querySelector('.legacy-card__art');
+    const boxRect = box?.getBoundingClientRect();
+    const verseRect = verse?.getBoundingClientRect();
+    const artRect = art?.getBoundingClientRect();
     return {
       count: cards.length,
       firstVerse: cards[0]?.querySelector('.legacy-card__verse')?.textContent?.trim() || '',
@@ -256,6 +260,8 @@ const main = async () => {
       artHeight: art?.getAttribute('height') || '',
       boxBackground: box ? getComputedStyle(box).backgroundColor : '',
       boxOverflow: box ? getComputedStyle(box).overflow : '',
+      rightGutter: boxRect && verseRect ? boxRect.right - verseRect.right : 0,
+      artRightGutter: boxRect && artRect ? boxRect.right - artRect.right : 0,
       sourceLabel: document.querySelector('.excerpt-source')?.textContent?.trim() || '',
     };
   })()`);
@@ -273,6 +279,9 @@ const main = async () => {
   }
   if (excerptCards.boxBackground !== "rgb(255, 255, 255)" || excerptCards.boxOverflow !== "hidden") {
     throw new Error("Historical card surface did not render");
+  }
+  if (excerptCards.rightGutter < 28 || excerptCards.artRightGutter < 24) {
+    throw new Error("Historical card content is too close to the right edge");
   }
   if (!excerptCards.sourceLabel.includes("诗句源：")) {
     throw new Error("Excerpt source state did not render");

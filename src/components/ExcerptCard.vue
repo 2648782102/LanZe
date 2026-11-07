@@ -66,6 +66,7 @@ const verseDensity = computed(() => {
 <style scoped>
 .legacy-card {
   --legacy-scale: 1;
+  --legacy-gutter: 12%;
   width: min(100%, 330px);
   margin-inline: auto;
   padding-block: calc(16px * var(--legacy-scale, 1));
@@ -177,9 +178,10 @@ const verseDensity = computed(() => {
 .legacy-card__verse {
   position: absolute;
   top: 25%;
-  left: 50%;
+  left: var(--legacy-gutter);
+  right: calc(var(--legacy-gutter) + 2%);
   z-index: 2;
-  width: 88%;
+  width: auto;
   height: calc(252px * var(--legacy-scale));
   margin: 0;
   color: var(--ink);
@@ -188,7 +190,6 @@ const verseDensity = computed(() => {
   letter-spacing: calc(4px * var(--legacy-scale));
   line-height: 1.5;
   text-align: start;
-  transform: translateX(-50%);
   writing-mode: vertical-rl;
 }
 
@@ -221,9 +222,9 @@ const verseDensity = computed(() => {
   position: absolute;
   z-index: 1;
   bottom: 4%;
-  left: 8%;
+  left: var(--legacy-gutter);
   display: block;
-  width: 84%;
+  width: calc(100% - 24%);
   height: auto;
   opacity: 0.96;
   mix-blend-mode: multiply;
