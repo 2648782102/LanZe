@@ -1,6 +1,6 @@
 # 展示与宣发清单
 
-> **状态：仓库内素材已更新，线上展示待核对。** `v0.2.0` 与 `v0.3.0` 均为已发布 Release；`RELEASE_NOTES.md`、`ANNOUNCEMENT.md`、`SOCIAL_POSTS.md` 已改为当前 `v0.3.0` 文案。社交预览图、Pages、失效 homepage、在线欢迎帖正文、社交平台短帖、外部社区投稿和付费推广均未由本轮确认完成。最后整理：2026-11-07。
+> **状态：仓库内素材与 GitHub About 已更新，线上展示待核对。** `v0.2.0` 与 `v0.3.0` 均为已发布 Release；`RELEASE_NOTES.md`、`ANNOUNCEMENT.md`、`SOCIAL_POSTS.md` 已改为当前 `v0.3.0` 文案。About 描述/topics 已按当前实现保存，失效 homepage 已清空；社交预览图、Pages、在线欢迎帖正文、社交平台短帖、外部社区投稿和付费推广仍未由本轮确认完成。最后整理：2026-11-07。
 
 ## 1. 推荐仓库定位
 
@@ -30,7 +30,7 @@ vue3, vite, javascript, frontend, chinese-poetry, poetry, classical-chinese, chi
 
 ### About / README 展示要点
 
-- Website 字段：在 GitHub Pages 实际部署并验证前**留空**；不要填历史 MemFire 地址或失效 Vercel 域名。
+- Website 字段：已清空历史失效 Vercel 域名；在 GitHub Pages 实际部署并验证前继续**留空**，不要填历史 MemFire 地址。
 - Social preview：仓库已提供 `public/og-image.svg` 与由它渲染、目检过的 `public/og-image.png`（1200×630）。上传 GitHub Social preview 需要浏览器中的仓库设置写权限；在设置页实际保存并回读前，不把它写成已展示。
 - README 首屏：项目定位 → 当前状态表 → 快速开始 → 本地演示/变量 → 路线图 → 许可证。不要在首屏堆砌 star/badge 或虚假在线体验。
 - Badges：保留 MIT、CI、Browser E2E、Vue 3、Changelog 与 v0.3.0 Release；CI / E2E badge 的 workflow 文件名必须与 `.github/workflows/ci.yml`、`.github/workflows/browser-e2e.yml` 一致。
@@ -48,7 +48,7 @@ vue3, vite, javascript, frontend, chinese-poetry, poetry, classical-chinese, chi
 | 6 | 给适合新人的 issue 加 `good first issue` / `help wanted` 标签 | `.github/ISSUE_TEMPLATE/*` | 先写清复现步骤或预期结果，避免空任务 |
 | 7 | 发布一条 Release/Discussion 公告，再按平台节奏发布短帖 | `SOCIAL_POSTS.md` | 不夸大 star、用户数、线上 Demo 或后端能力 |
 
-**执行记录：** `v0.2.0` 的第 3、4、6 项与 v0.2.0 Release/Discussion 已完成；`v0.3.0` 的第 1、4、6 项已完成：CI 与 Browser E2E 全绿，tag/Release 已创建并回读，3 个 `good first issue` / `help wanted` 入口已按当前状态更新。About 描述/topics 仍含旧版叙述与 `element-plus`，Website 仍为历史失效地址；`public/og-image.png` 已生成但社交预览未确认上传；Pages 未启用；在线 Discussion #1 正文仍为 v0.2.0 首版；短帖仍为草稿，外部社交媒体未发布。
+**执行记录：** `v0.2.0` 的第 3、4、6 项与 v0.2.0 Release/Discussion 已完成；`v0.3.0` 的第 1、4、6 项已完成：CI 与 Browser E2E 全绿，tag/Release 已创建并回读，3 个 `good first issue` / `help wanted` 入口已按当前状态更新。第 2 项已完成 About 描述/topics 更新与 Website 清空，并通过公开 API 回读确认；`public/og-image.png` 已生成但社交预览未确认上传；Pages 未启用；在线 Discussion #1 正文仍为 v0.2.0 首版；短帖仍为草稿，外部社交媒体未发布。
 
 ### 社交预览图渲染复核
 

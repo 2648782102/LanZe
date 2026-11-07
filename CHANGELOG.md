@@ -6,6 +6,10 @@
 
 > 记录 `v0.3.0` 之后、尚未发布的改动。
 
+### Changed
+
+- GitHub 仓库 About 已更新为「青瓷数字诗馆」描述，移除无关的 `element-plus` topic，清空失效 Vercel homepage，并补上 `static-site`、`design-system`、`github-actions`；已通过公开 API 回读确认。
+
 ## [v0.3.0] — 2026-11-07（已发布）
 
 > 本段汇总 `v0.2.0` 之后合并到 `main` 的视图重构、体验完善与工程验证；`v0.3.0` 已打 tag 并发布 Release，CI、Browser E2E 与本地验证均通过。`v0.2.0` 仍是独立历史 Release。
