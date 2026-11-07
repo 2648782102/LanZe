@@ -1,5 +1,14 @@
 <template>
-  <aside class="audio-dock" aria-label="兰泽本地播放器">
+  <aside class="audio-dock" :class="{ 'is-collapsed': isCollapsed }" aria-label="兰泽本地播放器">
+    <button
+      class="audio-dock__handle"
+      type="button"
+      :aria-label="isCollapsed ? '展开播放器' : '收起播放器'"
+      :aria-expanded="!isCollapsed"
+      @click="isCollapsed = !isCollapsed"
+    >
+      <AppIcon :name="isCollapsed ? 'chevron-right' : 'chevron-left'" :size="14" />
+    </button>
     <audio
       ref="audioRef"
       :src="track.url"
@@ -39,6 +48,7 @@ import { notify } from "../composables/useNotices.js";
 const audioRef = ref();
 const isPlaying = ref(false);
 const progress = ref(0);
+const isCollapsed = ref(false);
 const track = computed(() => audioConfig.tracks[0] || {
   name: "没有可用音轨",
   artist: "兰泽",
@@ -95,15 +105,43 @@ onBeforeUnmount(() => {
   left: 18px;
   z-index: 70;
   display: grid;
-  width: min(310px, calc(100vw - 36px));
-  grid-template-columns: auto 1fr auto;
+  width: min(344px, calc(100vw - 36px));
+  grid-template-columns: 24px 34px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 11px;
-  padding: 9px 12px 9px 9px;
+  gap: 8px;
+  padding: 9px 12px 9px 6px;
   border: 1px solid rgba(168, 196, 184, 0.26);
-  background: rgba(16, 40, 39, 0.94);
+  background: rgba(16, 40, 39, 0.98);
   color: var(--porcelain-panel);
   box-shadow: 0 14px 38px rgba(16, 40, 39, 0.2);
+  transition: width 180ms ease;
+}
+
+.audio-dock__handle {
+  display: grid;
+  width: 24px;
+  height: 34px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(251, 252, 249, 0.62);
+}
+
+.audio-dock__handle:hover {
+  color: var(--porcelain-panel);
+}
+
+.audio-dock.is-collapsed {
+  width: 48px;
+  grid-template-columns: 24px 34px;
+  gap: 0;
+  padding-right: 6px;
+}
+
+.audio-dock.is-collapsed .audio-dock__copy,
+.audio-dock.is-collapsed .audio-dock__state {
+  display: none;
 }
 
 .audio-dock__toggle {
@@ -169,18 +207,22 @@ audio {
   .audio-dock {
     bottom: 88px;
     left: 16px;
-    width: min(276px, calc(100vw - 32px));
+    width: min(310px, calc(100vw - 32px));
   }
 }
 
 @media (max-width: 420px) {
   .audio-dock {
     left: 12px;
-    width: min(238px, calc(100vw - 24px));
+    width: min(296px, calc(100vw - 24px));
   }
 
   .audio-dock__state {
     display: none;
+  }
+
+  .audio-dock {
+    grid-template-columns: 24px 34px minmax(0, 1fr);
   }
 }
 </style>

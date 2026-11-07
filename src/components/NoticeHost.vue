@@ -93,7 +93,7 @@ const { notices, dismissNotice } = useNotices();
   .notice-host {
     right: max(16px, env(safe-area-inset-right));
     left: max(16px, env(safe-area-inset-left));
-    bottom: 88px;
+    bottom: 164px;
     width: auto;
     max-width: calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));
   }

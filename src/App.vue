@@ -30,12 +30,13 @@ const isBare = computed(() => Boolean(route.meta.bare));
 <style>
 .app-frame {
   position: relative;
+  isolation: isolate;
   min-height: 100vh;
   background: var(--canvas);
   background: var(--porcelain);
 }
 
-.app-frame > :not(.porcelain-grid) {
+.app-frame > main {
   position: relative;
   z-index: 1;
 }

@@ -186,6 +186,56 @@ const main = async () => {
   if (home.audioDocks !== 1) throw new Error("Expected one native local audio dock");
   if (!home.audioTitle.includes("兰泽 · 本地演示音")) throw new Error("Local demo audio was not selected");
   if (home.navCount !== 3) throw new Error("Primary navigation did not render");
+  const dockLayout = await evaluate(`(() => {
+    const dock = document.querySelector('.audio-dock');
+    if (!dock) return null;
+    const style = getComputedStyle(dock);
+    const rect = dock.getBoundingClientRect();
+    return {
+      position: style.position,
+      zIndex: Number(style.zIndex),
+      top: Math.round(rect.top),
+      bottom: Math.round(rect.bottom),
+      viewportHeight: innerHeight,
+      visible: rect.bottom > 0 && rect.top < innerHeight,
+    };
+  })()`);
+  if (dockLayout?.position !== "fixed" || dockLayout.zIndex < 2 || !dockLayout.visible || dockLayout.bottom > dockLayout.viewportHeight) {
+    throw new Error("Audio dock is not pinned inside the viewport");
+  }
+
+  currentStep = "audio dock scroll";
+  await evaluate("window.scrollTo({ top: 600, behavior: 'instant' })");
+  await waitUntil("page scroll", () => evaluate("scrollY > 300"));
+  const scrolledDock = await evaluate(`(() => {
+    const rect = document.querySelector('.audio-dock')?.getBoundingClientRect();
+    return rect ? { top: Math.round(rect.top), bottom: Math.round(rect.bottom) } : null;
+  })()`);
+  if (!scrolledDock || Math.abs(scrolledDock.bottom - dockLayout.bottom) > 1) {
+    throw new Error("Audio dock did not stay pinned while scrolling");
+  }
+  await evaluate("window.scrollTo({ top: 0, behavior: 'instant' })");
+  await waitUntil("page scroll reset", () => evaluate("scrollY === 0"));
+
+  currentStep = "audio dock collapse";
+  if (!await evaluate(`(() => {
+    const handle = document.querySelector('.audio-dock__handle');
+    if (!handle) return false;
+    handle.click();
+    return true;
+  })()`)) throw new Error("Audio dock collapse control was not found");
+  await waitUntil("collapsed audio dock", () => evaluate(
+    "document.querySelector('.audio-dock')?.classList.contains('is-collapsed')",
+  ));
+  if (!await evaluate(`(() => {
+    const handle = document.querySelector('.audio-dock__handle');
+    if (!handle) return false;
+    handle.click();
+    return true;
+  })()`)) throw new Error("Audio dock expand control was not found");
+  await waitUntil("expanded audio dock", () => evaluate(
+    "!document.querySelector('.audio-dock')?.classList.contains('is-collapsed')",
+  ));
 
   if (!await clickByText("收入诗卷")) throw new Error("Save-to-collection button was not found");
   currentStep = "save";
