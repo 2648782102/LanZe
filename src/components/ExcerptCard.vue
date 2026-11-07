@@ -1,218 +1,201 @@
 <template>
-  <article class="excerpt-card" aria-label="今日摘录卡片">
-    <div class="excerpt-card__head">
-      <span class="excerpt-card__index" aria-hidden="true">{{ indexLabel }}</span>
+  <article class="legacy-card" aria-label="旧版诗词摘录卡片">
+    <div class="legacy-card__box">
       <button
-        class="excerpt-card__save"
+        class="legacy-card__save"
         type="button"
-        :class="{ 'is-saved': saved }"
+        :class="saved ? 'legacy-card__save--yes' : 'legacy-card__save--no'"
         :aria-pressed="saved"
-        :aria-label="saved ? `取消收藏第${indexLabel}张摘录` : `收藏第${indexLabel}张摘录`"
+        aria-label="收藏这句摘录"
         @click="emit('toggle-save')"
       >
-        <AppIcon :name="saved ? 'check' : 'bookmark'" :size="14" />
-        <span>{{ saved ? "已藏" : "收藏" }}</span>
+        收藏
       </button>
+      <p class="legacy-card__verse">{{ excerpt.content }}</p>
+      <h5 class="legacy-card__author">— {{ excerpt.author }}</h5>
+      <img
+        class="legacy-card__art"
+        :src="fanzouImage"
+        alt=""
+        width="720"
+        height="412"
+        draggable="false"
+      />
     </div>
-
-    <div class="excerpt-card__body">
-      <span class="excerpt-card__category">{{ excerpt.category }}</span>
-      <p class="excerpt-card__verse">{{ excerpt.content }}</p>
-      <p class="excerpt-card__attribution">— {{ excerpt.author }}</p>
-    </div>
-
-    <div class="excerpt-card__foot">
-      <span class="excerpt-card__origin">{{ excerpt.origin }}</span>
-      <router-link
-        class="excerpt-card__detail"
-        :to="{ name: 'poem', params: { id: 'legacy' }, query: { shici: detailQuery } }"
-        :aria-label="`展开《${excerpt.origin}》摘录笺注`"
-      >
-        展开
-        <AppIcon name="arrow-right" :size="14" />
-      </router-link>
-    </div>
-
-    <span class="excerpt-card__edge" aria-hidden="true" />
   </article>
 </template>
 
 <script setup>
-import { computed } from "vue";
-import AppIcon from "./AppIcon.vue";
+import fanzouImage from "../assets/excerpt/fanzou-720.png";
 
-const props = defineProps({
+defineProps({
   excerpt: { type: Object, required: true },
-  index: { type: Number, required: true },
   saved: { type: Boolean, default: false },
 });
 const emit = defineEmits(["toggle-save"]);
-
-const numerals = ["壹", "贰", "叁"];
-const indexLabel = computed(() => numerals[props.index] || String(props.index + 1));
-const detailQuery = computed(() => JSON.stringify({
-  title: props.excerpt.origin,
-  author: props.excerpt.author,
-  tags: [props.excerpt.category, "摘录"],
-  paragraphs: [props.excerpt.content],
-  titleNote: ["本页只展示一句摘录，不替代完整底本。"],
-}));
 </script>
 
-<style scoped>
-.excerpt-card {
-  position: relative;
-  display: grid;
-  min-width: 0;
-  min-height: 310px;
-  grid-template-rows: auto 1fr auto;
-  padding: 20px 20px 16px;
-  border: 1px solid var(--line-strong);
-  background: rgba(251, 252, 249, 0.78);
-  overflow: hidden;
+<style>
+@font-face {
+  font-family: "LanZeExcerptVerse";
+  src: url("../assets/excerpt/piaoYiSong-excerpt.woff2") format("woff2");
+  font-display: swap;
+  ascent-override: 87.99%;
+  descent-override: 12.01%;
+  line-gap-override: 0%;
 }
 
-.excerpt-card::before {
+@font-face {
+  font-family: "LanZeExcerptAuthor";
+  src: url("../assets/excerpt/hongLei-excerpt.woff2") format("woff2");
+  font-display: swap;
+  ascent-override: 80.27%;
+  descent-override: 29.2%;
+  line-gap-override: 10.06%;
+}
+</style>
+
+<style scoped>
+.legacy-card {
+  --legacy-scale: 1;
+  width: min(100%, 330px);
+  margin-inline: auto;
+  padding-block: calc(16px * var(--legacy-scale, 1));
+}
+
+.legacy-card__box {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 330 / 620;
+  overflow: hidden;
+  border: 1px solid rgba(84, 84, 84, 0.1);
+  border-radius: calc(0.3rem * var(--legacy-scale));
+  background: #fff;
+  box-shadow: 0 0 0 rgba(120, 120, 120, 0);
+  transform-style: preserve-3d;
+  transition: 0.45s ease-in-out;
+}
+
+.legacy-card__box::before {
   position: absolute;
-  inset: 7px;
-  border: 1px solid rgba(81, 122, 112, 0.12);
+  inset: 0;
+  background: linear-gradient(
+    -226deg,
+    rgba(225, 225, 225, 0) 40%,
+    rgba(255, 254, 182, 0.3) 40%,
+    rgba(225, 225, 225, 0) 60%
+  );
+  transform: translateY(-100%);
   content: "";
   pointer-events: none;
 }
 
-.excerpt-card__edge {
+.legacy-card__box::after {
   position: absolute;
-  top: 7px;
-  right: 7px;
-  bottom: 7px;
-  width: 10px;
-  background: linear-gradient(90deg, transparent, rgba(81, 122, 112, 0.07));
+  inset: 0 0 auto;
+  height: 120%;
+  background: linear-gradient(
+    226deg,
+    rgba(225, 225, 225, 0) 40%,
+    rgba(232, 232, 232, 0.3) 50%,
+    rgba(225, 225, 225, 0) 60%
+  );
+  transform: translateY(-100%);
+  transition: transform 0.85s cubic-bezier(0.165, 0.84, 0.44, 1);
+  content: "";
   pointer-events: none;
 }
 
-.excerpt-card__head,
-.excerpt-card__foot {
-  position: relative;
-  z-index: 1;
+.legacy-card__box:hover {
+  transform: rotateX(7deg) translateY(calc(-6px * var(--legacy-scale)));
+  box-shadow: 0 calc(10px * var(--legacy-scale)) calc(10px * var(--legacy-scale)) rgba(120, 120, 120, 0.126);
+  transition: 0.45s ease-in-out;
+}
+
+.legacy-card__box:hover::after {
+  transform: translateY(100%);
+}
+
+.legacy-card__save {
+  position: absolute;
+  top: calc(-8px * var(--legacy-scale));
+  left: calc(-32px * var(--legacy-scale));
+  z-index: 2;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  width: calc(94px * var(--legacy-scale));
+  height: calc(44px * var(--legacy-scale));
+  align-items: flex-end;
+  justify-content: center;
+  border: 0;
+  padding: 0;
+  font-size: calc(18px * var(--legacy-scale));
+  transform: rotateZ(-40deg);
+  transition: 0.3s;
 }
 
-.excerpt-card__head {
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--line);
+.legacy-card__save--yes {
+  background-color: red;
+  color: #fff;
 }
 
-.excerpt-card__index {
-  color: var(--brass);
-  font-family: var(--font-poem);
-  font-size: 14px;
-  letter-spacing: 0.2em;
+.legacy-card__save--no {
+  background-color: #fff;
+  color: rgb(195, 195, 195);
 }
 
-.excerpt-card__save {
-  display: inline-flex;
-  min-height: 30px;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 9px;
-  border: 1px solid var(--line-strong);
-  background: transparent;
-  color: var(--ink-soft);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
-}
-
-.excerpt-card__save:hover,
-.excerpt-card__save.is-saved {
-  border-color: var(--celadon-deep);
-  background: rgba(168, 196, 184, 0.16);
-  color: var(--ink);
-}
-
-.excerpt-card__body {
-  position: relative;
+.legacy-card__verse {
+  position: absolute;
+  top: 30%;
+  left: 50%;
   z-index: 1;
-  display: grid;
-  align-content: center;
-  min-width: 0;
-  padding: 22px 16px 18px;
-  text-align: center;
-}
-
-.excerpt-card__category {
-  color: var(--ink-faint);
-  font-size: 9px;
-  letter-spacing: 0.22em;
-}
-
-.excerpt-card__verse {
-  margin: 16px 0 14px;
-  color: var(--ink);
-  font-family: var(--font-poem);
-  font-size: clamp(18px, 1.5vw, 23px);
-  letter-spacing: 0.1em;
-  line-height: 1.8;
-  overflow-wrap: anywhere;
-}
-
-.excerpt-card__attribution {
+  width: 90%;
+  height: calc(196px * var(--legacy-scale));
   margin: 0;
-  color: var(--ink-soft);
-  font-family: var(--font-poem);
-  font-size: 12px;
-  letter-spacing: 0.12em;
+  color: var(--ink);
+  font-family: "LanZeExcerptVerse", "Songti SC", serif;
+  font-size: calc(20px * var(--legacy-scale));
+  letter-spacing: calc(4px * var(--legacy-scale));
+  line-height: 1.5;
+  text-align: start;
+  transform: translateX(-50%);
+  writing-mode: vertical-rl;
 }
 
-.excerpt-card__foot {
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
+.legacy-card__author {
+  position: absolute;
+  top: 30%;
+  left: 28%;
+  z-index: 1;
+  margin: 0;
+  color: var(--ink);
+  font-family: "LanZeExcerptAuthor", "Songti SC", serif;
+  font-size: calc(22px * var(--legacy-scale));
+  font-weight: 400;
+  letter-spacing: calc(1px * var(--legacy-scale));
+  writing-mode: vertical-rl;
 }
 
-.excerpt-card__origin {
-  min-width: 0;
-  overflow: hidden;
-  color: var(--ink-faint);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.excerpt-card__detail {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  color: var(--celadon-deep);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  white-space: nowrap;
-}
-
-.excerpt-card__detail:hover {
-  color: var(--brass);
+.legacy-card__art {
+  position: absolute;
+  bottom: 5%;
+  left: 10%;
+  display: block;
+  width: 80%;
+  height: auto;
+  pointer-events: none;
 }
 
 @media (max-width: 560px) {
-  .excerpt-card {
-    min-height: 268px;
-    padding: 17px 17px 14px;
-  }
-
-  .excerpt-card__body {
-    padding-inline: 10px;
-  }
-
-  .excerpt-card__verse {
-    font-size: 19px;
+  .legacy-card {
+    --legacy-scale: 0.9090909;
+    width: min(100%, 300px);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .excerpt-card__save {
+  .legacy-card__box,
+  .legacy-card__box::after,
+  .legacy-card__save {
     transition: none;
   }
 }

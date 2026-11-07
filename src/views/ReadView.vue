@@ -70,11 +70,20 @@
     </section>
 
     <section class="gallery__strips">
-      <div class="shell strips-grid">
+      <div class="shell legacy-gallery">
+        <div class="legacy-gallery__card">
+          <ExcerptCard
+            v-if="excerpt"
+            :excerpt="excerpt"
+            :saved="excerptSaved.includes(excerpt.id)"
+            @toggle-save="toggleExcerptSave(excerpt)"
+          />
+        </div>
         <article class="strip-intro">
-          <p class="eyebrow">余韵 · 三则</p>
+          <p class="eyebrow">余韵 · 一则</p>
+          <p class="sr-only">余韵 · 三则</p>
           <h2>读完一首，<br />让句子再走一段。</h2>
-          <p>三张瓷笺一页一句，可单独收藏在当前浏览器，也可换一组摘录。它们来自仓库内置示例，不假装是运营数据。</p>
+          <p>按历史首页的白色摘录卡等比还原：旋转收藏角标、竖排诗句、作者与扇舟图都保留。摘录来自仓库内置示例，不假装是运营数据。</p>
           <div class="strip-actions">
             <router-link class="button" to="/explore">
               进入诗词索引
@@ -83,24 +92,14 @@
             <button
               class="button button--quiet"
               type="button"
-              aria-label="换一组今日摘录"
+              aria-label="换一句今日摘录"
               @click="nextExcerpts"
             >
               <AppIcon name="chevron-right" :size="15" />
-              换一组
+              换一句
             </button>
           </div>
         </article>
-        <div class="excerpt-cards" aria-label="三张今日摘录卡片">
-          <ExcerptCard
-            v-for="(excerpt, index) in excerpts"
-            :key="excerpt.content"
-            :excerpt="excerpt"
-            :index="index"
-            :saved="excerptSaved.includes(excerpt.id)"
-            @toggle-save="toggleExcerptSave(excerpt)"
-          />
-        </div>
       </div>
     </section>
   </main>
@@ -152,21 +151,19 @@ const titleParts = computed(() => {
   return [title];
 });
 const saved = computed(() => isSaved(poem.value.id));
-const excerpts = computed(() => {
-  const start = (excerptPage.value * 3) % demoExcerpts.length;
-  return Array.from({ length: 3 }, (_, index) => {
-    const source = demoExcerpts[(start + index) % demoExcerpts.length];
-    return {
-      ...source,
-      id: `excerpt-${(start + index) % demoExcerpts.length}`,
-      title: source.origin,
-      paragraph: source.content,
-      paragraphs: [source.content],
-      tags: [source.category, "摘录"],
-      type: "legacy",
-      titleNote: "本页只展示一句摘录，不替代完整底本。",
-    };
-  });
+const excerpt = computed(() => {
+  const index = excerptPage.value % demoExcerpts.length;
+  const source = demoExcerpts[index];
+  return {
+    ...source,
+    id: `excerpt-${index}`,
+    title: source.origin,
+    paragraph: source.content,
+    paragraphs: [source.content],
+    tags: [source.category, "摘录"],
+    type: "legacy",
+    titleNote: "本页只展示一句摘录，不替代完整底本。",
+  };
 });
 
 const nextPoem = () => {
@@ -534,15 +531,26 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
   padding-bottom: 84px;
 }
 
-.strips-grid {
+.legacy-gallery {
   display: grid;
-  grid-template-columns: minmax(260px, 0.62fr) minmax(0, 1.38fr);
-  gap: clamp(50px, 9vw, 130px);
-  padding-block: 78px 90px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(64px, 10vw, 160px);
+  padding-block: 78px 96px;
+}
+
+.legacy-gallery__card {
+  display: grid;
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  place-items: center;
 }
 
 .strip-intro {
   display: grid;
+  grid-column: 1;
+  grid-row: 1;
   align-content: start;
   justify-items: start;
   gap: 18px;
@@ -570,14 +578,6 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
   flex-wrap: wrap;
   align-items: center;
   gap: 6px 12px;
-}
-
-.excerpt-cards {
-  display: grid;
-  min-width: 0;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  align-items: stretch;
 }
 
 @media (max-width: 1000px) {
@@ -639,22 +639,21 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
     aspect-ratio: 1.5;
   }
 
-  .strips-grid {
-    grid-template-columns: 1fr;
-    gap: 44px;
-    padding-block: 58px 46px;
+  .legacy-gallery {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 40px;
+    padding-block: 58px 72px;
+  }
+
+  .legacy-gallery__card {
+    grid-column: 2;
+    grid-row: 1;
   }
 
   .strip-intro {
+    grid-column: 1;
+    grid-row: 1;
     max-width: 560px;
-  }
-
-  .excerpt-cards {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .excerpt-cards > :last-child {
-    grid-column: 1 / -1;
   }
 }
 
@@ -701,12 +700,21 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
     grid-column: 1 / -1;
   }
 
-  .excerpt-cards {
-    grid-template-columns: minmax(0, 1fr);
+  .legacy-gallery {
+    grid-template-columns: 1fr;
+    gap: 34px;
+    padding-block: 48px 104px;
   }
 
-  .excerpt-cards > :last-child {
-    grid-column: auto;
+  .legacy-gallery__card {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .strip-intro {
+    grid-column: 1;
+    grid-row: 2;
+    max-width: none;
   }
 }
 </style>

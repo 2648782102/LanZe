@@ -183,29 +183,41 @@ const main = async () => {
     audioTitle: document.querySelector('.audio-dock__title')?.textContent?.trim() || '',
     navCount: document.querySelectorAll('.main-nav a').length,
   }))()`);
-  if (!home.text.includes("余韵 · 三则")) throw new Error("Today's reading page did not render");
+  if (!home.text.includes("余韵 · 一则")) throw new Error("Today's reading page did not render");
   if (home.audioDocks !== 1) throw new Error("Expected one native local audio dock");
   if (!home.audioTitle.includes("兰泽 · 本地演示音")) throw new Error("Local demo audio was not selected");
   if (home.navCount !== 3) throw new Error("Primary navigation did not render");
   const excerptCards = await evaluate(`(() => {
-    const cards = [...document.querySelectorAll('.excerpt-card')];
+    const cards = [...document.querySelectorAll('.legacy-card')];
+    const box = cards[0]?.querySelector('.legacy-card__box');
+    const art = cards[0]?.querySelector('.legacy-card__art');
     return {
       count: cards.length,
-      firstVerse: cards[0]?.querySelector('.excerpt-card__verse')?.textContent?.trim() || '',
-      labels: cards.map((card) => card.querySelector('.excerpt-card__index')?.textContent?.trim()),
-      saveButtons: cards.filter((card) => card.querySelector('.excerpt-card__save')).length,
-      detailLinks: cards.filter((card) => card.querySelector('.excerpt-card__detail')).length,
-      pressedStates: cards.map((card) => card.querySelector('.excerpt-card__save')?.getAttribute('aria-pressed')),
+      firstVerse: cards[0]?.querySelector('.legacy-card__verse')?.textContent?.trim() || '',
+      saveButtons: cards.filter((card) => card.querySelector('.legacy-card__save')).length,
+      pressedStates: cards.map((card) => card.querySelector('.legacy-card__save')?.getAttribute('aria-pressed')),
+      writingMode: cards[0] ? getComputedStyle(cards[0].querySelector('.legacy-card__verse')).writingMode : '',
+      artLoaded: Boolean(art?.complete && art.naturalWidth > 0),
+      artWidth: art?.getAttribute('width') || '',
+      artHeight: art?.getAttribute('height') || '',
+      boxBackground: box ? getComputedStyle(box).backgroundColor : '',
+      boxOverflow: box ? getComputedStyle(box).overflow : '',
     };
   })()`);
-  if (excerptCards.count !== 3 || excerptCards.saveButtons !== 3 || excerptCards.detailLinks !== 3) {
-    throw new Error("Three interactive excerpt cards did not render");
+  if (excerptCards.count !== 1 || excerptCards.saveButtons !== 1) {
+    throw new Error("One historical excerpt card did not render");
   }
-  if (!excerptCards.firstVerse || excerptCards.labels.join("") !== "壹贰叁") {
-    throw new Error("Excerpt card content or sequence did not render");
+  if (!excerptCards.firstVerse || excerptCards.writingMode !== "vertical-rl") {
+    throw new Error("Excerpt verse or vertical layout did not render");
   }
   if (excerptCards.pressedStates.some((state) => !["true", "false"].includes(state))) {
     throw new Error("Excerpt card save controls are missing pressed state");
+  }
+  if (!excerptCards.artLoaded || excerptCards.artWidth !== "720" || excerptCards.artHeight !== "412") {
+    throw new Error("Historical artwork did not render with stable dimensions");
+  }
+  if (excerptCards.boxBackground !== "rgb(255, 255, 255)" || excerptCards.boxOverflow !== "hidden") {
+    throw new Error("Historical card surface did not render");
   }
   const firstExcerpt = excerptCards.firstVerse;
   const dockLayout = await evaluate(`(() => {
@@ -236,9 +248,9 @@ const main = async () => {
   if (!scrolledDock || Math.abs(scrolledDock.bottom - dockLayout.bottom) > 1) {
     throw new Error("Audio dock did not stay pinned while scrolling");
   }
-  currentStep = "excerpt cards";
+  currentStep = "historical excerpt card";
   if (!await evaluate(`(() => {
-    const button = document.querySelector('.excerpt-card__save');
+    const button = document.querySelector('.legacy-card__save');
     if (!button) return false;
     button.click();
     return true;
@@ -253,15 +265,15 @@ const main = async () => {
   })()`));
   if (!savedExcerpt) throw new Error("Saving an excerpt did not persist locally");
   if (!await evaluate(`(() => {
-    const button = [...document.querySelectorAll('button')].find((node) => (node.innerText || '').includes('换一组'));
+    const button = [...document.querySelectorAll('button')].find((node) => (node.innerText || '').includes('换一句'));
     if (!button) return false;
     button.click();
     return true;
   })()`)) throw new Error("Excerpt rotation control was not found");
-  const rotatedExcerpts = await waitUntil("rotated excerpt cards", () => evaluate(
-    `document.querySelector('.excerpt-card__verse')?.textContent?.trim() !== ${JSON.stringify(firstExcerpt)}`,
+  const rotatedExcerpts = await waitUntil("rotated historical excerpt", () => evaluate(
+    `document.querySelector('.legacy-card__verse')?.textContent?.trim() !== ${JSON.stringify(firstExcerpt)}`,
   ));
-  if (!rotatedExcerpts) throw new Error("Excerpt cards did not rotate");
+  if (!rotatedExcerpts) throw new Error("Historical excerpt card did not rotate");
   await evaluate("window.scrollTo({ top: 0, behavior: 'instant' })");
   await waitUntil("page scroll reset", () => evaluate("scrollY === 0"));
 

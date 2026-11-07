@@ -13,13 +13,14 @@ find src/assets public -type f -print
 
 ## 仓库内二进制与数据素材
 
-> 当前 `src/assets/` 只保留三个运行时文件：一个 WOFF2 字体子集与两张压缩展品图。约 27 MB 未引用的历史 TTF、JPG、PNG、WebP 与旧 logo 已从工作树移除；它们仍可通过 Git 历史追溯，但不进入当前构建产物。
+> 当前 `src/assets/` 保留全局字体子集、两张压缩展品图，以及为历史摘录卡生成的两个字体子集与一张缩放扇舟图。约 27 MB 未引用的历史 TTF、JPG、PNG、WebP 与旧 logo 已从工作树移除；它们仍可通过 Git 历史追溯，原文件不进入当前构建产物。
 
 | 类别 | 当前位置 | 可观察来源 | 授权状态 | 后续动作 |
 | --- | --- | --- | --- | --- |
 | 当前使用字体 | `src/assets/fonts/LanZeSong-subset.woff2` | 由 Git 历史中的 `src/assets/ZiTi/FangZhengSong.ttf` 按仓库可见字符生成的 WOFF2 子集；`src/styles/base.css` 只引用该文件 | 未核验；子集化不改变原字体授权 | 核对字体厂商、授权书、Web 嵌入与再分发条款；无法确认时替换为授权明确的字体 |
-| 当前使用图片 | `src/assets/exhibit/songci300-768.jpg`、`auth-cover-960.jpg` | 分别由 Git 历史中的 `src/assets/beijing/songci300.jpg` 与 `src/assets/LunBo/1.webp` 缩放到展示尺寸并压缩 | 未核验；缩放不改变原图授权 | 按原图查找原始出处、许可与人物/美术权利；无法确认时替换 |
-| 已移除的历史素材 | `src/assets/ZiTi/*.ttf`、`src/assets/beijing/**`、`src/assets/LunBo/**`、`src/assets/hoad/**`、`src/assets/logo.png` | 2022–2024 年历史提交；当前工作树已删除，仍可从 Git 历史追溯 | 未核验 | 如需追溯来源或验证授权，先查阅历史提交；不要再以运行时资源形式引入 |
+| 当前使用图片 | `src/assets/exhibit/songci300-768.jpg`、`auth-cover-960.jpg`、`src/assets/excerpt/fanzou-720.png` | 前两者由 Git 历史中的 `src/assets/beijing/songci300.jpg` 与 `src/assets/LunBo/1.webp` 缩放压缩；后者由历史 `src/assets/beijing/fanzou.png` 等比缩放，用于还原旧版摘录卡 | 未核验；缩放不改变原图授权 | 按原图查找原始出处、许可与人物/美术权利；无法确认时替换 |
+| 历史摘录卡字体 | `src/assets/excerpt/piaoYiSong-excerpt.woff2`、`hongLei-excerpt.woff2` | 由历史 `src/assets/ZiTi/piaoYiSong.ttf` 与 `hongLei.ttf` 按摘录卡可见字符生成的 WOFF2 子集 | 未核验；子集化不改变原字体授权 | 核对字体厂商、Web 嵌入与再分发条款；无法确认时替换为授权明确的字体 |
+| 已移除的历史素材 | `src/assets/ZiTi/*.ttf`、`src/assets/beijing/**`、`src/assets/LunBo/**`、`src/assets/hoad/**`、`src/assets/logo.png` | 2022–2024 年历史提交；原始文件仍可从 Git 历史追溯，当前仅按可见字符或展示尺寸重新派生所需子集 | 未核验 | 如需追溯来源或验证授权，先查阅历史提交；不要把原始大文件原样重新引入构建产物 |
 | OG / favicon | `public/og-image.svg`、`public/og-image.png`、`public/favicon.ico` | SVG 与 1200×630 PNG 为 2026-11-07 按当前青瓷展厅视觉绘制的展示素材；favicon 来自历史提交 | SVG/PNG 由仓库贡献者提供；favicon 未核验 | 确认 favicon 来源；如需在线启用社交预览图，具备仓库设置写权限后按 `docs/PROMOTION.md` 上传并回读 |
 | 诗词文本 | `src/data/poems.js` | 2022–2024 年历史内容与 2026 年演示数据 | 未核验 | 标注公版依据、底本与校勘来源；现代作品必须取得作者许可 |
 
