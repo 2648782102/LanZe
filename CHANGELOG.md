@@ -4,7 +4,7 @@
 
 ## [Unreleased]
 
-> 记录 `v0.4.0` 之后、尚未发布的改动；当前工作树中的改动已整理进下方 `v0.4.0` 段，待推送和 Release 后回读确认。
+> 记录 `v0.4.0` 之后、尚未发布的改动。
 
 ### Added
 
@@ -12,7 +12,7 @@
 
 ## [v0.4.0] — 2026-11-07（当前版本）
 
-> 本段汇总 `v0.3.0` 之后已在工作树完成、待推送到 `main` 并由同名 tag 发布的改动。`v0.2.0` 与 `v0.3.0` 仍是独立历史 Release。
+> 本段汇总 `v0.3.0` 之后合并到 `main`、由同名 tag 发布的改动。`v0.2.0` 与 `v0.3.0` 仍是独立历史 Release。
 
 ### Added
 
@@ -25,14 +25,14 @@
 
 ### Changed
 
-- GitHub 仓库 About 已更新为「青瓷数字诗馆」描述，移除无关的 `element-plus` topic，清空失效 Vercel homepage，并补上 `static-site`、`design-system`、`github-actions`；已通过公开 API 回读确认。
+- GitHub topics 已移除无关的 `element-plus` 并补上 `static-site`、`design-system`、`github-actions`；公开 API 回读显示 About 描述仍为 27 项单测旧口径、Website 字段为可访问但未核验归属的 Vercel 地址，仓库文案不把它们写成已完成展示。
 - 收口移动端产品体验：窄屏播放器默认收起并与底部导航分层，缩小触控区但仍保留 44px 级主按钮；索引行、筛选容器、表单、页脚与摘录区按 320px 基线消除溢出，压缩解释性文案，减少首屏堆叠与页面留白。视口单位改用 `dvh`，补齐字体 accent token、路由首帧标题和固定层安全区留白，保持零页面级横向滚动和 CLS 0。
 - 默认媒体资源由旧 8 秒 `lanze-demo.wav` 替换为三段本地声景；静态冒烟逐项请求曲库资源，CI 校验曲库哈希，lint 拒绝旧演示音文件名和第三方音乐域回到默认配置。自定义音源仍只在显式启用且授权明确时使用。
 
 ### Verification
 
 - 干净环境 `npm ci` 后，`npm run lint`、`npm run audio:verify`、`npm run test`（39/39）、`npm run build`、`npm run smoke`（35 assets）、`npm run smoke:browser`（CLS 0.0000、控制台/网络错误 0）、`npm audit --omit=dev`（0 vulnerabilities）均通过。
-- `34d3912` 的 Browser E2E 为 success；`cb5f5a1` 的 CI run `42371462110` 与 Browser E2E run `42371462078` 均为 success。发布标签与公开 Release 回读由维护记录补充。
+- `54ca6b7` 的 CI run `42371607288` 与 Browser E2E run `42371607294` 均为 success；annotated tag `v0.4.0`、publish run `42371739156` 与公开 Release `437556989` 已回读。发布后的文档口径复核由维护记录补充。
 
 ## [v0.3.0] — 2026-11-07（已发布）
 

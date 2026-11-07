@@ -59,7 +59,7 @@ vue3, vite, javascript, frontend, chinese-poetry, poetry, classical-chinese, chi
 
 ## 3. GitHub Discussions 欢迎帖
 
-已发布 v0.2.0 欢迎帖：[欢迎参与兰泽诗词的重新整理 👋](https://github.com/2648782102/LanZe/discussions/1)。分类 `Announcements`，由 tag 发布 workflow 幂等创建并避免重复发帖。正文同步会比对现有内容；Actions 默认令牌对 `updateDiscussion` 缺少写权限时，workflow 会保留原帖并输出 warning，不把它误报为已更新。2026-11-06 06:30 巡检读取公开 Discussions REST 数据，确认线上欢迎帖正文仍是首版「新增 14 个单测和静态检查」；[`ANNOUNCEMENT.md`](../ANNOUNCEMENT.md) 才是仓库内 v0.4.0 当前文案，不把该帖写成已同步。后续在线更新需维护者明确授权且具备 Discussions 写权限的令牌，或人工编辑；浏览器人工修改公开帖还须在最终保存前单独确认；不重复发帖。
+已发布 v0.2.0 欢迎帖：[欢迎参与兰泽诗词的重新整理 👋](https://github.com/2648782102/LanZe/discussions/1)。分类 `Announcements`，由 tag 发布 workflow 幂等创建并避免重复发帖。正文同步会比对现有内容；Actions 默认令牌对 `updateDiscussion` 缺少写权限时，workflow 会保留原帖并输出 warning，不把它误报为已更新。2026-11-07 20:17 读取公开 Discussions REST 数据，确认 v0.4.0 publish workflow 的 Discussion 步骤虽 success，线上正文仍是 2026-11-05 首版「新增 14 个单测和静态检查」；[`ANNOUNCEMENT.md`](../ANNOUNCEMENT.md) 才是仓库内 v0.4.0 当前文案，不把该帖写成已同步。后续在线更新需维护者明确授权且具备 Discussions 写权限的令牌，或人工编辑；浏览器人工修改公开帖还须在最终保存前单独确认；不重复发帖。
 
 欢迎帖应引导四类讨论：文档勘误、本地复现、mock/API 契约、素材授权；明确「暂无线上 Demo」与「社区维护、不承诺响应 SLA」。
 
@@ -77,7 +77,7 @@ vue3, vite, javascript, frontend, chinese-poetry, poetry, classical-chinese, chi
 
 历史发布：[v0.2.0 Release](https://github.com/2648782102/LanZe/releases/tag/v0.2.0)，标题「兰泽诗词 v0.2.0 · 本地可运行的开源前端」。该 Release 固定描述当时版本，不用当前 [`RELEASE_NOTES.md`](../RELEASE_NOTES.md) 覆盖。
 
-当前发布：`v0.4.0 · 离线馆藏与声景曲库`，文案位于 `RELEASE_NOTES.md`；发布 workflow 仅由 `v0.4.0` tag push 触发。`v0.3.0` 的历史状态已回读：CI run `42354267725` 与 Browser E2E run `42354267756` 均为 success，publish run `42354434490` 为 success，公开 Release `437433058` 仍为正式发布；`v0.2.0` 保持独立历史 Release。v0.4.0 的 `cb5f5a1` CI run `42371462110` 与 Browser E2E run `42371462078` 均为 success；publish 与公开 Release 回读结果须在 tag 实际推送后补记。
+当前发布：`v0.4.0 · 离线馆藏与声景曲库`，文案位于 `RELEASE_NOTES.md`；发布 workflow 仅由 `v0.4.0` tag push 触发。`v0.3.0` 的历史状态已回读：CI run `42354267725` 与 Browser E2E run `42354267756` 均为 success，publish run `42354434490` 为 success，公开 Release `437433058` 仍为正式发布；`v0.2.0` 保持独立历史 Release。v0.4.0 的 `54ca6b7` CI run `42371607288` 与 Browser E2E run `42371607294` 均为 success；publish run `42371739156` 为 success，公开 Release `437556989` 已回读，正文与 `RELEASE_NOTES.md` 仅末尾换行差异。发布后若再次移动 tag，须复核 Release 指向和验证记录。
 
 发布核对：
 
@@ -102,7 +102,7 @@ vue3, vite, javascript, frontend, chinese-poetry, poetry, classical-chinese, chi
 | 渠道 | 最小可执行动作 | 前置条件 | 可信度要求 |
 | --- | --- | --- | --- |
 | GitHub Discussions | 发布欢迎帖、置顶、建立 3–4 个讨论分类 | 仓库启用 Discussions、主 agent 有权限 | 链接到已合并文件，不宣称已发布服务 |
-| GitHub Release | v0.4.0 notes 已整理，待 tag 发布并关联 CHANGELOG | tag、CI 与 Browser E2E 通过 | 逐项可验证；不覆盖 v0.2.0 / v0.3.0 |
+| GitHub Release | v0.4.0 已发布并关联 CHANGELOG | tag、CI 与 Browser E2E 通过 | 逐项可验证；不覆盖 v0.2.0 / v0.3.0 |
 | GitHub Topics / About | 设置描述、topics、社交预览图 | 合并完成 | 标签与项目实际相关 |
 | 即刻 / 微博 / 小红书 | 从 `SOCIAL_POSTS.md` 选 1 条中文短帖，配 hero 图 | 人工确认文案与图片授权 | 不买量、不刷互动、不虚构数据 |
 | X / Mastodon / LinkedIn | 从英文短帖选 1 条，附仓库链接 | 人工确认英文摘要 | 不夸大 production-ready |

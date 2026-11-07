@@ -224,3 +224,7 @@
 - 首次推送 `34d3912` 后 Browser E2E `42371313191` success；CI `42371313168` 的 Documentation checks 因「候选文案」四字命中过宽的发布措辞守卫而失败，Node 20/22 两个 build job 仍 success。现把守卫收窄到明确的「候选，待 tag/Release」等过期句式，避免把素材/About 候选文案误判为未发布 Release。
 - `cb5f5a1` 推送后 CI run `42371462110` 与 Browser E2E run `42371462078` 均 success；GitHub #2/#3/#4 已用具备 issue 写权限的连接同步到 39 项单测、9,350 篇离线馆藏、三段声景与 v0.4.0 边界。
 - 公开仓库 API 回读发现 homepage 实际为 `https://lan-ze-thau.vercel.app`，并非此前文档记录的「已清空」；首页、构建 JS/CSS 入口、曲库清单与馆藏清单均返回 200，但托管归属、部署来源和持续维护边界未核验。不擅自清空或把它写成维护者验证的官方 Demo；文档已改为如实记录。GitHub About 描述仍为 27 项单测旧口径，当前连接没有仓库 metadata 写工具，未声称已更新。
+- 在 `54ca6b7` 的 CI `42371607288` 与 Browser E2E `42371607294` 均 success 后，创建 annotated tag `v0.4.0`（object `e10667a`）并推送；publish run `42371739156` success，公开 Release id `437556989` 已回读，正文与 `RELEASE_NOTES.md` 仅末尾换行差异，未覆盖 v0.2.0 / v0.3.0。
+- 回读 publish job `128401097477`：`Create or update GitHub Release` 与 `Create or update welcome discussion` 两步均 success；但公开 Discussions REST 与网页仍显示 Discussion #1 首版「新增 14 个单测和静态检查」，说明 job success 不等于在线正文已同步。仓库内 `ANNOUNCEMENT.md` 为当前文案，不重复发帖，不伪造公开展示完成状态。
+- 发布后复核公开 API：3 个 open issue 均已于本轮更新且 0 评论，0 个 open PR；GitHub About 描述仍为 27 项单测旧口径，公开 homepage 仍为可访问但未核验归属的 Vercel 地址，Pages 仍 `has_pages=false`，社交预览未确认上传。当前连接具备 issue/文件写入，但没有仓库 metadata 写工具；不做未认证 PATCH 或浏览器静默编辑。
+- 发布后文档复核发现 CHANGELOG、`docs/PROMOTION.md` 与 `docs/ROADMAP.md` 仍残留「待推送 / homepage 已清空 / 待 tag」等旧措辞；补齐 CI、tag、Release 与 Discussion 状态后再次推送，并强制更新 `v0.4.0` tag 指向最终文档提交，防止 Release 与 `main` 口径分叉。

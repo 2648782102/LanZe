@@ -27,7 +27,7 @@
 | 工程现代化 | Vite 6、ESM、相对 base、统一请求层、本地演示数据、会话与本地演示音源 | 远端优先、失败降级；发布时 23 项单测通过 |
 | 发布素材 | Release notes、Discussions 欢迎帖、中英文短帖 | 只描述已验证能力，不写线上 Demo |
 
-GitHub 侧历史配合：v0.2.0 与 v0.3.0 Release 均已发布，Discussion #1 仍是 v0.2.0 首版；v0.3.0 的 About/topics 已更新、失效 homepage 已清空，社交预览图与 Pages 仍按 `docs/PROMOTION.md` 的实际写权限核对。`RELEASE_NOTES.md` 是 v0.4.0 发布说明，`ANNOUNCEMENT.md` 是当前欢迎帖文案，不回写历史 Release。
+GitHub 侧历史配合：v0.2.0、v0.3.0 与 v0.4.0 Release 均已发布，Discussion #1 仍是 v0.2.0 首版；topics 已按当前实现整理，但 About 描述仍为 27 项单测旧口径、Website 字段为可访问但未核验归属的 Vercel 地址，社交预览图与 Pages 仍按 `docs/PROMOTION.md` 的实际写权限核对。`RELEASE_NOTES.md` 是 v0.4.0 发布说明，`ANNOUNCEMENT.md` 是当前欢迎帖文案，不回写历史 Release。
 
 ## 2. v0.3.0 — 青瓷数字诗馆（已发布）
 
