@@ -9,7 +9,7 @@ rg -n 'https?://' index.html src --glob '!src/config/*.test.js'
 find src/assets public -type f -print
 ```
 
-构建与冒烟命令不依赖这些外部站点：`npm ci && npm run build && npm run test && npm run lint && npm run smoke`。
+构建、单测与静态冒烟不依赖这些外部站点：`npm ci && npm run build && npm run test && npm run lint && npm run smoke`；可选浏览器冒烟通过 CDP 拦截诗句源请求并注入固定响应，仍会检查其它运行时网络错误。
 
 ## 仓库内二进制与数据素材
 
@@ -33,6 +33,7 @@ find src/assets public -type f -print
 | 运行时依赖 | `package.json` / `package-lock.json` | Vue、Vue Router、Axios、Vue Cookies、Supabase JS 与 Vite 工具链 | 当前不再引入 Bootstrap、Font Awesome、Element Plus、Lottie、APlayer 或滑块验证码；npm 包各自许可见 lock 元数据 | 升级时再次核对依赖许可与构建产物中的版权说明 |
 | 默认演示音源与封面 | `public/media/lanze-demo.wav`、`public/media/lanze-demo-cover.svg` | 2026-11-06 由本仓库脚本生成的合成 PCM 音与原创 SVG | 由仓库贡献者提供；不引入第三方录音或美术素材 | 保持默认离线可用；如替换仍需记录生成方式与权利来源 |
 | 可选自定义音源 | `src/config/audio.js`、`VITE_AUDIO_TRACKS` | 部署者显式提供的音轨 URL / 封面 URL | 默认不含任何第三方媒体域；启用后版权、热链与隐私政策由配置者负责 | 仅在授权明确时设置 `VITE_AUDIO_SOURCE=custom`，无效配置自动回退到本地演示音并显示提示 |
+| 首页诗句源 | `src/services/poetrySource.js`、`VITE_POETRY_SOURCE_URL` | 默认 `https://v1.jinrishici.com/all.json`，对应历史首页使用的公开随机诗句接口；请求带缓存破坏参数，重复结果回退内置摘录 | 第三方服务不随仓库托管，授权与稳定性未核验；不承诺 SLA | 可通过 `VITE_POETRY_SOURCE=false` 完全关闭，或换成自建兼容接口；公开部署前核查服务条款与内容授权 |
 | 徽章 | `README.md` | `img.shields.io`、GitHub Actions badge | 文档展示外链；不参与运行时核心功能 | 可保留，但离线文档不应依赖其加载 |
 | 文档链接 | 全仓库 | GitHub、Vue、Vite 等官方/项目链接 | 属说明性链接 | 定期检查失效链接，不把其承诺视为本项目能力 |
 
@@ -48,3 +49,4 @@ find src/assets public -type f -print
 - [x] 已从当前工作树移除未被源码引用的历史字体、图片与头像文件；原始文件仍可由 Git 历史追溯。
 - [x] 默认音乐演示已提供离线、仓库自制的音源与封面；无效配置已有回退提示。
 - [ ] 继续补自定义音源 URL 不可达时的播放器状态。
+- [ ] 核查首页诗句源的服务条款、内容版权与公开部署隐私边界；无法确认时使用 `VITE_POETRY_SOURCE=false` 或自建兼容接口。

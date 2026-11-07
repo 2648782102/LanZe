@@ -34,7 +34,7 @@ npm run dev
 ```bash
 npm run dev                  # 开发服务器
 npm run build                # 生产构建，输出到 dist/
-npm run test                 # 23 个 node --test 单测
+npm run test                 # 27 个 node --test 单测
 npm run lint                 # 静态扫描失效后端地址、硬编码服务与脆弱引用
 npm run preview              # 预览构建产物
 npm run smoke                # 启动预览服务并检查首页与入口静态资源
@@ -70,7 +70,7 @@ VITE_USE_MOCK=true
 核对顺序：
 
 1. 打开 `package.json`，确认实际脚本名与 README/CI 一致。
-2. 打开 `src/config/runtime.js` 与 `src/config/audio.js`，确认 `VITE_API_BASE_URL`、`VITE_API_TIMEOUT`、`VITE_USE_MOCK`、`VITE_SUPABASE_URL`、`VITE_SUPABASE_ANON_KEY`、`VITE_AUDIO_SOURCE`、`VITE_AUDIO_TRACKS` 的解析规则。
+2. 打开 `src/config/runtime.js`、`src/config/poetrySource.js` 与 `src/config/audio.js`，确认 `VITE_API_BASE_URL`、`VITE_API_TIMEOUT`、`VITE_USE_MOCK`、`VITE_POETRY_SOURCE*`、Supabase 与音源变量的解析规则。
 3. 打开 `src/apis/request.js`，确认远端优先、失败降级与提示逻辑。
 4. 搜索 `http://`、`https://` 与 `createClient(`，确认页面是否仍有绕过请求层的外部调用或外部素材。
 5. 若源码与文档不一致，以源码事实修文档；若属于现代化遗漏，开 issue 说明。
@@ -153,7 +153,7 @@ VITE_USE_MOCK=true
 | `npm ci` 后 esbuild 二进制不可用 | 检查是否使用 `--ignore-scripts`；按实际错误运行 `npm rebuild esbuild` |
 | 页面打开即白屏 | 查看控制台、自定义音源配置是否阻断、hash 路径是否正确、`index.html` 是否加载 `/src/main.js` |
 | 搜索没有远端结果 | 检查 `VITE_USE_MOCK`、`VITE_API_BASE_URL` 与超时；默认会自动降级到演示数据 |
-| 摘录为空 | 检查是否清空了浏览器本地存储；演示数据不依赖今日诗词 API |
+| 摘录为空或来源不对 | 检查 `VITE_POETRY_SOURCE`、`VITE_POETRY_SOURCE_URL`、超时与页面来源状态；失败会自动回退内置摘录 |
 | GitHub Pages 子路径资源 404 | 检查 `base: './'` 与发布目录；hash 路由本身不需要 rewrite |
 | `npm run test` 失败 | 查看 `node --test` 输出；CI 使用 `npm run test --if-present` 兜底 |
 | Vite 配置因模块类型报错 | `vite.config.js` 使用 ESM 导出，与 `"type": "module"` 一致；CI 只跑 npm 脚本 |

@@ -12,10 +12,10 @@
 - [ ] `npm ci && npm run build && npm run test && npm run lint && npm run smoke` 通过。
 - [ ] 环境允许时，本机 Chrome 桌面/窄屏与登录发布冒烟 `npm run smoke:browser` 通过；CI 不强制依赖本机 Chrome。
 - [ ] 明确本次部署是「仅前端 + 浏览器本地演示数据」还是「前端 + 自建 API」。
-- [ ] 生产环境变量只含公开配置；`VITE_USE_MOCK` 按需求设置，避免把演示数据误写成正式账号服务。
+- [ ] 生产环境变量只含公开配置；`VITE_USE_MOCK` 按需求设置，避免把演示数据误写成正式账号服务。若使用默认首页诗句源，确认其服务条款、隐私边界与 CSP；离线部署设置 `VITE_POETRY_SOURCE=false`。
 - [ ] 若关闭 mock，`VITE_API_BASE_URL` 指向可访问的 HTTPS API 或同源 `/api/`；后端已配置 CORS/鉴权/限流。远端失败时前端会自动降级。
 - [ ] MemFire/Vercel 历史地址不再作为生产依赖；源码中不再包含历史硬编码 anon key。
-- [ ] WOFF2 字体子集、压缩展品图、自定义音源/封面与诗词文本的使用符合其授权与隐私要求；默认 `VITE_AUDIO_SOURCE=local` 使用仓库自制演示资源。
+- [ ] WOFF2 字体子集、压缩展品图、自定义音源/封面与诗词文本的使用符合其授权与隐私要求；默认 `VITE_AUDIO_SOURCE=local` 使用仓库自制演示资源，默认 `VITE_POETRY_SOURCE` 会请求第三方公开诗句接口。
 - [ ] 记录 commit SHA、构建命令、变量清单与回滚方式。
 
 ## 3. GitHub Pages（手动 workflow）
@@ -69,7 +69,7 @@ npm run build
 - 用 HTTPS 提供静态文件；不要把 `dist/` 提交进 Git。
 - 若 API 与前端不同源，后端需允许站点 Origin；优先同源 `/api/` 反向代理。
 - 缓存 `index.html` 时使用较短 TTL，静态资源可长缓存并带内容哈希。
-- 默认音源、封面、核心样式、WOFF2 字体子集与 SVG 图标均随构建产物本地分发；只有显式启用 `custom` 音源时，才需要把相应域加入 CSP 白名单。
+- 默认音源、封面、核心样式、WOFF2 字体子集与 SVG 图标均随构建产物本地分发；只有显式启用 `custom` 音源时，才需要把相应域加入 CSP 白名单。首页默认诗句源若保留，也需在 CSP 中允许 `VITE_POETRY_SOURCE_URL` 的 `connect-src`；设置 `VITE_POETRY_SOURCE=false` 可完全关闭此请求。
 
 ## 7. 环境变量与构建矩阵
 
@@ -79,6 +79,7 @@ npm run build
 | `VITE_API_BASE_URL` | 可不填 | `https://api.example.com/` 或 `/api/` |
 | `VITE_API_TIMEOUT` | `4000` | 按后端响应时间调整 |
 | `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` | 可不填 | 仅在确认权限与 RLS 后填写公开配置 |
+| `VITE_POETRY_SOURCE` / `VITE_POETRY_SOURCE_URL` / `VITE_POETRY_SOURCE_TIMEOUT` | `false` / 空 / `4000`（完全离线） | 按服务条款选择默认或自建兼容接口，并配置对应 CSP |
 | `VITE_AUDIO_SOURCE` / `VITE_AUDIO_TRACKS` | `local` / 空 | `custom` 时填写已核验授权的公开音轨 JSON |
 
 平台构建时变量是在**构建阶段**注入，修改后需要重新构建。不同平台的环境（Production / Preview / Development）应分别配置；不要把生产 API 地址写进 Preview 的公开 demo，除非该 demo 也经过授权。

@@ -4,14 +4,26 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import { createDemoBrowserWork } from "../src/config/demoBrowser.node.js";
+import { POETRY_SOURCE_URL } from "../src/config/poetrySource.constants.js";
 
 const port = Number(process.env.BROWSER_SMOKE_PORT || 4188);
 const debugPort = Number(process.env.BROWSER_SMOKE_DEBUG_PORT || 9223);
 const chromePath = process.env.CHROME_PATH
   || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const origin = `http://127.0.0.1:${port}`;
+const poetrySourceUrl = process.env.VITE_POETRY_SOURCE_URL || POETRY_SOURCE_URL;
 const processes = [];
 let currentStep = "boot";
+
+const isPoetrySourceRequest = (url) => {
+  try {
+    const request = new URL(url);
+    const configured = new URL(poetrySourceUrl);
+    return request.origin === configured.origin && request.pathname === configured.pathname;
+  } catch {
+    return false;
+  }
+};
 
 const stopAll = () => {
   for (const child of processes) {
@@ -74,6 +86,7 @@ const main = async () => {
   const pending = new Map();
   const events = [];
   const layoutShifts = [];
+  let send;
   socket.addEventListener("message", (event) => {
     const message = JSON.parse(event.data);
     if (message.id && pending.has(message.id)) {
@@ -93,7 +106,7 @@ const main = async () => {
     socket.addEventListener("error", reject, { once: true });
   });
 
-  const send = (method, params = {}) => new Promise((resolve, reject) => {
+  send = (method, params = {}) => new Promise((resolve, reject) => {
     const id = nextId += 1;
     pending.set(id, { resolve, reject });
     socket.send(JSON.stringify({ id, method, params }));
@@ -103,6 +116,41 @@ const main = async () => {
         reject(new Error(`Chrome DevTools timed out: ${method}`));
       }
     }, 10000);
+  });
+  const poetryResponses = [
+    {
+      content: "山有木兮木有枝，心悦君兮君不知。",
+      origin: "越人歌",
+      author: "佚名",
+      category: "古诗文-先秦",
+    },
+    {
+      content: "雨雪雰雰，益之以霡霂。",
+      origin: "信南山",
+      author: "佚名",
+      category: "古诗文-天气-写雪",
+    },
+  ];
+  let poetryRequestIndex = 0;
+  socket.addEventListener("message", async (event) => {
+    const message = JSON.parse(event.data);
+    if (message.method !== "Fetch.requestPaused") return;
+    const { requestId, request } = message.params;
+    if (!isPoetrySourceRequest(request.url)) {
+      await send("Fetch.continueRequest", { requestId });
+      return;
+    }
+    const payload = poetryResponses[poetryRequestIndex % poetryResponses.length];
+    poetryRequestIndex += 1;
+    await send("Fetch.fulfillRequest", {
+      requestId,
+      responseCode: 200,
+      responseHeaders: [
+        { name: "Access-Control-Allow-Origin", value: "*" },
+        { name: "Content-Type", value: "application/json; charset=utf-8" },
+      ],
+      body: Buffer.from(JSON.stringify(payload)).toString("base64"),
+    });
   });
   const evaluate = async (expression) => {
     const result = await send("Runtime.evaluate", {
@@ -163,6 +211,9 @@ const main = async () => {
   await send("Runtime.enable");
   await send("Log.enable");
   await send("Network.enable");
+  await send("Fetch.enable", {
+    patterns: [{ urlPattern: `${poetrySourceUrl}*`, requestStage: "Request" }],
+  });
   await send("Performance.enable");
   await send("Emulation.setDeviceMetricsOverride", {
     width: 1280,
@@ -174,6 +225,9 @@ const main = async () => {
   currentStep = "today";
   await send("Page.navigate", { url: `${origin}/#/` });
   await waitUntil("today's reading view", () => evaluate("Boolean(document.querySelector('.poem-plinth'))"));
+  await waitUntil("excerpt source settled", () => evaluate(
+    "Boolean(document.querySelector('.legacy-card')) && !document.querySelector('.button--quiet[aria-label=\"换一句今日摘录\"]')?.disabled",
+  ), 60);
 
   const home = await evaluate(`(() => ({
     href: location.href,
@@ -202,6 +256,7 @@ const main = async () => {
       artHeight: art?.getAttribute('height') || '',
       boxBackground: box ? getComputedStyle(box).backgroundColor : '',
       boxOverflow: box ? getComputedStyle(box).overflow : '',
+      sourceLabel: document.querySelector('.excerpt-source')?.textContent?.trim() || '',
     };
   })()`);
   if (excerptCards.count !== 1 || excerptCards.saveButtons !== 1) {
@@ -218,6 +273,9 @@ const main = async () => {
   }
   if (excerptCards.boxBackground !== "rgb(255, 255, 255)" || excerptCards.boxOverflow !== "hidden") {
     throw new Error("Historical card surface did not render");
+  }
+  if (!excerptCards.sourceLabel.includes("诗句源：")) {
+    throw new Error("Excerpt source state did not render");
   }
   const firstExcerpt = excerptCards.firstVerse;
   const dockLayout = await evaluate(`(() => {
@@ -266,13 +324,17 @@ const main = async () => {
   if (!savedExcerpt) throw new Error("Saving an excerpt did not persist locally");
   if (!await evaluate(`(() => {
     const button = [...document.querySelectorAll('button')].find((node) => (node.innerText || '').includes('换一句'));
-    if (!button) return false;
+    if (!button || button.disabled) return false;
     button.click();
     return true;
   })()`)) throw new Error("Excerpt rotation control was not found");
-  const rotatedExcerpts = await waitUntil("rotated historical excerpt", () => evaluate(
-    `document.querySelector('.legacy-card__verse')?.textContent?.trim() !== ${JSON.stringify(firstExcerpt)}`,
-  ));
+  const rotatedExcerpts = await waitUntil("rotated historical excerpt", () => evaluate(`
+    (() => {
+      const button = [...document.querySelectorAll('button')].find((node) => (node.innerText || '').includes('换一句'));
+      const verse = document.querySelector('.legacy-card__verse')?.textContent?.trim();
+      return Boolean(verse) && verse !== ${JSON.stringify(firstExcerpt)} && button && !button.disabled;
+    })()
+  `), 60);
   if (!rotatedExcerpts) throw new Error("Historical excerpt card did not rotate");
   await evaluate("window.scrollTo({ top: 0, behavior: 'instant' })");
   await waitUntil("page scroll reset", () => evaluate("scrollY === 0"));
@@ -425,10 +487,29 @@ const main = async () => {
         .join(" | ");
     });
   const failedRequests = events
-    .filter((event) => event.method === "Network.loadingFailed")
-    .map((event) => event.params.errorText);
-  const problems = [...consoleErrors, ...exceptions, ...failedRequests];
+    .filter((event) => event.method === "Network.loadingFailed");
+  const requestsById = new Map(
+    events
+      .filter((event) => event.method === "Network.requestWillBeSent")
+      .map((event) => [event.params.requestId, event.params.request?.url || ""]),
+  );
+  const unexpectedFailedRequests = failedRequests.filter((event) => {
+    const url = requestsById.get(event.params.requestId) || "";
+    return !isPoetrySourceRequest(url);
+  });
+  const expectedPoetryFailures = failedRequests.length - unexpectedFailedRequests.length;
+  const problems = [
+    ...consoleErrors,
+    ...exceptions,
+    ...unexpectedFailedRequests.map((event) => event.params.errorText),
+  ];
   if (problems.length) throw new Error(`Browser reported problems: ${problems.join(" | ")}`);
+  if (!expectedPoetryFailures && !excerptCards.sourceLabel.includes("随机古诗词 API")) {
+    throw new Error("Intercepted poetry source was not used");
+  }
+  if (expectedPoetryFailures && !excerptCards.sourceLabel.includes("仓库内置摘录")) {
+    throw new Error("Poetry source failed but the page did not report the local fallback");
+  }
   const cumulativeLayoutShift = layoutShifts.reduce((total, score) => total + score, 0);
   if (cumulativeLayoutShift > 0.05) {
     throw new Error(`Layout shifted beyond the 0.05 budget: ${cumulativeLayoutShift.toFixed(4)}`);
@@ -442,7 +523,7 @@ const main = async () => {
     "desktop/mobile search,",
     "native audio dock,",
     "login and publish flow,",
-    `no console or network errors, CLS ${cumulativeLayoutShift.toFixed(4)}.`,
+    `no unexpected console or network errors, CLS ${cumulativeLayoutShift.toFixed(4)}.`,
   ].join(" "));
   currentStep = "complete";
 };

@@ -62,6 +62,11 @@ try {
     }
   }
 
+  const { POETRY_SOURCE_URL: poetrySourceUrl } = await import("../src/config/poetrySource.constants.js");
+  if (!builtJsText.some((text) => text.includes(poetrySourceUrl))) {
+    throw new Error("Built JavaScript is missing the configurable poetry source endpoint");
+  }
+
   const mediaAssets = ["media/lanze-demo.wav", "media/lanze-demo-cover.svg"];
   for (const asset of mediaAssets) await expectOk(`/${asset}`);
 

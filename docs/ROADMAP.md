@@ -15,7 +15,7 @@
 
 ## 1. v0.2.0 — 本地可运行的开源前端（已完成）
 
-状态：已合并代码、文档、CI 与发布素材；本地 `npm ci`、build、23 项单测与 lint 均通过。Release / Discussion 由仓库发布工作流维护。
+状态：已合并代码、文档、CI 与发布素材；当时的 `npm ci`、build、23 项单测与 lint 均通过。Release / Discussion 由仓库发布工作流维护。
 
 | 事项 | 交付 | 验收 |
 | --- | --- | --- |
@@ -24,7 +24,7 @@
 | 治理 | 贡献指南、行为准则、安全政策、变更日志 | 模板与政策互相引用，无夸大承诺 |
 | 文档 | 架构、开发、部署、路线图、FAQ、宣发清单 | 描述 Vite 6 / 演示数据 / 单测的实际实现 |
 | GitHub 展示 | issue/PR 模板、CI、Pages 手动 workflow、OG SVG | workflow 在 Node 20+ 跑 npm 脚本，不自动发布旧域名 |
-| 工程现代化 | Vite 6、ESM、相对 base、统一请求层、本地演示数据、会话与本地演示音源 | 远端优先、失败降级；23 项单测通过 |
+| 工程现代化 | Vite 6、ESM、相对 base、统一请求层、本地演示数据、会话与本地演示音源 | 远端优先、失败降级；发布时 23 项单测通过 |
 | 发布素材 | Release notes、Discussions 欢迎帖、中英文短帖 | 只描述已验证能力，不写线上 Demo |
 
 GitHub 侧配合：维护 About、topics、社交预览图；发布 `v0.2.0` Release 与 Discussions 欢迎帖；按需手动触发 Pages 并验证站点。详见 `docs/PROMOTION.md`、`RELEASE_NOTES.md`、`ANNOUNCEMENT.md`。

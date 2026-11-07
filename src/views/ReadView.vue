@@ -73,17 +73,18 @@
       <div class="shell legacy-gallery">
         <div class="legacy-gallery__card">
           <ExcerptCard
-            v-if="excerpt"
+            v-if="excerpt && excerptStatus !== 'loading'"
             :excerpt="excerpt"
-            :saved="excerptSaved.includes(excerpt.id)"
+            :saved="excerptSaved.includes(`excerpt-${excerpt.content}`)"
             @toggle-save="toggleExcerptSave(excerpt)"
           />
+          <p v-else class="legacy-card-status" role="status">正在展开今日摘录……</p>
         </div>
         <article class="strip-intro">
           <p class="eyebrow">余韵 · 一则</p>
           <p class="sr-only">余韵 · 三则</p>
           <h2>读完一首，<br />让句子再走一段。</h2>
-          <p>按历史首页的白色摘录卡等比还原：旋转收藏角标、竖排诗句、作者与扇舟图都保留。摘录来自仓库内置示例，不假装是运营数据。</p>
+          <p>按历史首页的白色摘录卡等比还原：旋转收藏角标、竖排诗句、作者与扇舟图都保留。诗句默认来自随机古诗词源，不可用时回退仓库内置摘录。</p>
           <div class="strip-actions">
             <router-link class="button" to="/explore">
               进入诗词索引
@@ -93,12 +94,16 @@
               class="button button--quiet"
               type="button"
               aria-label="换一句今日摘录"
+              :disabled="excerptStatus === 'loading'"
               @click="nextExcerpts"
             >
               <AppIcon name="chevron-right" :size="15" />
               换一句
             </button>
           </div>
+          <p class="excerpt-source" aria-live="polite">
+            {{ excerptSource === "remote" ? "诗句源：随机古诗词 API" : "诗句源：仓库内置摘录" }}
+          </p>
         </article>
       </div>
     </section>
@@ -109,8 +114,8 @@
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import AppIcon from "../components/AppIcon.vue";
 import ExcerptCard from "../components/ExcerptCard.vue";
-import { demoExcerpts } from "../data/poems.js";
 import { readStore, writeStore } from "../services/browserStore.js";
+import { loadExcerptFromSource } from "../services/poetrySource.js";
 import { loadCatalog, useLibrary } from "../composables/useLibrary.js";
 import { notify } from "../composables/useNotices.js";
 import exhibitImage from "../assets/exhibit/songci300-768.jpg";
@@ -124,7 +129,11 @@ const dateLabel = new Intl.DateTimeFormat("zh-CN", {
 }).format(now);
 const dayIndex = Math.floor(Date.now() / 86400000);
 const page = ref(dayIndex % 10);
-const excerptPage = ref(Math.floor(dayIndex / 3));
+const excerptPage = ref(dayIndex);
+const excerpt = ref(null);
+const excerptStatus = ref("loading");
+const excerptSource = ref("local");
+let excerptRequest = 0;
 const storedExcerptSaves = readStore("lanze_saved_excerpts", []);
 const excerptSaved = ref(Array.isArray(storedExcerptSaves) ? storedExcerptSaves.map(String) : []);
 const isSwitching = ref(false);
@@ -151,20 +160,38 @@ const titleParts = computed(() => {
   return [title];
 });
 const saved = computed(() => isSaved(poem.value.id));
-const excerpt = computed(() => {
-  const index = excerptPage.value % demoExcerpts.length;
-  const source = demoExcerpts[index];
-  return {
-    ...source,
-    id: `excerpt-${index}`,
-    title: source.origin,
-    paragraph: source.content,
-    paragraphs: [source.content],
-    tags: [source.category, "摘录"],
-    type: "legacy",
-    titleNote: "本页只展示一句摘录，不替代完整底本。",
-  };
+
+const decorateExcerpt = (source) => ({
+  ...source,
+  title: source.origin,
+  paragraph: source.content,
+  paragraphs: [source.content],
+  tags: [source.category, "摘录"],
+  type: "legacy",
+  titleNote: "本页只展示一句摘录，不替代完整底本。",
 });
+
+const loadExcerpt = async () => {
+  const requestId = ++excerptRequest;
+  excerptStatus.value = "loading";
+  const { excerpt: next, source, reason } = await loadExcerptFromSource({
+    index: excerptPage.value,
+    previousContent: excerpt.value?.content || "",
+  });
+  if (requestId !== excerptRequest) return;
+  excerpt.value = decorateExcerpt(next);
+  excerptSource.value = source;
+  excerptStatus.value = source === "remote" ? "ready" : "fallback";
+  if (source === "local" && reason === "unavailable") {
+    notify("诗句源暂时不可用，已显示仓库内置摘录", "warning", 4200);
+  }
+  if (source === "local" && reason === "timeout") {
+    notify("诗句源响应超时，已显示仓库内置摘录", "warning", 4200);
+  }
+  if (source === "local" && reason === "duplicate") {
+    notify("诗句源重复了当前摘录，已换用仓库内置摘录", "info", 3200);
+  }
+};
 
 const nextPoem = () => {
   if (isSwitching.value) return;
@@ -178,7 +205,9 @@ const nextPoem = () => {
 };
 
 const nextExcerpts = () => {
+  if (excerptStatus.value === "loading") return;
   excerptPage.value += 1;
+  loadExcerpt();
 };
 
 const toggleSave = () => {
@@ -188,10 +217,11 @@ const toggleSave = () => {
 };
 
 const toggleExcerptSave = (excerpt) => {
-  const added = !excerptSaved.value.includes(excerpt.id);
+  const key = `excerpt-${excerpt.content}`;
+  const added = !excerptSaved.value.includes(key);
   const next = added
-    ? [...excerptSaved.value, excerpt.id]
-    : excerptSaved.value.filter((id) => id !== excerpt.id);
+    ? [...excerptSaved.value, key]
+    : excerptSaved.value.filter((id) => id !== key);
   excerptSaved.value = next;
   writeStore("lanze_saved_excerpts", next);
   notify(added ? "已收下这一句摘录" : "已取消这句摘录", added ? "success" : "info");
@@ -211,7 +241,10 @@ const speakPoem = () => {
   window.speechSynthesis.speak(utterance);
 };
 
-onMounted(loadCatalog);
+onMounted(() => {
+  loadCatalog();
+  loadExcerpt();
+});
 onBeforeUnmount(() => window.clearTimeout(switchTimer));
 </script>
 
@@ -544,7 +577,17 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
   grid-column: 2;
   grid-row: 1;
   min-width: 0;
+  min-height: 652px;
   place-items: center;
+}
+
+.legacy-card-status {
+  margin: 0;
+  color: var(--ink-faint);
+  font-family: var(--font-poem);
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  writing-mode: vertical-rl;
 }
 
 .strip-intro {
@@ -578,6 +621,18 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
   flex-wrap: wrap;
   align-items: center;
   gap: 6px 12px;
+}
+
+.strip-actions .button:disabled {
+  cursor: wait;
+  opacity: 0.5;
+}
+
+.excerpt-source {
+  margin: -6px 0 0;
+  color: var(--ink-faint);
+  font-size: 10px;
+  letter-spacing: 0.12em;
 }
 
 @media (max-width: 1000px) {
@@ -648,6 +703,7 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
   .legacy-gallery__card {
     grid-column: 2;
     grid-row: 1;
+    min-height: 590px;
   }
 
   .strip-intro {
@@ -709,6 +765,7 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
   .legacy-gallery__card {
     grid-column: 1;
     grid-row: 1;
+    min-height: 590px;
   }
 
   .strip-intro {

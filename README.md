@@ -35,7 +35,7 @@
 | 前端构建 | Vue 3 + Vue Router 4（hash 模式）+ 自有组件 + Vite 6（ESM 配置） |
 | 在线 Demo | 不承诺；旧展示地址仅保留在 `CHANGELOG.md` 与 `docs/FAQ.md` 的事实说明中 |
 | 后端/账号 | 仓库不附带完整后端；默认使用本地演示数据，配置 `VITE_API_BASE_URL` 后可连接自建 API |
-| 测试 | `npm run test` 含 23 个 `node --test` 单测；CI 在 Node 20/22 执行构建与测试 |
+| 测试 | `npm run test` 含 27 个 `node --test` 单测；CI 在 Node 20/22 执行构建与测试 |
 | 许可 | [MIT](LICENSE)，`Copyright (c) 2022-2026 LanZe contributors` |
 | 发布 | `v0.2.0` 的 Release notes 与 Discussions 欢迎帖见 `RELEASE_NOTES.md`、`ANNOUNCEMENT.md` |
 | 设计契约 | [青瓷数字诗馆](docs/DESIGN_SYSTEM.md)：冷白瓷面、青灰线框、铜金索引色与「一首诗一展厅」的信息架构 |
@@ -49,7 +49,7 @@
 - 👤 **我的诗卷**：收藏、最近读过与本机作品三类内容，空状态给出下一步。
 - 🎵 **音乐播放**：浏览器原生音频默认加载仓库自制 WAV / SVG 演示资源；可通过公开配置接入授权明确的自定义音源。
 - 📱 **响应式布局**：包含移动端底部导航与大屏布局，仍需持续无障碍/布局回归。
-- 🧩 **现代前端栈**：Vue 3、Vue Router 4、Axios、原生浏览器能力，配合 Vite 6 构建与 23 项单测。
+- 🧩 **现代前端栈**：Vue 3、Vue Router 4、Axios、原生浏览器能力，配合 Vite 6 构建与 27 项单测。
 - 📚 **开源治理**：MIT、贡献/行为/安全政策、变更日志、CI、issue/PR 模板、发布与宣发文案。
 
 「特性」描述的是仓库中已有界面与默认演示数据能力，不等于提供线上账号、持久化服务或正式内容审核。逐项可信度见 `docs/FAQ.md`。
@@ -93,7 +93,7 @@ npm run dev
 
 ```bash
 npm run build        # 生成 dist/
-npm run test         # 23 个 node --test 单测
+npm run test         # 27 个 node --test 单测
 npm run lint         # 静态检查：失效后端地址、硬编码服务与脆弱引用
 npm run preview      # 预览 dist/
 npm run smoke        # 预览服务与入口静态资源 HTTP 冒烟
@@ -121,6 +121,9 @@ v0.2.0 已实现数据来源切换和无需联网账号的演示数据：
 | `VITE_API_BASE_URL` | 否 | `/api/` | 业务 API 前缀；运行时自动补全末尾斜杠。生产环境建议使用同源 `/api/`，由托管平台反向代理 |
 | `VITE_API_TIMEOUT` | 否 | `4000` | 远端请求超时（毫秒） |
 | `VITE_USE_MOCK` | 否 | `true` | 未配置 API 时自动为 `true`；显式关闭后才会请求远端 |
+| `VITE_POETRY_SOURCE` | 否 | `jinrishici` | 首页摘录卡的诗句源；设为 `false` 或 `local` 时只用仓库内置摘录，不请求外部诗句服务 |
+| `VITE_POETRY_SOURCE_URL` | 否 | `https://v1.jinrishici.com/all.json` | 兼容 `content` / `origin` / `author` / `category` 字段的随机诗句接口，可替换为自建服务 |
+| `VITE_POETRY_SOURCE_TIMEOUT` | 否 | `4000` | 诗句源超时（毫秒）；失败或超时会回退内置摘录并显示来源状态 |
 | `VITE_SUPABASE_URL` | 否 | `https://example.supabase.co` | 可选；需与 `VITE_SUPABASE_ANON_KEY` 同时配置，否则使用本地适配器 |
 | `VITE_SUPABASE_ANON_KEY` | 否 | 公开 anon key | 可选公开配置；不要放服务端密钥或 `service_role` |
 | `VITE_AUDIO_SOURCE` | 否 | `local` | `local` 使用仓库自制演示音源；仅在确认授权后设置为 `custom` |
@@ -134,6 +137,8 @@ VITE_AUDIO_TRACKS=[{"name":"示例","artist":"作者","url":"/media/example.mp3"
 ```
 
 音源与封面的版权、可用性、防盗链与隐私政策由配置者自行负责；配置缺失或 JSON 无效时自动回退到本地演示音，并在播放器旁显示一次可读提示。`VITE_` 变量会进入浏览器产物，不要填入私密地址或凭据。
+
+首页摘录卡默认会向 `VITE_POETRY_SOURCE_URL` 请求一句随机诗词，这是旧版首页使用的同类公开诗句源。该请求只读取公开 JSON、不需要密钥，且允许通过 `VITE_POETRY_SOURCE=false` 完全关闭；接口失败、超时、返回空内容或重复当前诗句时会自动回退到 `src/data/poems.js` 的内置摘录，并在页面标注当前来源。该服务不由本仓库托管，也不承诺 SLA；部署者可把 URL 换成自建兼容接口，或设置 CSP / 离线变量。摘录收藏按诗句内容保存在当前浏览器，不依赖随机接口返回的标识。
 
 可创建 `.env.local`（已被 `.gitignore` 忽略）：
 

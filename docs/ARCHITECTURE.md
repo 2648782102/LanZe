@@ -49,6 +49,7 @@
 | `src/views/AuthView.vue` | 登录与注册 | 表单校验、演示账号与本地会话 |
 | `src/components/AudioDock.vue` | 原生音频播放器 | 默认音源来自 `public/media/`；无效自定义配置显示回退提示 |
 | `src/apis/request.js` | Axios + 本地演示数据双通道请求函数 | 远端返回无效数据时自动降级并提示一次 |
+| `src/services/poetrySource.js` | 首页历史摘录卡的独立诗句源适配器 | 默认请求公开随机诗句接口；失败或超时回退内置摘录，并显示来源状态 |
 | `src/apis/env.js` | 从 `src/config/runtime.js` 导出 `baseUrl` 与运行配置 | 不再硬编码后端地址 |
 | `src/apis/api/list.js`、`login.js` | 领域 API 函数 | 真实 API 契约由自建服务定义；本地演示路径见 `src/services/mockApi.js` |
 | `src/function/supabase.js` | 可选 Supabase 兼容适配器 | URL / anon key 仅来自公开环境变量；缺失时使用本地适配器 |
@@ -61,6 +62,8 @@
 ### 4.1 诗库与检索
 
 `useLibrary` 通过 `searchList({ keyword: "" })` 载入诗目并归一化；`ExploreView` 在本地做关键词/体裁筛选，同步到 URL query。配置 `VITE_API_BASE_URL` 且 `VITE_USE_MOCK=false` 时请求远端；否则由本地演示数据兜底。
+
+首页历史摘录卡不走业务诗库，而由 `src/services/poetrySource.js` 单独加载一句随机诗句。它与 `VITE_API_BASE_URL` 解耦，默认读取 `VITE_POETRY_SOURCE_URL`，可通过 `VITE_POETRY_SOURCE=false` 关闭；接口不可达时回退 `demoExcerpts`，并在界面标注实际来源，避免把失败伪装成实时数据。
 
 ### 4.2 收藏、最近阅读与详情
 

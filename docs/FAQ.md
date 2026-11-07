@@ -34,7 +34,7 @@
 
 ### 测试与 lint 怎么运行？
 
-`npm run test` 执行 23 个 `node --test` 单测，`npm run lint` 执行静态扫描。Node 20/22 build job 使用 `npm run test --if-present` 以兼容外部旧流程，Documentation checks job 执行 `npm run lint`。
+`npm run test` 执行 27 个 `node --test` 单测，`npm run lint` 执行静态扫描。Node 20/22 build job 使用 `npm run test --if-present` 以兼容外部旧流程，Documentation checks job 执行 `npm run lint`。
 
 ### 首次启动遇到 esbuild 二进制错误？
 
@@ -56,7 +56,7 @@
 
 ### 诗句、音乐或图标为什么有时不显示？
 
-诗目默认来自 `src/data/poems.js` 与本地演示数据；音乐与封面来自 `public/media/` 的仓库自制演示资源；图标由仓库内 SVG 组件绘制。只有显式配置 `VITE_AUDIO_SOURCE=custom` 时，自定义音源才可能受网络、CORS、地区限制、防盗链或服务变更影响，且不在本仓库控制范围内；无效 JSON 或空列表会回退本地演示音并显示提示。业务诗词数据默认使用本地演示数据兜底；CI 不依赖外部服务。
+诗目默认来自 `src/data/poems.js` 与本地演示数据；音乐与封面来自 `public/media/` 的仓库自制演示资源；图标由仓库内 SVG 组件绘制。首页历史摘录卡默认向 `VITE_POETRY_SOURCE_URL` 请求一句随机诗句，这是旧版首页使用的同类公开诗句源；可通过 `VITE_POETRY_SOURCE=false` 或 `local` 完全关闭，失败、超时或返回空内容时回退到内置摘录并显示来源状态。只有显式配置 `VITE_AUDIO_SOURCE=custom` 时，自定义音源才可能受网络、CORS、地区限制、防盗链或服务变更影响，且不在本仓库控制范围内；无效 JSON 或空列表会回退本地演示音并显示提示。业务诗词数据默认使用本地演示数据兜底；CI 不依赖外部服务。
 
 ### 收藏、登录态、个人资料会保存吗？
 
@@ -70,7 +70,7 @@
 
 ### 为什么 CI 用 `npm run test --if-present`？
 
-`--if-present` 是兼容旧工作流的兜底写法；当前 `package.json` 已定义 `test` 脚本，所以 CI 会实际执行 23 个单测，不假定任何模块格式或测试框架；静态扫描由 Documentation checks job 执行。
+`--if-present` 是兼容旧工作流的兜底写法；当前 `package.json` 已定义 `test` 脚本，所以 CI 会实际执行 27 个单测，不假定任何模块格式或测试框架；静态扫描由 Documentation checks job 执行。
 
 ### 仓库 About、topics、Release、Discussion 在哪里维护？
 
