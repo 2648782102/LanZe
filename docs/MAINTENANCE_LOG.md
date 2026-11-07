@@ -229,3 +229,4 @@
 - 发布后复核公开 API：3 个 open issue 均已于本轮更新且 0 评论，0 个 open PR；GitHub About 描述仍为 27 项单测旧口径，公开 homepage 仍为可访问但未核验归属的 Vercel 地址，Pages 仍 `has_pages=false`，社交预览未确认上传。当前连接具备 issue/文件写入，但没有仓库 metadata 写工具；不做未认证 PATCH 或浏览器静默编辑。
 - 发布后文档复核发现 CHANGELOG、`docs/PROMOTION.md` 与 `docs/ROADMAP.md` 仍残留「待推送 / homepage 已清空 / 待 tag」等旧措辞；最终文档提交 `dbc6721` 的 CI `42371908824` 与 Browser E2E `42371908935` 均 success 后，强制更新 `v0.4.0` tag（object `235d189`）指向该提交。publish run `42372037942` success，公开 Release `437556989` 已再次回读，正文与 `RELEASE_NOTES.md` 仅末尾换行差异；`v0.2.0` / `v0.3.0` 未被覆盖。
 - 为核对 GitHub About/社交预览写通道，浏览器控制曾返回应用 inventory，但 Chrome 命名会话不可用、iab 打开仓库设置页超时，随后 `getState` 也连续超时并重置内核。没有在确认页面与输入内容前静默修改公开仓库设置；About 描述仍按公开 API 事实保留为旧口径，社交预览仍标为未确认上传。
+- 为避免持续追加维护日志造成 tag 永远落后于 `main`，本条记录是本次保存的最后一次文档提交；其 CI / Browser E2E 通过后，将 `v0.4.0` 改为轻标签并指向本条记录所在提交，使 `main` 与 tag 的解引用一致。之后不再追加仓库提交，发布结果以线上回读为准。
