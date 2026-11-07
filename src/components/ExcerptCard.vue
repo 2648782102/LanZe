@@ -6,12 +6,12 @@
         type="button"
         :class="saved ? 'legacy-card__save--yes' : 'legacy-card__save--no'"
         :aria-pressed="saved"
-        aria-label="收藏这句摘录"
+        :aria-label="saved ? '取消收藏这句摘录' : '收藏这句摘录'"
         @click="emit('toggle-save')"
       >
-        收藏
+        {{ saved ? "已藏" : "收藏" }}
       </button>
-      <p class="legacy-card__verse">{{ excerpt.content }}</p>
+      <p class="legacy-card__verse" :class="verseDensity">{{ excerpt.content }}</p>
       <h5 class="legacy-card__author">— {{ excerpt.author }}</h5>
       <img
         class="legacy-card__art"
@@ -26,13 +26,21 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
 import fanzouImage from "../assets/excerpt/fanzou-720.png";
 
-defineProps({
+const props = defineProps({
   excerpt: { type: Object, required: true },
   saved: { type: Boolean, default: false },
 });
 const emit = defineEmits(["toggle-save"]);
+
+const verseDensity = computed(() => {
+  const length = Array.from(props.excerpt.content || "").length;
+  if (length > 16) return "legacy-card__verse--dense";
+  if (length > 12) return "legacy-card__verse--medium";
+  return "legacy-card__verse--open";
+});
 </script>
 
 <style>
@@ -68,10 +76,15 @@ const emit = defineEmits(["toggle-save"]);
   width: 100%;
   aspect-ratio: 330 / 620;
   overflow: hidden;
-  border: 1px solid rgba(84, 84, 84, 0.1);
+  border: 1px solid rgba(84, 84, 84, 0.08);
   border-radius: calc(0.3rem * var(--legacy-scale));
-  background: #fff;
-  box-shadow: 0 0 0 rgba(120, 120, 120, 0);
+  background-color: #fff;
+  background-image:
+    radial-gradient(ellipse at 18% 10%, rgba(22, 44, 43, 0.025), transparent 32%),
+    linear-gradient(180deg, transparent 66%, rgba(232, 236, 229, 0.22));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.72),
+    0 calc(2px * var(--legacy-scale)) calc(14px * var(--legacy-scale)) rgba(22, 49, 46, 0.035);
   transform-style: preserve-3d;
   transition: 0.45s ease-in-out;
 }
@@ -79,13 +92,9 @@ const emit = defineEmits(["toggle-save"]);
 .legacy-card__box::before {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    -226deg,
-    rgba(225, 225, 225, 0) 40%,
-    rgba(255, 254, 182, 0.3) 40%,
-    rgba(225, 225, 225, 0) 60%
-  );
-  transform: translateY(-100%);
+  z-index: 0;
+  background: linear-gradient(108deg, transparent 45%, rgba(255, 255, 255, 0.42) 50%, transparent 55%);
+  opacity: 0.7;
   content: "";
   pointer-events: none;
 }
@@ -93,63 +102,85 @@ const emit = defineEmits(["toggle-save"]);
 .legacy-card__box::after {
   position: absolute;
   inset: 0 0 auto;
+  z-index: 3;
   height: 120%;
   background: linear-gradient(
-    226deg,
-    rgba(225, 225, 225, 0) 40%,
-    rgba(232, 232, 232, 0.3) 50%,
-    rgba(225, 225, 225, 0) 60%
+    112deg,
+    rgba(255, 255, 255, 0) 43%,
+    rgba(255, 255, 255, 0.58) 50%,
+    rgba(255, 255, 255, 0) 57%
   );
   transform: translateY(-100%);
-  transition: transform 0.85s cubic-bezier(0.165, 0.84, 0.44, 1);
+  opacity: 0;
+  transition:
+    transform 0.85s cubic-bezier(0.165, 0.84, 0.44, 1),
+    opacity 0.2s ease;
   content: "";
   pointer-events: none;
 }
 
 .legacy-card__box:hover {
-  transform: rotateX(7deg) translateY(calc(-6px * var(--legacy-scale)));
-  box-shadow: 0 calc(10px * var(--legacy-scale)) calc(10px * var(--legacy-scale)) rgba(120, 120, 120, 0.126);
+  transform: rotateX(5deg) translateY(calc(-3px * var(--legacy-scale)));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.72),
+    0 calc(8px * var(--legacy-scale)) calc(18px * var(--legacy-scale)) rgba(22, 49, 46, 0.09);
   transition: 0.45s ease-in-out;
 }
 
 .legacy-card__box:hover::after {
   transform: translateY(100%);
+  opacity: 1;
 }
 
 .legacy-card__save {
   position: absolute;
-  top: calc(-8px * var(--legacy-scale));
-  left: calc(-32px * var(--legacy-scale));
-  z-index: 2;
+  top: calc(24px * var(--legacy-scale));
+  left: calc(2px * var(--legacy-scale));
+  z-index: 4;
   display: flex;
-  width: calc(94px * var(--legacy-scale));
-  height: calc(44px * var(--legacy-scale));
-  align-items: flex-end;
+  width: calc(96px * var(--legacy-scale));
+  height: calc(42px * var(--legacy-scale));
+  align-items: center;
   justify-content: center;
   border: 0;
+  border-radius: calc(2px * var(--legacy-scale));
   padding: 0;
-  font-size: calc(18px * var(--legacy-scale));
-  transform: rotateZ(-40deg);
-  transition: 0.3s;
+  font-family: "LanZeExcerptAuthor", "Songti SC", serif;
+  font-size: calc(17px * var(--legacy-scale));
+  font-weight: 400;
+  letter-spacing: calc(2px * var(--legacy-scale));
+  line-height: 1;
+  transform: rotateZ(-38deg);
+  transform-origin: center;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.legacy-card__save:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: -4px;
 }
 
 .legacy-card__save--yes {
-  background-color: red;
+  background-color: #a14134;
   color: #fff;
+  box-shadow: 0 calc(4px * var(--legacy-scale)) calc(12px * var(--legacy-scale)) rgba(112, 46, 37, 0.18);
 }
 
 .legacy-card__save--no {
-  background-color: #fff;
-  color: rgb(195, 195, 195);
+  background-color: transparent;
+  color: rgba(84, 103, 100, 0.76);
 }
 
 .legacy-card__verse {
   position: absolute;
-  top: 30%;
+  top: 25%;
   left: 50%;
-  z-index: 1;
-  width: 90%;
-  height: calc(196px * var(--legacy-scale));
+  z-index: 2;
+  width: 88%;
+  height: calc(252px * var(--legacy-scale));
   margin: 0;
   color: var(--ink);
   font-family: "LanZeExcerptVerse", "Songti SC", serif;
@@ -161,27 +192,43 @@ const emit = defineEmits(["toggle-save"]);
   writing-mode: vertical-rl;
 }
 
+.legacy-card__verse--medium {
+  font-size: calc(18px * var(--legacy-scale));
+  letter-spacing: calc(3px * var(--legacy-scale));
+}
+
+.legacy-card__verse--dense {
+  font-size: calc(16px * var(--legacy-scale));
+  letter-spacing: calc(2px * var(--legacy-scale));
+  line-height: 1.6;
+}
+
 .legacy-card__author {
   position: absolute;
-  top: 30%;
+  top: 25%;
   left: 28%;
-  z-index: 1;
+  z-index: 2;
   margin: 0;
-  color: var(--ink);
+  color: rgba(22, 44, 43, 0.88);
   font-family: "LanZeExcerptAuthor", "Songti SC", serif;
-  font-size: calc(22px * var(--legacy-scale));
+  font-size: calc(21px * var(--legacy-scale));
   font-weight: 400;
-  letter-spacing: calc(1px * var(--legacy-scale));
+  letter-spacing: calc(2px * var(--legacy-scale));
   writing-mode: vertical-rl;
 }
 
 .legacy-card__art {
   position: absolute;
-  bottom: 5%;
-  left: 10%;
+  z-index: 1;
+  bottom: 4%;
+  left: 8%;
   display: block;
-  width: 80%;
+  width: 84%;
   height: auto;
+  opacity: 0.96;
+  mix-blend-mode: multiply;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
   pointer-events: none;
 }
 
@@ -197,6 +244,10 @@ const emit = defineEmits(["toggle-save"]);
   .legacy-card__box::after,
   .legacy-card__save {
     transition: none;
+  }
+
+  .legacy-card__box:hover {
+    transform: none;
   }
 }
 </style>
