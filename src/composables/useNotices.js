@@ -10,7 +10,7 @@ export const dismissNotice = (id) => {
 export const notify = (message, tone = "info", duration = 3600) => {
   if (!message) return;
   const id = nextId++;
-  notices.value = [...notices.value, { id, message, tone }];
+  notices.value = [...notices.value.slice(-2), { id, message, tone }];
   window.setTimeout(() => dismissNotice(id), duration);
   return id;
 };

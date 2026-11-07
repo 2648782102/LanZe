@@ -1,7 +1,10 @@
 @font-face {
   font-family: "LanZeSong";
-  src: url("../assets/ZiTi/FangZhengSong.ttf") format("truetype");
+  src: url("../assets/fonts/LanZeSong-subset.woff2") format("woff2");
   font-display: swap;
+  ascent-override: 86.33%;
+  descent-override: 23.44%;
+  line-gap-override: 0%;
 }
 
 :root {

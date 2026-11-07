@@ -42,12 +42,11 @@ const isBare = computed(() => Boolean(route.meta.bare));
 
 .page-enter-active,
 .page-leave-active {
-  transition: opacity 180ms ease, transform 180ms ease;
+  transition: opacity 140ms ease;
 }
 
 .page-enter-from {
   opacity: 0;
-  transform: translateY(8px);
 }
 
 .page-leave-to {

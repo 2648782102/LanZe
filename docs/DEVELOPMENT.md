@@ -51,7 +51,7 @@ npm run lint
 npm run smoke
 ```
 
-`npm run smoke:browser` 使用临时 Chrome profile 与 CDP，在 1280×800 和 390×844 下验证今日展厅、本地收藏与音源、桌面/窄屏搜索、窄屏导航，再完成演示登录、作品发布与诗卷回读；脚本要求控制台错误、未捕获异常与失败请求均为 0，并在结束后清理临时 Cookie 和 `localStorage` 演示数据。它仍是本机可选检查，不进入 CI 矩阵，不覆盖真实后端、跨浏览器、视觉截图或正式 E2E 套件。若 Chrome 路径或端口不同，可用 `CHROME_PATH`、`BROWSER_SMOKE_PORT`、`BROWSER_SMOKE_DEBUG_PORT` 覆盖。
+`npm run smoke:browser` 使用临时 Chrome profile 与 CDP，在 1280×800 和 390×844 下验证今日展厅、本地收藏与音源、桌面/窄屏搜索、窄屏导航，再完成演示登录、作品发布与诗卷回读；脚本要求控制台错误、未捕获异常、失败请求为 0，并统计非用户输入引起的 CLS（预算 0.05），结束后清理临时 Cookie 和 `localStorage` 演示数据。它仍是本机可选检查，不进入 CI 矩阵，不覆盖真实后端、跨浏览器、视觉截图或正式 E2E 套件。若 Chrome 路径或端口不同，可用 `CHROME_PATH`、`BROWSER_SMOKE_PORT`、`BROWSER_SMOKE_DEBUG_PORT` 覆盖。
 
 CI 的 Node 20/22 build job 使用 `npm run test --if-present` 以兼容外部旧流程，Documentation checks job 执行 `npm run lint`；本地开发建议直接运行 `npm run test` 和 `npm run lint`。
 

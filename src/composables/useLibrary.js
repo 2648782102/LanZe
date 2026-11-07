@@ -21,6 +21,7 @@ export const loadCatalog = async ({ force = false } = {}) => {
   if (loadPromise) return loadPromise;
   if (loadedOnce && !force) return catalog.value;
   loading.value = true;
+  if (force) catalog.value = normalizePoemList(demoPoems);
   loadPromise = searchList({ keyword: "" })
     .then((response) => {
       const poems = normalizePoemList(normalizeListResponse(response, demoPoems));

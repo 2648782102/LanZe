@@ -104,7 +104,6 @@ onBeforeUnmount(() => {
   background: rgba(16, 40, 39, 0.94);
   color: var(--porcelain-panel);
   box-shadow: 0 14px 38px rgba(16, 40, 39, 0.2);
-  backdrop-filter: blur(14px);
 }
 
 .audio-dock__toggle {

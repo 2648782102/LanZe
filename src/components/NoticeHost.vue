@@ -50,7 +50,6 @@ const { notices, dismissNotice } = useNotices();
   font-size: 12px;
   line-height: 1.55;
   pointer-events: auto;
-  backdrop-filter: blur(12px);
 }
 
 .notice--success {

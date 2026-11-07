@@ -83,6 +83,7 @@ jobs:
             docs/FAQ.md \
             docs/PROMOTION.md \
             docs/THIRD_PARTY_ASSETS.md \
+            docs/DESIGN_SYSTEM.md \
             .github/PULL_REQUEST_TEMPLATE.md \
             .github/workflows/ci.yml \
             .github/workflows/pages.yml \
@@ -106,22 +107,36 @@ jobs:
             exit 1
           fi
 
-      - name: Reject legacy style CDNs
+      - name: Reject legacy UI dependencies
         shell: bash
         run: |
+          for package in element-plus bootstrap @fortawesome/fontawesome-free aplayer vue3-puzzle-vcode lottie-web; do
+            if grep -q "\"$package\"" package.json; then
+              echo "$package must not return to the independent UI layer." >&2
+              exit 1
+            fi
+          done
           if grep -nE 'cdn\.staticfile\.org|cdn\.bootcss\.com' index.html; then
             echo 'index.html still references a legacy third-party style CDN.' >&2
             exit 1
           fi
-          grep -q 'bootstrap.*5\.1\.1' package.json || { echo 'Bootstrap 5.1.1 is not pinned.' >&2; exit 1; }
-          grep -q '@fortawesome/fontawesome-free.*5\.13\.0' package.json || { echo 'Font Awesome 5.13.0 is not pinned.' >&2; exit 1; }
 
       - name: Reject third-party media defaults
         shell: bash
         run: |
-          if grep -nE 'music\.163\.com|music\.126\.net' src/pages/Audio.vue src/config/audio.js; then
+          if grep -nE 'music\.163\.com|music\.126\.net' src/components/AudioDock.vue src/config/audio.js; then
             echo 'The default audio player still hardcodes third-party media hosts.' >&2
             exit 1
           fi
           test -f public/media/lanze-demo.wav
           test -f public/media/lanze-demo-cover.svg
+
+      - name: Check optimized local assets
+        shell: bash
+        run: |
+          test -f src/assets/fonts/LanZeSong-subset.woff2
+          test -f src/assets/exhibit/songci300-768.jpg
+          test -f src/assets/exhibit/auth-cover-960.jpg
+          test "$(wc -c < src/assets/fonts/LanZeSong-subset.woff2)" -lt 250000
+          test "$(wc -c < src/assets/exhibit/songci300-768.jpg)" -lt 100000
+          test "$(wc -c < src/assets/exhibit/auth-cover-960.jpg)" -lt 180000

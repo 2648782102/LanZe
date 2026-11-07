@@ -59,24 +59,24 @@ const shouldFallback = (payload) => {
   return false;
 };
 
-const normalizeRemoteResponse = (payload, url, fallback) => {
-  if (Array.isArray(payload)) return normalizePoemPayload(payload, fallback);
+const normalizeRemoteResponse = (payload, url, getFallback) => {
+  if (Array.isArray(payload)) return normalizePoemPayload(payload, getFallback());
   if (payload && typeof payload === "object") {
     if (typeof payload.data === "string" && ["ok", "OK"].includes(payload.data)) {
       return { ...payload, code: 200, msg: payload.msg || "ok" };
     }
     if (Array.isArray(payload.data) || payload.list || payload.results) {
-      return normalizePoemPayload(payload, fallback);
+      return normalizePoemPayload(payload, getFallback());
     }
     return payload;
   }
-  return fallback;
+  return getFallback();
 };
 
 export const request = async (url, method = "get", data = null, params = null) => {
   const useRemote = hasRemoteApi(apiConfig);
   let remoteError = null;
-  const fallback = getMockResponse(url, method, data, params);
+  const getFallback = () => getMockResponse(url, method, data, params);
 
   if (useRemote) {
     try {
@@ -87,17 +87,17 @@ export const request = async (url, method = "get", data = null, params = null) =
         params,
         timeout: apiConfig.apiTimeout,
       });
-      const normalized = normalizeRemoteResponse(response.data, url, fallback);
+      const normalized = normalizeRemoteResponse(response.data, url, getFallback);
       if (!shouldFallback(normalized)) return normalized;
       showFallbackNotice("远端接口未返回有效数据");
-      return fallback;
+      return getFallback();
     } catch (error) {
       remoteError = error;
     }
   }
 
   if (remoteError) showFallbackNotice("远端接口不可用");
-  return fallback;
+  return getFallback();
 };
 
 export const requestOrThrow = async (...args) => {

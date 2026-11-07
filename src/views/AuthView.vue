@@ -1,7 +1,7 @@
 <template>
   <main class="auth-page">
     <section class="auth-art" aria-hidden="true">
-      <img :src="authImage" alt="" />
+      <img :src="authImage" alt="" width="960" height="600" decoding="async" />
       <div class="auth-art__veil" />
       <router-link class="auth-brand" to="/">
         <span>兰</span>
@@ -113,7 +113,7 @@ import AppIcon from "../components/AppIcon.vue";
 import { userLogin, userReg } from "../apis/api/login.js";
 import { useSession } from "../composables/useSession.js";
 import { notify } from "../composables/useNotices.js";
-import authImage from "../assets/LunBo/1.webp";
+import authImage from "../assets/exhibit/auth-cover-960.jpg";
 
 const route = useRoute();
 const router = useRouter();

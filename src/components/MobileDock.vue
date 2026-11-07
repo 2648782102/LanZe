@@ -46,7 +46,6 @@ const isActive = (item) => {
   border-radius: 0;
   background: rgba(16, 40, 39, 0.96);
   box-shadow: 0 18px 44px rgba(16, 40, 39, 0.24);
-  backdrop-filter: blur(16px);
 }
 
 .mobile-dock a {

@@ -75,7 +75,7 @@ try {
     ),
   )];
   const uniqueAssets = [...new Set([...localAssets, ...fontAssets])];
-  if (fontAssets.length === 0) throw new Error("No local icon font assets found in built CSS");
+  if (fontAssets.length === 0) throw new Error("No local font assets found in built CSS");
 
   await expectOk("/");
   for (const asset of uniqueAssets) await expectOk(`/${asset.replace(/^\.\//, "")}`);

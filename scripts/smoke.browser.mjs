@@ -73,6 +73,7 @@ const main = async () => {
   let nextId = 1;
   const pending = new Map();
   const events = [];
+  const layoutShifts = [];
   socket.addEventListener("message", (event) => {
     const message = JSON.parse(event.data);
     if (message.id && pending.has(message.id)) {
@@ -82,6 +83,9 @@ const main = async () => {
       else resolve(message.result);
     } else if (message.method) {
       events.push(message);
+      if (message.method === "Performance.layoutShift" && !message.params?.hadRecentInput) {
+        layoutShifts.push(message.params?.score || 0);
+      }
     }
   });
   await new Promise((resolve, reject) => {
@@ -158,6 +162,7 @@ const main = async () => {
   await send("Runtime.enable");
   await send("Log.enable");
   await send("Network.enable");
+  await send("Performance.enable");
   await send("Emulation.setDeviceMetricsOverride", {
     width: 1280,
     height: 800,
@@ -314,6 +319,10 @@ const main = async () => {
     .map((event) => event.params.errorText);
   const problems = [...consoleErrors, ...exceptions, ...failedRequests];
   if (problems.length) throw new Error(`Browser reported problems: ${problems.join(" | ")}`);
+  const cumulativeLayoutShift = layoutShifts.reduce((total, score) => total + score, 0);
+  if (cumulativeLayoutShift > 0.05) {
+    throw new Error(`Layout shifted beyond the 0.05 budget: ${cumulativeLayoutShift.toFixed(4)}`);
+  }
 
   socket.close();
   console.log([
@@ -323,7 +332,7 @@ const main = async () => {
     "desktop/mobile search,",
     "native audio dock,",
     "login and publish flow,",
-    "no console or network errors.",
+    `no console or network errors, CLS ${cumulativeLayoutShift.toFixed(4)}.`,
   ].join(" "));
   currentStep = "complete";
 };

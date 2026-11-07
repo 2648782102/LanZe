@@ -18,6 +18,16 @@ const forbiddenPatterns = [
     excludeSelf: true,
   },
   {
+    pattern: /ZiTi\/(?:FangZhengSong|piaoYiSong|hongLei|maoKen)\.ttf|LunBo\/\d+\.webp|beijing\/songci300\.jpg/,
+    message: "运行时请使用优化后的 WOFF2 字体与展品图，不加载旧大体积素材",
+    excludeSelf: true,
+  },
+  {
+    pattern: /backdrop-filter\s*:/,
+    message: "避免全局悬浮层的高成本 backdrop-filter",
+    excludeSelf: true,
+  },
+  {
     pattern: /music\.163\.com|music\.126\.net/,
     message: "禁止在默认播放器中硬编码第三方音乐/封面外链",
     excludeSelf: true,

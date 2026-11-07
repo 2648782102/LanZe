@@ -65,8 +65,7 @@ const isActive = (item) => {
   top: 0;
   z-index: 50;
   border-bottom: 1px solid var(--line);
-  background: rgba(243, 245, 240, 0.9);
-  backdrop-filter: blur(18px);
+  background: rgba(243, 245, 240, 0.97);
 }
 
 .museum-header__inner {

@@ -25,8 +25,8 @@
           <h1 :class="`title-length--${titleScale}`">
             <span v-for="(part, index) in titleParts" :key="index">{{ part }}</span>
           </h1>
-          <div class="poem-plinth__body">
-            <p v-for="(line, index) in poemLines" :key="index">{{ line }}</p>
+          <div class="poem-plinth__body" :class="{ 'is-switching': isSwitching }">
+            <p v-for="(line, index) in poemLines" :key="`${poem.id}-${index}`">{{ line }}</p>
           </div>
           <div class="poem-plinth__actions">
             <button class="gallery-action" type="button" @click="toggleSave">
@@ -46,7 +46,14 @@
 
         <div class="exhibit-card" aria-label="今日诗意图">
           <div class="exhibit-card__frame">
-            <img :src="exhibitImage" alt="月色与白花构成的青灰色诗意图" />
+            <img
+              :src="exhibitImage"
+              alt="月色与白花构成的青灰色诗意图"
+              width="672"
+              height="768"
+              decoding="async"
+              fetchpriority="high"
+            />
             <span class="exhibit-card__seal">兰泽馆藏</span>
           </div>
           <div class="exhibit-card__caption">
@@ -86,16 +93,15 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import AppIcon from "../components/AppIcon.vue";
 import { demoExcerpts } from "../data/poems.js";
 import { loadCatalog, useLibrary } from "../composables/useLibrary.js";
 import { notify } from "../composables/useNotices.js";
-import exhibitImage from "../assets/beijing/songci300.jpg";
+import exhibitImage from "../assets/exhibit/songci300-768.jpg";
 
 const { catalog, isSaved, toggleSaved } = useLibrary();
 const now = new Date();
-const isoDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 const dateLabel = new Intl.DateTimeFormat("zh-CN", {
   year: "numeric",
   month: "long",
@@ -103,6 +109,8 @@ const dateLabel = new Intl.DateTimeFormat("zh-CN", {
 }).format(now);
 const dayIndex = Math.floor(Date.now() / 86400000);
 const page = ref(dayIndex % 10);
+const isSwitching = ref(false);
+let switchTimer;
 
 const poem = computed(() => catalog.value[page.value % Math.max(catalog.value.length, 1)] || {});
 const poemLines = computed(() => poem.value.paragraphs || [poem.value.paragraph || "正在展开诗笺……"]);
@@ -131,9 +139,14 @@ const excerpts = computed(() => {
 });
 
 const nextPoem = () => {
-  page.value = (page.value + 1) % Math.max(catalog.value.length, 1);
+  if (isSwitching.value) return;
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-  window.scrollTo({ top: 0, behavior: reducedMotion ? "auto" : "smooth" });
+  isSwitching.value = true;
+  window.clearTimeout(switchTimer);
+  switchTimer = window.setTimeout(() => {
+    page.value = (page.value + 1) % Math.max(catalog.value.length, 1);
+    switchTimer = window.setTimeout(() => { isSwitching.value = false; }, reducedMotion ? 0 : 140);
+  }, reducedMotion ? 0 : 120);
 };
 
 const toggleSave = () => {
@@ -157,6 +170,7 @@ const speakPoem = () => {
 };
 
 onMounted(loadCatalog);
+onBeforeUnmount(() => window.clearTimeout(switchTimer));
 </script>
 
 <style scoped>
@@ -270,11 +284,7 @@ onMounted(loadCatalog);
   align-self: center;
   min-width: 0;
   max-width: 680px;
-  animation: exhibit-in 760ms cubic-bezier(0.18, 0.82, 0.3, 1) both;
-}
-
-@keyframes exhibit-in {
-  from { opacity: 0; transform: translateY(24px); }
+  min-height: 440px;
 }
 
 .poem-plinth__meta {
@@ -341,6 +351,11 @@ onMounted(loadCatalog);
   margin-top: clamp(28px, 4vw, 48px);
   padding: 10px 0 10px 28px;
   border-left: 1px solid var(--brass-soft);
+  transition: opacity 120ms ease;
+}
+
+.poem-plinth__body.is-switching {
+  opacity: 0.28;
 }
 
 .poem-plinth__body p {
@@ -381,7 +396,6 @@ onMounted(loadCatalog);
   align-self: center;
   justify-self: end;
   width: min(100%, 320px);
-  animation: exhibit-in 900ms 120ms cubic-bezier(0.18, 0.82, 0.3, 1) both;
 }
 
 .exhibit-card__frame {
@@ -389,7 +403,7 @@ onMounted(loadCatalog);
   padding: 13px;
   border: 1px solid var(--line);
   background: rgba(251, 252, 249, 0.7);
-  box-shadow: var(--shadow-paper);
+  box-shadow: 0 12px 32px rgba(22, 49, 46, 0.08);
 }
 
 .exhibit-card__frame::before {
@@ -405,8 +419,9 @@ onMounted(loadCatalog);
   display: block;
   width: 100%;
   aspect-ratio: 0.76;
+  height: auto;
   object-fit: cover;
-  filter: saturate(0.42) contrast(1.06) brightness(1.06);
+  filter: saturate(0.5) contrast(1.04);
 }
 
 .exhibit-card__seal {
@@ -421,7 +436,6 @@ onMounted(loadCatalog);
   font-family: var(--font-poem);
   font-size: 9px;
   letter-spacing: 0.14em;
-  backdrop-filter: blur(5px);
 }
 
 .exhibit-card__caption {
@@ -624,6 +638,10 @@ onMounted(loadCatalog);
 
   .poem-plinth__body {
     padding-left: 18px;
+  }
+
+  .poem-plinth {
+    min-height: 0;
   }
 
   .poem-plinth__body p {

@@ -62,7 +62,7 @@
 | 数据 | `src/config/runtime.js` 统一公开配置，`src/apis/request.js` 在真实 API 与 `src/services/mockApi.js` 之间切换 |
 | 动效与媒体 | 浏览器原生音频、CSS/SVG 图标与 `public/media/` 自制演示音源/封面 |
 | 样式 | `src/styles/base.css` 设计 token、组件内 CSS 与 `src/components/` 自有组件 |
-| 字体与素材 | 本地宋体字体与馆内图像；授权审查见 `docs/THIRD_PARTY_ASSETS.md` |
+| 字体与素材 | WOFF2 字体子集与压缩展品图；派生来源与授权审查见 `docs/THIRD_PARTY_ASSETS.md` |
 | 设计系统 | `src/styles/base.css` 与 `docs/DESIGN_SYSTEM.md`；组件、状态与响应式规则集中定义 |
 | 工具链 | npm、Node.js 20/22、GitHub Actions、`npm run test`、`npm run lint` |
 | 部署 | `vite build` 产物，可部署到 GitHub Pages / Vercel / Netlify 等静态托管 |
@@ -152,7 +152,7 @@ LanZe/
 ├── public/                  # favicon、SVG/PNG 展示素材与本地演示音源/封面
 ├── src/
 │   ├── apis/                # Axios 请求封装与业务 API 列表
-│   ├── assets/              # 字体、馆内图像与媒体资源
+│   ├── assets/              # WOFF2 字体子集与压缩展品图
 │   ├── components/          # 展馆壳层、图标、列表行与自有反馈组件
 │   ├── composables/         # 会话、诗库与通知状态
 │   ├── config/              # 运行时环境变量解析
