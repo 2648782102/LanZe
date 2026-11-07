@@ -32,7 +32,7 @@ find src/assets public -type f -print
 | 类别 | 当前位置 | 域名 / 用途 | 风险与状态 | 后续动作 |
 | --- | --- | --- | --- | --- |
 | 运行时依赖 | `package.json` / `package-lock.json` | Vue、Vue Router、Axios、Vue Cookies、Supabase JS 与 Vite 工具链 | 当前不再引入 Bootstrap、Font Awesome、Element Plus、Lottie、APlayer 或滑块验证码；npm 包各自许可见 lock 元数据 | 升级时再次核对依赖许可与构建产物中的版权说明 |
-| 默认演示音源与封面 | `public/media/lanze-demo.wav`、`public/media/lanze-demo-cover.svg` | 2026-11-06 由本仓库脚本生成的合成 PCM 音与原创 SVG | 由仓库贡献者提供；不引入第三方录音或美术素材 | 保持默认离线可用；如替换仍需记录生成方式与权利来源 |
+| 默认本地声景与封面 | `public/media/lanze-{qingshan,yuese,wanzhou}.wav`、对应 `-cover.svg`、`audio-manifest.json` | 2026-11-07 由 `scripts/generate-audio-library.mjs` 确定性合成的三段 24 秒 PCM 声景与原创 SVG | 由仓库贡献者提供；不引入第三方录音或美术素材；清单和 SHA-256 随仓库分发 | 修改音轨后运行 `npm run audio:generate && npm run audio:verify`，同步更新校验清单与本节记录 |
 | 可选自定义音源 | `src/config/audio.js`、`src/components/AudioDock.vue`、`VITE_AUDIO_TRACKS` | 部署者显式提供的音轨 URL / 封面 URL | 默认不含任何第三方媒体域；启用后版权、热链与隐私政策由配置者负责 | 仅在授权明确时设置 `VITE_AUDIO_SOURCE=custom`；无效配置自动回退并显示提示，不可达 URL 显示状态并允许重试 |
 | 首页诗句源 | `src/services/poetrySource.js`、`VITE_POETRY_SOURCE_URL` | 默认关闭；显式 `VITE_POETRY_SOURCE=remote` 时才请求 `https://v1.jinrishici.com/all.json` | 第三方服务不随仓库托管，授权与稳定性未核验；不承诺 SLA；默认构建不请求 | 可保持 `VITE_POETRY_SOURCE=local`，或换成自建兼容接口；公开部署前核查服务条款与内容授权 |
 | 徽章 | `README.md` | `img.shields.io`、GitHub Actions badge | 文档展示外链；不参与运行时核心功能 | 可保留，但离线文档不应依赖其加载 |
@@ -54,8 +54,12 @@ find src/assets public -type f -print
 | `src/assets/excerpt/fanzou-720.png` | `4263cece79f59c55b7287151ff718638221e74056d15e8c49aca1adb5a4d9316` |
 | `src/assets/excerpt/hongLei-excerpt.woff2` | `a79c5335d19afac98f4f2caae7e7b9c2ec38f70b2965dd5978c053c7a75fbe21` |
 | `src/assets/excerpt/piaoYiSong-excerpt.woff2` | `f12990c619ed3431193fa804dc6f703bf1a648526cdb3760bf2f306a8a4cbb39` |
-| `public/media/lanze-demo-cover.svg` | `ed5c4969d2781040df0bcf6efe855eb1cf00cb42c8afa132a40ac8fa353557da` |
-| `public/media/lanze-demo.wav` | `acb0dd40b18b94cc6431d5b42b0cd2c72ae77a1f8757983e3bf85b8aa66c200d` |
+| `public/media/lanze-qingshan.wav` | `882d62323454a600cd93f057e1a96989fc97959e7d1be8ee0e2df8656bbd46d0` |
+| `public/media/lanze-qingshan-cover.svg` | `b21a04a303f2e4014ebfcdfb02713442caea9f37b7889a63eb189c4681e70a46` |
+| `public/media/lanze-yuese.wav` | `14ca7693c83aa1985973d3da466a69bad28889fac87c5780bbb87da81a8c5752` |
+| `public/media/lanze-yuese-cover.svg` | `1706484bf5eadec140047c6866d7fc5c2853a0e7319fe4731ea4399fca3485bc` |
+| `public/media/lanze-wanzhou.wav` | `47dfd5afee68bdcb12faa75ecb04b171872056c8ff6783d76d646cb795b927d2` |
+| `public/media/lanze-wanzhou-cover.svg` | `d27f58df3acb6412ae0c4e69bedbb05050426f2a64a0e7ddca494172ba093534` |
 | `public/og-image.png` | `34acbf01d0fbc94a5db478dcc99c7358921eaac5c413f0dbb8151b0349bfce4c` |
 | `public/og-image.svg` | `f3f1d2dc1af474ed3af7d2c513e6c688b296386da285f3c28d1551a870eeda04` |
 | `public/favicon.ico` | `44a67fa9fa240e75a263991a80936224e047603dd7a0b7189813b4938218fe0a` |
@@ -68,6 +72,6 @@ find src/assets public -type f -print
 - [ ] 核查当前 WOFF2 子集对应的历史宋体是否允许 Web 嵌入、子集化与仓库再分发。
 - [ ] 核查今日展厅与登录封面压缩图对应的历史原图来源、许可与美术权利；无法确认时替换。
 - [x] 已从当前工作树移除未被源码引用的历史字体、图片与头像文件；原始文件仍可由 Git 历史追溯。
-- [x] 默认音乐演示已提供离线、仓库自制的音源与封面；无效配置已有回退提示。
+- [x] 默认音乐演示已升级为三段离线、仓库自制的声景与封面；清单、哈希和无效配置回退提示齐备。
 - [x] 自定义音源 URL 不可达时，播放器显示可读状态并允许重试，不影响业务页面。
 - [x] 首页诗句源默认关闭；只有显式启用远程接口时才需要核查服务条款、内容版权与公开部署隐私边界。

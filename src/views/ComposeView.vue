@@ -1,9 +1,9 @@
 <template>
   <main class="compose-page">
     <div class="shell compose-head">
-      <router-link class="back-link" :to="isLoggedIn ? '/collection?tab=works' : '/login'">
+      <router-link class="back-link" :to="isLoggedIn ? '/collection?tab=works' : '/'">
         <AppIcon name="arrow-left" :size="16" />
-        {{ isLoggedIn ? "回到我的诗卷" : "先去登录" }}
+        {{ isLoggedIn ? "回到我的诗卷" : "回到今日读诗" }}
       </router-link>
       <div class="compose-head__row">
         <div>
@@ -80,10 +80,15 @@
           />
         </label>
 
+        <p v-if="!isLoggedIn" class="compose-login-note" role="status">
+          访客可填写并预览；发布时登录，草稿保存在本机。
+          <router-link :to="{ name: 'login', query: { next: '/compose' } }">先去登录</router-link>
+        </p>
+
         <div class="form-actions">
           <button class="button button--solid" type="submit" :disabled="submitting">
             <AppIcon name="feather" :size="17" />
-            {{ submitting ? "正在发布" : "发布到我的诗卷" }}
+            {{ submitting ? "正在发布" : isLoggedIn ? "发布到我的诗卷" : "登录后发布" }}
           </button>
           <button class="button" type="button" :disabled="submitting" @click="clearDraft">清空草稿</button>
         </div>
@@ -92,7 +97,7 @@
       <aside class="preview-panel" aria-label="作品预览">
         <div class="preview-panel__top">
           <span>预览</span>
-          <span>{{ form.category || "未分类" }}</span>
+          <span>{{ form.category || "未分类" }} · {{ contentLength }} 字</span>
         </div>
         <div class="preview-sheet">
           <p class="preview-category">兰泽 · 本地诗卷</p>
@@ -163,7 +168,8 @@ const clearDraft = () => {
 
 const publish = async () => {
   if (!isLoggedIn.value) {
-    notify("请先登录后再发布", "warning");
+    persistDraft();
+    notify("草稿已留在本机，登录后可以继续发布", "info");
     router.push({ path: "/login", query: { next: "/compose" } });
     return;
   }
@@ -205,17 +211,15 @@ watch(
 );
 
 onMounted(() => {
-  if (!isLoggedIn.value) {
-    router.replace({ path: "/login", query: { next: "/compose" } });
-  }
+  loadCatalog();
 });
 </script>
 
 <style scoped>
 .compose-page {
-  min-height: 80vh;
-  padding-bottom: 96px;
+  min-height: 80dvh;
   background: var(--porcelain);
+  padding-bottom: calc(84px + env(safe-area-inset-bottom));
 }
 
 .compose-head {
@@ -224,6 +228,7 @@ onMounted(() => {
 
 .back-link {
   display: inline-flex;
+  min-height: 42px;
   align-items: center;
   gap: 7px;
   color: var(--ink-faint);
@@ -303,6 +308,25 @@ onMounted(() => {
   flex-wrap: wrap;
   gap: 10px;
   padding-top: 8px;
+}
+
+.compose-login-note {
+  margin: 0;
+  padding: 12px 14px;
+  border-left: 2px solid var(--brass);
+  background: var(--porcelain-deep);
+  color: var(--ink-soft);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.compose-login-note a {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  color: var(--celadon-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .button:disabled {
@@ -403,18 +427,85 @@ onMounted(() => {
 }
 
 @media (max-width: 650px) {
+  .compose-head {
+    padding-block: 24px 30px;
+  }
+
   .compose-head__row {
     display: grid;
     gap: 18px;
     margin-top: 28px;
   }
 
+  .compose-head h1 {
+    font-size: clamp(40px, 12vw, 60px);
+  }
+
+  .compose-head__copy {
+    font-size: 11px;
+    line-height: 1.7;
+  }
+
+  .compose-grid,
+  .compose-form {
+    gap: 18px;
+  }
+
   .form-row--two {
     grid-template-columns: 1fr;
   }
 
+  .compose-textarea {
+    min-height: 210px;
+    font-size: 16px;
+  }
+
+  .compose-login-note {
+    padding: 10px 12px;
+    font-size: 11px;
+    line-height: 1.65;
+  }
+
+  .form-actions {
+    gap: 8px;
+  }
+
+  .form-actions .button {
+    padding-inline: 14px;
+  }
+
   .preview-sheet {
+    min-height: 360px;
     padding: 34px 22px;
+  }
+}
+
+@media (max-width: 380px) {
+  .form-row--two {
+    gap: 12px;
+  }
+
+  .compose-textarea {
+    min-height: 180px;
+  }
+
+  .compose-login-note a {
+    display: block;
+    min-height: 28px;
+  }
+
+  .form-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .form-actions .button {
+    width: 100%;
+    padding-inline: 8px;
+  }
+
+  .preview-sheet {
+    padding: 26px 16px;
   }
 }
 </style>

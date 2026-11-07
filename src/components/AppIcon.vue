@@ -15,6 +15,9 @@
       <circle cx="10.8" cy="10.8" r="6.4" />
       <path d="m16 16 4.1 4.1" />
     </template>
+    <template v-else-if="name === 'filter'">
+      <path d="M4 6h16M7 12h10M10 18h4" />
+    </template>
     <template v-else-if="name === 'bookmark'">
       <path d="M6.5 4.5h11v15l-5.5-3.8-5.5 3.8z" />
     </template>
@@ -29,6 +32,19 @@
     </template>
     <template v-else-if="name === 'pause'">
       <path d="M9 6v12M15 6v12" />
+    </template>
+    <template v-else-if="name === 'skip-next'">
+      <path d="m6 5 10 7-10 7zM18 5v14" />
+    </template>
+    <template v-else-if="name === 'skip-previous'">
+      <path d="M6 5v14M18 5 8 12l10 7z" />
+    </template>
+    <template v-else-if="name === 'mute'">
+      <path d="M5 10v4h3l4 3V7l-4 3zM16 9l5 6M21 9l-5 6" />
+    </template>
+    <template v-else-if="name === 'list'">
+      <path d="M4 6h16M4 12h16M4 18h10" />
+      <circle cx="18" cy="18" r="2" />
     </template>
     <template v-else-if="name === 'pen'">
       <path d="m4 20 4.3-1 10.2-10.2a2.1 2.1 0 0 0-3-3L5.3 16zM14.5 7.5l3 3" />

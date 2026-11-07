@@ -257,8 +257,8 @@ onMounted(async () => {
 
 <style scoped>
 .collection-page {
-  min-height: 80vh;
-  padding-bottom: 100px;
+  min-height: 80dvh;
+  padding-bottom: calc(84px + env(safe-area-inset-bottom));
 }
 
 .collection-head {
@@ -345,7 +345,8 @@ onMounted(async () => {
   align-items: center;
   gap: 7px;
   margin-bottom: -1px;
-  padding: 13px 0;
+  min-height: 46px;
+  padding: 13px 4px;
   border: 0;
   border-bottom: 1px solid transparent;
   background: transparent;
@@ -558,8 +559,18 @@ onMounted(async () => {
 @media (max-width: 720px) {
   .collection-head__grid {
     grid-template-columns: 1fr;
-    gap: 30px;
-    padding-block: 44px 36px;
+    gap: 24px;
+    padding-block: 36px 28px;
+  }
+
+  .collection-head h1 {
+    font-size: clamp(42px, 12vw, 64px);
+  }
+
+  .collection-copy {
+    margin-top: 14px;
+    font-size: 12px;
+    line-height: 1.7;
   }
 
   .collection-stats {
@@ -574,6 +585,18 @@ onMounted(async () => {
     padding-top: 34px;
   }
 
+  .collection-tabs {
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .collection-tabs button {
+    flex: 1 0 auto;
+    justify-content: center;
+    padding-inline: 12px;
+  }
+
   .works-toolbar {
     display: grid;
     justify-items: start;
@@ -581,6 +604,37 @@ onMounted(async () => {
 
   .account-panel {
     padding: 22px;
+  }
+}
+
+@media (max-width: 380px) {
+  .collection-stats {
+    gap: 16px;
+  }
+
+  .collection-stats div {
+    min-width: 54px;
+  }
+
+  .collection-stats dd {
+    font-size: 32px;
+  }
+
+  .collection-tabs button {
+    padding-inline: 8px;
+    font-size: 12px;
+  }
+
+  .empty-state {
+    padding: 42px 0;
+  }
+
+  .empty-state h2 {
+    font-size: 24px;
+  }
+
+  .account-panel {
+    padding: 18px;
   }
 }
 </style>

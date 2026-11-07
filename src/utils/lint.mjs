@@ -32,6 +32,11 @@ const forbiddenPatterns = [
     message: "禁止在默认播放器中硬编码第三方音乐/封面外链",
     excludeSelf: true,
   },
+  {
+    pattern: /lanze-demo\.wav|lanze-demo-cover\.svg/,
+    message: "默认声景应使用可复现生成的三段本地曲库",
+    excludeSelf: true,
+  },
 ];
 
 const isOwned = (relativePath) =>

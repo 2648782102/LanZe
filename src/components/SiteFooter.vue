@@ -21,7 +21,7 @@ const year = new Date().getFullYear();
 
 <style scoped>
 .museum-footer {
-  padding: 36px 0 104px;
+  padding: 30px 0 80px;
   border-top: 1px solid var(--line);
   background: var(--porcelain-deep);
   color: var(--ink-faint);
@@ -70,9 +70,15 @@ const year = new Date().getFullYear();
   color: var(--brass);
 }
 
+.footer-links a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+}
+
 @media (max-width: 760px) {
   .museum-footer {
-    padding-bottom: 112px;
+    padding-bottom: calc(116px + env(safe-area-inset-bottom));
   }
 
   .museum-footer__inner {

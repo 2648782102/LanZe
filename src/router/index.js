@@ -82,8 +82,11 @@ const router = createRouter({
   },
 });
 
-router.afterEach((to) => {
+const updateTitle = (to) => {
   document.title = to.meta.title ? `${to.meta.title} · 兰泽` : "兰泽 · 读诗的地方";
-});
+};
+
+router.afterEach(updateTitle);
+updateTitle(router.currentRoute.value);
 
 export default router;

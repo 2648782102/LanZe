@@ -80,6 +80,7 @@ const isActive = (item) => {
 
 .brand {
   display: inline-flex;
+  min-height: 44px;
   align-items: center;
   justify-self: start;
   gap: 11px;
@@ -171,8 +172,8 @@ const isActive = (item) => {
 .search-link,
 .account-link {
   display: grid;
-  width: 36px;
-  height: 36px;
+  width: 42px;
+  height: 42px;
   place-items: center;
   border: 1px solid transparent;
   color: var(--ink-soft);

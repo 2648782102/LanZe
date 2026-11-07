@@ -204,14 +204,14 @@ watch(
 <style scoped>
 .auth-page {
   display: grid;
-  min-height: 100vh;
+  min-height: 100dvh;
   grid-template-columns: minmax(360px, 0.92fr) minmax(460px, 1.08fr);
   background: var(--porcelain-panel);
 }
 
 .auth-art {
   position: relative;
-  min-height: 100vh;
+  min-height: 100dvh;
   overflow: hidden;
   background: var(--night);
   color: var(--porcelain-panel);
@@ -307,7 +307,7 @@ watch(
   position: relative;
   display: grid;
   place-items: center;
-  min-height: 100vh;
+  min-height: 100dvh;
   padding: 74px 34px;
 }
 
@@ -316,6 +316,7 @@ watch(
   top: 30px;
   left: 34px;
   display: inline-flex;
+  min-height: 42px;
   align-items: center;
   gap: 7px;
   color: var(--ink-faint);
@@ -362,7 +363,11 @@ watch(
 
 .auth-tabs a {
   margin-bottom: -1px;
-  padding: 10px 0;
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  min-width: 44px;
+  padding: 10px 12px;
   border-bottom: 1px solid transparent;
   color: var(--ink-faint);
   font-size: 12px;
@@ -395,7 +400,11 @@ watch(
   position: absolute;
   top: 50%;
   right: 12px;
-  padding: 5px;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  padding: 0;
   border: 0;
   background: transparent;
   color: var(--ink-faint);
@@ -440,7 +449,8 @@ watch(
 }
 
 .demo-box button {
-  padding: 0;
+  min-height: 40px;
+  padding: 0 4px;
   border: 0;
   border-bottom: 1px solid var(--ink);
   background: transparent;
@@ -465,12 +475,40 @@ watch(
   }
 
   .auth-panel {
-    padding: 96px 24px 54px;
+    min-height: 100dvh;
+    padding: 96px 24px calc(54px + env(safe-area-inset-bottom));
   }
 
   .auth-back {
     top: 28px;
     left: 24px;
+  }
+}
+
+@media (max-width: 560px) {
+  .auth-panel {
+    padding: 80px 20px calc(40px + env(safe-area-inset-bottom));
+  }
+
+  .auth-back {
+    top: 22px;
+    left: 20px;
+  }
+
+  .auth-form-wrap h1 {
+    font-size: 36px;
+  }
+
+  .auth-copy {
+    line-height: 1.7;
+  }
+
+  .auth-form {
+    gap: 16px;
+  }
+
+  .auth-fineprint {
+    line-height: 1.65;
   }
 }
 </style>

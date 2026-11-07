@@ -42,6 +42,7 @@
   --font-poem: "LanZeSong", "Songti SC", "Noto Serif CJK SC", serif;
   --font-ui: "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   --font-number: "SF Pro Display", "Avenir Next", sans-serif;
+  --font-accent: var(--font-number);
   --radius-xs: 2px;
   --radius-sm: 6px;
   --radius-md: 14px;
@@ -284,7 +285,7 @@ img {
   right: 0;
   bottom: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   z-index: 0;
   background-image:
     linear-gradient(rgba(81, 122, 112, 0.035) 1px, transparent 1px),
@@ -306,8 +307,14 @@ img {
   }
 
   .button {
-    min-height: 42px;
+    min-height: 44px;
     padding-inline: 16px;
+  }
+
+  .eyebrow,
+  .tag,
+  .field-label {
+    font-size: 12px;
   }
 }
 

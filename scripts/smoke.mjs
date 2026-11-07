@@ -1,6 +1,7 @@
 import { spawn } from "node:child_process";
 import { readFile, readdir } from "node:fs/promises";
 import { setTimeout as delay } from "node:timers/promises";
+import { verifyAudioLibrary } from "./verify-audio-library.mjs";
 import { verifyPoetryCorpus } from "./verify-poetry-corpus.mjs";
 
 const port = Number(process.env.SMOKE_PORT || 4179);
@@ -68,8 +69,17 @@ try {
     throw new Error("Built JavaScript is missing the configurable poetry source endpoint");
   }
 
-  const mediaAssets = ["media/lanze-demo.wav", "media/lanze-demo-cover.svg"];
+  const audioManifest = JSON.parse(await readFile("public/media/audio-manifest.json", "utf8"));
+  const mediaAssets = [
+    "media/audio-manifest.json",
+    "media/SHA256SUMS.txt",
+    ...audioManifest.tracks.flatMap((track) => [
+      track.url.replace(/^\.\//, ""),
+      track.cover.replace(/^\.\//, ""),
+    ]),
+  ];
   for (const asset of mediaAssets) await expectOk(`/${asset}`);
+  await verifyAudioLibrary();
 
   const manifest = await (await fetch(`${origin}/data/poetry/manifest.json`)).json();
   const corpusAssets = ["data/poetry/manifest.json", "data/poetry/SHA256SUMS.txt", "data/poetry/LICENSE.chinese-poetry.txt"];

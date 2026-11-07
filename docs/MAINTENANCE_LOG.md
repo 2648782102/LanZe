@@ -198,3 +198,26 @@
 - 维护窗口结束。最后一次复核：`main` 与 `origin/main` 同步于 `fd2effb`，`v0.2.0` tag 仍指向 `9534ccc` 的发布内容；最新 CI run `42123080088` 三项 job 均 success，公开 Release `v0.2.0`（id `435565910`）仍为正式发布。3 个 open issue 无评论、无 open PR、Discussion #1 无评论。
 - 本窗口完成 Vite 6 / 本地演示数据 / 23 项单测 / lint / 构建冒烟 / 可选浏览器冒烟 / Node 20/22 CI / 文档治理 / Release 与 3 个新人入口；文档与公开 Release 保持一致，已如实记录在线欢迎帖、失效 homepage、Pages 与社交预览的权限限制。
 - 未进行付费推广、虚假宣传、刷 star 或外部社区群发；`SOCIAL_POSTS.md` 仍为草稿。自动化 `lanze-08-00` 已 `PAUSED`，不再继续巡检或重复发布。
+
+## 前端走查 — 2026-11-07 19:00 CST
+
+- 按用户要求对当前六页面再做一轮产品体验与移动端走查。用 Chrome/CDP 在 320、360、390、430、768、820、1024、1440px 八个宽度生成今日、寻诗、读诗、诗卷、写作台、登录页的布局指标与截图；同时检查展开筛选、滚动后的吸附层和登录页。最终指标为页面级横向溢出 0、固定层交叠 0；桌面装饰圆与收起播放器按钮的内部越界也已收敛。
+- 窄屏产品体验：寻诗页筛选改为带计数、可折叠、限高滚动的面板；访客可以直接填写写作台并看到实时预览，草稿保存在本机，发布时再引导登录；搜索、筛选、分页和触控目标按 320px 基线重新排版，解释性文案与次级箭头让位于正文和操作。
+- 固定层：窄屏播放器默认收起并与底部导航上下相接；底部导航、通知层、页脚与页面安全区留出空间。桌面仍保持完整吸底播放器与可收起控制；用户手动展开/收起后会尊重该偏好，桌面/窄屏切换时才重新同步默认态。
+- 稳定性与细节：全站视口单位改为 `dvh`，补齐 `--font-accent`、路由首帧标题、键盘焦点和 `44px` 级主操作尺寸；收紧页脚、展台、余韵区与写作台留白；`100vw` 背景网格改为 `100%`，避免滚动条宽度引起横向位移。
+- `scripts/smoke.browser.mjs` 增加窄屏默认收起播放器、筛选折叠状态、访客预览/草稿和 320px 无横向溢出断言；README、CHANGELOG、`docs/DESIGN_SYSTEM.md`、`docs/DEVELOPMENT.md` 同步新的响应式契约与验收宽度。
+- 本地全量验证：`git diff --check`、`npm run lint`、`npm run test`（36/36）、`npm run build`、`npm run smoke`（29 assets）、`npm run smoke:browser`（CLS 0.0000、控制台/网络错误 0）、`npm audit --omit=dev`（0 vulnerabilities）均通过；`npm ci` 与跨浏览器/视觉基线回归仍按路线图保留为后续事项。
+
+## 声景曲库 — 2026-11-07 19:25 CST
+
+- 按用户提出的「歌曲播放是否只是演示」走查播放器：旧实现只有一段 8 秒合成音，`VITE_AUDIO_TRACKS` 虽支持数组但播放器只取第一条，也没有进度拖动、切轨、音量或播放列表。现已移除旧 `lanze-demo.wav` / `lanze-demo-cover.svg`。
+- 新增 `npm run audio:generate`：用确定性算法合成「空山 · 松风」「月色 · 瓷盏」「晚舟 · 水纹」三段各 24 秒的 22.05 kHz / 16-bit 单声道 PCM 声景、三张原创 SVG 封面、`audio-manifest.json` 与 `SHA256SUMS.txt`；不含第三方录音、封面或网络请求。`npm run audio:verify` 校验 WAV 头、时长、清单和哈希，静态冒烟与 CI 复用该校验。
+- `AudioDock` 升级为曲库播放器：封面、标题/意境、可拖动进度与时长、播放列表、上一首/下一首/自动续播、音量/静音、播放/错误状态和本机偏好记忆；窄屏默认收起并压缩为播放/切轨/静音/列表的核心控件。自定义音源仍只在 `VITE_AUDIO_SOURCE=custom` 且配置授权明确时启用，不可达时保留重试状态。
+- Browser E2E 增加播放列表展开、三段曲目、切轨与偏好持久化、进度拖动回读；README、CHANGELOG、设计/开发/架构/部署/FAQ、素材清单、`.env.example` 与维护记录同步为新的三段本地声景曲库，避免把合成声景宣称为商业歌曲或第三方曲库。
+
+## 发布整理 — 2026-11-07 20:05 CST
+
+- 按「先保存现有成果，再整理公开口径」复核工作区：两批未提交改动分别为前端体验/移动端走查与三段本地声景曲库；`main` 与 `origin/main` 仍停在 `b315f27`，旧 08:00 自动化为 `PAUSED`，不恢复心跳巡检。
+- 将当前版本统一为 `v0.4.0 · 离线馆藏与声景曲库`：重写 `RELEASE_NOTES.md`、`ANNOUNCEMENT.md`、`SOCIAL_POSTS.md`，同步 README、CHANGELOG、FAQ、开发文档、路线图与展示清单中的 39 项单测、9,350 篇离线馆藏、三段本地声景和默认离线边界；历史 v0.2.0 / v0.3.0 段落按当时事实保留。
+- `package.json` 与锁文件补充 Node `>=20` / npm `>=10`；CI Documentation checks 增加 engines 校验，发布 workflow 改为仅由 `v0.4.0` tag push 触发，Release 标题跟随当前版本，不覆盖历史 Release。
+- `docs/PROMOTION.md` 明确把 GitHub About 描述、社交预览、Pages、在线 Discussion #1、外部短帖与 v0.4.0 tag/Release 标为待实际写权限或线上回读核对；不把候选文案、文件哈希或 workflow success 误写成公开展示已完成。

@@ -31,9 +31,13 @@ const isBare = computed(() => Boolean(route.meta.bare));
 .app-frame {
   position: relative;
   isolation: isolate;
-  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--canvas);
   background: var(--porcelain);
+}
+
+.app-frame:not(.is-bare) {
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .app-frame > main {

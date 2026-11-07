@@ -35,13 +35,13 @@ const isActive = (item) => {
 .mobile-dock {
   position: fixed;
   right: max(12px, env(safe-area-inset-right));
-  bottom: 12px;
+  bottom: max(12px, env(safe-area-inset-bottom));
   left: max(12px, env(safe-area-inset-left));
   z-index: 80;
   display: none;
   width: auto;
   max-width: calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right));
-  padding: 6px;
+  padding: 4px 6px 6px;
   border: 1px solid rgba(168, 196, 184, 0.3);
   border-radius: 0;
   background: rgba(16, 40, 39, 0.96);
@@ -52,9 +52,16 @@ const isActive = (item) => {
   display: grid;
   justify-items: center;
   gap: 3px;
+  min-height: 46px;
   padding: 7px 4px;
+  border-radius: 0;
   color: rgba(251, 252, 249, 0.5);
   font-size: 10px;
+}
+
+.mobile-dock a:focus-visible {
+  outline-color: var(--brass-soft);
+  outline-offset: -3px;
 }
 
 .mobile-dock a.is-active {

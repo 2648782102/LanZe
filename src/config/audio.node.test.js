@@ -6,9 +6,10 @@ test("uses the local demo track without configuration", () => {
   const config = createAudioConfig({});
   assert.equal(config.source, "local");
   assert.equal(config.invalidCustom, undefined);
-  assert.equal(config.tracks.length, 1);
-  assert.equal(config.tracks[0].url, "./media/lanze-demo.wav");
-  assert.equal(config.tracks[0].cover, "./media/lanze-demo-cover.svg");
+  assert.equal(config.tracks.length, 3);
+  assert.equal(config.tracks[0].url, "./media/lanze-qingshan.wav");
+  assert.equal(config.tracks[0].cover, "./media/lanze-qingshan-cover.svg");
+  assert.equal(config.tracks[0].duration, 24);
 });
 
 test("uses an explicit custom playlist only when enabled", () => {
@@ -36,6 +37,6 @@ test("falls back to the local track for invalid custom configuration", () => {
   for (const config of [invalidJson, emptyList]) {
     assert.equal(config.source, "local");
     assert.equal(config.invalidCustom, true);
-    assert.equal(config.tracks[0].url, "./media/lanze-demo.wav");
+    assert.equal(config.tracks[0].url, "./media/lanze-qingshan.wav");
   }
 });

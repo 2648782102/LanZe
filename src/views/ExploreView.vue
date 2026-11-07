@@ -30,6 +30,17 @@
       </div>
     </section>
 
+    <div class="mobile-filter-bar">
+      <div class="shell mobile-filter-bar__inner">
+        <button type="button" :aria-expanded="filtersOpen" aria-controls="mobile-filter-panel" @click="filtersOpen = !filtersOpen">
+          <AppIcon name="filter" :size="16" />
+          筛选
+          <span v-if="hasFilters">{{ activeFilterCount }}</span>
+        </button>
+        <p>{{ resultSummary }}</p>
+      </div>
+    </div>
+
     <section class="search-room">
       <div class="shell">
         <form class="index-search" role="search" @submit.prevent="submitSearch">
@@ -49,14 +60,14 @@
         </form>
         <div class="quick-terms">
           <span>常见入口</span>
-          <button v-for="hint in hints" :key="hint" type="button" @click="pickHint(hint)">{{ hint }}</button>
+          <button v-for="hint in hints" :key="hint" type="button" :aria-label="`搜索${hint}`" @click="pickHint(hint)">{{ hint }}</button>
         </div>
       </div>
     </section>
 
     <section class="index-content">
       <div class="shell index-grid">
-        <aside class="filter-wall" aria-label="馆藏筛选">
+        <aside id="mobile-filter-panel" class="filter-wall" :class="{ 'is-open': filtersOpen }" aria-label="馆藏筛选">
           <section class="facet">
             <div class="facet__head">
               <p class="eyebrow">朝代 / DYNASTY</p>
@@ -170,7 +181,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import AppIcon from "../components/AppIcon.vue";
 import PoemRow from "../components/PoemRow.vue";
@@ -190,6 +201,7 @@ const { isSaved, toggleSaved, catalogError } = useLibrary();
 const catalogVersion = useCatalogVersion();
 const hints = ["月亮", "李白", "宋词", "春天", "关雎"];
 const pageSize = 24;
+const filtersOpen = ref(false);
 
 const stats = computed(() => ({ ...getLibraryStats(), version: catalogVersion.value }));
 const facets = computed(() => ({ ...getLibraryFacets(), version: catalogVersion.value }));
@@ -214,6 +226,9 @@ const result = computed(() => {
   });
 });
 const hasFilters = computed(() => Boolean(query.value.trim()) || dynasty.value !== "全部" || genre.value !== "全部");
+const activeFilterCount = computed(() =>
+  Number(Boolean(query.value.trim())) + Number(dynasty.value !== "全部") + Number(genre.value !== "全部"),
+);
 const resultHeading = computed(() => {
   if (query.value.trim()) return `“${query.value.trim()}”`;
   if (dynasty.value !== "全部" && genre.value !== "全部") return `${dynasty.value} · ${genre.value}`;
@@ -240,6 +255,7 @@ const syncRoute = ({ resetPage = false } = {}) => {
 const submitSearch = () => {
   query.value = draftQuery.value.trim();
   page.value = 1;
+  filtersOpen.value = false;
   syncRoute({ resetPage: true });
 };
 
@@ -247,6 +263,7 @@ const pickHint = (hint) => {
   draftQuery.value = hint;
   query.value = hint;
   page.value = 1;
+  filtersOpen.value = false;
   syncRoute({ resetPage: true });
 };
 
@@ -254,6 +271,7 @@ const clearSearch = () => {
   draftQuery.value = "";
   query.value = "";
   page.value = 1;
+  filtersOpen.value = false;
   syncRoute({ resetPage: true });
 };
 
@@ -264,6 +282,16 @@ const selectFacet = (key, name) => {
   syncRoute({ resetPage: true });
 };
 
+onMounted(() => {
+  const desktopQuery = window.matchMedia("(min-width: 901px)");
+  const syncFilters = (event) => {
+    if (event.matches) filtersOpen.value = false;
+  };
+  desktopQuery.addEventListener("change", syncFilters);
+  onBeforeUnmount(() => desktopQuery.removeEventListener("change", syncFilters));
+  loadCatalog();
+});
+
 const resetFacet = (key) => selectFacet(key, "全部");
 
 const resetFilters = () => {
@@ -272,6 +300,7 @@ const resetFilters = () => {
   dynasty.value = "全部";
   genre.value = "全部";
   page.value = 1;
+  filtersOpen.value = false;
   syncRoute({ resetPage: true });
 };
 
@@ -306,12 +335,11 @@ watch([dynasty, genre], () => {
   if (genre.value !== "全部" && !facets.value.genres.some((item) => item.name === genre.value)) genre.value = "全部";
 });
 
-onMounted(loadCatalog);
 </script>
 
 <style scoped>
 .index-page {
-  min-height: 80vh;
+  min-height: 80dvh;
   background: var(--porcelain);
 }
 
@@ -442,8 +470,8 @@ onMounted(loadCatalog);
 
 .index-search__clear {
   display: grid;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   place-items: center;
   padding: 0;
   border: 0;
@@ -453,7 +481,7 @@ onMounted(loadCatalog);
 
 .index-search__button {
   min-width: 92px;
-  height: 50px;
+  min-height: 50px;
   border: 0;
   background: var(--ink);
   color: var(--porcelain-panel);
@@ -476,8 +504,8 @@ onMounted(loadCatalog);
 }
 
 .quick-terms button {
-  min-height: 26px;
-  padding: 4px 10px;
+  min-height: 40px;
+  padding: 7px 12px;
   border: 1px solid var(--line);
   background: transparent;
   color: var(--ink-soft);
@@ -489,8 +517,18 @@ onMounted(loadCatalog);
   color: var(--brass);
 }
 
+  .quick-terms button:focus-visible,
+  .mobile-filter-bar button:focus-visible,
+  .facet__list button:focus-visible {
+    outline-offset: -3px;
+  }
+
 .index-content {
-  padding-block: 60px 100px;
+  padding-block: 52px 76px;
+}
+
+.mobile-filter-bar {
+  display: none;
 }
 
 .index-grid {
@@ -523,7 +561,8 @@ onMounted(loadCatalog);
 }
 
 .facet__head button {
-  padding: 0;
+  min-height: 36px;
+  padding: 0 4px;
   border: 0;
   background: transparent;
   color: var(--ink-faint);
@@ -549,6 +588,7 @@ onMounted(loadCatalog);
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  min-height: 42px;
   padding: 10px 0;
   border: 0;
   border-bottom: 1px solid var(--line);
@@ -608,7 +648,8 @@ onMounted(loadCatalog);
 }
 
 .result-head__right button {
-  padding: 0;
+  min-height: 36px;
+  padding: 0 2px;
   border: 0;
   border-bottom: 1px solid var(--line-strong);
   background: transparent;
@@ -640,8 +681,8 @@ onMounted(loadCatalog);
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  min-height: 28px;
-  padding: 4px 10px;
+  min-height: 36px;
+  padding: 7px 11px;
   border: 1px solid var(--line);
   background: var(--porcelain-panel);
   color: var(--ink-soft);
@@ -696,8 +737,8 @@ onMounted(loadCatalog);
 
 .pagination button {
   display: grid;
-  width: 34px;
-  height: 34px;
+  width: 42px;
+  height: 42px;
   place-items: center;
   border: 1px solid var(--line);
   background: transparent;
@@ -756,11 +797,73 @@ onMounted(loadCatalog);
     min-width: 0;
   }
 
+  .mobile-filter-bar {
+    display: block;
+    border-bottom: 1px solid var(--line);
+    background: var(--porcelain-panel);
+  }
+
+  .mobile-filter-bar__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    min-height: 56px;
+    position: sticky;
+    top: var(--header-height);
+    z-index: 4;
+  }
+
+  .mobile-filter-bar button {
+    display: inline-flex;
+    min-height: 40px;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border: 1px solid var(--line-strong);
+    background: transparent;
+    color: var(--ink);
+    font-size: 12px;
+  }
+
+  .mobile-filter-bar button span {
+    display: grid;
+    width: 19px;
+    height: 19px;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--porcelain-panel);
+    font-family: var(--font-number);
+    font-size: 10px;
+  }
+
+  .mobile-filter-bar p {
+    margin: 0;
+    min-width: 0;
+    color: var(--ink-faint);
+    font-size: 10px;
+    text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .filter-wall {
+    display: none;
     position: static;
+    min-width: 0;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .filter-wall.is-open {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 20px;
+    max-height: min(360px, 60dvh);
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .facet + .facet {
@@ -769,19 +872,22 @@ onMounted(loadCatalog);
 
   .facet__list {
     display: flex;
-    max-height: 112px;
+    min-width: 0;
+    max-height: 132px;
     flex-wrap: wrap;
     align-content: start;
     gap: 8px;
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: auto;
     border-top: 0;
+    overscroll-behavior: contain;
   }
 
   .facet__list button {
     flex: 0 0 auto;
     gap: 8px;
-    padding: 7px 11px;
+    min-height: 40px;
+    padding: 8px 12px;
     border: 1px solid var(--line);
     white-space: nowrap;
   }
@@ -803,6 +909,35 @@ onMounted(loadCatalog);
 }
 
 @media (max-width: 560px) {
+  .index-banner__inner {
+    gap: 12px;
+    padding-block: 38px 30px;
+  }
+
+  .index-label span {
+    font-size: 30px;
+  }
+
+  .index-banner__copy h1 {
+    font-size: clamp(34px, 8.4vw, 48px);
+    line-height: 1.22;
+  }
+
+  .index-banner__copy > p {
+    max-width: 34em;
+    margin-top: 12px;
+    font-size: 11px;
+    line-height: 1.7;
+  }
+
+  .index-banner__stats dd {
+    font-size: 20px;
+  }
+
+  .search-room {
+    padding-block: 20px 22px;
+  }
+
   .index-search {
     grid-template-columns: auto 1fr auto;
     gap: 8px;
@@ -813,12 +948,20 @@ onMounted(loadCatalog);
     min-width: 64px;
   }
 
+  .quick-terms {
+    margin-top: 10px;
+  }
+
   .filter-wall {
     grid-template-columns: 1fr;
   }
 
+  .filter-wall.is-open {
+    grid-template-columns: 1fr;
+  }
+
   .facet__list {
-    max-height: none;
+    max-height: 116px;
     flex-wrap: nowrap;
     overflow-x: auto;
     overflow-y: hidden;
@@ -831,6 +974,71 @@ onMounted(loadCatalog);
 
   .result-head__right {
     justify-items: start;
+  }
+
+  .mobile-filter-bar__inner {
+    min-height: 54px;
+  }
+
+  .mobile-filter-bar p {
+    max-width: 62%;
+    line-height: 1.4;
+  }
+}
+
+@media (max-width: 380px) {
+  .index-label {
+    display: none;
+  }
+
+  .index-banner__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .index-banner__copy h1 br {
+    display: none;
+  }
+
+  .index-banner__stats {
+    grid-column: 1;
+  }
+
+  .index-banner__stats > div {
+    padding-inline: 8px;
+  }
+
+  .quick-terms > span {
+    display: none;
+  }
+
+  .quick-terms button {
+    min-height: 36px;
+    padding: 6px 9px;
+  }
+
+  .mobile-filter-bar__inner {
+    gap: 8px;
+    min-height: 50px;
+  }
+
+  .mobile-filter-bar button {
+    padding-inline: 10px;
+  }
+
+  .mobile-filter-bar p {
+    max-width: 52%;
+  }
+
+  .filter-wall.is-open {
+    grid-template-columns: 1fr;
+  }
+
+  .result-head h2 {
+    font-size: 28px;
+  }
+
+  .corpus-note code {
+    overflow-wrap: anywhere;
   }
 }
 </style>

@@ -34,7 +34,7 @@ npm run dev
 ```bash
 npm run dev                  # 开发服务器
 npm run build                # 生产构建，输出到 dist/
-npm run test                 # 36 个 node --test 单测
+npm run test                 # 39 个 node --test 单测
 npm run lint                 # 静态扫描失效后端地址、硬编码服务与脆弱引用
 npm run preview              # 预览构建产物
 npm run smoke                # 启动预览服务并检查首页与入口静态资源
@@ -52,7 +52,7 @@ npm run smoke
 npm run smoke:browser
 ```
 
-`npm run smoke:browser` 使用临时 Chrome / Chromium profile 与 CDP，在 1280×800 和 390×844 下验证今日展厅、单张历史摘录卡及竖排/扇舟图/收藏/换句、本地诗目收藏与吸底音源、桌面/窄屏搜索、窄屏导航，再完成演示登录、作品发布与诗卷回读；脚本要求控制台错误、未捕获异常、意外失败请求为 0，并统计非用户输入引起的 CLS（预算 0.05），结束后清理临时 Cookie 和 `localStorage` 演示数据。独立的 `.github/workflows/browser-e2e.yml` 在 Ubuntu 用 `browser-actions/setup-chrome@v2` 安装 Chromium，并通过 action 的 `chrome-path` 输出设置 `CHROME_PATH` 后运行同一脚本。本机也可用 `CHROME_PATH`、`BROWSER_SMOKE_PORT`、`BROWSER_SMOKE_DEBUG_PORT` 覆盖；脚本仍不覆盖真实后端、跨浏览器矩阵或视觉截图回归。
+`npm run smoke:browser` 使用临时 Chrome / Chromium profile 与 CDP，在 1280×800、390×844 和 320×720 下验证今日展厅、单张历史摘录卡及竖排/扇舟图/收藏/换句、本地诗目收藏与吸底音源、桌面/窄屏搜索、窄屏筛选折叠、访客草稿、窄屏导航与 320px 无横向溢出，再完成演示登录、作品发布与诗卷回读；脚本要求控制台错误、未捕获异常、意外失败请求为 0，并统计非用户输入引起的 CLS（预算 0.05），结束后清理临时 Cookie 和 `localStorage` 演示数据。独立的 `.github/workflows/browser-e2e.yml` 在 Ubuntu 用 `browser-actions/setup-chrome@v2` 安装 Chromium，并通过 action 的 `chrome-path` 输出设置 `CHROME_PATH` 后运行同一脚本。本机也可用 `CHROME_PATH`、`BROWSER_SMOKE_PORT`、`BROWSER_SMOKE_DEBUG_PORT` 覆盖；脚本仍不覆盖真实后端、跨浏览器矩阵或视觉截图回归。
 
 CI 的 Node 20/22 build job 使用 `npm run test --if-present` 以兼容外部旧流程，Documentation checks job 执行 `npm run lint`；Browser E2E job 执行构建与 `npm run smoke:browser`。本地开发建议直接运行上述全部命令。
 
@@ -71,7 +71,7 @@ VITE_USE_MOCK=true
 核对顺序：
 
 1. 打开 `package.json`，确认实际脚本名与 README/CI 一致。
-2. 打开 `src/config/runtime.js`、`src/config/poetrySource.js` 与 `src/config/audio.js`，确认 `VITE_API_BASE_URL`、`VITE_API_TIMEOUT`、`VITE_USE_MOCK`、`VITE_POETRY_SOURCE*`、Supabase 与音源变量的解析规则。
+2. 打开 `src/config/runtime.js`、`src/config/poetrySource.js` 与 `src/config/audio.js`，确认 `VITE_API_BASE_URL`、`VITE_API_TIMEOUT`、`VITE_USE_MOCK`、`VITE_POETRY_SOURCE*`、Supabase 与音源变量的解析规则；需要重建默认声景时运行 `npm run audio:generate && npm run audio:verify`。
 3. 打开 `src/apis/request.js`，确认远端优先、失败降级与提示逻辑。
 4. 搜索 `http://`、`https://` 与 `createClient(`，确认页面是否仍有绕过请求层的外部调用或外部素材。
 5. 若源码与文档不一致，以源码事实修文档；若属于现代化遗漏，开 issue 说明。
@@ -85,7 +85,7 @@ VITE_USE_MOCK=true
 - 行为：未配置业务 API 时，今日展厅使用 22 首精校短章；寻诗与读诗详情从 `public/data/poetry/` 按需加载 16 个分卷，共 9,328 篇 MIT 授权选段，合计 9,350 篇离线馆藏。首页摘录卡默认也只用本地摘录；显式开启 `VITE_POETRY_SOURCE=remote` 时才请求随机句接口，业务诗库不依赖它。
 - 演示数据不能包含真实用户、私人内容、生产密钥或未授权转载的全文数据集。
 - UI 应明确标注「演示数据」，并覆盖加载、空结果、请求失败三种状态。
-- 验收：断开外部业务 API 后首页、文库与搜索结果页仍可展示仓库内演示数据；播放器默认使用 `public/media/` 的本地音源/封面，自定义音源不可达时不应导致业务功能白屏。
+- 验收：断开外部业务 API 后首页、文库与搜索结果页仍可展示仓库内演示数据；播放器默认使用 `public/media/` 的三段本地声景/封面，切轨、进度、音量与偏好记忆可用，自定义音源不可达时不应导致业务功能白屏。
 
 ### 方案 B：自建 API
 
@@ -104,7 +104,7 @@ VITE_USE_MOCK=true
 
 ### 方案 C：可选自定义音源
 
-播放器默认只加载仓库内 WAV / SVG 演示资源，界面只使用自有 CSS/SVG 图标。只有设置 `VITE_AUDIO_SOURCE=custom` 并提供有效 `VITE_AUDIO_TRACKS` JSON 时才会启用自定义音源，其可用性、速率限制、内容授权与隐私政策由配置者负责。无效 JSON 或空列表自动回退到本地演示音并显示一次可读提示；URL 不可达或播放失败时，播放器显示「音源不可达」状态，点击播放按钮会重新加载并重试，业务页面保持可用。CI 不依赖第三方站点返回成功。逐项记录见 `docs/THIRD_PARTY_ASSETS.md`。
+播放器默认只加载 `public/media/` 下由 `scripts/generate-audio-library.mjs` 生成的三段 WAV 声景与 SVG 封面。每段 24 秒、22.05 kHz / 16-bit 单声道 PCM，清单与 SHA-256 由生成脚本同步写出；`npm run audio:verify` 和静态冒烟会核对文件头、时长、资源清单与哈希。界面只使用自有 CSS/SVG 图标，并提供播放列表、切轨、自动续播、进度拖动、音量/静音与本机偏好记忆。只有设置 `VITE_AUDIO_SOURCE=custom` 并提供有效 `VITE_AUDIO_TRACKS` JSON 时才会启用自定义音源，其可用性、速率限制、内容授权与隐私政策由配置者负责。无效 JSON 或空列表自动回退到本地声景并显示一次可读提示；URL 不可达或播放失败时播放器显示「声景不可达」，点击播放按钮会重新加载并重试，业务页面保持可用。CI 不依赖第三方站点返回成功。逐项记录见 `docs/THIRD_PARTY_ASSETS.md`。
 
 ## 6. 开发约定
 
@@ -138,7 +138,7 @@ VITE_USE_MOCK=true
 - [ ] `/#/collection` 收藏、最近阅读、作品、资料编辑与退出登录。
 - [ ] `/#/compose` 草稿自动保存、实时预览、校验与发布链路。
 - [ ] `/#/login` 演示账号与表单错误；不提交真实账号。
-- [ ] 桌面宽度与 390px 左右移动宽度，各检查一次布局、焦点和底部导航。
+- [ ] 桌面宽度、390px 与 320px 移动宽度，各检查一次布局、焦点、筛选/表单和底部固定层。
 
 ### 数据边界
 

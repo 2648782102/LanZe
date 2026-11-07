@@ -83,9 +83,8 @@
         </div>
         <article class="strip-intro">
           <p class="eyebrow">余韵 · 一则</p>
-          <p class="sr-only">余韵 · 三则</p>
           <h2>读完一首，<br />让句子再走一段。</h2>
-          <p>按历史首页的白色摘录卡等比还原：旋转收藏角标、竖排诗句、作者与扇舟图都保留。纸面层次、长句字距与收藏态做了细节打磨；默认只取仓库内置摘录与精校馆藏短句，不请求外部诗句服务。</p>
+          <p>按历史首页的白色摘录卡等比还原，保留旋转收藏角标、竖排诗句、作者与扇舟图；默认只用仓库内置摘录与精校馆藏短句。</p>
           <div class="strip-actions">
             <router-link class="button" to="/explore">
               进入诗词索引
@@ -272,7 +271,7 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
 
 .halo {
   position: absolute;
-  right: -10vw;
+  right: 0;
   top: -24vw;
   width: 64vw;
   height: 64vw;
@@ -281,7 +280,7 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
 }
 
 .halo--small {
-  right: 3vw;
+  right: 0;
   top: -9vw;
   width: 40vw;
   height: 40vw;
@@ -302,7 +301,7 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
 .gallery__room {
   position: relative;
   z-index: 1;
-  min-height: calc(100vh - var(--header-height));
+  min-height: calc(100dvh - var(--header-height));
   display: grid;
   align-items: center;
 }
@@ -323,7 +322,7 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
 .room-grid {
   position: relative;
   display: grid;
-  min-height: 660px;
+  min-height: 620px;
   min-width: 0;
   grid-template-columns: minmax(0, 0.92fr) minmax(260px, 0.52fr);
   align-content: space-between;
@@ -575,7 +574,7 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
   z-index: 1;
   border-top: 1px solid var(--line);
   background: rgba(232, 236, 229, 0.56);
-  padding-bottom: 84px;
+  padding-bottom: 64px;
 }
 
 .legacy-gallery {
@@ -583,7 +582,7 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
   gap: clamp(64px, 10vw, 160px);
-  padding-block: 78px 96px;
+  padding-block: 62px 72px;
 }
 
 .legacy-gallery__card {
@@ -728,6 +727,41 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
 }
 
 @media (max-width: 560px) {
+  .room-grid {
+    gap: 30px;
+    padding-block: 20px 40px;
+  }
+
+  .poem-plinth__meta {
+    margin-bottom: 14px;
+  }
+
+  .poem-plinth__body {
+    margin-top: 24px;
+    gap: 7px;
+  }
+
+  .poem-plinth__body p {
+    font-size: 17px;
+    line-height: 1.65;
+  }
+
+  .poem-plinth__actions {
+    margin-top: 24px;
+  }
+
+  .exhibit-card__frame {
+    padding: 9px;
+  }
+
+  .exhibit-card__frame img {
+    aspect-ratio: 2.1;
+  }
+
+  .exhibit-card__caption {
+    padding-top: 10px;
+  }
+
   .room-head {
     padding-top: 4px;
     overflow: hidden;
@@ -776,20 +810,60 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
 
   .legacy-gallery {
     grid-template-columns: 1fr;
-    gap: 34px;
-    padding-block: 48px 104px;
+    gap: 30px;
+    padding-block: 40px 108px;
   }
 
   .legacy-gallery__card {
     grid-column: 1;
     grid-row: 1;
-    min-height: 590px;
+    min-height: 570px;
   }
 
   .strip-intro {
     grid-column: 1;
     grid-row: 2;
     max-width: none;
+    gap: 13px;
+  }
+
+  .strip-intro h2 {
+    font-size: 30px;
+  }
+
+  .strip-intro > p:not(.eyebrow) {
+    font-size: 11px;
+    line-height: 1.75;
+  }
+}
+
+@media (max-width: 380px) {
+  .poem-plinth h1 {
+    font-size: clamp(34px, 10vw, 44px);
+  }
+
+  .poem-plinth h1.title-length--medium {
+    font-size: clamp(30px, 8.6vw, 38px);
+  }
+
+  .poem-plinth h1.title-length--long {
+    font-size: clamp(24px, 7vw, 30px);
+  }
+
+  .gallery-action {
+    padding-inline: 10px;
+  }
+
+  .legacy-gallery__card {
+    min-height: 550px;
+  }
+
+  .strip-actions {
+    gap: 8px;
+  }
+
+  .strip-actions .button {
+    padding-inline: 12px;
   }
 }
 </style>

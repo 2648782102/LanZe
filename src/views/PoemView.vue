@@ -183,8 +183,8 @@ onMounted(loadCatalog);
 
 <style scoped>
 .poem-page {
-  min-height: 80vh;
-  padding: 28px 0 96px;
+  min-height: 80dvh;
+  padding: 28px 0 80px;
   background: var(--porcelain);
 }
 
@@ -243,6 +243,7 @@ onMounted(loadCatalog);
 
 .icon-action {
   display: flex;
+  min-height: 44px;
   align-items: center;
   gap: 10px;
   padding: 10px 0;
@@ -260,6 +261,7 @@ onMounted(loadCatalog);
 
 .poem-side__back {
   display: inline-flex;
+  min-height: 42px;
   align-items: center;
   gap: 7px;
   margin-top: auto;
@@ -469,7 +471,7 @@ onMounted(loadCatalog);
     grid-row: 1;
     align-self: center;
     margin-top: 0;
-    padding-top: 0;
+    padding-top: 8px;
   }
 
   .poem-body {

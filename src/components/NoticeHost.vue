@@ -93,9 +93,14 @@ const { notices, dismissNotice } = useNotices();
   .notice-host {
     right: max(16px, env(safe-area-inset-right));
     left: max(16px, env(safe-area-inset-left));
-    bottom: 164px;
+    bottom: calc(146px + env(safe-area-inset-bottom));
     width: auto;
     max-width: calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));
+  }
+
+  .notice button {
+    width: 32px;
+    height: 32px;
   }
 }
 </style>

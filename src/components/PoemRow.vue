@@ -45,6 +45,7 @@ const firstLine = computed(() =>
   grid-template-columns: minmax(0, 1fr) 40px;
   align-items: center;
   min-height: 78px;
+  min-width: 0;
   border-bottom: 1px solid var(--line);
 }
 
@@ -61,6 +62,10 @@ const firstLine = computed(() =>
   color: var(--brass);
   font-family: var(--font-number);
   font-size: 11px;
+}
+
+.poem-row__title {
+  min-width: 0;
 }
 
 .poem-row__title h3 {
@@ -85,6 +90,7 @@ const firstLine = computed(() =>
 
 .poem-row__line {
   overflow: hidden;
+  min-width: 0;
   margin: 0;
   color: var(--ink-soft);
   font-family: var(--font-poem);
@@ -109,8 +115,8 @@ const firstLine = computed(() =>
 
 .poem-row__save {
   display: grid;
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   place-items: center;
   padding: 0;
   border: 0;
@@ -138,13 +144,14 @@ const firstLine = computed(() =>
   }
 
   .poem-row__main {
-    grid-template-columns: 32px 1fr auto;
-    gap: 8px 12px;
+    grid-template-columns: 26px minmax(0, 1fr) auto;
+    gap: 8px 10px;
     padding: 17px 0;
   }
 
   .poem-row__title {
     grid-column: 2;
+    overflow: hidden;
   }
 
   .poem-row__title h3 {
@@ -159,6 +166,29 @@ const firstLine = computed(() =>
   .poem-row__arrow {
     grid-column: 3;
     grid-row: 1;
+  }
+}
+
+@media (max-width: 380px) {
+  .poem-row {
+    grid-template-columns: minmax(0, 1fr) 36px;
+  }
+
+  .poem-row__main {
+    grid-template-columns: 22px minmax(0, 1fr);
+    column-gap: 8px;
+  }
+
+  .poem-row__arrow {
+    display: none;
+  }
+
+  .poem-row__line {
+    grid-column: 2;
+  }
+
+  .poem-row__save {
+    width: 36px;
   }
 }
 </style>
