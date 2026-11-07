@@ -1,6 +1,6 @@
 # 展示与宣发清单
 
-> **状态：仓库内素材与 GitHub About 候选文案已更新，线上展示待核对。** `v0.2.0` 与 `v0.3.0` 均为已发布 Release；`RELEASE_NOTES.md`、`ANNOUNCEMENT.md`、`SOCIAL_POSTS.md` 已改为当前 `v0.4.0` 文案。失效 homepage 已清空；GitHub About 描述、社交预览图、Pages、在线欢迎帖正文、社交平台短帖、外部社区投稿和付费推广仍须按实际写权限与线上回读核对。最后整理：2026-11-07。
+> **状态：仓库内素材与 GitHub About 候选文案已更新，线上展示待核对。** `v0.2.0` 与 `v0.3.0` 均为已发布 Release；`RELEASE_NOTES.md`、`ANNOUNCEMENT.md`、`SOCIAL_POSTS.md` 已改为当前 `v0.4.0` 文案。GitHub About 描述仍为旧的 27 项单测口径；Website 字段当前为 `https://lan-ze-thau.vercel.app`，2026-11-07 20:15 回读首页与入口资源返回 200，但这不是仓库文档此前写过的「已清空」，也不等于完成 Pages 或维护者承诺的线上 Demo。社交预览图、Pages、在线欢迎帖正文、社交平台短帖、外部社区投稿和付费推广仍须按实际写权限与线上回读核对。最后整理：2026-11-07。
 
 ## 1. 推荐仓库定位
 
@@ -30,7 +30,7 @@ vue3, vite, javascript, frontend, chinese-poetry, poetry, classical-chinese, chi
 
 ### About / README 展示要点
 
-- Website 字段：已清空历史失效 Vercel 域名；在 GitHub Pages 实际部署并验证前继续**留空**，不要填历史 MemFire 地址。
+- Website 字段：公开 API 当前回读为 `https://lan-ze-thau.vercel.app`，不是文档此前记录的「已清空」；该地址的首页、JS/CSS 入口、`media/audio-manifest.json` 与 `data/poetry/manifest.json` 返回 200，但托管者、部署来源、更新频率与是否为本项目当前构建未由本轮核验。在写权限与归属确认前不擅自清空，也不把它写成维护者验证的官方 Demo；如启用 GitHub Pages，再实测资源路径后更新这里。
 - Social preview：仓库已提供 `public/og-image.svg` 与由它渲染、目检过的 `public/og-image.png`（1200×630）。上传 GitHub Social preview 需要浏览器中的仓库设置写权限；在设置页实际保存并回读前，不把它写成已展示。
 - README 首屏：项目定位 → 当前状态表 → 快速开始 → 本地演示/变量 → 路线图 → 许可证。不要在首屏堆砌 star/badge 或虚假在线体验。
 - Badges：保留 MIT、CI、Browser E2E、Vue 3、Changelog 与 v0.4.0 Release；CI / E2E badge 的 workflow 文件名必须与 `.github/workflows/ci.yml`、`.github/workflows/browser-e2e.yml` 一致。
@@ -48,7 +48,7 @@ vue3, vite, javascript, frontend, chinese-poetry, poetry, classical-chinese, chi
 | 6 | 给适合新人的 issue 加 `good first issue` / `help wanted` 标签 | `.github/ISSUE_TEMPLATE/*` | 先写清复现步骤或预期结果，避免空任务 |
 | 7 | 发布一条 Release/Discussion 公告，再按平台节奏发布短帖 | `SOCIAL_POSTS.md` | 不夸大 star、用户数、线上 Demo 或后端能力 |
 
-**执行记录：** `v0.2.0` 的第 3、4、6 项与 v0.2.0 Release/Discussion 已完成；`v0.3.0` 的第 1、4、6 项已完成。`v0.4.0` 的仓库文案、Release notes、欢迎帖文案、短帖草稿与发布 workflow 已同步到 39 项单测、9,350 篇离线馆藏和三段本地声景；`main` 推送、CI/Browser E2E、tag/Release 与 GitHub About 线上回读须在保存后逐项补齐。Website 已清空；`public/og-image.png` 已生成但社交预览未确认上传；Pages 未启用；在线 Discussion #1 正文仍为 v0.2.0 首版；短帖仍为草稿，外部社交媒体未发布。
+**执行记录：** `v0.2.0` 的第 3、4、6 项与 v0.2.0 Release/Discussion 已完成；`v0.3.0` 的第 1、4、6 项已完成。`v0.4.0` 的仓库文案、Release notes、欢迎帖文案、短帖草稿与发布 workflow 已同步到 39 项单测、9,350 篇离线馆藏和三段本地声景；`main` 推送与 CI/Browser E2E 已通过，#2/#3/#4 已按当前状态更新。tag/Release、GitHub About 描述更新、社交预览图、Pages、在线 Discussion #1 正文、短帖与外部社区投稿仍须按实际写权限或线上回读核对。
 
 ### 社交预览图渲染复核
 
@@ -77,7 +77,7 @@ vue3, vite, javascript, frontend, chinese-poetry, poetry, classical-chinese, chi
 
 历史发布：[v0.2.0 Release](https://github.com/2648782102/LanZe/releases/tag/v0.2.0)，标题「兰泽诗词 v0.2.0 · 本地可运行的开源前端」。该 Release 固定描述当时版本，不用当前 [`RELEASE_NOTES.md`](../RELEASE_NOTES.md) 覆盖。
 
-当前发布：`v0.4.0 · 离线馆藏与声景曲库`，文案位于 `RELEASE_NOTES.md`；发布 workflow 仅由 `v0.4.0` tag push 触发。`v0.3.0` 的历史状态已回读：CI run `42354267725` 与 Browser E2E run `42354267756` 均为 success，publish run `42354434490` 为 success，公开 Release `437433058` 仍为正式发布；`v0.2.0` 保持独立历史 Release。v0.4.0 的最终 commit、CI/Browser E2E、publish 与公开 Release 回读结果须在 tag 实际推送后补记。
+当前发布：`v0.4.0 · 离线馆藏与声景曲库`，文案位于 `RELEASE_NOTES.md`；发布 workflow 仅由 `v0.4.0` tag push 触发。`v0.3.0` 的历史状态已回读：CI run `42354267725` 与 Browser E2E run `42354267756` 均为 success，publish run `42354434490` 为 success，公开 Release `437433058` 仍为正式发布；`v0.2.0` 保持独立历史 Release。v0.4.0 的 `cb5f5a1` CI run `42371462110` 与 Browser E2E run `42371462078` 均为 success；publish 与公开 Release 回读结果须在 tag 实际推送后补记。
 
 发布核对：
 

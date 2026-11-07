@@ -31,7 +31,8 @@
 
 ### Verification
 
-- 本地待推送基线：`npm run lint`、`npm run audio:verify`、`npm run test`（39/39）、`npm run build`、`npm run smoke`、`npm run smoke:browser`（CLS 0.0000、控制台/网络错误 0）、`npm audit --omit=dev`（0 vulnerabilities）均通过；`npm ci` 干净安装复核与推送后的 CI / Browser E2E 由维护记录补充。
+- 干净环境 `npm ci` 后，`npm run lint`、`npm run audio:verify`、`npm run test`（39/39）、`npm run build`、`npm run smoke`（35 assets）、`npm run smoke:browser`（CLS 0.0000、控制台/网络错误 0）、`npm audit --omit=dev`（0 vulnerabilities）均通过。
+- `34d3912` 的 Browser E2E 为 success；`cb5f5a1` 的 CI run `42371462110` 与 Browser E2E run `42371462078` 均为 success。发布标签与公开 Release 回读由维护记录补充。
 
 ## [v0.3.0] — 2026-11-07（已发布）
 

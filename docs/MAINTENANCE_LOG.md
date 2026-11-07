@@ -222,3 +222,5 @@
 - `package.json` 与锁文件补充 Node `>=20` / npm `>=10`；CI Documentation checks 增加 engines 校验，发布 workflow 改为仅由 `v0.4.0` tag push 触发，Release 标题跟随当前版本，不覆盖历史 Release。
 - `docs/PROMOTION.md` 明确把 GitHub About 描述、社交预览、Pages、在线 Discussion #1、外部短帖与 v0.4.0 tag/Release 标为待实际写权限或线上回读核对；不把候选文案、文件哈希或 workflow success 误写成公开展示已完成。
 - 首次推送 `34d3912` 后 Browser E2E `42371313191` success；CI `42371313168` 的 Documentation checks 因「候选文案」四字命中过宽的发布措辞守卫而失败，Node 20/22 两个 build job 仍 success。现把守卫收窄到明确的「候选，待 tag/Release」等过期句式，避免把素材/About 候选文案误判为未发布 Release。
+- `cb5f5a1` 推送后 CI run `42371462110` 与 Browser E2E run `42371462078` 均 success；GitHub #2/#3/#4 已用具备 issue 写权限的连接同步到 39 项单测、9,350 篇离线馆藏、三段声景与 v0.4.0 边界。
+- 公开仓库 API 回读发现 homepage 实际为 `https://lan-ze-thau.vercel.app`，并非此前文档记录的「已清空」；首页、构建 JS/CSS 入口、曲库清单与馆藏清单均返回 200，但托管归属、部署来源和持续维护边界未核验。不擅自清空或把它写成维护者验证的官方 Demo；文档已改为如实记录。GitHub About 描述仍为 27 项单测旧口径，当前连接没有仓库 metadata 写工具，未声称已更新。
