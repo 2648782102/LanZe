@@ -62,6 +62,20 @@
           <span>常见入口</span>
           <button v-for="hint in hints" :key="hint" type="button" :aria-label="`搜索${hint}`" @click="pickHint(hint)">{{ hint }}</button>
         </div>
+        <div class="poem-paths" aria-label="主题诗路">
+          <button
+            v-for="path in poemPaths"
+            :key="path.label"
+            type="button"
+            :class="{ 'is-active': isPathActive(path) }"
+            :aria-pressed="isPathActive(path)"
+            @click="enterPath(path)"
+          >
+            <span>{{ path.index }}</span>
+            <strong>{{ path.label }}</strong>
+            <em>{{ path.note }}</em>
+          </button>
+        </div>
       </div>
     </section>
 
@@ -200,6 +214,11 @@ const router = useRouter();
 const { isSaved, toggleSaved, catalogError } = useLibrary();
 const catalogVersion = useCatalogVersion();
 const hints = ["月亮", "李白", "宋词", "春天", "关雎"];
+const poemPaths = [
+  { index: "一", label: "月与夜", note: "明月、夜色与独坐", keyword: "月", genre: "全部" },
+  { index: "二", label: "春与归", note: "春风、花开与归程", keyword: "春", genre: "全部" },
+  { index: "三", label: "宋词小令", note: "从短句进入词牌", keyword: "", genre: "宋词" },
+];
 const pageSize = 24;
 const filtersOpen = ref(false);
 
@@ -265,6 +284,22 @@ const pickHint = (hint) => {
   page.value = 1;
   filtersOpen.value = false;
   syncRoute({ resetPage: true });
+};
+
+const isPathActive = (path) =>
+  query.value.trim() === path.keyword && (path.genre === "全部" || genre.value === path.genre);
+
+const enterPath = (path) => {
+  draftQuery.value = path.keyword;
+  query.value = path.keyword;
+  dynasty.value = "全部";
+  genre.value = path.genre;
+  page.value = 1;
+  filtersOpen.value = false;
+  syncRoute({ resetPage: true });
+  window.requestAnimationFrame(() => {
+    document.querySelector(".result-room")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 };
 
 const clearSearch = () => {
@@ -517,6 +552,70 @@ watch([dynasty, genre], () => {
   color: var(--brass);
 }
 
+.poem-paths {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.poem-paths button {
+  display: grid;
+  min-width: 0;
+  min-height: 76px;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  background: rgba(251, 252, 249, 0.58);
+  color: var(--ink-soft);
+  text-align: left;
+  transition:
+    border-color var(--motion-fast) var(--ease-standard),
+    background-color var(--motion-fast) var(--ease-standard),
+    transform var(--motion-fast) var(--ease-out);
+}
+
+.poem-paths button:hover {
+  border-color: var(--celadon-deep);
+  transform: translateY(-1px);
+}
+
+.poem-paths button:active {
+  transform: translateY(0);
+}
+
+.poem-paths button.is-active {
+  border-color: var(--brass);
+  background: rgba(216, 191, 142, 0.12);
+}
+
+.poem-paths span {
+  grid-row: 1 / 3;
+  color: var(--brass);
+  font-family: var(--font-poem);
+  font-size: 22px;
+}
+
+.poem-paths strong {
+  color: var(--ink);
+  font-family: var(--font-poem);
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+}
+
+.poem-paths em {
+  overflow: hidden;
+  color: var(--ink-faint);
+  font-size: 10px;
+  font-style: normal;
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
   .quick-terms button:focus-visible,
   .mobile-filter-bar button:focus-visible,
   .facet__list button:focus-visible {
@@ -596,6 +695,10 @@ watch([dynasty, genre], () => {
   color: var(--ink-soft);
   font-size: 12px;
   text-align: left;
+  transition:
+    color var(--motion-fast) var(--ease-standard),
+    background-color var(--motion-fast) var(--ease-standard),
+    border-color var(--motion-fast) var(--ease-standard);
 }
 
 .facet__list button:hover,
@@ -605,6 +708,20 @@ watch([dynasty, genre], () => {
 
 .facet__list button.is-active span {
   font-weight: 600;
+}
+
+.facet__list button.is-active {
+  position: relative;
+}
+
+.facet__list button.is-active::before {
+  position: absolute;
+  top: 9px;
+  bottom: 9px;
+  left: -8px;
+  width: 2px;
+  background: var(--brass);
+  content: "";
 }
 
 .facet__list em {
@@ -866,6 +983,10 @@ watch([dynasty, genre], () => {
     overscroll-behavior: contain;
   }
 
+  .facet__list button.is-active::before {
+    left: -1px;
+  }
+
   .facet + .facet {
     margin-top: 0;
   }
@@ -952,6 +1073,21 @@ watch([dynasty, genre], () => {
     margin-top: 10px;
   }
 
+  .poem-paths {
+    grid-template-columns: 1fr;
+    gap: 7px;
+    margin-top: 14px;
+  }
+
+  .poem-paths button {
+    min-height: 64px;
+    padding: 9px 12px;
+  }
+
+  .poem-paths span {
+    font-size: 19px;
+  }
+
   .filter-wall {
     grid-template-columns: 1fr;
   }
@@ -1014,6 +1150,10 @@ watch([dynasty, genre], () => {
   .quick-terms button {
     min-height: 36px;
     padding: 6px 9px;
+  }
+
+  .poem-paths em {
+    font-size: 9px;
   }
 
   .mobile-filter-bar__inner {

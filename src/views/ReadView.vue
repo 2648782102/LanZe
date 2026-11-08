@@ -17,7 +17,7 @@
           </div>
         </header>
 
-        <div class="poem-plinth">
+        <div class="poem-plinth" :key="poem.id">
           <p class="poem-plinth__meta">
             <span>{{ poem.category }}</span>
             <span aria-hidden="true" />
@@ -30,7 +30,7 @@
             <p v-for="(line, index) in poemLines" :key="`${poem.id}-${index}`">{{ line }}</p>
           </div>
           <div class="poem-plinth__actions">
-            <button class="gallery-action" type="button" @click="toggleSave">
+            <button class="gallery-action" type="button" :class="{ 'is-confirmed': saved && savePulse }" @click="toggleSave">
               <AppIcon :name="saved ? 'check' : 'bookmark'" :size="17" />
               {{ saved ? "已收入诗卷" : "收入诗卷" }}
             </button>
@@ -62,7 +62,7 @@
               <small>视觉注释</small>
               <strong>{{ poem.tags?.[1] || "诗与夜色" }}</strong>
             </div>
-            <button type="button" aria-label="换一首诗" @click="nextPoem">
+            <button type="button" aria-label="换一首诗" :class="{ 'is-turning': isSwitching }" @click="nextPoem">
               <AppIcon name="chevron-right" :size="20" />
             </button>
           </div>
@@ -101,7 +101,7 @@
               换一句
             </button>
           </div>
-          <p class="excerpt-source" aria-live="polite">
+          <p class="excerpt-source" aria-live="polite" :class="{ 'is-refreshing': excerptStatus === 'loading' }">
             {{ excerptSource === "remote" ? "诗句源：随机古诗词 API" : "诗句源：仓库内置摘录" }}
           </p>
         </article>
@@ -143,7 +143,9 @@ let excerptRequest = 0;
 const storedExcerptSaves = readStore("lanze_saved_excerpts", []);
 const excerptSaved = ref(Array.isArray(storedExcerptSaves) ? storedExcerptSaves.map(String) : []);
 const isSwitching = ref(false);
+const savePulse = ref(false);
 let switchTimer;
+let saveTimer;
 
 const poem = computed(() => featured[page.value % featured.length] || getDailyLibraryPoem());
 const poemLines = computed(() => poem.value.paragraphs || [poem.value.paragraph || "正在展开诗笺……"]);
@@ -201,13 +203,13 @@ const loadExcerpt = async () => {
 
 const nextPoem = () => {
   if (isSwitching.value) return;
-  const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
   isSwitching.value = true;
   window.clearTimeout(switchTimer);
   switchTimer = window.setTimeout(() => {
     page.value = (page.value + 1) % featured.length;
-    switchTimer = window.setTimeout(() => { isSwitching.value = false; }, reducedMotion ? 0 : 140);
-  }, reducedMotion ? 0 : 120);
+    switchTimer = window.setTimeout(() => { isSwitching.value = false; }, prefersReducedMotion ? 0 : 140);
+  }, prefersReducedMotion ? 0 : 120);
 };
 
 const nextExcerpts = () => {
@@ -219,6 +221,16 @@ const nextExcerpts = () => {
 const toggleSave = () => {
   if (!poem.value.id) return;
   const added = toggleSaved(poem.value);
+  savePulse.value = false;
+  if (added) {
+    requestAnimationFrame(() => {
+      savePulse.value = true;
+      window.clearTimeout(saveTimer);
+      saveTimer = window.setTimeout(() => {
+        savePulse.value = false;
+      }, 420);
+    });
+  }
   notify(added ? "已收入你的诗卷" : "已从诗卷移除", added ? "success" : "info");
 };
 
@@ -250,7 +262,10 @@ const speakPoem = () => {
 onMounted(() => {
   loadExcerpt();
 });
-onBeforeUnmount(() => window.clearTimeout(switchTimer));
+onBeforeUnmount(() => {
+  window.clearTimeout(switchTimer);
+  window.clearTimeout(saveTimer);
+});
 </script>
 
 <style scoped>
@@ -373,6 +388,12 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
   min-width: 0;
   max-width: 680px;
   min-height: 440px;
+  animation: plinth-arrive var(--motion-slow) var(--ease-out) both;
+}
+
+@keyframes plinth-arrive {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .poem-plinth__meta {
@@ -439,11 +460,14 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
   margin-top: clamp(28px, 4vw, 48px);
   padding: 10px 0 10px 28px;
   border-left: 1px solid var(--brass-soft);
-  transition: opacity 120ms ease;
+  transition:
+    opacity var(--motion-fast) var(--ease-standard),
+    transform var(--motion-base) var(--ease-out);
 }
 
 .poem-plinth__body.is-switching {
   opacity: 0.28;
+  transform: translateY(4px);
 }
 
 .poem-plinth__body p {
@@ -472,6 +496,11 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
   color: var(--ink-soft);
   font-size: 12px;
   letter-spacing: 0.06em;
+  transition:
+    border-color var(--motion-fast) var(--ease-standard),
+    background-color var(--motion-fast) var(--ease-standard),
+    color var(--motion-fast) var(--ease-standard),
+    transform var(--motion-fast) var(--ease-standard);
 }
 
 .gallery-action:hover {
@@ -480,10 +509,32 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
   color: var(--ink);
 }
 
+.gallery-action:active {
+  transform: scale(0.98);
+}
+
+.gallery-action.is-confirmed {
+  border-color: var(--brass);
+  color: var(--brass);
+  animation: ink-confirm var(--motion-base) var(--ease-out);
+}
+
+@keyframes ink-confirm {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.035); }
+  100% { transform: scale(1); }
+}
+
 .exhibit-card {
   align-self: center;
   justify-self: end;
   width: min(100%, 320px);
+  animation: exhibit-arrive var(--motion-slow) var(--ease-out) 80ms both;
+}
+
+@keyframes exhibit-arrive {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .exhibit-card__frame {
@@ -561,12 +612,21 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
   border-radius: 50%;
   background: transparent;
   color: var(--ink);
+  transition:
+    border-color var(--motion-fast) var(--ease-standard),
+    background-color var(--motion-fast) var(--ease-standard),
+    color var(--motion-fast) var(--ease-standard),
+    transform var(--motion-base) var(--ease-out);
 }
 
 .exhibit-card__caption button:hover {
   border-color: var(--brass);
   background: var(--ink);
   color: var(--porcelain-panel);
+}
+
+.exhibit-card__caption button.is-turning {
+  transform: translateX(4px);
 }
 
 .gallery__strips {
@@ -646,6 +706,11 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
   color: var(--ink-faint);
   font-size: 10px;
   letter-spacing: 0.12em;
+  transition: opacity var(--motion-fast) var(--ease-standard);
+}
+
+.excerpt-source.is-refreshing {
+  opacity: 0.45;
 }
 
 @media (max-width: 1000px) {
@@ -701,6 +766,10 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
   .exhibit-card {
     justify-self: stretch;
     width: 100%;
+  }
+
+  .exhibit-card__caption {
+    padding-right: 108px;
   }
 
   .exhibit-card__frame img {
@@ -760,6 +829,7 @@ onBeforeUnmount(() => window.clearTimeout(switchTimer));
 
   .exhibit-card__caption {
     padding-top: 10px;
+    padding-right: 104px;
   }
 
   .room-head {

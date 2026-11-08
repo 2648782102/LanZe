@@ -69,6 +69,11 @@
           <span class="field-hint">{{ contentLength }} 字 · 草稿自动保存在当前浏览器</span>
         </label>
 
+        <p class="draft-status" role="status" aria-live="polite">
+          <span :class="{ 'is-saving': draftSaving }" aria-hidden="true" />
+          {{ draftStatusLabel }}
+        </p>
+
         <label class="field-label" for="poem-note">
           小注
           <textarea
@@ -85,16 +90,16 @@
           <router-link :to="{ name: 'login', query: { next: '/compose' } }">先去登录</router-link>
         </p>
 
-        <div class="form-actions">
-          <button class="button button--solid" type="submit" :disabled="submitting">
+        <div class="form-actions" :class="{ 'is-submitting': submitting }">
+          <button class="button button--solid" type="submit" :disabled="submitting" :aria-busy="submitting">
             <AppIcon name="feather" :size="17" />
-            {{ submitting ? "正在发布" : isLoggedIn ? "发布到我的诗卷" : "登录后发布" }}
+            {{ submitting ? "正在收入诗卷" : isLoggedIn ? "发布到我的诗卷" : "登录后发布" }}
           </button>
           <button class="button" type="button" :disabled="submitting" @click="clearDraft">清空草稿</button>
         </div>
       </form>
 
-      <aside class="preview-panel" aria-label="作品预览">
+      <aside class="preview-panel" aria-label="作品预览" :class="{ 'is-refreshing': previewChanged }">
         <div class="preview-panel__top">
           <span>预览</span>
           <span>{{ form.category || "未分类" }} · {{ contentLength }} 字</span>
@@ -115,7 +120,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import AppIcon from "../components/AppIcon.vue";
 import { userPublishPoem } from "../apis/api/login.js";
@@ -128,7 +133,12 @@ const DRAFT_KEY = "lanze_compose_draft";
 const router = useRouter();
 const { isLoggedIn, profile } = useSession();
 const submitting = ref(false);
+const draftSaving = ref(false);
+const draftSavedAt = ref("");
+const previewChanged = ref(false);
 const savedDraft = readStore(DRAFT_KEY, {});
+let draftTimer;
+let previewTimer;
 const form = reactive({
   title: savedDraft.title || "",
   author: savedDraft.author || profile.value.user_name || "",
@@ -138,6 +148,12 @@ const form = reactive({
 });
 
 const contentLength = computed(() => form.content.trim().length);
+const draftStatusLabel = computed(() => {
+  if (draftSaving.value) return "正在保存草稿";
+  if (submitting.value) return "正在收入诗卷";
+  if (draftSavedAt.value) return `草稿已保存 · ${draftSavedAt.value}`;
+  return "草稿会保存在当前浏览器";
+});
 const previewLines = computed(() => {
   const lines = form.content
     .split(/\n|[，。；;]/)
@@ -154,6 +170,16 @@ const persistDraft = () => {
     content: form.content,
     note: form.note,
   });
+  draftSaving.value = true;
+  window.clearTimeout(draftTimer);
+  draftTimer = window.setTimeout(() => {
+    draftSaving.value = false;
+    draftSavedAt.value = new Intl.DateTimeFormat("zh-CN", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(new Date());
+  }, 260);
 };
 
 const clearDraft = () => {
@@ -163,12 +189,16 @@ const clearDraft = () => {
   form.content = "";
   form.note = "";
   removeStore(DRAFT_KEY);
+  draftSavedAt.value = "";
+  draftSaving.value = false;
+  window.clearTimeout(draftTimer);
   notify("草稿已清空", "info");
 };
 
 const publish = async () => {
   if (!isLoggedIn.value) {
     persistDraft();
+    await new Promise((resolve) => window.setTimeout(resolve, 280));
     notify("草稿已留在本机，登录后可以继续发布", "info");
     router.push({ path: "/login", query: { next: "/compose" } });
     return;
@@ -192,6 +222,7 @@ const publish = async () => {
       return;
     }
     removeStore(DRAFT_KEY);
+    window.clearTimeout(draftTimer);
     await loadCatalog({ force: true });
     notify("作品已收入你的诗卷", "success");
     router.push({ name: "collection", query: { tab: "works" } });
@@ -203,6 +234,16 @@ const publish = async () => {
 };
 
 watch(form, persistDraft, { deep: true });
+watch([() => form.title, () => form.content, () => form.category, () => form.author, () => form.note], () => {
+  previewChanged.value = false;
+  window.clearTimeout(previewTimer);
+  window.requestAnimationFrame(() => {
+    previewChanged.value = true;
+    previewTimer = window.setTimeout(() => {
+      previewChanged.value = false;
+    }, 320);
+  });
+});
 watch(
   () => profile.value.user_name,
   (name) => {
@@ -212,6 +253,10 @@ watch(
 
 onMounted(() => {
   loadCatalog();
+});
+onBeforeUnmount(() => {
+  window.clearTimeout(draftTimer);
+  window.clearTimeout(previewTimer);
 });
 </script>
 
@@ -303,11 +348,42 @@ onMounted(() => {
   font-size: 10px;
 }
 
+.draft-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -12px 0 0;
+  color: var(--ink-faint);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+
+.draft-status span {
+  width: 6px;
+  height: 6px;
+  border: 1px solid var(--celadon-deep);
+  border-radius: 50%;
+}
+
+.draft-status span.is-saving {
+  animation: draft-pulse var(--motion-base) var(--ease-standard) infinite alternate;
+}
+
+@keyframes draft-pulse {
+  from { transform: scale(0.7); opacity: 0.45; }
+  to { transform: scale(1.2); opacity: 1; }
+}
+
 .form-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   padding-top: 8px;
+  transition: opacity var(--motion-fast) var(--ease-standard);
+}
+
+.form-actions.is-submitting {
+  opacity: 0.7;
 }
 
 .compose-login-note {
@@ -337,6 +413,11 @@ onMounted(() => {
 .preview-panel {
   position: sticky;
   top: 104px;
+  transition: filter var(--motion-base) var(--ease-standard);
+}
+
+.preview-panel.is-refreshing {
+  filter: saturate(1.04);
 }
 
 .preview-panel__top {
@@ -357,6 +438,14 @@ onMounted(() => {
   background: var(--surface);
   box-shadow: var(--shadow-soft);
   text-align: center;
+  transition:
+    border-color var(--motion-base) var(--ease-standard),
+    box-shadow var(--motion-base) var(--ease-standard);
+}
+
+.preview-panel.is-refreshing .preview-sheet {
+  border-color: rgba(168, 130, 69, 0.42);
+  box-shadow: 0 0 0 3px rgba(168, 130, 69, 0.08), var(--shadow-soft);
 }
 
 .preview-category {

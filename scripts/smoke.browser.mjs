@@ -115,6 +115,7 @@ const main = async () => {
       if (message.error) reject(new Error(JSON.stringify(message.error)));
       else resolve(message.result);
     } else if (message.method) {
+      if (message.sessionId) return;
       events.push(message);
       if (message.method === "Performance.layoutShift" && !message.params?.hadRecentInput) {
         layoutShifts.push(message.params?.score || 0);
@@ -188,6 +189,77 @@ const main = async () => {
     }
     return result.result.value;
   };
+  const createColdStartPage = async () => {
+    const created = await send("Target.createTarget", { url: "about:blank" });
+    const attached = await send("Target.attachToTarget", { targetId: created.targetId, flatten: true });
+    const sessionId = attached.sessionId;
+    const sessionSend = (method, params = {}) => new Promise((resolve, reject) => {
+      const id = nextId += 1;
+      pending.set(id, { resolve, reject });
+      socket.send(JSON.stringify({ id, method, params, sessionId }));
+      setTimeout(() => {
+        if (pending.has(id)) {
+          pending.delete(id);
+          reject(new Error(`Chrome DevTools timed out: ${method}`));
+        }
+      }, 10000);
+    });
+    const sessionEvaluate = async (expression) => {
+      const result = await sessionSend("Runtime.evaluate", {
+        expression,
+        returnByValue: true,
+        awaitPromise: true,
+      });
+      if (result.exceptionDetails) throw new Error(result.exceptionDetails.text);
+      return result.result.value;
+    };
+    await sessionSend("Page.enable");
+    await sessionSend("Runtime.enable");
+    await sessionSend("Network.enable");
+    await sessionSend("Performance.enable");
+    await sessionSend("Page.addScriptToEvaluateOnNewDocument", {
+      source: `(() => {
+        window.__coldLayoutShift = 0;
+        new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) {
+            if (!entry.hadRecentInput) window.__coldLayoutShift += entry.value;
+          }
+        }).observe({ type: "layout-shift", buffered: true });
+      })()`,
+    });
+    await sessionSend("Emulation.setDeviceMetricsOverride", {
+      width: 1280,
+      height: 800,
+      deviceScaleFactor: 1,
+      mobile: false,
+    });
+    await sessionSend("Page.navigate", { url: `${origin}/#/` });
+    await waitUntil("cold start reading view", () => sessionEvaluate(
+      "Boolean(document.querySelector('.poem-plinth'))",
+    ), 60);
+    await delay(500);
+    const coldStart = await sessionEvaluate(`(() => {
+      const dock = document.querySelector('.audio-dock')?.getBoundingClientRect();
+      const plinth = document.querySelector('.poem-plinth')?.getBoundingClientRect();
+      const action = document.querySelector('.poem-plinth__actions')?.getBoundingClientRect();
+      const intersects = (first, second) => Boolean(first && second
+        && first.left < second.right
+        && first.right > second.left
+        && first.top < second.bottom
+        && first.bottom > second.top);
+      return {
+        scrollWidth: document.documentElement.scrollWidth,
+        viewportWidth: document.documentElement.clientWidth,
+        dockWidth: dock ? Math.round(dock.width) : 0,
+        dockHeight: dock ? Math.round(dock.height) : 0,
+        overlapsPlinth: intersects(dock, plinth),
+        overlapsPlinthActions: intersects(dock, action),
+      };
+    })()`);
+    const coldLayoutShift = Number(await sessionEvaluate("window.__coldLayoutShift || 0"));
+    await send("Target.closeTarget", { targetId: created.targetId });
+    return { ...coldStart, coldLayoutShift };
+  };
   const clickByText = (text) => evaluate(`(() => {
     const target = [...document.querySelectorAll('button, a, [role="button"]')]
       .find((node) => (node.innerText || node.textContent || '').includes(${JSON.stringify(text)}));
@@ -244,6 +316,19 @@ const main = async () => {
   });
 
   currentStep = "today";
+  const coldStart = await createColdStartPage();
+  if (coldStart.scrollWidth > coldStart.viewportWidth + 1) {
+    throw new Error("Cold start reading page overflows horizontally");
+  }
+  if (coldStart.overlapsPlinth || coldStart.overlapsPlinthActions) {
+    throw new Error("Desktop audio dock overlaps the reading plinth on cold start");
+  }
+  if (coldStart.dockWidth > 400 || coldStart.dockHeight > 120) {
+    throw new Error("Desktop audio dock exceeds its compact fixed-layer budget");
+  }
+  if (coldStart.coldLayoutShift > 0.05) {
+    throw new Error(`Cold start layout shifted beyond the 0.05 budget: ${coldStart.coldLayoutShift.toFixed(4)}`);
+  }
   await send("Page.navigate", { url: `${origin}/#/` });
   await waitUntil("today's reading view", () => evaluate("Boolean(document.querySelector('.poem-plinth'))"));
   await waitUntil("excerpt source settled", () => evaluate(
@@ -756,7 +841,7 @@ const main = async () => {
     "desktop/mobile search,",
     "native audio dock,",
     "login and publish flow,",
-    `no unexpected console or network errors, CLS ${cumulativeLayoutShift.toFixed(4)}.`,
+    `no unexpected console or network errors, cold-start CLS ${coldStart.coldLayoutShift.toFixed(4)}, CLS ${cumulativeLayoutShift.toFixed(4)}.`,
   ].join(" "));
   currentStep = "complete";
 };

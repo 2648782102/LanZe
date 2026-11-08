@@ -191,6 +191,17 @@ export const getRelatedLibraryPoems = (poem, limit = 3) => {
   return [...sameCollection, ...sameAuthor, ...sameGenre].slice(0, limit).map(asLibraryPoem);
 };
 
+export const getAdjacentLibraryPoems = (poem) => {
+  if (!poem || poetryCatalog.length < 2) return { previous: null, next: null };
+  const index = poetryCatalog.findIndex((item) => item.id === poem.id);
+  if (index < 0) return { previous: null, next: null };
+  const wrap = (offset) => (index + offset + poetryCatalog.length) % poetryCatalog.length;
+  return {
+    previous: asLibraryPoem(poetryCatalog[wrap(-1)]),
+    next: asLibraryPoem(poetryCatalog[wrap(1)]),
+  };
+};
+
 export const getDailyLibraryPoem = (date = new Date()) => {
   const dayIndex = Math.floor(date.getTime() / 86400000);
   return asLibraryPoem(curatedPoems[Math.abs(dayIndex) % curatedPoems.length]);

@@ -245,3 +245,11 @@
 - 通过浏览器上传 `public/og-image.png`（1200×630）为 GitHub Social preview；设置页显示 `Remove image`，公开仓库页 `og:image` 从默认图变为 `https://repository-images.githubusercontent.com/499469811/bdaf4616-a973-405d-9b98-eeaa34e470cf`。哈希仍记录在 `docs/THIRD_PARTY_ASSETS.md`，不把哈希写成授权证明。
 - 经用户确认后，在浏览器用 `ANNOUNCEMENT.md` 替换既有 Discussion #1 正文，不新建帖子；16:10 CST 再修正「安全政策」链接为 `blob/main/SECURITY.md`。最终公开 Discussions REST 回读 `updated_at=2026-11-08T08:10:29Z`，正文不再含「14 个单测」或错误的相对链接，含 39 项单测、9,350 篇离线馆藏与三段本地声景；归一化换行后与 `ANNOUNCEMENT.md` 一致。
 - 修正 `ANNOUNCEMENT.md` 中会在 Discussions 内解析到错误路径的相对「安全政策」链接；CI 增加欢迎帖源文案相对链接守卫，publish workflow 归一化已有正文的 CRLF 后比较并用同一规范正文创建/更新，避免换行差异与默认令牌权限边界造成误判。外部短帖、社区投稿、付费推广未执行；不移动 `v0.4.0` tag、不重发 Release、不重复发帖。
+
+## 前端表现专项 — 2026-11-09 01:56–02:20 CST
+
+- 按「可游走的青瓷诗馆」清单完成一轮聚焦优化：保留冷瓷、铜金、宋体、历史白色摘录卡与 9,350 篇离线馆藏契约，不改数据层、API 契约、GitHub 公开展示或已发布 Release。
+- P0：`App.vue` 给主壳 `router-view` 增加 `route-stage` 与最小一屏高度，生产构建冷启动 CLS 从桌面约 `0.1519` 降至 `0.0000`；`AudioDock` 改为桌面右下贴边声景索引，默认 92px、悬停/聚焦展开，窄屏收起态与 `MobileDock` / `NoticeHost` 分层，截图复核 1440 / 390 / 320px 不再压住换诗箭头或正文。
+- P1/P2：加入统一 motion token、首屏一次编排入场与收藏/换诗/切轨/草稿/预览/发布反馈；寻诗页新增「月与夜 / 春与归 / 宋词小令」真实筛选诗路；读诗页修复 `如梦令·常记溪亭日暮` 硬折，新增相邻馆藏上一首/下一首；写作台显示草稿保存时间与 `aria-busy` 发布态。
+- `scripts/smoke.browser.mjs` 新建隔离 CDP target 做冷启动 `PerformanceObserver` CLS、播放器尺寸与固定层相交检查；既有 39 项单测数量不变，把相邻馆藏顺序与边界环绕断言并入现有离线目录测试。
+- 本地复核 `npm run lint`、`npm run test`（39/39）、`npm run build`、`npm run smoke`（35 assets）、`npm run smoke:browser`（冷启动 CLS 0.0000、全流程 CLS 0.0000、控制台/网络错误 0）通过；用临时 CDP 截图复核 1440 / 390 / 320px 无横向溢出，读诗长题与连续阅读入口可见。临时截图在 `/tmp/lanze-visual-audit/`，不写入仓库。

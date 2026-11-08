@@ -2,11 +2,13 @@
   <div class="app-frame" :class="{ 'is-bare': isBare }">
     <div class="porcelain-grid" aria-hidden="true" />
     <SiteHeader v-if="!isBare" />
-    <router-view v-slot="{ Component }">
-      <transition name="page" mode="out-in">
-        <component :is="Component" />
-      </transition>
-    </router-view>
+    <div class="route-stage">
+      <router-view v-slot="{ Component }">
+        <transition name="page" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
+    </div>
     <SiteFooter v-if="!isBare" />
     <MobileDock v-if="!isBare" />
     <AudioDock v-if="!isBare" />
@@ -40,14 +42,23 @@ const isBare = computed(() => Boolean(route.meta.bare));
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-.app-frame > main {
+.route-stage {
+  position: relative;
+  z-index: 1;
+}
+
+.app-frame:not(.is-bare) .route-stage {
+  min-height: calc(100dvh - var(--header-height));
+}
+
+.app-frame .route-stage > main {
   position: relative;
   z-index: 1;
 }
 
 .page-enter-active,
 .page-leave-active {
-  transition: opacity 140ms ease;
+  transition: opacity var(--motion-fast) var(--ease-standard);
 }
 
 .page-enter-from {

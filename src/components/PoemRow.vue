@@ -56,6 +56,11 @@ const firstLine = computed(() =>
   align-items: center;
   gap: 20px;
   padding: 20px 0;
+  transition: transform var(--motion-fast) var(--ease-out);
+}
+
+.poem-row__main:hover {
+  transform: translateX(3px);
 }
 
 .poem-row__number {
@@ -101,7 +106,9 @@ const firstLine = computed(() =>
 
 .poem-row__arrow {
   color: var(--ink-faint);
-  transition: color 160ms ease, transform 160ms ease;
+  transition:
+    color var(--motion-fast) var(--ease-standard),
+    transform var(--motion-fast) var(--ease-out);
 }
 
 .poem-row__main:hover .poem-row__arrow {
@@ -123,6 +130,10 @@ const firstLine = computed(() =>
   border-radius: 50%;
   background: transparent;
   color: var(--ink-faint);
+  transition:
+    background-color var(--motion-fast) var(--ease-standard),
+    color var(--motion-fast) var(--ease-standard),
+    transform var(--motion-fast) var(--ease-out);
 }
 
 .poem-row__save:hover {
@@ -136,6 +147,10 @@ const firstLine = computed(() =>
 
 .poem-row__save.is-saved :deep(svg) {
   fill: currentColor;
+}
+
+.poem-row__save:active {
+  transform: scale(0.88);
 }
 
 @media (max-width: 700px) {

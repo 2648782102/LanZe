@@ -48,6 +48,11 @@
   --radius-md: 14px;
   --shell: min(1240px, calc(100vw - 72px));
   --header-height: 78px;
+  --motion-fast: 140ms;
+  --motion-base: 220ms;
+  --motion-slow: 560ms;
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * {
@@ -145,13 +150,21 @@ img {
   font-weight: 500;
   line-height: 1;
   letter-spacing: 0.06em;
-  transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+  transition:
+    background var(--motion-fast) var(--ease-standard),
+    border-color var(--motion-fast) var(--ease-standard),
+    color var(--motion-fast) var(--ease-standard),
+    transform var(--motion-fast) var(--ease-standard);
 }
 
 .button:hover {
   border-color: var(--celadon-deep);
   background: var(--celadon-pale);
   transform: translateY(-1px);
+}
+
+.button:active {
+  transform: translateY(0) scale(0.985);
 }
 
 .button--solid {
@@ -200,7 +213,9 @@ img {
   background: var(--porcelain-panel);
   color: var(--ink);
   outline: none;
-  transition: border-color 160ms ease, box-shadow 160ms ease;
+  transition:
+    border-color var(--motion-fast) var(--ease-standard),
+    box-shadow var(--motion-fast) var(--ease-standard);
 }
 
 .field::placeholder {

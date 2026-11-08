@@ -28,7 +28,7 @@ const { notices, dismissNotice } = useNotices();
 .notice-host {
   position: fixed;
   right: max(24px, env(safe-area-inset-right));
-  bottom: 92px;
+  bottom: 120px;
   z-index: 120;
   display: grid;
   gap: 8px;
@@ -80,7 +80,9 @@ const { notices, dismissNotice } = useNotices();
 
 .notice-enter-active,
 .notice-leave-active {
-  transition: opacity 180ms ease, transform 180ms ease;
+  transition:
+    opacity var(--motion-fast) var(--ease-standard),
+    transform var(--motion-fast) var(--ease-out);
 }
 
 .notice-enter-from,
@@ -93,7 +95,7 @@ const { notices, dismissNotice } = useNotices();
   .notice-host {
     right: max(16px, env(safe-area-inset-right));
     left: max(16px, env(safe-area-inset-left));
-    bottom: calc(146px + env(safe-area-inset-bottom));
+    bottom: calc(154px + env(safe-area-inset-bottom));
     width: auto;
     max-width: calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));
   }

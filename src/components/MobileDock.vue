@@ -44,8 +44,9 @@ const isActive = (item) => {
   padding: 4px 6px 6px;
   border: 1px solid rgba(168, 196, 184, 0.3);
   border-radius: 0;
-  background: rgba(16, 40, 39, 0.96);
-  box-shadow: 0 18px 44px rgba(16, 40, 39, 0.24);
+  background: rgba(16, 40, 39, 0.94);
+  box-shadow: 0 12px 32px rgba(16, 40, 39, 0.18);
+  transition: background-color var(--motion-fast) var(--ease-standard);
 }
 
 .mobile-dock a {

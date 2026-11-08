@@ -8,6 +8,7 @@ import {
   getLibraryPage,
   getLibraryPoem,
   getRelatedLibraryPoems,
+  getAdjacentLibraryPoems,
 } from "./poetryCatalog.js";
 
 test("loads offline corpus from split collections", async () => {
@@ -67,4 +68,13 @@ test("daily reading, excerpts and related poems stay offline", () => {
   assert.equal(related.length, 3);
   assert.ok(related.every((poem) => poem.id !== sourcePoem.id));
   assert.ok(related.every((poem) => poem.category === "诗经" || poem.author === sourcePoem.author));
+
+  const first = getLibraryPoem("demo-jingyesi");
+  const second = getLibraryPage({ page: 1, pageSize: 2 }).items[1];
+  const adjacent = getAdjacentLibraryPoems(first);
+
+  assert.equal(adjacent.next.id, second.id);
+  assert.ok(adjacent.previous.id);
+  assert.notEqual(adjacent.previous.id, first.id);
+  assert.deepEqual(getAdjacentLibraryPoems({ id: "not-in-catalog" }), { previous: null, next: null });
 });

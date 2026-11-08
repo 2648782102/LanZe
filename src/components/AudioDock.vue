@@ -1,8 +1,17 @@
 <template>
   <aside
     class="audio-dock"
-    :class="{ 'is-collapsed': isCollapsed, 'is-error': hasError, 'is-playing': isPlaying }"
+    :class="{
+      'is-collapsed': isCollapsed,
+      'is-error': hasError,
+      'is-playing': isPlaying,
+      'is-changing': trackChanged,
+      'is-expanded': isExpanded,
+    }"
     aria-label="兰泽本地声景播放器"
+    @mouseenter="expandDock"
+    @mouseleave="scheduleDockCollapse"
+    @focusin="expandDock"
   >
     <button
       class="audio-dock__handle"
@@ -73,7 +82,7 @@
       <button type="button" aria-label="上一首声景" @click="selectTrack(trackIndex - 1)">
         <AppIcon name="skip-previous" :size="15" />
       </button>
-      <button type="button" aria-label="下一首声景" @click="selectTrack(trackIndex + 1)">
+      <button type="button" aria-label="下一首声景" @click="selectTrack(trackIndex + 1); keepDockOpen()">
         <AppIcon name="skip-next" :size="15" />
       </button>
       <button
@@ -100,7 +109,7 @@
         aria-label="查看播放列表"
         :aria-expanded="playlistOpen"
         aria-controls="audio-playlist"
-        @click="playlistOpen = !playlistOpen"
+        @click="playlistOpen = !playlistOpen; keepDockOpen()"
       >
         <AppIcon name="list" :size="15" />
       </button>
@@ -108,21 +117,23 @@
 
     <span class="audio-dock__state" role="status" aria-live="polite">{{ stateLabel }}</span>
 
-    <div v-if="playlistOpen && !isCollapsed" id="audio-playlist" class="audio-dock__playlist" role="list">
-      <button
-        v-for="(item, index) in tracks"
-        :key="item.id || item.url"
-        type="button"
-        :class="{ 'is-active': index === trackIndex }"
-        :aria-current="index === trackIndex ? 'true' : undefined"
-        @click="selectTrack(index)"
-      >
-        <span>{{ String(index + 1).padStart(2, "0") }}</span>
-        <strong>{{ item.name }}</strong>
-        <em>{{ item.mood || item.artist }}</em>
-      </button>
-      <p>声景由仓库脚本合成，全部随构建产物本地分发；自定义音源仅在你显式配置后启用。</p>
-    </div>
+    <transition name="playlist">
+      <div v-if="playlistOpen && !isCollapsed" id="audio-playlist" class="audio-dock__playlist" role="list">
+        <button
+          v-for="(item, index) in tracks"
+          :key="item.id || item.url"
+          type="button"
+          :class="{ 'is-active': index === trackIndex }"
+          :aria-current="index === trackIndex ? 'true' : undefined"
+          @click="selectTrack(index)"
+        >
+          <span>{{ String(index + 1).padStart(2, "0") }}</span>
+          <strong>{{ item.name }}</strong>
+          <em>{{ item.mood || item.artist }}</em>
+        </button>
+        <p>声景由仓库脚本合成，全部随构建产物本地分发；自定义音源仅在你显式配置后启用。</p>
+      </div>
+    </transition>
   </aside>
 </template>
 
@@ -141,6 +152,8 @@ const hasError = ref(false);
 const hasUserCollapsedPreference = ref(false);
 const compactViewport = ref(false);
 const playlistOpen = ref(false);
+const trackChanged = ref(false);
+const isExpanded = ref(false);
 const isMuted = ref(false);
 const currentTime = ref(0);
 const duration = ref(audioConfig.tracks[0]?.duration || 0);
@@ -153,6 +166,8 @@ const track = computed(() => tracks.value[trackIndex.value] || {
   url: "",
 });
 let viewportQuery;
+let trackChangeTimer;
+let expandTimer;
 
 const stateLabel = computed(() => {
   if (hasError.value) return "声景不可达";
@@ -270,8 +285,14 @@ const selectTrack = async (index, { autoplay = false } = {}) => {
   duration.value = track.value.duration || 0;
   hasError.value = false;
   playlistOpen.value = false;
+  trackChanged.value = false;
   syncPreferences();
   await nextTick();
+  trackChanged.value = true;
+  window.clearTimeout(trackChangeTimer);
+  trackChangeTimer = window.setTimeout(() => {
+    trackChanged.value = false;
+  }, 320);
   const current = audioRef.value;
   if (!current) return;
   current.load();
@@ -296,6 +317,25 @@ const toggleCollapsed = () => {
   hasUserCollapsedPreference.value = true;
   isCollapsed.value = !isCollapsed.value;
   if (isCollapsed.value) playlistOpen.value = false;
+};
+
+const expandDock = () => {
+  if (isCollapsed.value || window.innerWidth <= 820) return;
+  isExpanded.value = true;
+  window.clearTimeout(expandTimer);
+  expandTimer = window.setTimeout(() => {
+    isExpanded.value = false;
+  }, 4200);
+};
+
+const keepDockOpen = () => window.clearTimeout(expandTimer);
+
+const scheduleDockCollapse = () => {
+  if (window.innerWidth <= 820) return;
+  window.clearTimeout(expandTimer);
+  expandTimer = window.setTimeout(() => {
+    isExpanded.value = false;
+  }, 260);
 };
 
 watch(compactViewport, (compact) => {
@@ -325,6 +365,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   audioRef.value?.pause();
+  window.clearTimeout(trackChangeTimer);
+  window.clearTimeout(expandTimer);
   viewportQuery?.removeEventListener("change", syncViewportPreference);
 });
 </script>
@@ -332,28 +374,40 @@ onBeforeUnmount(() => {
 <style scoped>
 .audio-dock {
   position: fixed;
+  right: 18px;
   bottom: 18px;
-  left: 18px;
+  left: auto;
   z-index: 70;
   display: grid;
-  width: min(460px, calc(100vw - 36px));
-  grid-template-columns: 34px 40px minmax(0, 1fr) auto;
-  grid-template-areas: "handle toggle stage state" "controls controls controls controls";
+  width: 92px;
+  grid-template-columns: 24px 40px;
+  grid-template-areas: "handle toggle";
   align-items: center;
-  gap: 8px 10px;
-  padding: 9px 12px 9px 6px;
-  border: 1px solid rgba(168, 196, 184, 0.26);
-  background: rgba(16, 40, 39, 0.98);
+  gap: 6px 8px;
+  padding: 6px 8px 6px 4px;
+  border: 1px solid rgba(168, 196, 184, 0.22);
+  background: rgba(16, 40, 39, 0.94);
   color: var(--porcelain-panel);
-  box-shadow: 0 14px 38px rgba(16, 40, 39, 0.2);
-  transition: width 180ms ease;
+  box-shadow: 0 10px 30px rgba(16, 40, 39, 0.16);
+  transition:
+    width var(--motion-base) var(--ease-standard),
+    grid-template-columns var(--motion-base) var(--ease-standard),
+    background-color var(--motion-fast) var(--ease-standard),
+    border-color var(--motion-fast) var(--ease-standard);
+}
+
+.audio-dock.is-expanded {
+  width: min(380px, calc(100vw - 36px));
+  grid-template-columns: 28px 36px minmax(0, 1fr) auto;
+  grid-template-areas: "handle toggle stage state" "handle controls controls controls";
 }
 
 .audio-dock__handle {
   grid-area: handle;
   display: grid;
-  width: 34px;
-  height: 40px;
+  width: 24px;
+  height: 36px;
+  align-self: center;
   place-items: center;
   padding: 0;
   border: 0;
@@ -366,17 +420,24 @@ onBeforeUnmount(() => {
 }
 
 .audio-dock.is-collapsed {
-  width: 92px;
-  grid-template-columns: 34px 40px;
+  width: 84px;
+  grid-template-columns: 28px 36px;
   grid-template-areas: "handle toggle";
-  gap: 8px;
-  padding-right: 6px;
+  gap: 6px;
+  padding-right: 5px;
 }
 
 .audio-dock.is-collapsed .audio-dock__stage,
 .audio-dock.is-collapsed .audio-dock__state,
 .audio-dock.is-collapsed .audio-dock__controls,
 .audio-dock.is-collapsed .audio-dock__playlist {
+  display: none;
+}
+
+.audio-dock:not(.is-expanded):not(.is-collapsed) .audio-dock__stage,
+.audio-dock:not(.is-expanded):not(.is-collapsed) .audio-dock__state,
+.audio-dock:not(.is-expanded):not(.is-collapsed) .audio-dock__controls,
+.audio-dock:not(.is-expanded):not(.is-collapsed) .audio-dock__playlist {
   display: none;
 }
 
@@ -398,25 +459,34 @@ onBeforeUnmount(() => {
   color: var(--brass-soft);
 }
 
+.audio-dock.is-expanded .audio-dock__handle {
+  width: 28px;
+}
+
+.audio-dock.is-expanded .audio-dock__toggle {
+  width: 36px;
+  height: 36px;
+}
+
 .audio-dock__stage {
   grid-area: stage;
   display: grid;
   min-width: 0;
-  gap: 4px;
+  gap: 2px;
 }
 
 .audio-dock__meta {
   display: grid;
   min-width: 0;
-  grid-template-columns: 38px minmax(0, 1fr) auto;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
 }
 
 .audio-dock__cover {
   display: block;
-  width: 38px;
-  height: 38px;
+  width: 32px;
+  height: 32px;
   object-fit: cover;
   border: 1px solid rgba(168, 196, 184, 0.2);
 }
@@ -436,6 +506,25 @@ onBeforeUnmount(() => {
 
 .audio-dock__title {
   font-size: 11px;
+  transition: color var(--motion-fast) var(--ease-standard);
+}
+
+.audio-dock.is-changing .audio-dock__title {
+  animation: track-settle var(--motion-base) var(--ease-out);
+}
+
+.audio-dock.is-changing .audio-dock__cover {
+  animation: cover-settle var(--motion-base) var(--ease-out);
+}
+
+@keyframes track-settle {
+  from { opacity: 0.45; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cover-settle {
+  from { transform: scale(0.94); }
+  to { transform: scale(1); }
 }
 
 .audio-dock__copy > p:nth-child(2) {
@@ -509,18 +598,18 @@ onBeforeUnmount(() => {
 .audio-dock__controls {
   grid-area: controls;
   display: grid;
-  grid-template-columns: repeat(3, 28px) minmax(52px, 1fr) 28px;
+  grid-template-columns: repeat(3, 26px) minmax(48px, 1fr) 26px;
   align-items: center;
-  gap: 6px;
-  margin-top: 2px;
-  padding-top: 7px;
+  gap: 4px;
+  margin-top: 0;
+  padding-top: 5px;
   border-top: 1px solid rgba(168, 196, 184, 0.16);
 }
 
 .audio-dock__controls button {
   display: grid;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   place-items: center;
   padding: 0;
   border: 0;
@@ -553,7 +642,7 @@ onBeforeUnmount(() => {
 .audio-dock__playlist {
   position: absolute;
   right: 0;
-  bottom: calc(100% + 10px);
+  bottom: calc(100% + 8px);
   left: 0;
   z-index: 2;
   display: grid;
@@ -609,6 +698,19 @@ onBeforeUnmount(() => {
   line-height: 1.6;
 }
 
+.playlist-enter-active,
+.playlist-leave-active {
+  transition:
+    opacity var(--motion-fast) var(--ease-standard),
+    transform var(--motion-fast) var(--ease-out);
+}
+
+.playlist-enter-from,
+.playlist-leave-to {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
 audio {
   display: none;
 }
@@ -616,14 +718,27 @@ audio {
 @media (max-width: 820px) {
   .audio-dock {
     right: max(12px, env(safe-area-inset-right));
-    bottom: calc(76px + env(safe-area-inset-bottom));
+    bottom: calc(84px + env(safe-area-inset-bottom));
     left: max(12px, env(safe-area-inset-left));
     width: auto;
-    max-height: 104px;
-    padding-block: 6px;
-    border-color: rgba(168, 196, 184, 0.18);
+    max-height: 96px;
+    padding-block: 5px;
+    border-color: rgba(168, 196, 184, 0.16);
     border-bottom: 0;
-    box-shadow: none;
+    box-shadow: 0 10px 26px rgba(16, 40, 39, 0.14);
+  }
+
+  .audio-dock:not(.is-collapsed),
+  .audio-dock.is-expanded {
+    width: auto;
+    grid-template-columns: 28px 36px minmax(0, 1fr) auto;
+    grid-template-areas: "handle toggle stage state" "handle controls controls controls";
+  }
+
+  .audio-dock:not(.is-collapsed):not(.is-expanded) .audio-dock__stage,
+  .audio-dock:not(.is-collapsed):not(.is-expanded) .audio-dock__controls,
+  .audio-dock:not(.is-collapsed):not(.is-expanded) .audio-dock__playlist {
+    display: grid;
   }
 
   .audio-dock__state {
@@ -631,11 +746,17 @@ audio {
   }
 
   .audio-dock.is-collapsed {
-    width: 100px;
-    max-height: 60px;
-    grid-template-columns: 34px 40px;
+    width: 92px;
+    max-height: 48px;
+    grid-template-columns: 28px 36px;
     grid-template-areas: "handle toggle";
     margin-left: auto;
+  }
+
+  .audio-dock.is-collapsed .audio-dock__handle,
+  .audio-dock.is-collapsed .audio-dock__toggle {
+    width: 28px;
+    height: 36px;
   }
 
   .audio-dock__playlist {
@@ -646,8 +767,8 @@ audio {
 
 @media (max-width: 420px) {
   .audio-dock {
-    grid-template-columns: 34px 40px minmax(0, 1fr);
-    grid-template-areas: "handle toggle stage" "controls controls controls";
+    grid-template-columns: 28px 36px minmax(0, 1fr);
+    grid-template-areas: "handle toggle stage" "handle controls controls";
     gap: 6px;
     padding-right: 8px;
   }
@@ -659,17 +780,17 @@ audio {
   }
 
   .audio-dock__controls {
-    grid-template-columns: repeat(3, 32px);
+    grid-template-columns: repeat(3, 30px);
     justify-content: center;
   }
 
   .audio-dock__cover {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
   }
 
   .audio-dock__meta {
-    grid-template-columns: 32px minmax(0, 1fr);
+    grid-template-columns: 30px minmax(0, 1fr);
   }
 }
 </style>

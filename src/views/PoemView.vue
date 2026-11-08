@@ -41,7 +41,9 @@
         <div class="poem-body">
           <header class="poem-head">
             <p>{{ sourceLabel }}</p>
-            <h1>{{ poem.title }}</h1>
+            <h1 :class="{ 'has-parts': titleParts.length > 1 }">
+              <span v-for="(part, index) in titleParts" :key="index">{{ part }}</span>
+            </h1>
             <span>{{ poem.author }}</span>
           </header>
 
@@ -61,6 +63,27 @@
           <p class="poem-disclaimer">
             演示文本用于界面展示。引用、出版或教学使用前，请自行核对底本与点校信息。
           </p>
+
+          <nav v-if="adjacent.previous || adjacent.next" class="reading-continuation" aria-label="连续阅读">
+            <router-link
+              v-if="adjacent.previous"
+              class="reading-continuation__link"
+              :to="{ name: 'poem', params: { id: adjacent.previous.id } }"
+            >
+              <AppIcon name="arrow-left" :size="16" />
+              <span>上一首</span>
+              <strong>{{ adjacent.previous.title }}</strong>
+            </router-link>
+            <router-link
+              v-if="adjacent.next"
+              class="reading-continuation__link reading-continuation__link--next"
+              :to="{ name: 'poem', params: { id: adjacent.next.id } }"
+            >
+              <span>下一首</span>
+              <AppIcon name="arrow-right" :size="16" />
+              <strong>{{ adjacent.next.title }}</strong>
+            </router-link>
+          </nav>
         </div>
       </article>
 
@@ -99,12 +122,14 @@ import { computed, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import AppIcon from "../components/AppIcon.vue";
 import { normalizePoem } from "../data/poems.js";
-import { loadCatalog, relatedLibraryPoems, useLibrary } from "../composables/useLibrary.js";
+import { loadCatalog, relatedLibraryPoems, useCatalogVersion, useLibrary } from "../composables/useLibrary.js";
+import { getAdjacentLibraryPoems } from "../data/poetryCatalog.js";
 import { notify } from "../composables/useNotices.js";
 import { normalizeDetails, parseJsonObject } from "../utils/poemQuery.js";
 
 const route = useRoute();
 const { getPoem, isSaved, toggleSaved, recordRecent } = useLibrary();
+const catalogVersion = useCatalogVersion();
 
 const legacyPoem = computed(() => {
   if (route.params.id !== "legacy") return null;
@@ -134,10 +159,21 @@ const annotation = computed(() => {
   if (Array.isArray(value)) return value;
   return value ? [String(value)] : [];
 });
+const titleParts = computed(() => {
+  const title = String(poem.value?.title || "");
+  const separator = title.indexOf("·");
+  if (separator > 0) return [title.slice(0, separator), title.slice(separator + 1).trim()].filter(Boolean);
+  return [title];
+});
 const saved = computed(() => (poem.value ? isSaved(poem.value.id) : false));
 const related = computed(() => {
+  catalogVersion.value;
   if (!poem.value) return [];
   return relatedLibraryPoems(poem.value, 3);
+});
+const adjacent = computed(() => {
+  catalogVersion.value;
+  return getAdjacentLibraryPoems(poem.value);
 });
 
 const toggleSave = () => {
@@ -305,6 +341,21 @@ onMounted(loadCatalog);
   line-height: 1.2;
 }
 
+.poem-head h1.has-parts {
+  font-size: clamp(34px, 4.6vw, 58px);
+}
+
+.poem-head h1.has-parts span {
+  display: block;
+}
+
+.poem-head h1.has-parts span + span {
+  margin-top: 8px;
+  color: var(--ink-soft);
+  font-size: 0.7em;
+  letter-spacing: 0.1em;
+}
+
 .poem-head span {
   color: var(--ink-soft);
   font-family: var(--font-poem);
@@ -326,6 +377,11 @@ onMounted(loadCatalog);
   font-size: clamp(21px, 2.4vw, 31px);
   letter-spacing: 0.11em;
   line-height: 1.75;
+  transition: color var(--motion-fast) var(--ease-standard);
+}
+
+.poem-text p:hover {
+  color: var(--brass);
 }
 
 .poem-tags {
@@ -365,6 +421,59 @@ onMounted(loadCatalog);
   font-size: 10px;
   letter-spacing: 0.03em;
   text-align: center;
+}
+
+.reading-continuation {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.reading-continuation__link {
+  display: grid;
+  min-width: 0;
+  min-height: 64px;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 4px 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  transition:
+    border-color var(--motion-fast) var(--ease-standard),
+    background-color var(--motion-fast) var(--ease-standard),
+    transform var(--motion-fast) var(--ease-out);
+}
+
+.reading-continuation__link:hover {
+  border-color: var(--brass);
+  background: rgba(216, 191, 142, 0.1);
+  transform: translateY(-1px);
+}
+
+.reading-continuation__link--next {
+  grid-template-columns: minmax(0, 1fr) auto;
+  justify-items: end;
+  text-align: right;
+}
+
+.reading-continuation__link > span {
+  color: var(--brass);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.reading-continuation__link > strong {
+  grid-column: 1 / -1;
+  overflow: hidden;
+  font-family: var(--font-poem);
+  font-size: 15px;
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .related-section {
@@ -478,6 +587,10 @@ onMounted(loadCatalog);
     padding: 54px 22px 36px;
   }
 
+  .reading-continuation {
+    grid-template-columns: 1fr;
+  }
+
   .related-list {
     grid-template-columns: 1fr;
   }
@@ -495,6 +608,14 @@ onMounted(loadCatalog);
 
   .poem-head h1 {
     font-size: 39px;
+  }
+
+  .poem-head h1.has-parts {
+    font-size: 32px;
+  }
+
+  .poem-head h1.has-parts span + span {
+    font-size: 0.76em;
   }
 
   .poem-text {
