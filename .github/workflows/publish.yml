@@ -54,7 +54,7 @@ jobs:
 
           owner="${REPOSITORY%/*}"
           repo="${REPOSITORY#*/}"
-          desired_body="$(< ANNOUNCEMENT.md)"
+          desired_body="$(sed 's/\r$//' ANNOUNCEMENT.md)"
 
           graphql() {
             local response
@@ -112,8 +112,8 @@ jobs:
                 | graphql \
                 | jq -r '.data.node.body // empty'
             )"
-            desired_body_without_trailing_newlines="${desired_body%"$'\n'"}"
-            if [ "$current_body" = "$desired_body_without_trailing_newlines" ]; then
+            current_body="${current_body//$'\r'/}"
+            if [ "$current_body" = "$desired_body" ]; then
               echo "Welcome discussion is already current: $DISCUSSION_URL"
               exit 0
             fi
@@ -123,7 +123,7 @@ jobs:
                 --arg query 'mutation($input: UpdateDiscussionInput!) { updateDiscussion(input: $input) { discussion { id url } } }' \
                 --arg discussion "$existing_id" \
                 --arg title "$DISCUSSION_TITLE" \
-                --rawfile body ANNOUNCEMENT.md \
+                --arg body "$desired_body" \
                 '{query: $query, variables: {input: {discussionId: $discussion, title: $title, body: $body}}}'
             )"
             if ! update_response="$(
@@ -157,7 +157,7 @@ jobs:
               --arg repository "$repository_id" \
               --arg category "$category_id" \
               --arg title "$DISCUSSION_TITLE" \
-              --rawfile body ANNOUNCEMENT.md \
+              --arg body "$desired_body" \
               '{query: $query, variables: {input: {repositoryId: $repository, categoryId: $category, title: $title, body: $body}}}' \
               | graphql \
               | jq -er '.data.createDiscussion.discussion // error("Discussion creation returned no discussion") | "Created discussion \(.id): \(.url)"'

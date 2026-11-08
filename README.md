@@ -194,7 +194,7 @@ LanZe/
 
 ## 演示与截图
 
-`public/og-image.svg` 与 `public/og-image.png` 是按当前青瓷数字诗馆设计绘制的展示插画，不是运行截图；上传与更新步骤见 `docs/PROMOTION.md`。当前界面的可复核预览请运行 `npm run dev` 或 `npm run preview`。
+`public/og-image.svg` 与 `public/og-image.png` 是按当前青瓷数字诗馆设计绘制的展示插画，不是运行截图；`public/og-image.png` 已上传为 GitHub Social preview 并回读公开 `og:image`，上传与更新步骤见 `docs/PROMOTION.md`。当前界面的可复核预览请运行 `npm run dev` 或 `npm run preview`。
 
 本地演示建议录屏脚本：
 
@@ -204,7 +204,7 @@ LanZe/
 4. 在窄屏或浏览器设备模拟器中重复首页与底部导航。
 5. 回到终端运行 `npm run build && npm run test && npm run lint`，展示可复现构建与检查。
 
-`public/og-image.svg` 与 `public/og-image.png` 是展示插画，不是运行截图。GitHub Pages 静态预览可作为当前构建的页面入口，但不要写成官方线上 Demo、账号服务或正式运营社区；历史地址仅作为迁移背景记录。
+GitHub Pages 静态预览可作为当前构建的页面入口，但不要写成官方线上 Demo、账号服务或正式运营社区；历史地址仅作为迁移背景记录。
 
 ## 部署
 

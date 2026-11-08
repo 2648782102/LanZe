@@ -238,3 +238,10 @@
 - 同步 README、`docs/PROMOTION.md`、`docs/DEPLOYMENT.md`、`docs/ROADMAP.md`、`docs/FAQ.md`、`CHANGELOG.md` 的当前展示状态：Pages 是静态前端预览，不是线上账号、托管后端、内容审核或维护者 SLA 承诺；历史 Vercel/MemFire 地址仍是迁移背景。已发布 `RELEASE_NOTES.md` 与 `ANNOUNCEMENT.md` 保持发布时快照，不回写后续设置变更。
 - 社交预览图仍未上传，在线 Discussion #1 正文仍是 v0.2.0 首版，外部短帖/社区投稿/付费推广仍未执行；不把 workflow success 或字段保存误写成这些事项已完成。
 - 本轮只改当前文档，不改 `RELEASE_NOTES.md` / `ANNOUNCEMENT.md`、应用代码或发布 workflow；`v0.4.0` tag 与已发布 Release 保持在 `6251b0d`，避免重新触发 publish workflow 或修改发布时快照。
+
+## GitHub 展示收尾 — 2026-11-08 15:45–16:10 CST
+
+- 公开仓库 API 回读 About 描述为 39 项单测、9,350 篇离线馆藏、三段本地声景与 Pages 静态预览边界，Website 为 `https://2648782102.github.io/LanZe/`，`has_pages=true`，`updated_at=2026-11-08T07:45:10Z`；Pages 首页返回 200，入口 JS/CSS、馆藏与音频清单此前均已验证。
+- 通过浏览器上传 `public/og-image.png`（1200×630）为 GitHub Social preview；设置页显示 `Remove image`，公开仓库页 `og:image` 从默认图变为 `https://repository-images.githubusercontent.com/499469811/bdaf4616-a973-405d-9b98-eeaa34e470cf`。哈希仍记录在 `docs/THIRD_PARTY_ASSETS.md`，不把哈希写成授权证明。
+- 经用户确认后，在浏览器用 `ANNOUNCEMENT.md` 替换既有 Discussion #1 正文，不新建帖子；16:10 CST 再修正「安全政策」链接为 `blob/main/SECURITY.md`。最终公开 Discussions REST 回读 `updated_at=2026-11-08T08:10:29Z`，正文不再含「14 个单测」或错误的相对链接，含 39 项单测、9,350 篇离线馆藏与三段本地声景；归一化换行后与 `ANNOUNCEMENT.md` 一致。
+- 修正 `ANNOUNCEMENT.md` 中会在 Discussions 内解析到错误路径的相对「安全政策」链接；CI 增加欢迎帖源文案相对链接守卫，publish workflow 归一化已有正文的 CRLF 后比较并用同一规范正文创建/更新，避免换行差异与默认令牌权限边界造成误判。外部短帖、社区投稿、付费推广未执行；不移动 `v0.4.0` tag、不重发 Release、不重复发帖。

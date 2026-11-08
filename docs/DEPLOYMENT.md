@@ -93,7 +93,7 @@ npm run build
 - [ ] 演示模式下今日展厅/诗词索引/搜索有本地数据；关闭 mock 且后端不可用时自动降级并给出提示。
 - [ ] 移动端宽度下导航与滚动可用。
 - [ ] README / Release 中没有把本次部署写成「官方线上 Demo」，除非维护者实际验证并明确声明。
-- [ ] 记录部署 URL、commit SHA、构建日志链接与回滚步骤；如为该 GitHub 仓库启用 Pages，更新 About 后再对外发布。Welcome Discussion #1 正文仍是历史首版，不把 workflow success 写成公告已同步。
+- [ ] 记录部署 URL、commit SHA、构建日志链接与回滚步骤；如为该 GitHub 仓库启用 Pages，更新 About 后再对外发布。Welcome Discussion #1 正文已按 `ANNOUNCEMENT.md` 更新并经公开 API 回读；仍不把 workflow success 单独写成公告已同步。
 
 ## 9. 不做的事
 

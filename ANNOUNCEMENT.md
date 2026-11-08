@@ -59,7 +59,7 @@ npm run smoke:browser
 - 这是社区维护项目，不承诺固定响应时间、商业支持或线上 SLA。
 - 不刷 star、不虚构用户数据、不把历史失效演示站写成「官方 Demo」。
 - 浏览器里的 `VITE_` 变量不是秘密；服务端密钥、私人 token、真实用户数据不要提交，也不要贴在 Discussion。
-- 安全问题请使用 GitHub 私密漏洞报告入口或按 [安全政策](SECURITY.md) 沟通，不要在公开帖贴 PoC。
+- 安全问题请使用 GitHub 私密漏洞报告入口或按 [安全政策](https://github.com/2648782102/LanZe/blob/main/SECURITY.md) 沟通，不要在公开帖贴 PoC。
 - 对第三方内容保持来源意识：MIT 覆盖本仓库贡献者提供的代码/文档，不自动覆盖外链或外部素材。
 
 ### 接下来

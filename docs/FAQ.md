@@ -74,7 +74,7 @@
 
 ### 仓库 About、topics、Release、Discussion 在哪里维护？
 
-GitHub About 描述、Website 与 topics 在仓库首页的 About 面板维护；当前描述与 Pages Website 已通过公开 API 回读。`v0.2.0` / `v0.3.0` 是历史 Release，`v0.4.0` 的发布说明与仓库内欢迎帖文案分别位于 `RELEASE_NOTES.md`、`ANNOUNCEMENT.md`，发布与展示清单见 `docs/PROMOTION.md`。在线 Discussion #1 仍是历史首版；如有后续展示变更，以仓库页面/公开 API、`CHANGELOG.md` 和维护日志为准，不回写已发布 Release 快照。
+GitHub About 描述、Website 与 topics 在仓库首页的 About 面板维护；当前描述与 Pages Website 已通过公开 API 回读。`v0.2.0` / `v0.3.0` 是历史 Release，`v0.4.0` 的发布说明与仓库内欢迎帖文案分别位于 `RELEASE_NOTES.md`、`ANNOUNCEMENT.md`，发布与展示清单见 `docs/PROMOTION.md`。在线 Discussion #1 已按 `ANNOUNCEMENT.md` 更新并经公开 API 回读；发布 workflow 默认令牌仍可能无法更新既有正文，Actions success 不等于正文已同步。后续展示变更以仓库页面/公开 API、`CHANGELOG.md` 和维护日志为准，不回写已发布 Release 快照。
 
 ## 许可与内容
 

@@ -27,7 +27,7 @@
 | 工程现代化 | Vite 6、ESM、相对 base、统一请求层、本地演示数据、会话与本地演示音源 | 远端优先、失败降级；发布时 23 项单测通过 |
 | 发布素材 | Release notes、Discussions 欢迎帖、中英文短帖 | 只描述已验证能力，不写线上 Demo |
 
-GitHub 侧当前配合：v0.2.0、v0.3.0 与 v0.4.0 Release 均已发布，Discussion #1 仍是 v0.2.0 首版；topics 已按当前实现整理，About 描述已更新为 39 项单测、9,350 篇离线馆藏与三段本地声景，Website 指向已验证的 `https://2648782102.github.io/LanZe/`，Pages 静态站点与入口资源已回读 200。社交预览图与在线欢迎帖正文仍未同步；`RELEASE_NOTES.md` 是 v0.4.0 发布时快照，`ANNOUNCEMENT.md` 是仓库内当前欢迎帖文案，不回写历史 Release。
+GitHub 侧当前配合：v0.2.0、v0.3.0 与 v0.4.0 Release 均已发布；topics 已按当前实现整理，About 描述已更新为 39 项单测、9,350 篇离线馆藏与三段本地声景，Website 指向已验证的 `https://2648782102.github.io/LanZe/`，Pages 静态站点与入口资源已回读 200。社交预览图已上传并回读公开 `og:image`；在线 Discussion #1 已按 `ANNOUNCEMENT.md` 更新并经公开 API 回读。外部短帖、社区投稿与付费推广仍未执行。`RELEASE_NOTES.md` 是 v0.4.0 发布时快照，`ANNOUNCEMENT.md` 是当前欢迎帖源文案；后续展示状态不回写历史 Release。
 
 ## 2. v0.3.0 — 青瓷数字诗馆（已发布）
 

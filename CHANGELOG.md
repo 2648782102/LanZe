@@ -10,11 +10,13 @@
 
 - 本次保存补齐 `v0.4.0` 发布与展示文案、Node/npm `engines` 约束及发布 workflow；发布前用 `npm ci` 重建依赖并复核全部质量门。
 - GitHub Pages 静态预览已启用并回读：手动 workflow `42376966164` 以 `6251b0d` 构建并部署成功，项目站点首页、入口 JS/CSS、馆藏清单与音频清单均返回 200；仓库 Website 已改为同一 Pages URL。
+- GitHub 社交预览图已上传、在线 Discussion #1 已按 `ANNOUNCEMENT.md` 更新，About 描述与 Website 已公开 API 回读；外部短帖、社区投稿与付费推广仍未执行。
 
 ### Changed
 
 - GitHub About 描述已由 27 项单测旧口径更新为 v0.4.0 当前事实：39 项单测、9,350 篇离线馆藏、三段本地声景；Website 不再使用未核验归属的 Vercel 地址。展示、部署、路线图、FAQ 与 README 同步为「已验证静态预览，不承诺托管后端或完整线上 Demo」。
 - 已发布 `v0.4.0` Release 正文按发布时快照保留；后续展示状态以 GitHub 页面/公开 API、维护日志和本文件为准，避免把版本说明改写成持续更新的展示看板。
+- 修正 `ANNOUNCEMENT.md` 中会在 Discussions 里解析错误的相对「安全政策」链接；CI 拒绝欢迎帖源文案再次出现相对链接，publish workflow 归一化已有正文的 CRLF 后比较并用同一规范正文写入。
 
 ## [v0.4.0] — 2026-11-07（当前版本）
 

@@ -118,6 +118,20 @@ jobs:
             exit 1
           fi
 
+      - name: Reject relative links in discussion source
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const links = [...fs.readFileSync('ANNOUNCEMENT.md', 'utf8').matchAll(/\]\(([^)]+)\)/g)]
+            .map((match) => match[1])
+            .filter((url) => !/^(https?:\/\/|#|mailto:)/.test(url));
+          if (links.length > 0) {
+            console.error(`ANNOUNCEMENT.md contains relative links that break in Discussions: ${links.join(', ')}`);
+            process.exit(1);
+          }
+          NODE
+
       - name: Check package engines
         shell: bash
         run: |
