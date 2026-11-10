@@ -18,9 +18,9 @@
 - [ ] WOFF2 字体子集、压缩展品图、自定义音源/封面与诗词文本的使用符合其授权与隐私要求；默认 `VITE_AUDIO_SOURCE=local` 使用仓库自制三段声景，自定义音源不可达时会显示可重试状态，默认 `VITE_POETRY_SOURCE=local` 不请求第三方公开诗句接口。
 - [ ] 记录 commit SHA、构建命令、变量清单与回滚方式。
 
-## 3. GitHub Pages（手动 workflow）
+## 3. GitHub Pages（自动 workflow）
 
-仓库提供 `.github/workflows/pages.yml`，它是 `workflow_dispatch` 手动触发，不在 push 时自动发布，也不绑定任何历史失效域名。流程：
+仓库提供 `.github/workflows/pages.yml`：推送到 `main` 时自动构建并部署，也保留 `workflow_dispatch` 供手动重跑；不绑定任何历史失效域名。流程：
 
 1. 使用 Node 20 与 `npm ci` 安装依赖。
 2. 运行 `npm run build`。
@@ -37,7 +37,9 @@
 
 2026-11-07 实测记录：维护者在 Settings → Pages 启用 GitHub Actions 来源后，手动 workflow `42376966164` 在 head `6251b0d` success，`https://2648782102.github.io/LanZe/` 返回 200；入口 JS/CSS、`data/poetry/manifest.json` 与 `media/audio-manifest.json` 均返回 200。GitHub 仓库 Website 字段已改为同一 Pages URL 并经公开 API 回读。此结果只证明静态资源可访问与静态前端可渲染，不构成线上账号、托管后端、内容审核或维护者 SLA 承诺。
 
-回滚：重新运行 workflow 指向上一个已知良好 commit，或在 Pages 设置中恢复上一份 artifact；若只是环境变量错误，修正变量后重新构建，保留旧构建编号便于对照。
+2026-11-11 补充：此前 `pages.yml` 只有 `workflow_dispatch`，多次代码推送与 CI 成功后 Pages 仍停留在 11 月 7 日的旧 artifact；线上 `index.html` 的 `last-modified` 与入口资源哈希均未更新。手动 workflow `42874012307` 已基于 `7119087` 重新部署，回读线上入口 JS/CSS 与本地 `dist` 一致。随后 workflow 增加 `push: branches: [main]`，避免后续每次提交都需手动触发。
+
+回滚：在上一个已知良好 commit 上重新运行 workflow，或在 Pages 设置中恢复上一份 artifact；若只是环境变量错误，修正变量后重新构建，保留旧构建编号便于对照。自动部署后的每次 `main` push 都应核对 workflow 状态和线上入口资源哈希。
 
 ## 4. Vercel
 

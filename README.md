@@ -212,7 +212,7 @@ GitHub Pages 静态预览可作为当前构建的页面入口，但不要写成�
 
 | 平台 | 构建命令 | 发布目录 | 关键配置 |
 | --- | --- | --- | --- |
-| GitHub Pages | `npm ci && npm run build` | `dist` | 使用 `.github/workflows/pages.yml` 手动 workflow；GitHub Actions 来源已启用，`base: './'` 与静态资源路径已实测，不自动部署到历史失效域名 |
+| GitHub Pages | `npm ci && npm run build` | `dist` | 使用 `.github/workflows/pages.yml`，`main` push 自动部署并保留手动 workflow；GitHub Actions 来源已启用，`base: './'` 与静态资源路径已实测，不部署到历史失效域名 |
 | Vercel | `npm run build` | `dist` | Framework: Vite；用环境变量或 rewrites 配置 `/api/`；不要沿用历史 Vercel 函数域名 |
 | Netlify | `npm run build` | `dist` | Publish directory `dist`；用 redirects/proxy 指向自建 API；设置公开 `VITE_` 变量 |
 | 任意静态服务器 | `npm run build` | `dist` | 用 HTTPS 托管静态文件；后端同源代理或显式配置 CORS |

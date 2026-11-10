@@ -45,7 +45,7 @@ vue3, vite, javascript, frontend, chinese-poetry, poetry, classical-chinese, chi
 | 2 | 核对 About 描述、Website（已验证 Pages URL）、topics 与社交预览图；均已保存/上传并回读 | 本文件第 1 节、`public/og-image.svg`、`public/og-image.png` | 不沿用旧展示域名，公开 API / `og:image` 回读 |
 | 3 | 维护 Discussions 欢迎帖（已存在，不重复发帖） | `ANNOUNCEMENT.md` | 将占位日期/链接替换为真实值，公开 API 回读正文 |
 | 4 | 创建 tag `v0.4.0` 与 GitHub Release，不覆盖历史 Release | `RELEASE_NOTES.md`、`.github/workflows/publish.yml` | 只描述已合并内容；tag 与 CI/Browser E2E 通过 |
-| 5 | 确认 CI 与 Pages 权限；Pages 按需手动触发（workflow 含 configure/upload/deploy 标准步骤） | `.github/workflows/ci.yml`、`.github/workflows/pages.yml`、`docs/DEPLOYMENT.md` | 不自动部署到失效域名；GitHub Actions 来源已启用且 workflow 已验证 |
+| 5 | 确认 CI 与 Pages 权限；`main` push 自动部署并保留手动重跑（workflow 含 configure/upload/deploy 标准步骤） | `.github/workflows/ci.yml`、`.github/workflows/pages.yml`、`docs/DEPLOYMENT.md` | 不部署到失效域名；GitHub Actions 来源已启用且 workflow 已验证 |
 | 6 | 给适合新人的 issue 加 `good first issue` / `help wanted` 标签 | `.github/ISSUE_TEMPLATE/*` | 先写清复现步骤或预期结果，避免空任务 |
 | 7 | 保留已发布 Release/Discussion 公告；外部短帖按平台节奏另行人工确认 | `SOCIAL_POSTS.md` | 不夸大 star、用户数、线上 Demo 或后端能力 |
 

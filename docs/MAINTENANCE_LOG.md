@@ -282,4 +282,11 @@
 - 按「播放器展开和收回样式布局都很差，对齐主题并默认收回不播放」重做 `AudioDock`：移除 hover / focus / 空闲计时 / `isExpanded` 的第三套状态，只保留 `isCollapsed` 的显式两态。收起态是 152×48px 夜青声景签，显示当前曲目与试听状态；展开态是 388×108px 夜青声景卷，用同一套方角、青瓷细线、铜金曲序和稳定网格组织封面、标题、进度、时间与控件。
 - 冷启动在所有宽度强制收起、暂停、`currentTime = 0`，音频保持 `preload="none"` 且无 `autoplay`；展开、断点切换或路由变化都不会调用 `play()`。进入窄屏时清理播放列表并恢复收起态，通知层仍沿用 208px 避让预算。保留三段本地声景、播放列表、切轨/自动续播、进度、音量、错误重试与本机偏好记忆。
 - Browser E2E 重写播放器收起/展开/键盘流程，新增冷启动静默、展开不播放、两态尺寸、桌面/390/320px 默认收起与静默断言；`README.md`、`docs/DESIGN_SYSTEM.md`、`docs/DEVELOPMENT.md` 和 `CHANGELOG.md` 同步新的默认行为与设计契约。不改已发布 Release、Pages、Discussion 或 GitHub 展示。
+
+## Pages 部署滞后修正 — 2026-11-11 02:18–02:22 CST
+
+- 用户反馈「线上效果没有更新」后核对公开状态：`7119087` 已推送，CI / Browser E2E success，Vercel Production deployment 也指向该提交；但 GitHub Pages 首页 `last-modified` 仍是 2026-11-07 13:26:45 GMT，线上入口为旧 `index-Dai6zHNe.js` / `index-3pECJfpw.css`，本地构建为 `index-BYPU5qA9.js` / `index-36Q6UR3C.css`。
+- 根因是 `.github/workflows/pages.yml` 只声明 `workflow_dispatch`；push 触发的 CI 与 Vercel 部署不会更新 GitHub Pages artifact，Pages workflow 历史也只有 11 月 7 日的一次手动运行 `42376966164`。
+- 通过 GitHub Actions 网页手动运行 `main` 的 Pages workflow `42874012307`，29 秒后 success；部署 API 新增 `github-pages` environment 记录，线上 `index.html` 的 `last-modified`、入口 JS/CSS 哈希及 CSS 字节均与本地 `dist` 一致，所有新入口资源返回 200。
+- 为消除复发，把 `pages.yml` 增加 `push: branches: [main]`，保留 `workflow_dispatch` 作为手动重跑；`README.md`、`docs/DEPLOYMENT.md`、`docs/ARCHITECTURE.md`、`docs/PROMOTION.md` 与 `CHANGELOG.md` 同步部署方式。该变更提交并推送后，再核对自动 Pages workflow 成功与线上资源哈希一致。
 - `scripts/smoke.browser.mjs` 增加真实 Pointer 拖动（抬起 transform、进入掀卡状态、换句完成）、卡片键盘/按钮入口、以及登录左栏竖排诗笺断言；保留单卡、白底、720×412 扇舟图、右留白、收藏与来源状态等原契约。

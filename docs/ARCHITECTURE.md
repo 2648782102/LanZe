@@ -27,7 +27,7 @@
 构建与治理（不在浏览器运行时内）
   ├── npm ci / npm run build / npm run test / npm run lint
   ├── GitHub Actions: ci.yml、browser-e2e.yml、publish.yml
-  └── GitHub Pages: .github/workflows/pages.yml（手动触发，产物 artifact）
+  └── GitHub Pages: .github/workflows/pages.yml（main push 自动部署，可手动重跑）
 ```
 
 仓库负责前端界面、构建配置、文档与 CI。它不负责托管第三方 API 的可用性，也不应保存生产密钥。任何后端都应通过公开、可替换的 HTTP 契约接入，而不是把数据库凭据打进浏览器包。
