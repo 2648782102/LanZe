@@ -1,19 +1,14 @@
 <template>
   <aside
-    ref="dockRef"
     class="audio-dock"
     :class="{
       'is-collapsed': isCollapsed,
       'is-error': hasError,
       'is-playing': isPlaying,
       'is-changing': trackChanged,
-      'is-expanded': isExpanded,
+      'is-expanded': !isCollapsed,
     }"
     aria-label="兰泽本地声景播放器"
-    @mouseenter="handlePointerEnter"
-    @mouseleave="handlePointerLeave"
-    @focusin="expandDock"
-    @focusout="scheduleDockCollapse()"
   >
     <button
       class="audio-dock__handle"
@@ -22,7 +17,8 @@
       :aria-expanded="!isCollapsed"
       @click="toggleCollapsed"
     >
-      <AppIcon :name="isCollapsed ? 'chevron-right' : 'chevron-left'" :size="14" />
+      <span class="audio-dock__handle-label" aria-hidden="true">{{ isCollapsed ? "展开声景" : "收束" }}</span>
+      <AppIcon :name="isCollapsed ? 'chevron-right' : 'chevron-left'" :size="13" />
     </button>
 
     <audio
@@ -50,6 +46,7 @@
 
     <div class="audio-dock__stage">
       <div class="audio-dock__meta">
+        <span class="audio-dock__index" aria-hidden="true">{{ String(trackIndex + 1).padStart(2, "0") }} / {{ String(tracks.length).padStart(2, "0") }}</span>
         <img
           class="audio-dock__cover"
           :src="track.cover || './media/lanze-qingshan-cover.svg'"
@@ -84,7 +81,7 @@
       <button type="button" aria-label="上一首声景" @click="selectTrack(trackIndex - 1)">
         <AppIcon name="skip-previous" :size="15" />
       </button>
-      <button type="button" aria-label="下一首声景" @click="selectTrack(trackIndex + 1); keepDockOpen()">
+      <button type="button" aria-label="下一首声景" @click="selectTrack(trackIndex + 1)">
         <AppIcon name="skip-next" :size="15" />
       </button>
       <button
@@ -111,13 +108,15 @@
         aria-label="查看播放列表"
         :aria-expanded="playlistOpen"
         aria-controls="audio-playlist"
-        @click="playlistOpen = !playlistOpen; keepDockOpen()"
+        @click="playlistOpen = !playlistOpen"
       >
         <AppIcon name="list" :size="15" />
       </button>
     </div>
 
     <span class="audio-dock__state" role="status" aria-live="polite">{{ stateLabel }}</span>
+    <span class="audio-dock__compact-title">{{ track.name }}</span>
+    <span class="audio-dock__compact-state" role="status" aria-live="polite">{{ stateLabel }}</span>
 
     <transition name="playlist">
       <div v-if="playlistOpen && !isCollapsed" id="audio-playlist" class="audio-dock__playlist" role="list">
@@ -140,7 +139,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 import AppIcon from "./AppIcon.vue";
 import { audioConfig } from "../config/audio.js";
 import { readStore, writeStore } from "../services/browserStore.js";
@@ -148,16 +147,12 @@ import { notify } from "../composables/useNotices.js";
 
 const AUDIO_PREFERENCES_KEY = "lanze_audio_preferences";
 const audioRef = ref();
-const dockRef = ref();
 const isPlaying = ref(false);
-const isCollapsed = ref(false);
+const isCollapsed = ref(true);
 const hasError = ref(false);
-const hasUserCollapsedPreference = ref(false);
 const compactViewport = ref(false);
 const playlistOpen = ref(false);
 const trackChanged = ref(false);
-const isExpanded = ref(false);
-const isPointerInside = ref(false);
 const isMuted = ref(false);
 const currentTime = ref(0);
 const duration = ref(audioConfig.tracks[0]?.duration || 0);
@@ -171,7 +166,6 @@ const track = computed(() => tracks.value[trackIndex.value] || {
 });
 let viewportQuery;
 let trackChangeTimer;
-let expandTimer;
 
 const stateLabel = computed(() => {
   if (hasError.value) return "声景不可达";
@@ -312,73 +306,20 @@ const selectTrack = async (index, { autoplay = false } = {}) => {
 };
 
 const syncViewportPreference = (event) => {
+  if (event.matches === compactViewport.value) return;
   compactViewport.value = event.matches;
-  if (hasUserCollapsedPreference.value) return;
-  isCollapsed.value = event.matches;
+  if (event.matches) {
+    isCollapsed.value = true;
+    playlistOpen.value = false;
+    audioRef.value?.pause();
+    isPlaying.value = false;
+  }
 };
 
 const toggleCollapsed = () => {
-  hasUserCollapsedPreference.value = true;
-  if (isCollapsed.value) {
-    window.clearTimeout(expandTimer);
-    isCollapsed.value = false;
-    isExpanded.value = window.innerWidth > 820;
-    return;
-  }
-  isCollapsed.value = true;
-  isExpanded.value = false;
-  isPointerInside.value = false;
-  playlistOpen.value = false;
-  window.clearTimeout(expandTimer);
+  isCollapsed.value = !isCollapsed.value;
+  if (isCollapsed.value) playlistOpen.value = false;
 };
-
-const dockIsActive = () => isPointerInside.value
-  || playlistOpen.value
-  || Boolean(dockRef.value?.contains(document.activeElement));
-
-const collapseDockIfIdle = () => {
-  if (dockIsActive()) return;
-  isExpanded.value = false;
-};
-
-const expandDock = () => {
-  if (isCollapsed.value || window.innerWidth <= 820) return;
-  isExpanded.value = true;
-  window.clearTimeout(expandTimer);
-  expandTimer = window.setTimeout(() => {
-    collapseDockIfIdle();
-  }, 4200);
-};
-
-const keepDockOpen = () => window.clearTimeout(expandTimer);
-
-const scheduleDockCollapse = (delay = 260) => {
-  if (window.innerWidth <= 820) return;
-  window.clearTimeout(expandTimer);
-  expandTimer = window.setTimeout(() => {
-    collapseDockIfIdle();
-  }, delay);
-};
-
-const handlePointerEnter = () => {
-  if (window.innerWidth <= 820) return;
-  isPointerInside.value = true;
-  expandDock();
-};
-
-const handlePointerLeave = () => {
-  isPointerInside.value = false;
-  scheduleDockCollapse();
-};
-
-watch(compactViewport, (compact) => {
-  if (hasUserCollapsedPreference.value) return;
-  isCollapsed.value = compact;
-});
-
-watch(playlistOpen, (open) => {
-  if (!open) scheduleDockCollapse();
-});
 
 onMounted(() => {
   if (audioConfig.invalidCustom) {
@@ -394,16 +335,23 @@ onMounted(() => {
   if (Number.isFinite(savedVolume) && savedVolume >= 0 && savedVolume <= 1) volume.value = savedVolume;
   isMuted.value = Boolean(preferences?.muted);
   applyAudioSettings();
+  const audio = audioRef.value;
+  if (audio) {
+    audio.pause();
+    audio.currentTime = 0;
+  }
+  isPlaying.value = false;
   viewportQuery = window.matchMedia?.("(max-width: 820px)");
   if (!viewportQuery) return;
   compactViewport.value = viewportQuery.matches;
+  isCollapsed.value = true;
+  playlistOpen.value = false;
   viewportQuery.addEventListener("change", syncViewportPreference);
 });
 
 onBeforeUnmount(() => {
   audioRef.value?.pause();
   window.clearTimeout(trackChangeTimer);
-  window.clearTimeout(expandTimer);
   viewportQuery?.removeEventListener("change", syncViewportPreference);
 });
 </script>
@@ -415,39 +363,66 @@ onBeforeUnmount(() => {
   bottom: 18px;
   left: auto;
   z-index: 70;
-  display: grid;
-  width: 92px;
-  grid-template-columns: 24px 40px;
-  grid-template-areas: "handle toggle";
+  display: flex;
+  width: 168px;
+  min-height: 52px;
   align-items: center;
-  gap: 6px 8px;
-  padding: 6px 8px 6px 4px;
-  border: 1px solid rgba(168, 196, 184, 0.22);
-  background: rgba(16, 40, 39, 0.94);
+  gap: 9px;
+  padding: 6px 7px 6px 4px;
+  border: 1px solid rgba(168, 196, 184, 0.34);
+  border-left: 2px solid var(--brass-soft);
+  background: var(--night);
   color: var(--porcelain-panel);
-  box-shadow: 0 10px 30px rgba(16, 40, 39, 0.16);
   transition:
     width var(--motion-base) var(--ease-standard),
-    grid-template-columns var(--motion-base) var(--ease-standard),
+    min-height var(--motion-base) var(--ease-standard),
     background-color var(--motion-fast) var(--ease-standard),
     border-color var(--motion-fast) var(--ease-standard);
 }
 
+.audio-dock.is-expanded,
+.audio-dock.is-collapsed {
+  display: grid;
+}
+
 .audio-dock.is-expanded {
-  width: min(380px, calc(100vw - 36px));
-  grid-template-columns: 28px 36px minmax(0, 1fr) auto;
-  grid-template-areas: "handle toggle stage state" "handle controls controls controls";
+  width: min(388px, calc(100vw - 36px));
+  min-height: 108px;
+  max-height: 108px;
+  grid-template-columns: 32px 40px minmax(0, 1fr) auto;
+  grid-template-areas:
+    "handle toggle stage state"
+    "handle controls controls controls";
+  align-content: center;
+  align-items: center;
+  gap: 2px 9px;
+  padding: 6px 11px 5px 6px;
+}
+
+.audio-dock.is-collapsed {
+  width: 176px;
+  max-height: 48px;
+  min-height: 48px;
+  grid-template-columns: 28px 40px minmax(0, 1fr);
+  grid-template-areas:
+    "handle toggle compact"
+    "handle toggle compact-state";
+  align-items: center;
+  gap: 0 8px;
+  padding: 5px 8px 5px 4px;
+  border-left-width: 2px;
 }
 
 .audio-dock__handle {
   grid-area: handle;
   display: grid;
-  width: 24px;
-  height: 36px;
+  width: 28px;
+  height: 40px;
   align-self: center;
   place-items: center;
   padding: 0;
   border: 0;
+  border-right: 1px solid rgba(168, 196, 184, 0.16);
   background: transparent;
   color: rgba(251, 252, 249, 0.62);
 }
@@ -456,25 +431,7 @@ onBeforeUnmount(() => {
   color: var(--porcelain-panel);
 }
 
-.audio-dock.is-collapsed {
-  width: 84px;
-  grid-template-columns: 28px 36px;
-  grid-template-areas: "handle toggle";
-  gap: 6px;
-  padding-right: 5px;
-}
-
-.audio-dock.is-collapsed .audio-dock__stage,
-.audio-dock.is-collapsed .audio-dock__state,
-.audio-dock.is-collapsed .audio-dock__controls,
-.audio-dock.is-collapsed .audio-dock__playlist {
-  display: none;
-}
-
-.audio-dock:not(.is-expanded):not(.is-collapsed) .audio-dock__stage,
-.audio-dock:not(.is-expanded):not(.is-collapsed) .audio-dock__state,
-.audio-dock:not(.is-expanded):not(.is-collapsed) .audio-dock__controls,
-.audio-dock:not(.is-expanded):not(.is-collapsed) .audio-dock__playlist {
+.audio-dock__handle-label {
   display: none;
 }
 
@@ -485,24 +442,69 @@ onBeforeUnmount(() => {
   height: 40px;
   place-items: center;
   padding: 0;
-  border: 1px solid rgba(168, 196, 184, 0.34);
-  border-radius: 50%;
-  background: transparent;
+  border: 1px solid rgba(168, 196, 184, 0.36);
+  border-radius: 0;
+  background: rgba(168, 196, 184, 0.06);
   color: var(--porcelain-panel);
 }
 
+.audio-dock__toggle:hover,
 .audio-dock.is-playing .audio-dock__toggle {
   border-color: var(--brass-soft);
   color: var(--brass-soft);
 }
 
 .audio-dock.is-expanded .audio-dock__handle {
-  width: 28px;
+  width: 32px;
+  height: 86px;
 }
 
 .audio-dock.is-expanded .audio-dock__toggle {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
+}
+
+.audio-dock.is-collapsed .audio-dock__handle {
+  height: 38px;
+  border-right: 0;
+}
+
+.audio-dock.is-collapsed .audio-dock__toggle {
+  width: 38px;
+  height: 38px;
+}
+
+.audio-dock.is-collapsed .audio-dock__stage,
+.audio-dock.is-collapsed .audio-dock__state,
+.audio-dock.is-collapsed .audio-dock__controls,
+.audio-dock.is-collapsed .audio-dock__playlist {
+  display: none;
+}
+
+.audio-dock__compact-title,
+.audio-dock__compact-state {
+  display: none;
+}
+
+.audio-dock.is-collapsed .audio-dock__compact-title {
+  grid-area: compact;
+  display: block;
+  overflow: hidden;
+  color: var(--porcelain-panel);
+  font-family: var(--font-poem);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.audio-dock.is-collapsed .audio-dock__compact-state {
+  grid-area: compact-state;
+  display: block;
+  color: rgba(251, 252, 249, 0.5);
+  font-size: var(--text-meta);
+  line-height: 1.3;
 }
 
 .audio-dock__stage {
@@ -515,9 +517,17 @@ onBeforeUnmount(() => {
 .audio-dock__meta {
   display: grid;
   min-width: 0;
-  grid-template-columns: 32px minmax(0, 1fr) auto;
+  grid-template-columns: 24px 32px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+}
+
+.audio-dock__index {
+  color: var(--brass-soft);
+  font-family: var(--font-number);
+  font-size: var(--text-meta);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
 .audio-dock__cover {
@@ -542,7 +552,9 @@ onBeforeUnmount(() => {
 }
 
 .audio-dock__title {
-  font-size: var(--text-note);
+  font-family: var(--font-poem);
+  font-size: 12px;
+  letter-spacing: 0.04em;
   line-height: 1.35;
   transition: color var(--motion-fast) var(--ease-standard);
 }
@@ -585,6 +597,7 @@ onBeforeUnmount(() => {
 
 .audio-dock__seek-wrap {
   min-width: 0;
+  padding-left: 30px;
 }
 
 .audio-dock__seek,
@@ -644,10 +657,10 @@ onBeforeUnmount(() => {
   display: grid;
   grid-template-columns: repeat(3, 36px) minmax(48px, 1fr) 36px;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   margin-top: 0;
-  padding-top: 5px;
-  border-top: 1px solid rgba(168, 196, 184, 0.16);
+  padding-top: 4px;
+  border-top: 1px solid rgba(168, 196, 184, 0.18);
 }
 
 .audio-dock__controls button {
@@ -656,7 +669,7 @@ onBeforeUnmount(() => {
   height: 36px;
   place-items: center;
   padding: 0;
-  border: 0;
+  border: 1px solid transparent;
   background: transparent;
   color: rgba(251, 252, 249, 0.55);
 }
@@ -664,14 +677,17 @@ onBeforeUnmount(() => {
 .audio-dock__controls button:hover,
 .audio-dock__controls button[aria-expanded="true"],
 .audio-dock__controls button[aria-pressed="true"] {
+  border-color: rgba(216, 191, 142, 0.42);
   color: var(--brass-soft);
 }
 
 .audio-dock__state {
   grid-area: state;
+  align-self: start;
+  padding-top: 2px;
   color: rgba(251, 252, 249, 0.5);
   font-size: var(--text-meta);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.06em;
   white-space: nowrap;
 }
 
@@ -691,9 +707,10 @@ onBeforeUnmount(() => {
   z-index: 2;
   display: grid;
   padding: 8px;
-  border: 1px solid rgba(168, 196, 184, 0.28);
-  background: rgba(16, 40, 39, 0.99);
-  box-shadow: 0 18px 44px rgba(16, 40, 39, 0.28);
+  border: 1px solid rgba(168, 196, 184, 0.34);
+  border-left: 2px solid var(--brass-soft);
+  background: var(--night-raised);
+  box-shadow: 0 18px 36px rgba(16, 40, 39, 0.18);
 }
 
 .audio-dock__playlist button {
@@ -764,43 +781,48 @@ audio {
     right: max(12px, env(safe-area-inset-right));
     bottom: calc(84px + env(safe-area-inset-bottom));
     left: max(12px, env(safe-area-inset-left));
-    width: auto;
+    width: 176px;
     max-height: 108px;
-    padding-block: 5px;
-    border-color: rgba(168, 196, 184, 0.16);
+    margin-left: auto;
+    border-color: rgba(168, 196, 184, 0.34);
     border-bottom: 0;
-    box-shadow: 0 10px 26px rgba(16, 40, 39, 0.14);
   }
 
-  .audio-dock:not(.is-collapsed),
   .audio-dock.is-expanded {
     width: auto;
-    grid-template-columns: 28px 36px minmax(0, 1fr) auto;
-    grid-template-areas: "handle toggle stage state" "handle controls controls controls";
-  }
-
-  .audio-dock:not(.is-collapsed):not(.is-expanded) .audio-dock__stage,
-  .audio-dock:not(.is-collapsed):not(.is-expanded) .audio-dock__controls,
-  .audio-dock:not(.is-collapsed):not(.is-expanded) .audio-dock__playlist {
-    display: grid;
+    min-height: 108px;
+    max-height: 108px;
+    grid-template-columns: 28px 40px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "handle toggle stage state"
+      "handle controls controls controls";
+    gap: 2px 8px;
+    padding: 5px 9px 4px 4px;
   }
 
   .audio-dock__state {
-    display: none;
+    padding-top: 0;
   }
 
   .audio-dock.is-collapsed {
-    width: 92px;
+    width: 176px;
+    min-height: 46px;
     max-height: 48px;
-    grid-template-columns: 28px 36px;
-    grid-template-areas: "handle toggle";
-    margin-left: auto;
+    grid-template-columns: 28px 38px minmax(0, 1fr);
+    grid-template-areas:
+      "handle toggle compact"
+      "handle toggle compact-state";
   }
 
   .audio-dock.is-collapsed .audio-dock__handle,
   .audio-dock.is-collapsed .audio-dock__toggle {
     width: 28px;
     height: 36px;
+  }
+
+  .audio-dock.is-expanded .audio-dock__handle {
+    width: 28px;
+    height: 86px;
   }
 
   .audio-dock__playlist {
@@ -811,10 +833,22 @@ audio {
 
 @media (max-width: 420px) {
   .audio-dock {
-    grid-template-columns: 28px 36px minmax(0, 1fr);
-    grid-template-areas: "handle toggle stage" "handle controls controls";
-    gap: 6px;
-    padding-right: 8px;
+    grid-template-columns: 28px 38px minmax(0, 1fr);
+    grid-template-areas:
+      "handle toggle compact"
+      "handle toggle compact-state";
+    gap: 0 7px;
+    padding-right: 7px;
+  }
+
+  .audio-dock.is-expanded {
+    width: auto;
+    grid-template-columns: 28px 38px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "handle toggle stage state"
+      "handle controls controls";
+    gap: 3px 7px;
+    padding-right: 7px;
   }
 
   .audio-dock__time,
@@ -825,7 +859,11 @@ audio {
 
   .audio-dock__controls {
     grid-template-columns: repeat(3, 36px);
-    justify-content: center;
+    justify-content: start;
+  }
+
+  .audio-dock__index {
+    display: none;
   }
 
   .audio-dock__cover {
@@ -835,6 +873,27 @@ audio {
 
   .audio-dock__meta {
     grid-template-columns: 30px minmax(0, 1fr);
+  }
+
+  .audio-dock__seek-wrap {
+    padding-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .audio-dock,
+  .audio-dock__title,
+  .audio-dock__cover,
+  .playlist-enter-active,
+  .playlist-leave-active {
+    animation: none;
+    transition: none;
+  }
+
+  .playlist-enter-from,
+  .playlist-leave-to {
+    opacity: 1;
+    transform: none;
   }
 }
 </style>

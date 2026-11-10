@@ -8,11 +8,11 @@
         <strong>兰泽</strong>
       </router-link>
       <figure class="auth-verse">
-        <blockquote>
-          <span>心悦君兮君不知</span>
-          <span>山有木兮木有枝</span>
-        </blockquote>
-        <figcaption>《越人歌》</figcaption>
+        <div class="auth-verse__columns" aria-label="山有木兮木有枝，心悦君兮君不知">
+          <blockquote class="auth-verse__line">山有木兮木有枝</blockquote>
+          <blockquote class="auth-verse__line">心悦君兮君不知</blockquote>
+        </div>
+        <figcaption><span>《越人歌》</span></figcaption>
       </figure>
       <p class="auth-art__note">读诗不需要登录。登录只用于本地演示的作品与资料。</p>
     </section>
@@ -282,58 +282,73 @@ watch(
   top: 50%;
   right: 11%;
   z-index: 2;
-  display: flex;
   width: min(300px, 42%);
-  height: min(540px, 66vh);
-  flex-direction: column;
-  align-items: stretch;
+  height: min(520px, 64vh);
   margin: 0;
-  padding: 34px 26px 24px;
+  padding: 28px 24px 22px;
   border: 1px solid rgba(216, 191, 142, 0.32);
-  background: rgba(16, 40, 39, 0.18);
+  background: rgba(16, 40, 39, 0.22);
   transform: translateY(-50%);
 }
 
-.auth-verse blockquote {
+.auth-verse__columns {
   position: relative;
+  height: 100%;
+  padding: 8px 4px 22px;
+}
+
+.auth-verse__line {
+  position: absolute;
+  top: 12px;
+  right: 52%;
   display: block;
-  flex: 1;
+  width: min-content;
+  height: min-content;
   margin: 0;
+  white-space: nowrap;
   font-family: var(--font-poem);
-  font-size: clamp(28px, 2.8vw, 42px);
-  letter-spacing: 0.14em;
-  line-height: 1.35;
+  font-size: clamp(27px, 2.6vw, 38px);
+  letter-spacing: 0.11em;
+  line-height: 1.25;
   writing-mode: vertical-rl;
 }
 
-.auth-verse blockquote span {
+.auth-verse__columns::before {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  display: block;
-  white-space: nowrap;
+  top: 12px;
+  bottom: 24px;
+  left: 50%;
+  width: 1px;
+  background: rgba(216, 191, 142, 0.12);
+  content: "";
 }
 
-.auth-verse blockquote span:first-child {
-  right: 8%;
+.auth-verse__line:last-child {
+  right: 18%;
 }
 
-.auth-verse blockquote span:last-child {
-  right: 52%;
+.auth-verse__line:first-child {
+  right: 60%;
 }
 
 .auth-verse figcaption {
-  margin: 18px 0 0;
-  padding-top: 12px;
-  border-top: 1px solid rgba(216, 191, 142, 0.18);
+  position: absolute;
+  right: 16px;
+  bottom: 18px;
+  height: 108px;
+  margin: 0;
+  padding-left: 9px;
+  border-left: 1px solid rgba(216, 191, 142, 0.24);
   color: rgba(251, 252, 249, 0.54);
   font-family: var(--font-poem);
   font-size: var(--text-meta);
-  letter-spacing: 0.16em;
+  letter-spacing: 0.08em;
   line-height: 1.4;
-  text-align: center;
+  writing-mode: vertical-rl;
+}
+
+.auth-verse figcaption span {
   white-space: nowrap;
-  writing-mode: horizontal-tb;
 }
 
 .auth-art__note {

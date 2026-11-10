@@ -252,6 +252,10 @@ const main = async () => {
         viewportWidth: document.documentElement.clientWidth,
         dockWidth: dock ? Math.round(dock.width) : 0,
         dockHeight: dock ? Math.round(dock.height) : 0,
+        dockCollapsed: Boolean(document.querySelector('.audio-dock')?.classList.contains('is-collapsed')),
+        audioPaused: Boolean(document.querySelector('audio')?.paused),
+        audioTime: Number(document.querySelector('audio')?.currentTime || 0),
+        autoplayAttribute: Boolean(document.querySelector('audio')?.autoplay),
         overlapsPlinth: intersects(dock, plinth),
         overlapsPlinthActions: intersects(dock, action),
       };
@@ -329,6 +333,9 @@ const main = async () => {
   if (coldStart.coldLayoutShift > 0.05) {
     throw new Error(`Cold start layout shifted beyond the 0.05 budget: ${coldStart.coldLayoutShift.toFixed(4)}`);
   }
+  if (!coldStart.dockCollapsed || !coldStart.audioPaused || coldStart.audioTime !== 0 || coldStart.autoplayAttribute) {
+    throw new Error("Cold start must show a collapsed, silent audio dock without autoplay");
+  }
   await send("Page.navigate", { url: `${origin}/#/` });
   await waitUntil("today's reading view", () => evaluate("Boolean(document.querySelector('.poem-plinth'))"));
   await waitUntil("excerpt source settled", () => evaluate(
@@ -343,6 +350,8 @@ const main = async () => {
     audioTitle: document.querySelector('.audio-dock__title')?.textContent?.trim() || '',
     audioState: document.querySelector('.audio-dock__state')?.textContent?.trim() || '',
     audioStateRole: document.querySelector('.audio-dock__state')?.getAttribute('role') || '',
+    dockCollapsed: Boolean(document.querySelector('.audio-dock')?.classList.contains('is-collapsed')),
+    audioPaused: Boolean(document.querySelector('audio')?.paused),
     navCount: document.querySelectorAll('.main-nav a').length,
   }))()`);
   if (!home.text.includes("余韵 · 一则")) throw new Error("Today's reading page did not render");
@@ -351,7 +360,11 @@ const main = async () => {
   if (home.audioStateRole !== "status" || !["试听", "播放中"].includes(home.audioState)) {
     throw new Error("Audio dock status is missing or reports an unexpected initial state");
   }
+  if (!home.dockCollapsed || !home.audioPaused) {
+    throw new Error("Audio dock should start collapsed and silent");
+  }
   await evaluate(`(() => {
+    document.querySelector('.audio-dock__handle')?.click();
     document.querySelector('button[aria-label="查看播放列表"]')?.click();
     return true;
   })()`);
@@ -365,6 +378,13 @@ const main = async () => {
   if (!audioLibrary.seek || !audioLibrary.volume || !audioLibrary.cover) {
     throw new Error("Local soundscape controls did not render");
   }
+  await evaluate(`(() => {
+    document.querySelector('.audio-dock__handle')?.click();
+    return true;
+  })()`);
+  await waitUntil("audio library returns to collapsed", () => evaluate(
+    "document.querySelector('.audio-dock')?.classList.contains('is-collapsed')",
+  ));
   await evaluate(`(() => {
     document.querySelector('button[aria-label="下一首声景"]')?.click();
     return true;
@@ -460,14 +480,16 @@ const main = async () => {
     return {
       position: style.position,
       zIndex: Number(style.zIndex),
+      collapsed: dock.classList.contains('is-collapsed'),
       top: Math.round(rect.top),
       bottom: Math.round(rect.bottom),
       viewportHeight: innerHeight,
       visible: rect.bottom > 0 && rect.top < innerHeight,
     };
   })()`);
-  if (dockLayout?.position !== "fixed" || dockLayout.zIndex < 2 || !dockLayout.visible || dockLayout.bottom > dockLayout.viewportHeight) {
-    throw new Error("Audio dock is not pinned inside the viewport");
+  if (!dockLayout?.collapsed || dockLayout.position !== "fixed" || dockLayout.zIndex < 2
+    || !dockLayout.visible || dockLayout.bottom > dockLayout.viewportHeight) {
+    throw new Error(`Audio dock is not pinned inside the viewport: ${JSON.stringify(dockLayout)}`);
   }
 
   currentStep = "audio dock scroll";
@@ -582,14 +604,14 @@ const main = async () => {
   await evaluate("window.scrollTo({ top: 0, behavior: 'instant' })");
   await waitUntil("page scroll reset", () => evaluate("scrollY === 0"));
 
-  currentStep = "audio dock collapse";
-  if (!await evaluate(`(() => {
-    const handle = document.querySelector('.audio-dock__handle');
-    if (!handle) return false;
-    handle.click();
+  currentStep = "audio dock two states";
+  await evaluate(`(() => {
+    const dock = document.querySelector('.audio-dock');
+    const handle = dock?.querySelector('.audio-dock__handle');
+    if (handle && !dock.classList.contains('is-collapsed')) handle.click();
     return true;
-  })()`)) throw new Error("Audio dock collapse control was not found");
-  await waitUntil("collapsed audio dock", () => evaluate(
+  })()`);
+  await waitUntil("initial collapsed audio dock", () => evaluate(
     "document.querySelector('.audio-dock')?.classList.contains('is-collapsed')",
   ));
   if (!await evaluate(`(() => {
@@ -610,43 +632,59 @@ const main = async () => {
       stageVisible: getComputedStyle(document.querySelector('.audio-dock__stage')).display !== 'none',
       minControlHeight: controls.length ? Math.min(...controls.map((button) => button.getBoundingClientRect().height)) : 0,
       seekHeight: seek ? seek.getBoundingClientRect().height : 0,
+      width: dock ? Math.round(dock.getBoundingClientRect().width) : 0,
+      height: dock ? Math.round(dock.getBoundingClientRect().height) : 0,
+      audioPaused: Boolean(document.querySelector('audio')?.paused),
     };
   })()`);
   if (!expandedDock.isExpanded || !expandedDock.stageVisible) {
     throw new Error("Manually expanded audio dock did not reveal its controls");
   }
+  if (!expandedDock.audioPaused) {
+    throw new Error("Expanding the audio dock must not start playback");
+  }
+  if (expandedDock.height > 120) {
+    throw new Error(`Expanded audio dock exceeds the fixed-layer height budget: ${JSON.stringify(expandedDock)}`);
+  }
   if (expandedDock.minControlHeight < 36 || expandedDock.seekHeight < 24) {
     throw new Error("Expanded audio dock controls fell below the touch target floor");
   }
-
-  currentStep = "audio dock keyboard focus";
-  if (!await evaluate(`(() => {
+  await evaluate(`(() => {
     const handle = document.querySelector('.audio-dock__handle');
-    if (!handle) return false;
-    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     handle.focus();
-    handle.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
-    return document.activeElement === handle;
-  })()`)) throw new Error("Audio dock keyboard focus control was not found");
-  await waitUntil("keyboard expanded audio dock", () => evaluate(
-    "document.querySelector('.audio-dock')?.classList.contains('is-expanded')",
-  ));
-  await waitUntil("keyboard focus keeps audio dock expanded", async () => {
+    return true;
+  })()`);
+  await waitUntil("focus keeps audio dock expanded", async () => {
     await delay(320);
-    return evaluate(
-      "document.querySelector('.audio-dock')?.classList.contains('is-expanded')",
-    );
+    return evaluate("document.querySelector('.audio-dock')?.classList.contains('is-expanded')");
   });
-  if (!await evaluate(`(() => {
+  await evaluate(`(() => {
     const handle = document.querySelector('.audio-dock__handle');
-    if (!handle) return false;
-    handle.blur();
-    handle.dispatchEvent(new FocusEvent("focusout", { bubbles: true }));
-    return document.activeElement !== handle;
-  })()`)) throw new Error("Audio dock keyboard focus could not be released");
-  await waitUntil("keyboard collapsed audio dock", () => evaluate(
-    "!document.querySelector('.audio-dock')?.classList.contains('is-expanded')",
+    handle.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    handle.click();
+    return true;
+  })()`);
+  await waitUntil("audio dock returns to collapsed", () => evaluate(
+    "document.querySelector('.audio-dock')?.classList.contains('is-collapsed')",
   ));
+  await waitUntil("collapsed audio dock settles", () => evaluate(`(() => {
+    const dock = document.querySelector('.audio-dock');
+    return dock ? Math.round(dock.getBoundingClientRect().width) <= 180 : false;
+  })()`));
+  const collapsedDock = await evaluate(`(() => {
+    const dock = document.querySelector('.audio-dock');
+    return {
+      width: dock ? Math.round(dock.getBoundingClientRect().width) : 0,
+      height: dock ? Math.round(dock.getBoundingClientRect().height) : 0,
+      compactTitle: getComputedStyle(document.querySelector('.audio-dock__compact-title')).display !== 'none',
+      stageHidden: getComputedStyle(document.querySelector('.audio-dock__stage')).display === 'none',
+      audioPaused: Boolean(document.querySelector('audio')?.paused),
+    };
+  })()`);
+  if (!collapsedDock.compactTitle || !collapsedDock.stageHidden || !collapsedDock.audioPaused
+    || collapsedDock.width > 190 || collapsedDock.height > 56) {
+    throw new Error(`Collapsed audio dock should be a quiet soundscape slip: ${JSON.stringify(collapsedDock)}`);
+  }
 
   if (!await clickByText("收入诗卷")) throw new Error("Save-to-collection button was not found");
   currentStep = "save";
@@ -724,9 +762,7 @@ const main = async () => {
     `(() => {
       const dock = document.querySelector('.audio-dock');
       if (!dock) return false;
-      const handle = dock.querySelector('.audio-dock__handle');
-      if (handle && !dock.classList.contains('is-collapsed')) handle.click();
-      return dock.classList.contains('is-collapsed');
+      return dock.classList.contains('is-collapsed') && Boolean(document.querySelector('audio')?.paused);
     })()`,
   ));
   const mobileLayout = await evaluate(`(() => ({
@@ -739,6 +775,7 @@ const main = async () => {
     audioDockBottom: Math.round(document.querySelector('.audio-dock')?.getBoundingClientRect().bottom || 0),
     mobileDockTop: Math.round(document.querySelector('.mobile-dock')?.getBoundingClientRect().top || 0),
     audioDockCollapsed: document.querySelector('.audio-dock')?.classList.contains('is-collapsed') || false,
+    audioPaused: Boolean(document.querySelector('audio')?.paused),
   }))()`);
   if (mobileLayout.mobileDock === "none" || mobileLayout.desktopNav !== "none") {
     throw new Error("Mobile navigation layout did not switch as expected");
@@ -754,6 +791,9 @@ const main = async () => {
   }
   if (!mobileLayout.audioDockCollapsed) {
     throw new Error("Mobile audio dock should start collapsed");
+  }
+  if (!mobileLayout.audioPaused) {
+    throw new Error("Mobile audio dock should start silently");
   }
   if (!await evaluate(`(() => {
     const button = document.querySelector('.mobile-filter-bar button');
@@ -860,18 +900,52 @@ const main = async () => {
   await waitUntil("narrow audio dock preference", () => evaluate(
     "document.querySelector('.audio-dock')?.classList.contains('is-collapsed')",
   ));
+  if (!await evaluate(`(() => {
+    const dock = document.querySelector('.audio-dock');
+    const handle = dock?.querySelector('.audio-dock__handle');
+    if (!handle) return false;
+    handle.click();
+    return true;
+  })()`)) throw new Error("Narrow audio dock expand control was not found");
+  await waitUntil("320px expanded audio dock", () => evaluate(
+    "!document.querySelector('.audio-dock')?.classList.contains('is-collapsed')",
+  ));
+  const narrowExpanded = await evaluate(`(() => {
+    const dock = document.querySelector('.audio-dock');
+    const controls = [...document.querySelectorAll('.audio-dock__controls button')]
+      .filter((button) => getComputedStyle(button).display !== "none");
+    return {
+      width: dock ? Math.round(dock.getBoundingClientRect().width) : 0,
+      height: dock ? Math.round(dock.getBoundingClientRect().height) : 0,
+      minControlHeight: controls.length ? Math.min(...controls.map((button) => button.getBoundingClientRect().height)) : 0,
+      visibleControls: controls.length,
+      audioPaused: Boolean(document.querySelector('audio')?.paused),
+    };
+  })()`);
+  if (narrowExpanded.height > 120 || narrowExpanded.visibleControls < 3
+    || narrowExpanded.minControlHeight < 36 || !narrowExpanded.audioPaused) {
+    throw new Error(`320px expanded audio dock is unstable: ${JSON.stringify(narrowExpanded)}`);
+  }
+  await evaluate("document.querySelector('.audio-dock__handle').click()");
+  await waitUntil("320px audio dock collapsed again", () => evaluate(
+    "document.querySelector('.audio-dock')?.classList.contains('is-collapsed')",
+  ));
   const narrowLayout = await evaluate(`(() => ({
     scrollWidth: document.documentElement.scrollWidth,
     bodyScrollWidth: document.body.scrollWidth,
     viewportWidth: document.documentElement.clientWidth,
     filterBar: getComputedStyle(document.querySelector('.mobile-filter-bar')).display,
     audioDockCollapsed: document.querySelector('.audio-dock')?.classList.contains('is-collapsed') || false,
+    audioPaused: Boolean(document.querySelector('audio')?.paused),
   }))()`);
   if (narrowLayout.scrollWidth > narrowLayout.viewportWidth + 1 || narrowLayout.bodyScrollWidth > narrowLayout.viewportWidth + 1) {
     throw new Error("320px explore page overflows horizontally");
   }
   if (narrowLayout.filterBar === "none" || !narrowLayout.audioDockCollapsed) {
     throw new Error("320px mobile controls did not adapt as expected");
+  }
+  if (!narrowLayout.audioPaused) {
+    throw new Error("320px audio dock did not start silently");
   }
   await evaluate("window.scrollTo({ top: 600, behavior: 'instant' })");
   await waitUntil("320px page scroll", () => evaluate("scrollY > 300"));
@@ -904,12 +978,25 @@ const main = async () => {
       .filter((element) => element.tabIndex >= 0).length,
     tablist: document.querySelectorAll('.auth-tabs[role="tablist"]').length,
     currentPage: document.querySelector('.auth-tabs a[aria-current="page"]')?.textContent?.trim() || '',
-    verseWritingMode: getComputedStyle(document.querySelector('.auth-verse blockquote')).writingMode,
-    verseLines: [...document.querySelectorAll('.auth-verse blockquote span')].every((line) => getComputedStyle(line).whiteSpace === 'nowrap'),
+    verseWritingMode: getComputedStyle(document.querySelector('.auth-verse__line')).writingMode,
+    verseLines: [...document.querySelectorAll('.auth-verse__line')].every((line) => getComputedStyle(line).whiteSpace === 'nowrap'),
+    verseGeometry: [...document.querySelectorAll('.auth-verse__line')].map((line) => {
+      const rect = line.getBoundingClientRect();
+      return { width: Math.round(rect.width), height: Math.round(rect.height) };
+    }),
+    verseText: [...document.querySelectorAll('.auth-verse__line')].map((line) => line.textContent.trim()).join('，'),
+    captionWritingMode: getComputedStyle(document.querySelector('.auth-verse figcaption')).writingMode,
   }))()`);
   if (authSemantics.hiddenFocusable || authSemantics.tablist || authSemantics.currentPage !== "登录"
     || authSemantics.verseWritingMode !== "vertical-rl" || !authSemantics.verseLines) {
     throw new Error("Auth page has hidden focusable content or inconsistent navigation semantics");
+  }
+  if (authSemantics.verseText !== "山有木兮木有枝，心悦君兮君不知"
+    || authSemantics.captionWritingMode !== "vertical-rl"
+    || authSemantics.verseGeometry.length !== 2
+    || authSemantics.verseGeometry.some((line) => line.width > 70 || line.height < 180)
+    || Math.abs(authSemantics.verseGeometry[0].height - authSemantics.verseGeometry[1].height) > 2) {
+    throw new Error("Auth verse should form two complete vertical columns");
   }
   if (!await setInput('input[aria-label="登录账号"]', "demo")) {
     throw new Error("Login username input was not found");
