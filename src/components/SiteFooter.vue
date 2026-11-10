@@ -25,7 +25,7 @@ const year = new Date().getFullYear();
   border-top: 1px solid var(--line);
   background: var(--porcelain-deep);
   color: var(--ink-faint);
-  font-size: 11px;
+  font-size: var(--text-note);
 }
 
 .museum-footer__inner {
@@ -51,8 +51,8 @@ const year = new Date().getFullYear();
 }
 
 .footer-brand small {
-  font-size: 9px;
-  letter-spacing: 0.12em;
+  font-size: var(--text-meta);
+  letter-spacing: 0.1em;
 }
 
 .museum-footer p {
@@ -72,7 +72,7 @@ const year = new Date().getFullYear();
 
 .footer-links a {
   display: inline-flex;
-  min-height: 40px;
+  min-height: 44px;
   align-items: center;
 }
 

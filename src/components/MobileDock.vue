@@ -57,7 +57,8 @@ const isActive = (item) => {
   padding: 7px 4px;
   border-radius: 0;
   color: rgba(251, 252, 249, 0.5);
-  font-size: 10px;
+  font-size: var(--text-meta);
+  line-height: 1.2;
 }
 
 .mobile-dock a:focus-visible {

@@ -410,8 +410,8 @@ watch([dynasty, genre], () => {
 .index-label p {
   margin: 0;
   color: var(--ink-soft);
-  font-size: 10px;
-  letter-spacing: 0.16em;
+  font-size: var(--text-meta);
+  letter-spacing: 0.14em;
   writing-mode: vertical-rl;
 }
 
@@ -420,16 +420,18 @@ watch([dynasty, genre], () => {
   font-family: var(--font-poem);
   font-size: clamp(42px, 6vw, 78px);
   font-weight: 400;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.03em;
   line-height: 1.18;
+  text-wrap: balance;
 }
 
 .index-banner__copy > p {
-  max-width: 48em;
+  max-width: min(48em, var(--measure-copy));
   margin: 20px 0 0;
   color: var(--ink-soft);
-  font-size: 12px;
-  line-height: 1.9;
+  font-size: 13px;
+  line-height: var(--leading-copy);
+  text-wrap: pretty;
 }
 
 .index-banner__stats {
@@ -447,8 +449,8 @@ watch([dynasty, genre], () => {
 
 .index-banner__stats dt {
   color: var(--ink-faint);
-  font-size: 10px;
-  letter-spacing: 0.08em;
+  font-size: var(--text-meta);
+  letter-spacing: 0.06em;
 }
 
 .index-banner__stats dd {
@@ -535,16 +537,16 @@ watch([dynasty, genre], () => {
   gap: 8px;
   margin-top: 13px;
   color: var(--ink-faint);
-  font-size: 10px;
+  font-size: var(--text-meta);
 }
 
 .quick-terms button {
-  min-height: 40px;
+  min-height: 42px;
   padding: 7px 12px;
   border: 1px solid var(--line);
   background: transparent;
   color: var(--ink-soft);
-  font-size: 10px;
+  font-size: var(--text-meta);
 }
 
 .quick-terms button:hover {
@@ -609,7 +611,7 @@ watch([dynasty, genre], () => {
 .poem-paths em {
   overflow: hidden;
   color: var(--ink-faint);
-  font-size: 10px;
+  font-size: var(--text-meta);
   font-style: normal;
   line-height: 1.5;
   text-overflow: ellipsis;
@@ -623,7 +625,7 @@ watch([dynasty, genre], () => {
   }
 
 .index-content {
-  padding-block: 52px 76px;
+  padding-block: 52px max(76px, var(--fixed-layer-space));
 }
 
 .mobile-filter-bar {
@@ -660,12 +662,12 @@ watch([dynasty, genre], () => {
 }
 
 .facet__head button {
-  min-height: 36px;
+  min-height: 40px;
   padding: 0 4px;
   border: 0;
   background: transparent;
   color: var(--ink-faint);
-  font-size: 10px;
+  font-size: var(--text-meta);
 }
 
 .facet__head button:hover {
@@ -727,15 +729,16 @@ watch([dynasty, genre], () => {
 .facet__list em {
   color: var(--ink-faint);
   font-family: var(--font-number);
-  font-size: 9px;
+  font-size: var(--text-meta);
   font-style: normal;
 }
 
 .filter-note {
   margin: 24px 0 0;
   color: var(--ink-faint);
-  font-size: 10px;
-  line-height: 1.8;
+  font-size: var(--text-meta);
+  line-height: var(--leading-copy);
+  text-wrap: pretty;
 }
 
 .result-head {
@@ -754,6 +757,7 @@ watch([dynasty, genre], () => {
   font-size: clamp(30px, 4vw, 48px);
   font-weight: 400;
   letter-spacing: 0.04em;
+  text-wrap: balance;
 }
 
 .result-head__right {
@@ -761,17 +765,17 @@ watch([dynasty, genre], () => {
   justify-items: end;
   gap: 7px;
   color: var(--ink-faint);
-  font-size: 10px;
+  font-size: var(--text-meta);
 }
 
 .result-head__right button {
-  min-height: 36px;
+  min-height: 40px;
   padding: 0 2px;
   border: 0;
   border-bottom: 1px solid var(--line-strong);
   background: transparent;
   color: var(--ink-soft);
-  font-size: 10px;
+  font-size: var(--text-meta);
 }
 
 .result-head__right button:hover {
@@ -798,7 +802,7 @@ watch([dynasty, genre], () => {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  min-height: 36px;
+  min-height: 40px;
   padding: 7px 11px;
   border: 1px solid var(--line);
   background: var(--porcelain-panel);
@@ -808,7 +812,7 @@ watch([dynasty, genre], () => {
 
 .active-filters button span {
   color: var(--ink-faint);
-  font-size: 9px;
+  font-size: var(--text-meta);
 }
 
 .active-filters button:hover {
@@ -874,13 +878,14 @@ watch([dynasty, genre], () => {
 .corpus-note {
   margin: 18px 0 0;
   color: var(--ink-faint);
-  font-size: 10px;
-  line-height: 1.8;
+  font-size: var(--text-meta);
+  line-height: var(--leading-copy);
+  text-wrap: pretty;
 }
 
 .corpus-note code {
   font-family: var(--font-ui);
-  font-size: 10px;
+  font-size: var(--text-meta);
 }
 
 @media (max-width: 900px) {
@@ -952,14 +957,14 @@ watch([dynasty, genre], () => {
     background: var(--ink);
     color: var(--porcelain-panel);
     font-family: var(--font-number);
-    font-size: 10px;
+    font-size: var(--text-meta);
   }
 
   .mobile-filter-bar p {
     margin: 0;
     min-width: 0;
     color: var(--ink-faint);
-    font-size: 10px;
+    font-size: var(--text-meta);
     text-align: right;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1032,7 +1037,7 @@ watch([dynasty, genre], () => {
 @media (max-width: 560px) {
   .index-banner__inner {
     gap: 12px;
-    padding-block: 38px 30px;
+    padding-block: 28px 20px;
   }
 
   .index-label span {
@@ -1046,9 +1051,9 @@ watch([dynasty, genre], () => {
 
   .index-banner__copy > p {
     max-width: 34em;
-    margin-top: 12px;
-    font-size: 11px;
-    line-height: 1.7;
+    margin-top: 10px;
+    font-size: var(--text-note);
+    line-height: 1.8;
   }
 
   .index-banner__stats dd {
@@ -1056,7 +1061,7 @@ watch([dynasty, genre], () => {
   }
 
   .search-room {
-    padding-block: 20px 22px;
+    padding-block: 14px 16px;
   }
 
   .index-search {
@@ -1070,18 +1075,18 @@ watch([dynasty, genre], () => {
   }
 
   .quick-terms {
-    margin-top: 10px;
+    margin-top: 8px;
   }
 
   .poem-paths {
     grid-template-columns: 1fr;
     gap: 7px;
-    margin-top: 14px;
+    margin-top: 10px;
   }
 
   .poem-paths button {
-    min-height: 64px;
-    padding: 9px 12px;
+    min-height: 56px;
+    padding: 7px 12px;
   }
 
   .poem-paths span {
@@ -1153,7 +1158,7 @@ watch([dynasty, genre], () => {
   }
 
   .poem-paths em {
-    font-size: 9px;
+    font-size: var(--text-meta);
   }
 
   .mobile-filter-bar__inner {

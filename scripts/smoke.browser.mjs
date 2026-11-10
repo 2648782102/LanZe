@@ -527,6 +527,35 @@ const main = async () => {
     "!document.querySelector('.audio-dock')?.classList.contains('is-collapsed')",
   ));
 
+  currentStep = "audio dock keyboard focus";
+  if (!await evaluate(`(() => {
+    const handle = document.querySelector('.audio-dock__handle');
+    if (!handle) return false;
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+    handle.focus();
+    handle.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    return document.activeElement === handle;
+  })()`)) throw new Error("Audio dock keyboard focus control was not found");
+  await waitUntil("keyboard expanded audio dock", () => evaluate(
+    "document.querySelector('.audio-dock')?.classList.contains('is-expanded')",
+  ));
+  await waitUntil("keyboard focus keeps audio dock expanded", async () => {
+    await delay(320);
+    return evaluate(
+      "document.querySelector('.audio-dock')?.classList.contains('is-expanded')",
+    );
+  });
+  if (!await evaluate(`(() => {
+    const handle = document.querySelector('.audio-dock__handle');
+    if (!handle) return false;
+    handle.blur();
+    handle.dispatchEvent(new FocusEvent("focusout", { bubbles: true }));
+    return document.activeElement !== handle;
+  })()`)) throw new Error("Audio dock keyboard focus could not be released");
+  await waitUntil("keyboard collapsed audio dock", () => evaluate(
+    "!document.querySelector('.audio-dock')?.classList.contains('is-expanded')",
+  ));
+
   if (!await clickByText("收入诗卷")) throw new Error("Save-to-collection button was not found");
   currentStep = "save";
   const savedCount = await waitUntil("saved poem in local storage", () => evaluate(`(() => {
@@ -569,6 +598,25 @@ const main = async () => {
   }))()`).then((value) => value.href.includes("q=") && value.text.includes("李白") ? value : null));
   if (!desktopSearch.text.includes("找到") || desktopSearch.rows !== 24 || !desktopSearch.summary.includes("找到")) {
     throw new Error("Desktop search summary or pagination did not render");
+  }
+  const desktopTypography = await evaluate(`(() => {
+    const title = document.querySelector('.poem-row__title h3');
+    const selectors = ['.eyebrow', '.quick-terms button', '.facet__head button', '.filter-note', '.corpus-note'];
+    const sizes = selectors
+      .map((selector) => document.querySelector(selector))
+      .filter(Boolean)
+      .map((element) => parseFloat(getComputedStyle(element).fontSize));
+    return {
+      titleWhiteSpace: title ? getComputedStyle(title).whiteSpace : '',
+      titleTextOverflow: title ? getComputedStyle(title).textOverflow : '',
+      minSize: sizes.length ? Math.min(...sizes) : 0,
+    };
+  })()`);
+  if (desktopTypography.titleWhiteSpace === "nowrap" || desktopTypography.titleTextOverflow === "ellipsis") {
+    throw new Error("Long poem titles should wrap instead of being clipped");
+  }
+  if (desktopTypography.minSize < 11) {
+    throw new Error("Explore supporting text fell below the 11px readability floor");
   }
 
   await send("Emulation.setDeviceMetricsOverride", {
@@ -677,6 +725,28 @@ const main = async () => {
   if (!guestDraft) throw new Error("Guest compose draft was not retained locally");
   if (guestCompose.scrollWidth > guestCompose.viewportWidth + 1) {
     throw new Error("Mobile compose page overflows horizontally");
+  }
+  const composeTypography = await evaluate(`(() => {
+    const selectors = ['.field-hint', '.draft-status', '.preview-panel__top', '.preview-category', '.preview-hint'];
+    const sizes = selectors
+      .map((selector) => document.querySelector(selector))
+      .filter(Boolean)
+      .map((element) => parseFloat(getComputedStyle(element).fontSize));
+    const loginLink = document.querySelector('.compose-login-note a');
+    return {
+      minSize: sizes.length ? Math.min(...sizes) : 0,
+      loginHeight: loginLink ? Math.round(loginLink.getBoundingClientRect().height) : 0,
+      fixedLayerSpace: parseFloat(getComputedStyle(document.querySelector("main")).paddingBottom),
+    };
+  })()`);
+  if (composeTypography.minSize < 11) {
+    throw new Error("Compose supporting text fell below the 11px readability floor");
+  }
+  if (composeTypography.loginHeight < 40) {
+    throw new Error("Compose login link is below the minimum touch target");
+  }
+  if (composeTypography.fixedLayerSpace < 120) {
+    throw new Error("Narrow screens do not reserve space for fixed layers");
   }
 
   await send("Emulation.setDeviceMetricsOverride", {

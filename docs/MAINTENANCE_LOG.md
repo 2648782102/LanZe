@@ -253,3 +253,10 @@
 - P1/P2：加入统一 motion token、首屏一次编排入场与收藏/换诗/切轨/草稿/预览/发布反馈；寻诗页新增「月与夜 / 春与归 / 宋词小令」真实筛选诗路；读诗页修复 `如梦令·常记溪亭日暮` 硬折，新增相邻馆藏上一首/下一首；写作台显示草稿保存时间与 `aria-busy` 发布态。
 - `scripts/smoke.browser.mjs` 新建隔离 CDP target 做冷启动 `PerformanceObserver` CLS、播放器尺寸与固定层相交检查；既有 39 项单测数量不变，把相邻馆藏顺序与边界环绕断言并入现有离线目录测试。
 - 本地复核 `npm run lint`、`npm run test`（39/39）、`npm run build`、`npm run smoke`（35 assets）、`npm run smoke:browser`（冷启动 CLS 0.0000、全流程 CLS 0.0000、控制台/网络错误 0）通过；用临时 CDP 截图复核 1440 / 390 / 320px 无横向溢出，读诗长题与连续阅读入口可见。临时截图在 `/tmp/lanze-visual-audit/`，不写入仓库。
+
+## 前端细节走查 — 2026-11-11 00:10 CST
+
+- 按「检查前端样式细节、交互与文字排版」复核当前六页面：沿用临时 Vite preview / Chrome CDP 审计的 1440、768、390、320px 截图与指标，确认主要问题是辅助字号 9–10px、中文标签字距过宽、长诗题单行截断、少量链接点击高度不足，以及窄屏固定层遮住正文。
+- 在不改动历史白色摘录卡、离线馆藏与已发布 Release 的前提下，补充排版 token、固定层安全区与 `text-wrap` 规则；统一提升辅助文字与播放器文字，减少过宽字距，诗题改为两行显示，修复读诗页/写作台链接触控尺寸，并让桌面播放器在鼠标或键盘焦点停留期间保持展开、焦点离开后收束。
+- `scripts/smoke.browser.mjs` 增加播放器键盘展开、长诗题不省略、关键辅助文字字号、写作台登录链接触控高度与窄屏固定层安全区断言；`docs/DESIGN_SYSTEM.md`、`CHANGELOG.md` 和本日志同步记录契约。
+- 本地复核 `npm run lint`、`npm run test`（39/39）、`npm run build`、`npm run smoke`（35 assets）、`npm run audio:verify`、`npm run smoke:browser`（冷启动 CLS 0.0000、全流程 CLS 0.0000、控制台/网络错误 0）与 `git diff --check` 均通过；临时 CDP 截图复核 14 个页面/视口组合后，小于 11px 文字、低于 36px 控件、文本截断与页面横向溢出均为 0，历史摘录卡契约仍由 Browser E2E 覆盖。不修改 GitHub 展示、Pages、Discussion、`v0.4.0` tag 或 Release，不执行外部宣发。

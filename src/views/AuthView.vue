@@ -299,8 +299,9 @@ watch(
   max-width: 330px;
   margin: 0;
   color: rgba(251, 252, 249, 0.54);
-  font-size: 10px;
-  line-height: 1.8;
+  font-size: var(--text-meta);
+  line-height: var(--leading-copy);
+  text-wrap: pretty;
 }
 
 .auth-panel {
@@ -334,8 +335,8 @@ watch(
 .auth-kicker {
   margin: 0 0 12px;
   color: var(--brass);
-  font-size: 11px;
-  letter-spacing: 0.14em;
+  font-size: var(--text-note);
+  letter-spacing: 0.12em;
 }
 
 .auth-form-wrap h1 {
@@ -345,13 +346,16 @@ watch(
   font-weight: 400;
   letter-spacing: 0.04em;
   line-height: 1.2;
+  text-wrap: balance;
 }
 
 .auth-copy {
   margin: 16px 0 28px;
   color: var(--ink-soft);
-  font-size: 12px;
-  line-height: 1.85;
+  max-width: var(--measure-copy);
+  font-size: 13px;
+  line-height: var(--leading-copy);
+  text-wrap: pretty;
 }
 
 .auth-tabs {
@@ -408,7 +412,7 @@ watch(
   border: 0;
   background: transparent;
   color: var(--ink-faint);
-  font-size: 10px;
+  font-size: var(--text-meta);
   transform: translateY(-50%);
 }
 
@@ -445,7 +449,7 @@ watch(
 .demo-box p {
   margin: 0;
   color: var(--ink-soft);
-  font-size: 10px;
+  font-size: var(--text-meta);
 }
 
 .demo-box button {
@@ -455,14 +459,15 @@ watch(
   border-bottom: 1px solid var(--ink);
   background: transparent;
   color: var(--ink);
-  font-size: 10px;
+  font-size: var(--text-meta);
 }
 
 .auth-fineprint {
   margin: 22px 0 0;
   color: var(--ink-faint);
-  font-size: 9px;
-  line-height: 1.8;
+  font-size: var(--text-meta);
+  line-height: var(--leading-copy);
+  text-wrap: pretty;
 }
 
 @media (max-width: 880px) {

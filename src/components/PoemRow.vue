@@ -74,21 +74,26 @@ const firstLine = computed(() =>
 }
 
 .poem-row__title h3 {
+  display: -webkit-box;
   overflow: hidden;
   margin: 0;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   font-family: var(--font-poem);
   font-size: 20px;
   font-weight: 400;
-  letter-spacing: 0.05em;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  letter-spacing: 0.04em;
+  line-height: 1.35;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .poem-row__title p {
   overflow: hidden;
   margin: 4px 0 0;
   color: var(--ink-faint);
-  font-size: 10px;
+  font-size: var(--text-meta);
+  letter-spacing: 0.02em;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

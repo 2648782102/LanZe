@@ -220,7 +220,7 @@ onMounted(loadCatalog);
 <style scoped>
 .poem-page {
   min-height: 80dvh;
-  padding: 28px 0 80px;
+  padding: 28px 0 max(80px, var(--fixed-layer-space));
   background: var(--porcelain);
 }
 
@@ -235,6 +235,12 @@ onMounted(loadCatalog);
 
 .breadcrumb a:hover {
   color: var(--clay);
+}
+
+.breadcrumb a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
 }
 
 .poem-sheet {
@@ -327,8 +333,8 @@ onMounted(loadCatalog);
 .poem-head p {
   margin: 0;
   color: var(--brass);
-  font-size: 10px;
-  letter-spacing: 0.2em;
+  font-size: var(--text-meta);
+  letter-spacing: 0.16em;
 }
 
 .poem-head h1 {
@@ -339,6 +345,7 @@ onMounted(loadCatalog);
   font-weight: 400;
   letter-spacing: 0.08em;
   line-height: 1.2;
+  text-wrap: balance;
 }
 
 .poem-head h1.has-parts {
@@ -411,16 +418,20 @@ onMounted(loadCatalog);
   margin: 0 0 8px;
   color: var(--ink-soft);
   font-size: 13px;
-  line-height: 1.9;
+  line-height: var(--leading-copy);
+  text-wrap: pretty;
 }
 
 .poem-disclaimer {
   margin: auto auto 0;
   padding-top: 54px;
   color: var(--ink-faint);
-  font-size: 10px;
-  letter-spacing: 0.03em;
+  max-width: var(--measure-copy);
+  margin-inline: auto;
+  font-size: var(--text-meta);
+  letter-spacing: 0.02em;
   text-align: center;
+  text-wrap: pretty;
 }
 
 .reading-continuation {
@@ -462,8 +473,8 @@ onMounted(loadCatalog);
 
 .reading-continuation__link > span {
   color: var(--brass);
-  font-size: 10px;
-  letter-spacing: 0.12em;
+  font-size: var(--text-meta);
+  letter-spacing: 0.1em;
 }
 
 .reading-continuation__link > strong {
@@ -499,6 +510,7 @@ onMounted(loadCatalog);
 
 .related-section header a {
   display: inline-flex;
+  min-height: 40px;
   align-items: center;
   gap: 7px;
   color: var(--ink-soft);
@@ -528,7 +540,7 @@ onMounted(loadCatalog);
 
 .related-list span {
   color: var(--brass);
-  font-size: 10px;
+  font-size: var(--text-meta);
 }
 
 .related-list strong {
@@ -606,6 +618,28 @@ onMounted(loadCatalog);
     padding-top: 14px;
   }
 
+  .poem-head {
+    gap: 7px;
+  }
+
+  .poem-text {
+    gap: 9px;
+    margin-top: 30px;
+  }
+
+  .poem-tags {
+    margin-top: 28px;
+  }
+
+  .annotation {
+    margin-top: 36px;
+    padding-top: 20px;
+  }
+
+  .poem-disclaimer {
+    padding-top: 34px;
+  }
+
   .poem-head h1 {
     font-size: 39px;
   }
@@ -623,7 +657,7 @@ onMounted(loadCatalog);
   }
 
   .poem-text p {
-    font-size: 20px;
+    font-size: 19px;
   }
 }
 </style>

@@ -63,7 +63,7 @@
             v-model="form.content"
             class="field compose-textarea"
             rows="11"
-            placeholder="从第一句开始。换行或标点都会保留为诗句边界。"
+            placeholder="从第一句开始；换行或标点会保留为诗句边界。"
             required
           />
           <span class="field-hint">{{ contentLength }} 字 · 草稿自动保存在当前浏览器</span>
@@ -264,7 +264,7 @@ onBeforeUnmount(() => {
 .compose-page {
   min-height: 80dvh;
   background: var(--porcelain);
-  padding-bottom: calc(84px + env(safe-area-inset-bottom));
+  padding-bottom: max(calc(84px + env(safe-area-inset-bottom)), var(--fixed-layer-space));
 }
 
 .compose-head {
@@ -309,11 +309,12 @@ onBeforeUnmount(() => {
 }
 
 .compose-head__copy {
-  max-width: 400px;
+  max-width: min(400px, var(--measure-copy));
   margin: 0;
   color: var(--ink-soft);
-  font-size: 12px;
-  line-height: 1.85;
+  font-size: 13px;
+  line-height: var(--leading-copy);
+  text-wrap: pretty;
 }
 
 .compose-grid {
@@ -343,9 +344,14 @@ onBeforeUnmount(() => {
   resize: vertical;
 }
 
+.compose-textarea::placeholder {
+  font-size: 13px;
+  line-height: 1.7;
+}
+
 .field-hint {
   color: var(--ink-faint);
-  font-size: 10px;
+  font-size: var(--text-meta);
 }
 
 .draft-status {
@@ -354,7 +360,7 @@ onBeforeUnmount(() => {
   gap: 8px;
   margin: -12px 0 0;
   color: var(--ink-faint);
-  font-size: 10px;
+  font-size: var(--text-meta);
   letter-spacing: 0.04em;
 }
 
@@ -392,13 +398,14 @@ onBeforeUnmount(() => {
   border-left: 2px solid var(--brass);
   background: var(--porcelain-deep);
   color: var(--ink-soft);
-  font-size: 12px;
-  line-height: 1.8;
+  font-size: 13px;
+  line-height: var(--leading-copy);
+  text-wrap: pretty;
 }
 
 .compose-login-note a {
   display: inline-flex;
-  min-height: 32px;
+  min-height: 40px;
   align-items: center;
   color: var(--celadon-deep);
   text-decoration: underline;
@@ -426,8 +433,8 @@ onBeforeUnmount(() => {
   padding-bottom: 11px;
   border-bottom: 1px solid var(--line-strong);
   color: var(--ink-faint);
-  font-size: 10px;
-  letter-spacing: 0.1em;
+  font-size: var(--text-meta);
+  letter-spacing: 0.08em;
 }
 
 .preview-sheet {
@@ -451,8 +458,8 @@ onBeforeUnmount(() => {
 .preview-category {
   margin: 0 0 22px;
   color: var(--brass);
-  font-size: 9px;
-  letter-spacing: 0.18em;
+  font-size: var(--text-meta);
+  letter-spacing: 0.14em;
 }
 
 .preview-sheet h2 {
@@ -462,6 +469,7 @@ onBeforeUnmount(() => {
   font-weight: 400;
   letter-spacing: 0.08em;
   line-height: 1.3;
+  text-wrap: balance;
 }
 
 .preview-author {
@@ -490,15 +498,17 @@ onBeforeUnmount(() => {
   padding-top: 18px;
   border-top: 1px solid var(--line);
   color: var(--ink-soft);
-  font-size: 11px;
-  line-height: 1.8;
+  font-size: var(--text-note);
+  line-height: var(--leading-copy);
   white-space: pre-line;
 }
 
 .preview-hint {
   margin: 11px 0 0;
   color: var(--ink-faint);
-  font-size: 9px;
+  font-size: var(--text-meta);
+  line-height: 1.7;
+  text-wrap: pretty;
 }
 
 @media (max-width: 940px) {
@@ -531,8 +541,8 @@ onBeforeUnmount(() => {
   }
 
   .compose-head__copy {
-    font-size: 11px;
-    line-height: 1.7;
+    font-size: var(--text-note);
+    line-height: 1.8;
   }
 
   .compose-grid,
@@ -551,8 +561,8 @@ onBeforeUnmount(() => {
 
   .compose-login-note {
     padding: 10px 12px;
-    font-size: 11px;
-    line-height: 1.65;
+    font-size: var(--text-note);
+    line-height: 1.75;
   }
 
   .form-actions {
@@ -580,7 +590,6 @@ onBeforeUnmount(() => {
 
   .compose-login-note a {
     display: block;
-    min-height: 28px;
   }
 
   .form-actions {

@@ -258,7 +258,7 @@ onMounted(async () => {
 <style scoped>
 .collection-page {
   min-height: 80dvh;
-  padding-bottom: calc(84px + env(safe-area-inset-bottom));
+  padding-bottom: max(calc(84px + env(safe-area-inset-bottom)), var(--fixed-layer-space));
 }
 
 .collection-head {
@@ -279,8 +279,8 @@ onMounted(async () => {
 .collection-kicker {
   margin: 0 0 16px;
   color: var(--brass);
-  font-size: 11px;
-  letter-spacing: 0.14em;
+  font-size: var(--text-note);
+  letter-spacing: 0.12em;
 }
 
 .collection-head h1 {
@@ -293,11 +293,12 @@ onMounted(async () => {
 }
 
 .collection-copy {
-  max-width: 610px;
+  max-width: min(610px, var(--measure-copy));
   margin: 20px 0 0;
   color: var(--ink-soft);
   font-size: 13px;
-  line-height: 1.9;
+  line-height: var(--leading-copy);
+  text-wrap: pretty;
 }
 
 .collection-stats {
@@ -316,7 +317,7 @@ onMounted(async () => {
 .collection-stats dt {
   order: 2;
   color: var(--ink-faint);
-  font-size: 10px;
+  font-size: var(--text-meta);
 }
 
 .collection-stats dd {
@@ -361,7 +362,7 @@ onMounted(async () => {
 
 .collection-tabs button span {
   color: var(--ink-faint);
-  font-size: 9px;
+  font-size: var(--text-meta);
 }
 
 .saved-list {
@@ -399,7 +400,7 @@ onMounted(async () => {
 .work-item > div > p:first-child {
   margin: 0 0 5px;
   color: var(--ink-faint);
-  font-size: 10px;
+  font-size: var(--text-meta);
 }
 
 .work-item h3 {
@@ -462,15 +463,20 @@ onMounted(async () => {
 .account-identity p {
   margin: 1px 0 0;
   color: var(--ink-faint);
-  font-size: 10px;
+  font-size: var(--text-meta);
 }
 
 .account-intro,
 .account-panel > p {
   margin: 18px 0;
   color: var(--ink-soft);
-  font-size: 12px;
-  line-height: 1.85;
+  font-size: 13px;
+  line-height: var(--leading-copy);
+  text-wrap: pretty;
+}
+
+.account-panel :where(.demo-note, .local-note p) {
+  text-wrap: pretty;
 }
 
 .profile-editor {
@@ -513,7 +519,8 @@ onMounted(async () => {
 .demo-note {
   padding-top: 12px;
   color: var(--ink-faint) !important;
-  font-size: 10px !important;
+  font-size: var(--text-meta) !important;
+  line-height: var(--leading-copy);
 }
 
 .local-note {
@@ -537,8 +544,9 @@ onMounted(async () => {
 .local-note p {
   margin: 0;
   color: var(--ink-faint);
-  font-size: 10px;
-  line-height: 1.75;
+  font-size: var(--text-meta);
+  line-height: var(--leading-copy);
+  text-wrap: pretty;
 }
 
 @media (max-width: 980px) {
@@ -569,8 +577,8 @@ onMounted(async () => {
 
   .collection-copy {
     margin-top: 14px;
-    font-size: 12px;
-    line-height: 1.7;
+    font-size: 13px;
+    line-height: 1.8;
   }
 
   .collection-stats {

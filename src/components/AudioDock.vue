@@ -1,5 +1,6 @@
 <template>
   <aside
+    ref="dockRef"
     class="audio-dock"
     :class="{
       'is-collapsed': isCollapsed,
@@ -9,9 +10,10 @@
       'is-expanded': isExpanded,
     }"
     aria-label="兰泽本地声景播放器"
-    @mouseenter="expandDock"
-    @mouseleave="scheduleDockCollapse"
+    @mouseenter="handlePointerEnter"
+    @mouseleave="handlePointerLeave"
     @focusin="expandDock"
+    @focusout="scheduleDockCollapse()"
   >
     <button
       class="audio-dock__handle"
@@ -146,6 +148,7 @@ import { notify } from "../composables/useNotices.js";
 
 const AUDIO_PREFERENCES_KEY = "lanze_audio_preferences";
 const audioRef = ref();
+const dockRef = ref();
 const isPlaying = ref(false);
 const isCollapsed = ref(false);
 const hasError = ref(false);
@@ -154,6 +157,7 @@ const compactViewport = ref(false);
 const playlistOpen = ref(false);
 const trackChanged = ref(false);
 const isExpanded = ref(false);
+const isPointerInside = ref(false);
 const isMuted = ref(false);
 const currentTime = ref(0);
 const duration = ref(audioConfig.tracks[0]?.duration || 0);
@@ -319,28 +323,52 @@ const toggleCollapsed = () => {
   if (isCollapsed.value) playlistOpen.value = false;
 };
 
+const dockIsActive = () => isPointerInside.value
+  || playlistOpen.value
+  || Boolean(dockRef.value?.contains(document.activeElement));
+
+const collapseDockIfIdle = () => {
+  if (dockIsActive()) return;
+  isExpanded.value = false;
+};
+
 const expandDock = () => {
   if (isCollapsed.value || window.innerWidth <= 820) return;
   isExpanded.value = true;
   window.clearTimeout(expandTimer);
   expandTimer = window.setTimeout(() => {
-    isExpanded.value = false;
+    collapseDockIfIdle();
   }, 4200);
 };
 
 const keepDockOpen = () => window.clearTimeout(expandTimer);
 
-const scheduleDockCollapse = () => {
+const scheduleDockCollapse = (delay = 260) => {
   if (window.innerWidth <= 820) return;
   window.clearTimeout(expandTimer);
   expandTimer = window.setTimeout(() => {
-    isExpanded.value = false;
-  }, 260);
+    collapseDockIfIdle();
+  }, delay);
+};
+
+const handlePointerEnter = () => {
+  if (window.innerWidth <= 820) return;
+  isPointerInside.value = true;
+  expandDock();
+};
+
+const handlePointerLeave = () => {
+  isPointerInside.value = false;
+  scheduleDockCollapse();
 };
 
 watch(compactViewport, (compact) => {
   if (hasUserCollapsedPreference.value) return;
   isCollapsed.value = compact;
+});
+
+watch(playlistOpen, (open) => {
+  if (!open) scheduleDockCollapse();
 });
 
 onMounted(() => {
@@ -505,7 +533,8 @@ onBeforeUnmount(() => {
 }
 
 .audio-dock__title {
-  font-size: 11px;
+  font-size: var(--text-note);
+  line-height: 1.35;
   transition: color var(--motion-fast) var(--ease-standard);
 }
 
@@ -529,14 +558,20 @@ onBeforeUnmount(() => {
 
 .audio-dock__copy > p:nth-child(2) {
   color: rgba(251, 252, 249, 0.48);
-  font-size: 9px;
+  font-size: var(--text-meta);
+  line-height: 1.4;
 }
 
 .audio-dock__time {
   color: rgba(251, 252, 249, 0.5);
   font-family: var(--font-number);
-  font-size: 9px;
+  font-size: var(--text-meta);
   white-space: nowrap;
+}
+
+.audio-dock :focus-visible {
+  outline: 2px solid var(--brass-soft);
+  outline-offset: 2px;
 }
 
 .audio-dock__seek-wrap {
@@ -598,7 +633,7 @@ onBeforeUnmount(() => {
 .audio-dock__controls {
   grid-area: controls;
   display: grid;
-  grid-template-columns: repeat(3, 26px) minmax(48px, 1fr) 26px;
+  grid-template-columns: repeat(3, 30px) minmax(48px, 1fr) 30px;
   align-items: center;
   gap: 4px;
   margin-top: 0;
@@ -608,8 +643,8 @@ onBeforeUnmount(() => {
 
 .audio-dock__controls button {
   display: grid;
-  width: 26px;
-  height: 26px;
+  width: 30px;
+  height: 30px;
   place-items: center;
   padding: 0;
   border: 0;
@@ -626,7 +661,7 @@ onBeforeUnmount(() => {
 .audio-dock__state {
   grid-area: state;
   color: rgba(251, 252, 249, 0.5);
-  font-size: 9px;
+  font-size: var(--text-meta);
   letter-spacing: 0.1em;
   white-space: nowrap;
 }
@@ -674,12 +709,12 @@ onBeforeUnmount(() => {
 .audio-dock__playlist button span {
   color: var(--brass-soft);
   font-family: var(--font-number);
-  font-size: 9px;
+  font-size: var(--text-meta);
 }
 
 .audio-dock__playlist button strong {
   overflow: hidden;
-  font-size: 11px;
+  font-size: var(--text-note);
   font-weight: 400;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -687,14 +722,14 @@ onBeforeUnmount(() => {
 
 .audio-dock__playlist button em {
   color: rgba(251, 252, 249, 0.42);
-  font-size: 9px;
+  font-size: var(--text-meta);
   font-style: normal;
 }
 
 .audio-dock__playlist > p {
   margin: 8px 8px 2px;
   color: rgba(251, 252, 249, 0.45);
-  font-size: 9px;
+  font-size: var(--text-meta);
   line-height: 1.6;
 }
 

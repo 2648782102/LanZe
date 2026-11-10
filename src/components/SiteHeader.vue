@@ -121,9 +121,9 @@ const isActive = (item) => {
   align-self: flex-end;
   padding-bottom: 3px;
   color: var(--ink-faint);
-  font-size: 8px;
+  font-size: var(--text-meta);
   font-weight: 600;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.16em;
 }
 
 .main-nav {
@@ -148,7 +148,9 @@ const isActive = (item) => {
   height: 1px;
   background: var(--brass);
   content: "";
-  transition: left 180ms ease, right 180ms ease;
+  transition:
+    left var(--motion-fast) var(--ease-standard),
+    right var(--motion-fast) var(--ease-standard);
 }
 
 .main-nav a:hover,

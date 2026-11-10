@@ -307,9 +307,9 @@ onBeforeUnmount(() => {
   right: 18px;
   top: 36%;
   color: rgba(22, 44, 43, 0.18);
-  font-size: 9px;
+  font-size: var(--text-meta);
   font-weight: 600;
-  letter-spacing: 0.32em;
+  letter-spacing: 0.28em;
   writing-mode: vertical-rl;
 }
 
@@ -358,8 +358,8 @@ onBeforeUnmount(() => {
 .room-archive {
   margin: 0 auto 0 24px;
   color: var(--ink-faint);
-  font-size: 10px;
-  letter-spacing: 0.06em;
+  font-size: var(--text-meta);
+  letter-spacing: 0.04em;
 }
 
 .room-count {
@@ -378,9 +378,9 @@ onBeforeUnmount(() => {
 
 .room-count em {
   color: var(--ink-faint);
-  font-size: 10px;
+  font-size: var(--text-meta);
   font-style: normal;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
 }
 
 .poem-plinth {
@@ -403,7 +403,7 @@ onBeforeUnmount(() => {
   margin: 0 0 20px;
   color: var(--brass);
   font-size: 11px;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.12em;
 }
 
 .poem-plinth__meta span:nth-child(2) {
@@ -426,6 +426,7 @@ onBeforeUnmount(() => {
   letter-spacing: 0.04em;
   line-height: 1.16;
   overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .poem-plinth h1 span {
@@ -474,8 +475,8 @@ onBeforeUnmount(() => {
   margin: 0;
   font-family: var(--font-poem);
   font-size: clamp(18px, 1.75vw, 24px);
-  letter-spacing: 0.08em;
-  line-height: 1.7;
+  letter-spacing: var(--tracking-poem);
+  line-height: 1.8;
 }
 
 .poem-plinth__actions {
@@ -494,8 +495,8 @@ onBeforeUnmount(() => {
   border: 1px solid var(--line-strong);
   background: rgba(251, 252, 249, 0.62);
   color: var(--ink-soft);
-  font-size: 12px;
-  letter-spacing: 0.06em;
+  font-size: 13px;
+  letter-spacing: 0.05em;
   transition:
     border-color var(--motion-fast) var(--ease-standard),
     background-color var(--motion-fast) var(--ease-standard),
@@ -573,8 +574,8 @@ onBeforeUnmount(() => {
   background: rgba(16, 40, 39, 0.42);
   color: rgba(251, 252, 249, 0.9);
   font-family: var(--font-poem);
-  font-size: 9px;
-  letter-spacing: 0.14em;
+  font-size: var(--text-meta);
+  letter-spacing: 0.12em;
 }
 
 .exhibit-card__caption {
@@ -592,8 +593,8 @@ onBeforeUnmount(() => {
 
 .exhibit-card__caption small {
   color: var(--ink-faint);
-  font-size: 9px;
-  letter-spacing: 0.13em;
+  font-size: var(--text-meta);
+  letter-spacing: 0.11em;
 }
 
 .exhibit-card__caption strong {
@@ -679,14 +680,16 @@ onBeforeUnmount(() => {
   font-weight: 400;
   letter-spacing: 0.05em;
   line-height: 1.35;
+  text-wrap: balance;
 }
 
 .strip-intro > p:not(.eyebrow) {
-  max-width: 380px;
+  max-width: min(380px, var(--measure-copy));
   margin: 0;
   color: var(--ink-soft);
-  font-size: 12px;
-  line-height: 1.9;
+  font-size: 13px;
+  line-height: var(--leading-copy);
+  text-wrap: pretty;
 }
 
 .strip-actions {
@@ -704,7 +707,7 @@ onBeforeUnmount(() => {
 .excerpt-source {
   margin: -6px 0 0;
   color: var(--ink-faint);
-  font-size: 10px;
+  font-size: var(--text-meta);
   letter-spacing: 0.12em;
   transition: opacity var(--motion-fast) var(--ease-standard);
 }
@@ -797,8 +800,8 @@ onBeforeUnmount(() => {
 
 @media (max-width: 560px) {
   .room-grid {
-    gap: 30px;
-    padding-block: 20px 40px;
+    gap: 22px;
+    padding-block: 14px 32px;
   }
 
   .poem-plinth__meta {
@@ -806,17 +809,17 @@ onBeforeUnmount(() => {
   }
 
   .poem-plinth__body {
-    margin-top: 24px;
+    margin-top: 16px;
     gap: 7px;
   }
 
   .poem-plinth__body p {
     font-size: 17px;
-    line-height: 1.65;
+    line-height: 1.72;
   }
 
   .poem-plinth__actions {
-    margin-top: 24px;
+    margin-top: 16px;
   }
 
   .exhibit-card__frame {
@@ -824,7 +827,7 @@ onBeforeUnmount(() => {
   }
 
   .exhibit-card__frame img {
-    aspect-ratio: 2.1;
+    aspect-ratio: 2.6;
   }
 
   .exhibit-card__caption {
@@ -856,7 +859,7 @@ onBeforeUnmount(() => {
   }
 
   .poem-plinth__body p {
-    font-size: 18px;
+    font-size: 17px;
   }
 
   .poem-plinth h1.title-length--long {
@@ -902,8 +905,8 @@ onBeforeUnmount(() => {
   }
 
   .strip-intro > p:not(.eyebrow) {
-    font-size: 11px;
-    line-height: 1.75;
+    font-size: var(--text-note);
+    line-height: 1.8;
   }
 }
 
