@@ -74,17 +74,21 @@
       <div class="shell legacy-gallery">
         <div class="legacy-gallery__card">
           <ExcerptCard
-            v-if="excerpt && excerptStatus !== 'loading'"
+            ref="excerptCardRef"
+            v-if="excerpt"
             :excerpt="excerpt"
             :saved="excerptSaved.includes(`excerpt-${excerpt.content}`)"
+            :disabled="excerptStatus === 'loading'"
             @toggle-save="toggleExcerptSave(excerpt)"
+            @turn="beginExcerptTurn"
+            @settled="finishExcerptTurn"
           />
-          <p v-else class="legacy-card-status" role="status">正在展开今日摘录……</p>
+          <p v-if="excerptStatus === 'loading' && !excerpt" class="legacy-card-status" role="status">正在展开今日摘录……</p>
         </div>
         <article class="strip-intro">
           <p class="eyebrow">余韵 · 一则</p>
           <h2>读完一首，<br />让句子再走一段。</h2>
-          <p>按历史首页的白色摘录卡等比还原，保留旋转收藏角标、竖排诗句、作者与扇舟图；默认只用仓库内置摘录与精校馆藏短句。</p>
+          <p>按历史首页的白色摘录卡等比还原，保留旋转收藏角标、竖排诗句、作者与扇舟图；拖动或掀开卡片即可换一句，默认只用仓库内置摘录与精校馆藏短句。</p>
           <div class="strip-actions">
             <router-link class="button" to="/explore">
               进入诗词索引
@@ -95,7 +99,7 @@
               type="button"
               aria-label="换一句今日摘录"
               :disabled="excerptStatus === 'loading'"
-              @click="nextExcerpts"
+              @click="excerptCardRef?.turn()"
             >
               <AppIcon name="chevron-right" :size="15" />
               换一句
@@ -140,6 +144,8 @@ const excerpt = ref(null);
 const excerptStatus = ref("loading");
 const excerptSource = ref("local");
 let excerptRequest = 0;
+let pendingExcerpt = null;
+const excerptCardRef = ref(null);
 const storedExcerptSaves = readStore("lanze_saved_excerpts", []);
 const excerptSaved = ref(Array.isArray(storedExcerptSaves) ? storedExcerptSaves.map(String) : []);
 const isSwitching = ref(false);
@@ -187,9 +193,21 @@ const loadExcerpt = async () => {
     previousContent: excerpt.value?.content || "",
   });
   if (requestId !== excerptRequest) return;
-  excerpt.value = decorateExcerpt(next);
+  const decorated = decorateExcerpt(next);
+  if (pendingExcerpt) {
+    pendingExcerpt.result = { decorated, source, reason };
+    excerptCardRef.value?.deliver(decorated);
+    if (!excerptCardRef.value?.isTurning) finishExcerptTurn();
+    return;
+  }
+  excerpt.value = decorated;
   excerptSource.value = source;
   excerptStatus.value = source === "remote" ? "ready" : "fallback";
+  const failure = { source, reason };
+  reportExcerptSource(failure);
+};
+
+const reportExcerptSource = ({ source, reason }) => {
   if (source === "local" && reason === "unavailable") {
     notify("诗句源暂时不可用，已显示仓库内置摘录", "warning", 4200);
   }
@@ -212,11 +230,28 @@ const nextPoem = () => {
   }, prefersReducedMotion ? 0 : 120);
 };
 
-const nextExcerpts = () => {
-  if (excerptStatus.value === "loading") return;
-  excerptPage.value += 1;
+const beginExcerptTurn = (direction = "right") => {
+  if (excerptStatus.value === "loading" || pendingExcerpt) return;
+  if (direction === "left") excerptPage.value += 3;
+  else excerptPage.value += 1;
+  pendingExcerpt = { result: null };
   loadExcerpt();
 };
+
+const finishExcerptTurn = () => {
+  const result = pendingExcerpt?.result;
+  pendingExcerpt = null;
+  if (!result) {
+    excerptStatus.value = "fallback";
+    return;
+  }
+  excerpt.value = result.decorated;
+  excerptSource.value = result.source;
+  excerptStatus.value = result.source === "remote" ? "ready" : "fallback";
+  reportExcerptSource(result);
+};
+
+const nextExcerpts = () => excerptCardRef.value?.turn();
 
 const toggleSave = () => {
   if (!poem.value.id) return;
@@ -234,8 +269,8 @@ const toggleSave = () => {
   notify(added ? "已收入你的诗卷" : "已从诗卷移除", added ? "success" : "info");
 };
 
-const toggleExcerptSave = (excerpt) => {
-  const key = `excerpt-${excerpt.content}`;
+const toggleExcerptSave = (targetExcerpt) => {
+  const key = `excerpt-${targetExcerpt.content}`;
   const added = !excerptSaved.value.includes(key);
   const next = added
     ? [...excerptSaved.value, key]
@@ -656,12 +691,17 @@ onBeforeUnmount(() => {
 }
 
 .legacy-card-status {
+  position: absolute;
+  z-index: 4;
   margin: 0;
+  padding: 8px 10px;
+  background: rgba(251, 252, 249, 0.86);
   color: var(--ink-faint);
   font-family: var(--font-poem);
   font-size: 14px;
   letter-spacing: 0.12em;
   writing-mode: vertical-rl;
+  pointer-events: none;
 }
 
 .strip-intro {

@@ -7,11 +7,13 @@
         <span>兰</span>
         <strong>兰泽</strong>
       </router-link>
-      <div class="auth-verse">
-        <p>山有木兮木有枝</p>
-        <p>心悦君兮君不知</p>
-        <span>《越人歌》</span>
-      </div>
+      <figure class="auth-verse">
+        <blockquote>
+          <span>心悦君兮君不知</span>
+          <span>山有木兮木有枝</span>
+        </blockquote>
+        <figcaption>《越人歌》</figcaption>
+      </figure>
       <p class="auth-art__note">读诗不需要登录。登录只用于本地演示的作品与资料。</p>
     </section>
 
@@ -278,29 +280,60 @@ watch(
 .auth-verse {
   position: absolute;
   top: 50%;
-  right: 12%;
+  right: 11%;
   z-index: 2;
   display: flex;
-  align-items: flex-start;
-  gap: 24px;
+  width: min(300px, 42%);
+  height: min(540px, 66vh);
+  flex-direction: column;
+  align-items: stretch;
+  margin: 0;
+  padding: 34px 26px 24px;
+  border: 1px solid rgba(216, 191, 142, 0.32);
+  background: rgba(16, 40, 39, 0.18);
   transform: translateY(-50%);
+}
+
+.auth-verse blockquote {
+  position: relative;
+  display: block;
+  flex: 1;
+  margin: 0;
+  font-family: var(--font-poem);
+  font-size: clamp(28px, 2.8vw, 42px);
+  letter-spacing: 0.14em;
+  line-height: 1.35;
   writing-mode: vertical-rl;
 }
 
-.auth-verse p {
-  margin: 0;
-  font-family: var(--font-poem);
-  font-size: clamp(28px, 3.4vw, 48px);
-  letter-spacing: 0.2em;
-  line-height: 1.6;
+.auth-verse blockquote span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: block;
+  white-space: nowrap;
 }
 
-.auth-verse span {
-  align-self: flex-end;
+.auth-verse blockquote span:first-child {
+  right: 8%;
+}
+
+.auth-verse blockquote span:last-child {
+  right: 52%;
+}
+
+.auth-verse figcaption {
+  margin: 18px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid rgba(216, 191, 142, 0.18);
   color: rgba(251, 252, 249, 0.54);
   font-family: var(--font-poem);
-  font-size: 11px;
+  font-size: var(--text-meta);
   letter-spacing: 0.16em;
+  line-height: 1.4;
+  text-align: center;
+  white-space: nowrap;
+  writing-mode: horizontal-tb;
 }
 
 .auth-art__note {

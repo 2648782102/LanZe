@@ -402,18 +402,18 @@ const main = async () => {
   if (home.navCount !== 3) throw new Error("Primary navigation did not render");
   const excerptCards = await evaluate(`(() => {
     const cards = [...document.querySelectorAll('.legacy-card')];
-    const box = cards[0]?.querySelector('.legacy-card__box');
-    const verse = cards[0]?.querySelector('.legacy-card__verse');
-    const art = cards[0]?.querySelector('.legacy-card__art');
+    const box = cards[0]?.querySelector('.legacy-card__box--current');
+    const verse = cards[0]?.querySelector('.legacy-card__box--current .legacy-card__verse');
+    const art = cards[0]?.querySelector('.legacy-card__box--current .legacy-card__art');
     const boxRect = box?.getBoundingClientRect();
     const verseRect = verse?.getBoundingClientRect();
     const artRect = art?.getBoundingClientRect();
     return {
       count: cards.length,
-      firstVerse: cards[0]?.querySelector('.legacy-card__verse')?.textContent?.trim() || '',
-      saveButtons: cards.filter((card) => card.querySelector('.legacy-card__save')).length,
-      pressedStates: cards.map((card) => card.querySelector('.legacy-card__save')?.getAttribute('aria-pressed')),
-      writingMode: cards[0] ? getComputedStyle(cards[0].querySelector('.legacy-card__verse')).writingMode : '',
+      firstVerse: verse?.textContent?.trim() || '',
+      saveButtons: cards.filter((card) => card.querySelector('.legacy-card__box--current .legacy-card__save')).length,
+      pressedStates: cards.map((card) => card.querySelector('.legacy-card__box--current .legacy-card__save')?.getAttribute('aria-pressed')),
+      writingMode: verse ? getComputedStyle(verse).writingMode : '',
       artLoaded: Boolean(art?.complete && art.naturalWidth > 0),
       artWidth: art?.getAttribute('width') || '',
       artHeight: art?.getAttribute('height') || '',
@@ -444,6 +444,12 @@ const main = async () => {
   }
   if (!excerptCards.sourceLabel.includes("诗句源：")) {
     throw new Error("Excerpt source state did not render");
+  }
+  if (!await evaluate(`(() => {
+    const card = document.querySelector('.legacy-card');
+    return Boolean(card?.getAttribute('tabindex') === '0' && card.querySelector('.legacy-card__turn'));
+  })()`)) {
+    throw new Error("Excerpt card does not expose its drag and keyboard affordance");
   }
   const firstExcerpt = excerptCards.firstVerse;
   const dockLayout = await evaluate(`(() => {
@@ -476,7 +482,7 @@ const main = async () => {
   }
   currentStep = "historical excerpt card";
   if (!await evaluate(`(() => {
-    const button = document.querySelector('.legacy-card__save');
+    const button = document.querySelector('.legacy-card__box--current .legacy-card__save');
     if (!button) return false;
     button.click();
     return true;
@@ -490,6 +496,73 @@ const main = async () => {
     }
   })()`));
   if (!savedExcerpt) throw new Error("Saving an excerpt did not persist locally");
+  currentStep = "draggable excerpt card";
+  await evaluate(`(() => {
+    const card = document.querySelector('.legacy-card');
+    if (card) card.scrollIntoView({ block: 'start', behavior: 'instant' });
+    return true;
+  })()`);
+  await waitUntil("excerpt card grab area in viewport", () => evaluate(`(() => {
+    const rect = document.querySelector('.legacy-card')?.getBoundingClientRect();
+    return Boolean(rect && rect.top >= 0 && rect.top < innerHeight - 180);
+  })()`));
+  const dragOrigin = await evaluate(`(() => {
+    const rect = document.querySelector('.legacy-card')?.getBoundingClientRect();
+    return rect ? { x: Math.round(rect.left + rect.width / 2), y: Math.round(rect.top + Math.min(rect.height / 3, 180)) } : null;
+  })()`);
+  if (!dragOrigin) throw new Error("Excerpt card was not available for pointer dragging");
+  await send("Input.dispatchMouseEvent", {
+    type: "mousePressed",
+    x: dragOrigin.x,
+    y: dragOrigin.y,
+    button: "left",
+    buttons: 1,
+    clickCount: 1,
+  });
+  await send("Input.dispatchMouseEvent", {
+    type: "mouseMoved",
+    x: dragOrigin.x + 92,
+    y: dragOrigin.y - 44,
+    button: "left",
+    buttons: 1,
+  });
+  const pointerDrag = await evaluate(`(() => {
+    const card = document.querySelector('.legacy-card');
+    const current = card?.querySelector('.legacy-card__box--current');
+    return {
+      isDragging: Boolean(card?.classList.contains('is-dragging')),
+      lifted: current ? getComputedStyle(current).transform : 'none',
+    };
+  })()`);
+  await send("Input.dispatchMouseEvent", {
+    type: "mouseMoved",
+    x: dragOrigin.x + 180,
+    y: dragOrigin.y - 90,
+    button: "left",
+    buttons: 1,
+  });
+  await send("Input.dispatchMouseEvent", {
+    type: "mouseReleased",
+    x: dragOrigin.x + 180,
+    y: dragOrigin.y - 90,
+    button: "left",
+    buttons: 0,
+    clickCount: 1,
+  });
+  pointerDrag.isTurning = await evaluate(`Boolean(document.querySelector('.legacy-card')?.classList.contains('is-turning'))`);
+  if (!pointerDrag.isDragging || pointerDrag.lifted === "none" || !pointerDrag.isTurning) {
+    throw new Error("Dragging the excerpt card did not lift and turn it");
+  }
+  const draggedExcerpt = await waitUntil("dragged historical excerpt", () => evaluate(`
+    (() => {
+      const card = document.querySelector('.legacy-card');
+      const verse = card?.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim();
+      return Boolean(verse) && verse !== ${JSON.stringify(firstExcerpt)} && !card?.classList.contains('is-turning')
+        && document.querySelectorAll('.legacy-card__box').length === 1 ? verse : null;
+    })()
+  `), 80);
+  await evaluate("document.querySelector('.legacy-card')?.blur(); window.scrollTo({ top: 0, behavior: 'instant' })");
+  await waitUntil("page scroll reset after drag", () => evaluate("scrollY === 0"));
   if (!await evaluate(`(() => {
     const button = [...document.querySelectorAll('button')].find((node) => (node.innerText || '').includes('换一句'));
     if (!button || button.disabled) return false;
@@ -499,8 +572,10 @@ const main = async () => {
   const rotatedExcerpts = await waitUntil("rotated historical excerpt", () => evaluate(`
     (() => {
       const button = [...document.querySelectorAll('button')].find((node) => (node.innerText || '').includes('换一句'));
-      const verse = document.querySelector('.legacy-card__verse')?.textContent?.trim();
-      return Boolean(verse) && verse !== ${JSON.stringify(firstExcerpt)} && button && !button.disabled;
+      const card = document.querySelector('.legacy-card');
+      const verse = card?.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim();
+      return Boolean(verse) && verse !== ${JSON.stringify(String(draggedExcerpt || ""))} && button && !button.disabled
+        && !card?.classList.contains('is-turning');
     })()
   `), 60);
   if (!rotatedExcerpts) throw new Error("Historical excerpt card did not rotate");
@@ -829,8 +904,11 @@ const main = async () => {
       .filter((element) => element.tabIndex >= 0).length,
     tablist: document.querySelectorAll('.auth-tabs[role="tablist"]').length,
     currentPage: document.querySelector('.auth-tabs a[aria-current="page"]')?.textContent?.trim() || '',
+    verseWritingMode: getComputedStyle(document.querySelector('.auth-verse blockquote')).writingMode,
+    verseLines: [...document.querySelectorAll('.auth-verse blockquote span')].every((line) => getComputedStyle(line).whiteSpace === 'nowrap'),
   }))()`);
-  if (authSemantics.hiddenFocusable || authSemantics.tablist || authSemantics.currentPage !== "登录") {
+  if (authSemantics.hiddenFocusable || authSemantics.tablist || authSemantics.currentPage !== "登录"
+    || authSemantics.verseWritingMode !== "vertical-rl" || !authSemantics.verseLines) {
     throw new Error("Auth page has hidden focusable content or inconsistent navigation semantics");
   }
   if (!await setInput('input[aria-label="登录账号"]', "demo")) {
