@@ -414,7 +414,6 @@ onBeforeUnmount(() => {
 
 .button:disabled {
   cursor: wait;
-  opacity: 0.56;
 }
 
 .preview-panel {

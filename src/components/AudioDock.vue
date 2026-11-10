@@ -319,8 +319,17 @@ const syncViewportPreference = (event) => {
 
 const toggleCollapsed = () => {
   hasUserCollapsedPreference.value = true;
-  isCollapsed.value = !isCollapsed.value;
-  if (isCollapsed.value) playlistOpen.value = false;
+  if (isCollapsed.value) {
+    window.clearTimeout(expandTimer);
+    isCollapsed.value = false;
+    isExpanded.value = window.innerWidth > 820;
+    return;
+  }
+  isCollapsed.value = true;
+  isExpanded.value = false;
+  isPointerInside.value = false;
+  playlistOpen.value = false;
+  window.clearTimeout(expandTimer);
 };
 
 const dockIsActive = () => isPointerInside.value
@@ -581,7 +590,7 @@ onBeforeUnmount(() => {
 .audio-dock__seek,
 .audio-dock__volume {
   width: 100%;
-  height: 12px;
+  height: 24px;
   margin: 0;
   appearance: none;
   background: transparent;
@@ -633,7 +642,7 @@ onBeforeUnmount(() => {
 .audio-dock__controls {
   grid-area: controls;
   display: grid;
-  grid-template-columns: repeat(3, 30px) minmax(48px, 1fr) 30px;
+  grid-template-columns: repeat(3, 36px) minmax(48px, 1fr) 36px;
   align-items: center;
   gap: 4px;
   margin-top: 0;
@@ -643,8 +652,8 @@ onBeforeUnmount(() => {
 
 .audio-dock__controls button {
   display: grid;
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
   place-items: center;
   padding: 0;
   border: 0;
@@ -756,7 +765,7 @@ audio {
     bottom: calc(84px + env(safe-area-inset-bottom));
     left: max(12px, env(safe-area-inset-left));
     width: auto;
-    max-height: 96px;
+    max-height: 108px;
     padding-block: 5px;
     border-color: rgba(168, 196, 184, 0.16);
     border-bottom: 0;
@@ -815,7 +824,7 @@ audio {
   }
 
   .audio-dock__controls {
-    grid-template-columns: repeat(3, 30px);
+    grid-template-columns: repeat(3, 36px);
     justify-content: center;
   }
 

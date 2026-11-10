@@ -21,7 +21,7 @@ const year = new Date().getFullYear();
 
 <style scoped>
 .museum-footer {
-  padding: 30px 0 80px;
+  padding: 30px 0 max(80px, var(--fixed-layer-space));
   border-top: 1px solid var(--line);
   background: var(--porcelain-deep);
   color: var(--ink-faint);
@@ -76,11 +76,7 @@ const year = new Date().getFullYear();
   align-items: center;
 }
 
-@media (max-width: 760px) {
-  .museum-footer {
-    padding-bottom: calc(116px + env(safe-area-inset-bottom));
-  }
-
+@media (max-width: 820px) {
   .museum-footer__inner {
     grid-template-columns: 1fr;
     gap: 10px;

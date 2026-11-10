@@ -526,6 +526,23 @@ const main = async () => {
   await waitUntil("expanded audio dock", () => evaluate(
     "!document.querySelector('.audio-dock')?.classList.contains('is-collapsed')",
   ));
+  const expandedDock = await evaluate(`(() => {
+    const dock = document.querySelector('.audio-dock');
+    const controls = [...document.querySelectorAll('.audio-dock__controls button')];
+    const seek = document.querySelector('.audio-dock__seek');
+    return {
+      isExpanded: Boolean(dock?.classList.contains('is-expanded')),
+      stageVisible: getComputedStyle(document.querySelector('.audio-dock__stage')).display !== 'none',
+      minControlHeight: controls.length ? Math.min(...controls.map((button) => button.getBoundingClientRect().height)) : 0,
+      seekHeight: seek ? seek.getBoundingClientRect().height : 0,
+    };
+  })()`);
+  if (!expandedDock.isExpanded || !expandedDock.stageVisible) {
+    throw new Error("Manually expanded audio dock did not reveal its controls");
+  }
+  if (expandedDock.minControlHeight < 36 || expandedDock.seekHeight < 24) {
+    throw new Error("Expanded audio dock controls fell below the touch target floor");
+  }
 
   currentStep = "audio dock keyboard focus";
   if (!await evaluate(`(() => {
@@ -748,6 +765,14 @@ const main = async () => {
   if (composeTypography.fixedLayerSpace < 120) {
     throw new Error("Narrow screens do not reserve space for fixed layers");
   }
+  const consistency = await evaluate(`(() => ({
+    fixedLayerSpace: parseFloat(getComputedStyle(document.querySelector("main")).paddingBottom),
+    footerPadding: parseFloat(getComputedStyle(document.querySelector('.museum-footer')).paddingBottom),
+    noticeBottom: parseFloat(getComputedStyle(document.querySelector('.notice-host')).bottom),
+  }))()`);
+  if (consistency.footerPadding < consistency.fixedLayerSpace || consistency.noticeBottom < 200) {
+    throw new Error("Fixed layers do not share the narrow-screen safe area");
+  }
 
   await send("Emulation.setDeviceMetricsOverride", {
     width: 320,
@@ -799,6 +824,15 @@ const main = async () => {
     return Boolean(document.querySelector('input[aria-label="登录账号"]'))
       && Boolean(document.querySelector('input[aria-label="登录密码"]'));
   })()`));
+  const authSemantics = await evaluate(`(() => ({
+    hiddenFocusable: [...document.querySelectorAll('[aria-hidden="true"] a, [aria-hidden="true"] button, [aria-hidden="true"] input, [aria-hidden="true"] [tabindex]')]
+      .filter((element) => element.tabIndex >= 0).length,
+    tablist: document.querySelectorAll('.auth-tabs[role="tablist"]').length,
+    currentPage: document.querySelector('.auth-tabs a[aria-current="page"]')?.textContent?.trim() || '',
+  }))()`);
+  if (authSemantics.hiddenFocusable || authSemantics.tablist || authSemantics.currentPage !== "登录") {
+    throw new Error("Auth page has hidden focusable content or inconsistent navigation semantics");
+  }
   if (!await setInput('input[aria-label="登录账号"]', "demo")) {
     throw new Error("Login username input was not found");
   }

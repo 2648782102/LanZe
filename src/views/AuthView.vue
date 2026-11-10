@@ -3,7 +3,7 @@
     <section class="auth-art" aria-hidden="true">
       <img :src="authImage" alt="" width="960" height="600" decoding="async" />
       <div class="auth-art__veil" />
-      <router-link class="auth-brand" to="/">
+      <router-link class="auth-brand" to="/" tabindex="-1">
         <span>兰</span>
         <strong>兰泽</strong>
       </router-link>
@@ -30,14 +30,22 @@
             : "使用演示账号体验完整流程，或继续使用你在这台设备上创建过的账号。" }}
         </p>
 
-        <div class="auth-tabs" role="tablist" aria-label="账号操作">
-          <router-link :to="{ name: 'login', query: route.query }" :class="{ 'is-active': !isRegister }">
+        <nav class="auth-tabs" aria-label="账号操作">
+          <router-link
+            :to="{ name: 'login', query: route.query }"
+            :class="{ 'is-active': !isRegister }"
+            :aria-current="isRegister ? undefined : 'page'"
+          >
             登录
           </router-link>
-          <router-link :to="{ name: 'register', query: route.query }" :class="{ 'is-active': isRegister }">
+          <router-link
+            :to="{ name: 'register', query: route.query }"
+            :class="{ 'is-active': isRegister }"
+            :aria-current="isRegister ? 'page' : undefined"
+          >
             创建账号
           </router-link>
-        </div>
+        </nav>
 
         <form class="auth-form" @submit.prevent="submit">
           <label class="field-label" for="auth-user">
@@ -86,8 +94,13 @@
 
           <p v-if="error" class="form-error" role="alert">{{ error }}</p>
 
-          <button class="button button--solid auth-submit" type="submit" :disabled="busy"
-            :aria-label="isRegister ? '提交注册' : '提交登录'">
+          <button
+            class="button button--solid auth-submit"
+            type="submit"
+            :disabled="busy"
+            :aria-busy="busy"
+            :aria-label="isRegister ? '提交注册' : '提交登录'"
+          >
             {{ busy ? "请稍候" : isRegister ? "创建账号" : "登录" }}
             <AppIcon :name="isRegister ? 'feather' : 'arrow-right'" :size="17" />
           </button>
@@ -433,7 +446,6 @@ watch(
 
 .auth-submit:disabled {
   cursor: wait;
-  opacity: 0.6;
 }
 
 .demo-box {

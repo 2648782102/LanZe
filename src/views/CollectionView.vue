@@ -32,9 +32,11 @@
           <button
             v-for="tab in tabs"
             :key="tab.id"
+            :id="`collection-tab-${tab.id}`"
             type="button"
             role="tab"
             :aria-selected="activeTab === tab.id"
+            aria-controls="collection-tab-panel"
             :class="{ 'is-active': activeTab === tab.id }"
             @click="setTab(tab.id)"
           >
@@ -43,66 +45,72 @@
           </button>
         </div>
 
-        <div v-if="activeTab === 'saved'">
-          <div v-if="savedPoems.length" class="saved-list">
-            <PoemRow
-              v-for="(poem, index) in savedPoems"
-              :key="poem.id"
-              :poem="poem"
-              :index="String(index + 1).padStart(2, '0')"
-              :saved="true"
-              @toggle="removeSaved"
-            />
+        <div
+          id="collection-tab-panel"
+          role="tabpanel"
+          :aria-labelledby="`collection-tab-${activeTab}`"
+        >
+          <div v-if="activeTab === 'saved'">
+            <div v-if="savedPoems.length" class="saved-list">
+              <PoemRow
+                v-for="(poem, index) in savedPoems"
+                :key="poem.id"
+                :poem="poem"
+                :index="String(index + 1).padStart(2, '0')"
+                :saved="true"
+                @toggle="removeSaved"
+              />
+            </div>
+            <div v-else class="empty-state">
+              <h2>诗卷还没有折角</h2>
+              <p>在今日读诗或诗词索引里点一下书签，喜欢的那首就会留在这里。</p>
+              <router-link class="button button--solid" to="/explore">去寻一首诗</router-link>
+            </div>
           </div>
-          <div v-else class="empty-state">
-            <h2>诗卷还没有折角</h2>
-            <p>在今日读诗或诗词索引里点一下书签，喜欢的那首就会留在这里。</p>
-            <router-link class="button button--solid" to="/explore">去寻一首诗</router-link>
-          </div>
-        </div>
 
-        <div v-else-if="activeTab === 'recent'">
-          <div v-if="recentPoems.length" class="saved-list">
-            <PoemRow
-              v-for="(poem, index) in recentPoems"
-              :key="poem.id"
-              :poem="poem"
-              :index="String(index + 1).padStart(2, '0')"
-              :saved="isSaved(poem.id)"
-              @toggle="toggleSavedPoem"
-            />
+          <div v-else-if="activeTab === 'recent'">
+            <div v-if="recentPoems.length" class="saved-list">
+              <PoemRow
+                v-for="(poem, index) in recentPoems"
+                :key="poem.id"
+                :poem="poem"
+                :index="String(index + 1).padStart(2, '0')"
+                :saved="isSaved(poem.id)"
+                @toggle="toggleSavedPoem"
+              />
+            </div>
+            <div v-else class="empty-state">
+              <h2>还没有最近读诗</h2>
+              <p>打开任意一首诗的详情页，它就会安静地记在这里，最多保留十二首。</p>
+              <router-link class="button button--solid" to="/">从今日读诗开始</router-link>
+            </div>
           </div>
-          <div v-else class="empty-state">
-            <h2>还没有最近读诗</h2>
-            <p>打开任意一首诗的详情页，它就会安静地记在这里，最多保留十二首。</p>
-            <router-link class="button button--solid" to="/">从今日读诗开始</router-link>
-          </div>
-        </div>
 
-        <div v-else>
-          <div class="works-toolbar">
-            <p>发布后会立即写入当前浏览器的演示数据。</p>
-            <router-link class="button button--solid" to="/compose">
-              <AppIcon name="pen" :size="16" />
-              写一首诗
-            </router-link>
-          </div>
-          <div v-if="works.length" class="works-list">
-            <article v-for="work in works" :key="work.id" class="work-item">
-              <div>
-                <p>{{ work.category }} · {{ work.author }}</p>
-                <h3>
-                  <router-link :to="{ name: 'poem', params: { id: work.id } }">{{ work.title }}</router-link>
-                </h3>
-                <p class="work-item__line">{{ work.paragraph || work.paragraphs?.[0] }}</p>
-              </div>
-              <AppIcon name="arrow-right" :size="18" />
-            </article>
-          </div>
-          <div v-else class="empty-state">
-            <h2>还没有自己的作品</h2>
-            <p>可以从一句此刻想到的话开始。表单不会上传到服务器，除非你配置了自建 API。</p>
-            <router-link class="button button--solid" to="/compose">打开写作台</router-link>
+          <div v-else>
+            <div class="works-toolbar">
+              <p>发布后会立即写入当前浏览器的演示数据。</p>
+              <router-link class="button button--solid" to="/compose">
+                <AppIcon name="pen" :size="16" />
+                写一首诗
+              </router-link>
+            </div>
+            <div v-if="works.length" class="works-list">
+              <article v-for="work in works" :key="work.id" class="work-item">
+                <div>
+                  <p>{{ work.category }} · {{ work.author }}</p>
+                  <h3>
+                    <router-link :to="{ name: 'poem', params: { id: work.id } }">{{ work.title }}</router-link>
+                  </h3>
+                  <p class="work-item__line">{{ work.paragraph || work.paragraphs?.[0] }}</p>
+                </div>
+                <AppIcon name="arrow-right" :size="18" />
+              </article>
+            </div>
+            <div v-else class="empty-state">
+              <h2>还没有自己的作品</h2>
+              <p>可以从一句此刻想到的话开始。表单不会上传到服务器，除非你配置了自建 API。</p>
+              <router-link class="button button--solid" to="/compose">打开写作台</router-link>
+            </div>
           </div>
         </div>
       </section>

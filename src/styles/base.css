@@ -181,6 +181,11 @@ img {
   transform: translateY(0) scale(0.985);
 }
 
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.56;
+}
+
 .button--solid {
   border-color: var(--ink);
   background: var(--ink);

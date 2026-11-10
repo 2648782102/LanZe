@@ -701,7 +701,7 @@ onBeforeUnmount(() => {
 
 .strip-actions .button:disabled {
   cursor: wait;
-  opacity: 0.5;
+  opacity: 0.56;
 }
 
 .excerpt-source {

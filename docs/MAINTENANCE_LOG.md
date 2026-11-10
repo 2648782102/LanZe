@@ -260,3 +260,11 @@
 - 在不改动历史白色摘录卡、离线馆藏与已发布 Release 的前提下，补充排版 token、固定层安全区与 `text-wrap` 规则；统一提升辅助文字与播放器文字，减少过宽字距，诗题改为两行显示，修复读诗页/写作台链接触控尺寸，并让桌面播放器在鼠标或键盘焦点停留期间保持展开、焦点离开后收束。
 - `scripts/smoke.browser.mjs` 增加播放器键盘展开、长诗题不省略、关键辅助文字字号、写作台登录链接触控高度与窄屏固定层安全区断言；`docs/DESIGN_SYSTEM.md`、`CHANGELOG.md` 和本日志同步记录契约。
 - 本地复核 `npm run lint`、`npm run test`（39/39）、`npm run build`、`npm run smoke`（35 assets）、`npm run audio:verify`、`npm run smoke:browser`（冷启动 CLS 0.0000、全流程 CLS 0.0000、控制台/网络错误 0）与 `git diff --check` 均通过；临时 CDP 截图复核 14 个页面/视口组合后，小于 11px 文字、低于 36px 控件、文本截断与页面横向溢出均为 0，历史摘录卡契约仍由 Browser E2E 覆盖。不修改 GitHub 展示、Pages、Discussion、`v0.4.0` tag 或 Release，不执行外部宣发。
+
+## 完整性收口 — 2026-11-11 01:10 CST
+
+- 按「继续打磨但要克制、照顾所有地方、保持整体一致性」复核固定层、表单、播放器、通知、页脚与语义状态；旧 `lanze-08-00` 心跳窗口已结束，不恢复自动化巡检，也不重新设计页面。
+- 临时 Vite preview / Chrome CDP 状态审计记录到 390/320/768px 的展开播放器、通知、登录/注册、诗卷、写作台等场景：改动前 3 个场景通知层与展开播放器相交，641–820px 仍沿用桌面通知/页脚 offset；关闭提示 24/32px、展开播放器控件 30px、进度条 12px；登录装饰区的 `auth-brand` 可被 Tab 聚焦；桌面手动展开播放器只切换 `isCollapsed`，控件显示仍依赖 hover/focus。
+- 本轮把通知层、页脚固定层断点统一到 820px，并用 `--fixed-layer-space` 对齐页脚留白；通知关闭按钮改为 40px、暗层焦点改为铜金色，展开播放器控件改为 36px、滑块改为 24px、窄屏展开高度改为 108px，手动展开时显式设置完整控件状态并清理收起态。`quick-terms` 次级按钮补至 40px，全局按钮禁用态统一为 `not-allowed` / `0.56`，等待态仍保留局部 `wait`。
+- 登录装饰区品牌链接退出 Tab 顺序，账号切换由伪 `tablist` 改为普通 `nav` 与 `aria-current`；提交按钮补 `aria-busy`。诗卷标签补齐 `aria-controls` / `tabpanel` / `aria-labelledby` 关联。浏览器冒烟新增隐藏焦点、展开播放器控件尺寸、固定层安全区与登录语义断言；设计契约和变更日志同步记录。
+- 临时状态审计复核后，8 个场景中通知层与展开播放器相交 0、隐藏可聚焦元素 0、小于 36px 控件 0、页面横向溢出 0；768px 页脚与 `main` 安全区均为 132px。历史白色摘录卡、9,350 篇离线馆藏、三段本地声景、GitHub 展示、Pages、Discussion、`v0.4.0` tag 与 Release 均未改动。

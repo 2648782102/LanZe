@@ -64,8 +64,8 @@ const { notices, dismissNotice } = useNotices();
 .notice button {
   display: grid;
   flex: 0 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 40px;
+  height: 40px;
   place-items: center;
   padding: 0;
   border: 0;
@@ -76,6 +76,11 @@ const { notices, dismissNotice } = useNotices();
 
 .notice button:hover {
   opacity: 1;
+}
+
+.notice button:focus-visible {
+  outline-color: var(--brass-soft);
+  outline-offset: -3px;
 }
 
 .notice-enter-active,
@@ -91,18 +96,13 @@ const { notices, dismissNotice } = useNotices();
   transform: translateY(8px);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 820px) {
   .notice-host {
     right: max(16px, env(safe-area-inset-right));
     left: max(16px, env(safe-area-inset-left));
-    bottom: calc(154px + env(safe-area-inset-bottom));
+    bottom: calc(208px + env(safe-area-inset-bottom));
     width: auto;
     max-width: calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));
-  }
-
-  .notice button {
-    width: 32px;
-    height: 32px;
   }
 }
 </style>

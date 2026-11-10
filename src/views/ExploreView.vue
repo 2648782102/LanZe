@@ -1153,7 +1153,7 @@ watch([dynasty, genre], () => {
   }
 
   .quick-terms button {
-    min-height: 36px;
+    min-height: 40px;
     padding: 6px 9px;
   }
 
