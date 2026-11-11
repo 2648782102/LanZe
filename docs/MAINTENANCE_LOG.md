@@ -289,4 +289,10 @@
 - 根因是 `.github/workflows/pages.yml` 只声明 `workflow_dispatch`；push 触发的 CI 与 Vercel 部署不会更新 GitHub Pages artifact，Pages workflow 历史也只有 11 月 7 日的一次手动运行 `42376966164`。
 - 通过 GitHub Actions 网页手动运行 `main` 的 Pages workflow `42874012307`，29 秒后 success；部署 API 新增 `github-pages` environment 记录，线上 `index.html` 的 `last-modified`、入口 JS/CSS 哈希及 CSS 字节均与本地 `dist` 一致，所有新入口资源返回 200。
 - 为消除复发，把 `pages.yml` 增加 `push: branches: [main]`，保留 `workflow_dispatch` 作为手动重跑；`README.md`、`docs/DEPLOYMENT.md`、`docs/ARCHITECTURE.md`、`docs/PROMOTION.md` 与 `CHANGELOG.md` 同步部署方式。该变更提交并推送后，再核对自动 Pages workflow 成功与线上资源哈希一致。
+
+## 摘录卡连续掀页 — 2026-11-11
+
+- 用户指出旧交互「卡片不跟手指、松手后才切换、翻页效果不自然」。复核 `ExcerptCard.vue`：旧状态在 `pointermove` 直接写位移、`pointerup` 才按较大距离阈值触发 `turn`，且 `turn` 发出接口请求后依赖 `watch(props.excerpt)` 才把下一句塞入 incoming 卡。
+- 本轮把下一张卡提升为 `ReadView` 的 `nextExcerpt` 预热数据并在输入框未交互时常驻底层；`ExcerptCard` 用 Pointer Events + `requestAnimationFrame` 统一鼠标/触屏采样，记录横向速度，按 `位移 + 速度投影` 在拖拽中越过约 42–64px 等效阈值即提前掀走旧卡。拖动期间上层卡跟手 `translate3d`、轻微 `rotateY/rotateZ/rotateX` 和渐进阴影，底层新卡随抬起渐显；飞离曲线从当前手势位置接续，动画时长收短到 560ms，新卡 80ms 后落纸，显墨按 28ms/字推进，总提交窗口 620–900ms。
+- 按钮和键盘复用同一 `turnCard`；`touch-action: none` 与指针捕获保证触屏不把水平手势让给页面滚动。`prefers-reduced-motion` 下直接换句，卡片比例、白底、竖排诗句、扇舟图、收藏角标和右留白保持不变。Browser E2E 改查拖动 34px 时的真实位移、72px 前已进入 `is-turning`、底层新句可见，并用 CDP `Input.dispatchTouchEvent` 验证触屏反向拖动与连续换句。
 - `scripts/smoke.browser.mjs` 增加真实 Pointer 拖动（抬起 transform、进入掀卡状态、换句完成）、卡片键盘/按钮入口、以及登录左栏竖排诗笺断言；保留单卡、白底、720×412 扇舟图、右留白、收藏与来源状态等原契约。

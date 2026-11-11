@@ -543,46 +543,89 @@ const main = async () => {
   });
   await send("Input.dispatchMouseEvent", {
     type: "mouseMoved",
-    x: dragOrigin.x + 92,
-    y: dragOrigin.y - 44,
+    x: dragOrigin.x + 18,
+    y: dragOrigin.y - 8,
     button: "left",
     buttons: 1,
   });
+  await delay(40);
   const pointerDrag = await evaluate(`(() => {
     const card = document.querySelector('.legacy-card');
     const current = card?.querySelector('.legacy-card__box--current');
+    const incoming = card?.querySelector('.legacy-card__box--incoming');
+    const currentRect = current?.getBoundingClientRect();
+    const cardRect = card?.getBoundingClientRect();
     return {
       isDragging: Boolean(card?.classList.contains('is-dragging')),
       lifted: current ? getComputedStyle(current).transform : 'none',
+      offset: currentRect && cardRect ? Math.round(currentRect.left - cardRect.left) : 0,
+      incomingOpacity: incoming ? Number(getComputedStyle(incoming).opacity) : 0,
+      incomingVerse: incoming?.querySelector('.legacy-card__verse')?.textContent?.trim() || '',
+      touchAction: card ? getComputedStyle(card).touchAction : '',
     };
   })()`);
   await send("Input.dispatchMouseEvent", {
     type: "mouseMoved",
-    x: dragOrigin.x + 180,
-    y: dragOrigin.y - 90,
+    x: dragOrigin.x + 72,
+    y: dragOrigin.y - 34,
     button: "left",
     buttons: 1,
   });
+  pointerDrag.turnedBeforeRelease = await evaluate(`Boolean(document.querySelector('.legacy-card')?.classList.contains('is-turning'))`);
   await send("Input.dispatchMouseEvent", {
     type: "mouseReleased",
-    x: dragOrigin.x + 180,
-    y: dragOrigin.y - 90,
+    x: dragOrigin.x + 72,
+    y: dragOrigin.y - 34,
     button: "left",
     buttons: 0,
     clickCount: 1,
   });
-  pointerDrag.isTurning = await evaluate(`Boolean(document.querySelector('.legacy-card')?.classList.contains('is-turning'))`);
-  if (!pointerDrag.isDragging || pointerDrag.lifted === "none" || !pointerDrag.isTurning) {
-    throw new Error("Dragging the excerpt card did not lift and turn it");
+  if (!pointerDrag.isDragging || pointerDrag.lifted === "none" || pointerDrag.offset < 10
+    || pointerDrag.incomingOpacity <= 0 || !pointerDrag.incomingVerse
+    || pointerDrag.touchAction !== "none" || !pointerDrag.turnedBeforeRelease) {
+    throw new Error(`Dragging the excerpt card did not follow the pointer or turn early: ${JSON.stringify(pointerDrag)}`);
   }
-  const draggedExcerpt = await waitUntil("dragged historical excerpt", () => evaluate(`
+  currentStep = "touch excerpt card";
+  await waitUntil("touch excerpt ready", () => evaluate(
+    "Boolean(document.querySelector('.legacy-card')) && !document.querySelector('.legacy-card')?.classList.contains('is-turning')",
+  ));
+  const touchOrigin = await evaluate(`(() => {
+    const rect = document.querySelector('.legacy-card')?.getBoundingClientRect();
+    return rect ? { x: Math.round(rect.left + rect.width / 2), y: Math.round(rect.top + Math.min(rect.height / 3, 180)) } : null;
+  })()`);
+  if (!touchOrigin) throw new Error("Excerpt card was not available for touch dragging");
+  const touchVerse = await evaluate(`document.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim() || ''`);
+  await send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: touchOrigin.x, y: touchOrigin.y, id: 1 }] });
+  await send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: touchOrigin.x - 28, y: touchOrigin.y - 12, id: 1 }] });
+  await delay(40);
+  const touchDrag = await evaluate(`(() => {
+    const card = document.querySelector('.legacy-card');
+    const current = card?.querySelector('.legacy-card__box--current');
+    const currentRect = current?.getBoundingClientRect();
+    const cardRect = card?.getBoundingClientRect();
+    return {
+      isDragging: Boolean(card?.classList.contains('is-dragging')),
+      offset: currentRect && cardRect ? Math.round(currentRect.left - cardRect.left) : 0,
+    };
+  })()`);
+  await send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: touchOrigin.x - 78, y: touchOrigin.y - 28, id: 1 }] });
+  await send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+  if (!touchDrag.isDragging || touchDrag.offset > -8) {
+    throw new Error(`Touch dragging did not move the excerpt card with the finger: ${JSON.stringify(touchDrag)}`);
+  }
+  await waitUntil("touch excerpt settled", () => evaluate(`
     (() => {
       const card = document.querySelector('.legacy-card');
       const verse = card?.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim();
-      return Boolean(verse) && verse !== ${JSON.stringify(firstExcerpt)} && !card?.classList.contains('is-turning')
-        && document.querySelectorAll('.legacy-card__box').length === 1 ? verse : null;
+      return Boolean(verse) && verse !== ${JSON.stringify(touchVerse)} && !card?.classList.contains('is-turning');
     })()
   `), 80);
+  const draggedExcerpt = await evaluate(
+    "document.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim() || ''",
+  );
+  if (!draggedExcerpt || draggedExcerpt === firstExcerpt) {
+    throw new Error("Dragged historical excerpt did not settle on a new verse");
+  }
   await evaluate("document.querySelector('.legacy-card')?.blur(); window.scrollTo({ top: 0, behavior: 'instant' })");
   await waitUntil("page scroll reset after drag", () => evaluate("scrollY === 0"));
   if (!await evaluate(`(() => {

@@ -17,9 +17,9 @@
     @pointercancel="cancelDrag"
     @keydown="handleKeydown"
   >
-    <div class="legacy-card__hint" aria-hidden="true">拖动卡片，换一句诗</div>
+    <div class="legacy-card__hint" aria-hidden="true">轻轻一掀，换一句诗</div>
 
-    <div v-if="incomingExcerpt" class="legacy-card__box legacy-card__box--incoming">
+    <div class="legacy-card__box legacy-card__box--incoming" aria-hidden="true">
       <button
         class="legacy-card__save"
         type="button"
@@ -36,7 +36,7 @@
           v-for="(character, characterIndex) in incomingCharacters"
           :key="`${character}-${characterIndex}`"
           class="legacy-card__ink"
-          :style="{ '--ink-delay': `${characterIndex * 46}ms` }"
+          :style="{ '--ink-delay': `${characterIndex * 28}ms` }"
         >{{ character }}</span>
       </p>
       <h5 class="legacy-card__author">— {{ incomingExcerpt.author }}</h5>
@@ -87,16 +87,18 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref } from "vue";
 import AppIcon from "./AppIcon.vue";
 import fanzouImage from "../assets/excerpt/fanzou-720.png";
 
 const props = defineProps({
   excerpt: { type: Object, required: true },
   saved: { type: Boolean, default: false },
+  nextExcerpt: { type: Object, default: null },
+  nextSaved: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
 });
-const emit = defineEmits(["toggle-save", "turn", "settled"]);
+const emit = defineEmits(["toggle-save", "needs-next", "turn", "settled"]);
 
 const isDragging = ref(false);
 const isLifting = ref(false);
@@ -104,9 +106,15 @@ const isWriting = ref(false);
 const isTurning = ref(false);
 const direction = ref("");
 const dragOffset = ref({ x: 0, y: 0 });
-const incomingExcerpt = ref(null);
-const incomingSaved = ref(false);
 const pointerOrigin = { x: 0, y: 0, id: null, target: null };
+const pointerState = {
+  x: 0,
+  y: 0,
+  time: 0,
+  velocityX: 0,
+  frame: 0,
+  turnRequested: false,
+};
 let writingTimer;
 let commitTimer;
 let releaseTimer;
@@ -114,8 +122,9 @@ let releaseTimer;
 const cardStyle = computed(() => ({
   "--drag-x": `${dragOffset.value.x}px`,
   "--drag-y": `${dragOffset.value.y}px`,
-  "--drag-turn": `${dragOffset.value.x * 0.09}deg`,
-  "--drag-tilt": `${Math.max(-13, Math.min(13, dragOffset.value.y * -0.045))}deg`,
+  "--drag-turn": `${dragOffset.value.x * 0.065}deg`,
+  "--drag-tilt": `${Math.max(-9, Math.min(9, dragOffset.value.y * -0.032))}deg`,
+  "--drag-lift": `${Math.min(1, Math.hypot(dragOffset.value.x, dragOffset.value.y) / 72)}`,
 }));
 
 const densityFor = (content) => {
@@ -125,6 +134,8 @@ const densityFor = (content) => {
   return "legacy-card__verse--open";
 };
 const verseDensity = computed(() => densityFor(props.excerpt.content));
+const incomingExcerpt = computed(() => props.nextExcerpt || props.excerpt);
+const incomingSaved = computed(() => props.nextSaved);
 const incomingDensity = computed(() => densityFor(incomingExcerpt.value?.content));
 const incomingCharacters = computed(() => Array.from(incomingExcerpt.value?.content || ""));
 
@@ -135,8 +146,6 @@ const clearTimers = () => {
   window.clearTimeout(releaseTimer);
 };
 const finishTurn = () => {
-  incomingExcerpt.value = null;
-  incomingSaved.value = false;
   isWriting.value = false;
   isDragging.value = false;
   isLifting.value = false;
@@ -145,18 +154,20 @@ const finishTurn = () => {
     isTurning.value = false;
     direction.value = "";
     emit("settled");
-  }, reducedMotion() ? 0 : 160);
+  }, 0);
 };
 
 const turnCard = (turnDirection = "right") => {
   if (isTurning.value || props.disabled) return;
+  emit("needs-next");
   clearTimers();
+  window.cancelAnimationFrame(pointerState.frame);
+  pointerState.frame = 0;
   isTurning.value = true;
   isDragging.value = false;
   isLifting.value = true;
   isWriting.value = false;
   direction.value = turnDirection;
-  incomingExcerpt.value = null;
   emit("turn", turnDirection);
   if (reducedMotion()) {
     finishTurn();
@@ -164,8 +175,9 @@ const turnCard = (turnDirection = "right") => {
   }
   writingTimer = window.setTimeout(() => {
     isWriting.value = true;
-  }, 320);
-  commitTimer = window.setTimeout(finishTurn, 1420);
+  }, 210);
+  const writingDuration = Math.max(260, incomingCharacters.value.length * 28 + 180);
+  commitTimer = window.setTimeout(finishTurn, Math.min(900, Math.max(620, writingDuration)));
 };
 
 const startDrag = (event) => {
@@ -176,21 +188,64 @@ const startDrag = (event) => {
   pointerOrigin.id = event.pointerId;
   pointerOrigin.target = event.currentTarget;
   pointerOrigin.target.setPointerCapture?.(event.pointerId);
-  isDragging.value = true;
+  pointerState.x = event.clientX;
+  pointerState.y = event.clientY;
+  pointerState.time = event.timeStamp;
+  pointerState.velocityX = 0;
+  pointerState.frame = 0;
+  pointerState.turnRequested = false;
+  dragOffset.value = { x: 0, y: 0 };
   direction.value = "";
+  isDragging.value = true;
+  emit("needs-next");
 };
 
 const moveDrag = (event) => {
   if (!isDragging.value || event.pointerId !== pointerOrigin.id) return;
+  const elapsed = Math.max(8, event.timeStamp - pointerState.time);
+  const instantVelocity = (event.clientX - pointerState.x) / elapsed * 1000;
+  pointerState.velocityX = pointerState.velocityX * 0.72 + instantVelocity * 0.28;
+  pointerState.x = event.clientX;
+  pointerState.y = event.clientY;
+  pointerState.time = event.timeStamp;
+  if (pointerState.frame) return;
+  pointerState.frame = window.requestAnimationFrame(() => {
+    pointerState.frame = 0;
+    if (!isDragging.value) return;
+    const nextX = pointerState.x - pointerOrigin.x;
+    const nextY = pointerState.y - pointerOrigin.y;
+    dragOffset.value = {
+      x: Math.max(-220, Math.min(220, nextX)),
+      y: Math.max(-140, Math.min(120, nextY)),
+    };
+    direction.value = dragOffset.value.x < 0 ? "left" : "right";
+    const projected = Math.abs(dragOffset.value.x) + Math.abs(pointerState.velocityX) * 0.055;
+    const width = pointerOrigin.target?.getBoundingClientRect().width || 330;
+    const threshold = Math.min(64, Math.max(42, width * 0.17));
+    if (!pointerState.turnRequested && Math.abs(dragOffset.value.x) > 12 && projected > threshold) {
+      pointerState.turnRequested = true;
+      pointerOrigin.target?.releasePointerCapture?.(pointerOrigin.id);
+      turnCard(dragOffset.value.x < 0 ? "left" : "right");
+    }
+  });
+};
+
+const commitDragFrame = () => {
+  if (!isDragging.value || pointerState.frame) return;
+  const nextX = pointerState.x - pointerOrigin.x;
+  const nextY = pointerState.y - pointerOrigin.y;
   dragOffset.value = {
-    x: Math.max(-260, Math.min(260, event.clientX - pointerOrigin.x)),
-    y: Math.max(-220, Math.min(180, event.clientY - pointerOrigin.y)),
+    x: Math.max(-220, Math.min(220, nextX)),
+    y: Math.max(-140, Math.min(120, nextY)),
   };
   direction.value = dragOffset.value.x < 0 ? "left" : "right";
 };
 
 const cancelDrag = () => {
   if (!isDragging.value) return;
+  window.cancelAnimationFrame(pointerState.frame);
+  pointerState.frame = 0;
+  pointerOrigin.target?.releasePointerCapture?.(pointerOrigin.id);
   isDragging.value = false;
   dragOffset.value = { x: 0, y: 0 };
   direction.value = "";
@@ -198,50 +253,37 @@ const cancelDrag = () => {
 
 const endDrag = (event) => {
   if (!isDragging.value || event.pointerId !== pointerOrigin.id) return;
+  commitDragFrame();
   pointerOrigin.target?.releasePointerCapture?.(event.pointerId);
-  const threshold = Math.min(140, Math.max(88, (event.currentTarget.getBoundingClientRect().width || 330) * 0.34));
+  const width = event.currentTarget.getBoundingClientRect().width || 330;
+  const threshold = Math.min(64, Math.max(42, width * 0.17));
   const offset = dragOffset.value;
-  const distance = Math.hypot(offset.x, offset.y);
-  isDragging.value = false;
-  if (distance < threshold) {
-    cancelDrag();
-    return;
-  }
-  turnCard(offset.x < 0 ? "left" : "right");
+  const projected = Math.abs(offset.x) + Math.abs(pointerState.velocityX) * 0.055;
+  if (Math.abs(offset.x) > 12 && projected > threshold) turnCard(offset.x < 0 ? "left" : "right");
+  else cancelDrag();
 };
 
-const turnFromButton = () => turnCard("right");
+const turnFromButton = () => {
+  emit("needs-next");
+  turnCard("right");
+};
 
 const handleKeydown = (event) => {
   if (event.target !== event.currentTarget) return;
   if (event.key === "ArrowRight" || event.key === "ArrowLeft" || event.key === "Enter" || event.key === " ") {
     event.preventDefault();
+    emit("needs-next");
     turnCard(event.key === "ArrowLeft" ? "left" : "right");
   }
 };
 
-const prepareIncoming = (nextExcerpt) => {
-  if (!isTurning.value || !nextExcerpt || nextExcerpt === props.excerpt) return;
-  incomingExcerpt.value = nextExcerpt;
-  incomingSaved.value = false;
-  const writingDelay = reducedMotion() ? 0 : 80;
-  window.clearTimeout(writingTimer);
-  writingTimer = window.setTimeout(() => {
-    isWriting.value = true;
-  }, writingDelay);
-  const commitDelay = reducedMotion() ? 0 : Math.max(760, incomingCharacters.value.length * 46 + 420);
-  window.clearTimeout(commitTimer);
-  commitTimer = window.setTimeout(finishTurn, commitDelay);
-};
-
-watch(() => props.excerpt, prepareIncoming);
 defineExpose({
-  deliver: prepareIncoming,
   turn: turnFromButton,
   isTurning,
 });
 onBeforeUnmount(() => {
   clearTimers();
+  window.cancelAnimationFrame(pointerState.frame);
 });
 </script>
 
@@ -273,13 +315,14 @@ onBeforeUnmount(() => {
   --drag-y: 0px;
   --drag-turn: 0deg;
   --drag-tilt: 0deg;
+  --drag-lift: 0;
   position: relative;
   width: min(100%, 330px);
   margin-inline: auto;
   padding-block: calc(16px * var(--legacy-scale, 1));
   cursor: grab;
   perspective: 1200px;
-  touch-action: pan-y;
+  touch-action: none;
   user-select: none;
 }
 
@@ -309,6 +352,14 @@ onBeforeUnmount(() => {
 .legacy-card.is-dragging .legacy-card__hint,
 .legacy-card.is-turning .legacy-card__hint {
   opacity: 0;
+}
+
+.legacy-card__box--incoming {
+  will-change: transform, opacity;
+}
+
+.legacy-card__box--current {
+  will-change: transform;
 }
 
 .legacy-card__box {
@@ -361,14 +412,14 @@ onBeforeUnmount(() => {
   pointer-events: none;
 }
 
-.legacy-card:not(.is-turning):hover .legacy-card__box--current {
+.legacy-card:not(.is-turning):not(.is-dragging):hover .legacy-card__box--current {
   transform: rotateX(5deg) translateY(calc(-3px * var(--legacy-scale)));
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.72),
     0 calc(8px * var(--legacy-scale)) calc(18px * var(--legacy-scale)) rgba(22, 49, 46, 0.09);
 }
 
-.legacy-card:not(.is-turning):hover .legacy-card__box--current::after {
+.legacy-card:not(.is-turning):not(.is-dragging):hover .legacy-card__box--current::after {
   transform: translateY(100%);
   opacity: 1;
 }
@@ -378,7 +429,7 @@ onBeforeUnmount(() => {
   inset: calc(16px * var(--legacy-scale)) 0 auto;
   z-index: 1;
   opacity: 0;
-  transform: translateY(-18px) scale(0.985);
+  transform: translateY(-8px) scale(0.992);
 }
 
 .legacy-card__box--current {
@@ -522,10 +573,19 @@ onBeforeUnmount(() => {
 
 .legacy-card.is-dragging .legacy-card__box--current {
   transform:
-    translate3d(var(--drag-x), var(--drag-y), 34px)
+    translate3d(var(--drag-x), var(--drag-y), calc(18px + 18px * var(--drag-lift)))
     rotateZ(var(--drag-turn))
+    rotateY(calc(var(--drag-turn) * -0.42))
     rotateX(var(--drag-tilt));
-  box-shadow: 0 26px 42px rgba(16, 40, 39, 0.2);
+  box-shadow:
+    0 calc(8px + 16px * var(--drag-lift)) calc(18px + 24px * var(--drag-lift))
+    rgba(16, 40, 39, calc(0.08 + 0.12 * var(--drag-lift)));
+  transition: none;
+}
+
+.legacy-card.is-dragging .legacy-card__box--incoming {
+  opacity: calc(0.18 + 0.62 * var(--drag-lift));
+  transform: translateY(calc(-8px + 6px * var(--drag-lift))) scale(0.992);
   transition: none;
 }
 
@@ -534,15 +594,15 @@ onBeforeUnmount(() => {
 }
 
 .legacy-card.is-turning.legacy-card--right .legacy-card__box--current {
-  animation: card-lift-right 760ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation: card-lift-right 560ms cubic-bezier(0.18, 0.72, 0.28, 1) both;
 }
 
 .legacy-card.is-turning.legacy-card--left .legacy-card__box--current {
-  animation: card-lift-left 760ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation: card-lift-left 560ms cubic-bezier(0.18, 0.72, 0.28, 1) both;
 }
 
 .legacy-card.is-turning .legacy-card__box--incoming {
-  animation: card-settle 620ms cubic-bezier(0.22, 0.61, 0.36, 1) 220ms both;
+  animation: card-settle 480ms cubic-bezier(0.22, 0.61, 0.36, 1) 80ms both;
 }
 
 .legacy-card__box--incoming .legacy-card__verse,
@@ -564,43 +624,47 @@ onBeforeUnmount(() => {
 }
 
 .legacy-card.is-writing .legacy-card__ink {
-  animation: ink-appear 260ms var(--ease-out) var(--ink-delay) both;
+  animation: ink-appear 220ms var(--ease-out) var(--ink-delay) both;
 }
 
 @keyframes card-lift-right {
   0% {
     opacity: 1;
-    transform: translate3d(var(--drag-x), var(--drag-y), 34px) rotateZ(var(--drag-turn)) rotateX(var(--drag-tilt));
+    transform:
+      translate3d(var(--drag-x), var(--drag-y), calc(18px + 18px * var(--drag-lift)))
+      rotateZ(var(--drag-turn)) rotateY(calc(var(--drag-turn) * -0.42)) rotateX(var(--drag-tilt));
   }
-  46% {
+  28% {
     opacity: 1;
-    transform: translate3d(18%, -14%, 96px) rotateZ(8deg) rotateY(-46deg) rotateX(14deg);
+    transform: translate3d(calc(var(--drag-x) + 9%), calc(var(--drag-y) - 6%), 78px) rotateZ(7deg) rotateY(-24deg) rotateX(9deg);
   }
   100% {
     opacity: 0;
-    transform: translate3d(124%, -72%, 150px) rotateZ(22deg) rotateY(-62deg) rotateX(20deg) scale(0.88);
+    transform: translate3d(92%, -48%, 124px) rotateZ(18deg) rotateY(-52deg) rotateX(16deg) scale(0.92);
   }
 }
 
 @keyframes card-lift-left {
   0% {
     opacity: 1;
-    transform: translate3d(var(--drag-x), var(--drag-y), 34px) rotateZ(var(--drag-turn)) rotateX(var(--drag-tilt));
+    transform:
+      translate3d(var(--drag-x), var(--drag-y), calc(18px + 18px * var(--drag-lift)))
+      rotateZ(var(--drag-turn)) rotateY(calc(var(--drag-turn) * -0.42)) rotateX(var(--drag-tilt));
   }
-  46% {
+  28% {
     opacity: 1;
-    transform: translate3d(-18%, -14%, 96px) rotateZ(-8deg) rotateY(46deg) rotateX(14deg);
+    transform: translate3d(calc(var(--drag-x) - 9%), calc(var(--drag-y) - 6%), 78px) rotateZ(-7deg) rotateY(24deg) rotateX(9deg);
   }
   100% {
     opacity: 0;
-    transform: translate3d(-124%, -72%, 150px) rotateZ(-22deg) rotateY(62deg) rotateX(20deg) scale(0.88);
+    transform: translate3d(-92%, -48%, 124px) rotateZ(-18deg) rotateY(52deg) rotateX(16deg) scale(0.92);
   }
 }
 
 @keyframes card-settle {
   from {
-    opacity: 0;
-    transform: translateY(-22px) scale(0.985) rotateX(7deg);
+    opacity: 0.78;
+    transform: translateY(-8px) scale(0.992) rotateX(3deg);
   }
   to {
     opacity: 1;
