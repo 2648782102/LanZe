@@ -145,6 +145,7 @@ const page = ref(dayIndex % featured.length);
 const excerptPage = ref(dayIndex);
 const excerpt = ref(null);
 const nextExcerpt = ref(null);
+const nextExcerptSource = ref("local");
 const excerptStatus = ref("loading");
 const excerptSource = ref("local");
 let excerptRequest = 0;
@@ -198,29 +199,28 @@ const loadExcerpt = async () => {
   });
   if (requestId !== excerptRequest) return;
   const decorated = decorateExcerpt(next);
-  if (pendingExcerpt) {
-    pendingExcerpt.result = { decorated, source, reason };
-    if (!excerptCardRef.value?.isTurning) finishExcerptTurn();
-    return;
-  }
   excerpt.value = decorated;
   excerptSource.value = source;
   excerptStatus.value = source === "remote" ? "ready" : "fallback";
   const failure = { source, reason };
   reportExcerptSource(failure);
-  prepareNextExcerpt();
 };
 
 const prepareNextExcerpt = async () => {
   if (nextExcerpt.value || pendingExcerpt) return;
   const requestId = ++nextExcerptRequest;
   const nextIndex = excerptPage.value + 1;
-  const { excerpt: upcoming } = await loadExcerptFromSource({
+  const requestedPage = excerptPage.value;
+  const { excerpt: upcoming, source } = await loadExcerptFromSource({
     index: nextIndex,
     previousContent: excerpt.value?.content || "",
   });
-  if (requestId !== nextExcerptRequest || pendingExcerpt) return;
+  if (requestId !== nextExcerptRequest
+    || requestedPage !== excerptPage.value
+    || pendingExcerpt
+    || nextExcerpt.value) return;
   nextExcerpt.value = decorateExcerpt(upcoming);
+  nextExcerptSource.value = source;
 };
 
 const reportExcerptSource = ({ source, reason }) => {
@@ -246,43 +246,29 @@ const nextPoem = () => {
   }, prefersReducedMotion ? 0 : 120);
 };
 
-const beginExcerptTurn = (direction = "right") => {
+const beginExcerptTurn = () => {
   if (excerptStatus.value === "loading" || pendingExcerpt) return;
-  const previousIndex = excerptPage.value;
-  if (direction === "left") excerptPage.value += 3;
-  else excerptPage.value += 1;
   const prepared = nextExcerpt.value;
-  if (prepared && direction === "right" && previousIndex + 1 === excerptPage.value) {
-    pendingExcerpt = { result: { decorated: prepared, source: excerptSource.value, reason: "" } };
-    nextExcerpt.value = null;
-    nextExcerptRequest += 1;
-    return;
-  }
-  pendingExcerpt = { result: null };
-  nextExcerpt.value = null;
-  nextExcerptRequest += 1;
-  loadExcerpt();
+  if (!prepared) return;
+  pendingExcerpt = {
+    decorated: prepared,
+    source: nextExcerptSource.value,
+    reason: "",
+  };
 };
 
 const finishExcerptTurn = () => {
-  const result = pendingExcerpt?.result;
+  const result = pendingExcerpt;
+  if (!result) return;
   pendingExcerpt = null;
-  nextExcerpt.value = null;
-  nextExcerptRequest += 1;
-  if (!result) {
-    excerptStatus.value = "fallback";
-    prepareNextExcerpt();
-    return;
-  }
+  excerptPage.value += 1;
   excerpt.value = result.decorated;
   excerptSource.value = result.source;
   excerptStatus.value = result.source === "remote" ? "ready" : "fallback";
-  if (result.reason) reportExcerptSource(result);
+  nextExcerpt.value = null;
+  nextExcerptSource.value = "local";
+  nextExcerptRequest += 1;
   prepareNextExcerpt();
-};
-
-const nextExcerpts = () => {
-  excerptCardRef.value?.turn();
 };
 
 const toggleSave = () => {
@@ -327,8 +313,9 @@ const speakPoem = () => {
 };
 
 onMounted(() => {
-  loadExcerpt();
-  prepareNextExcerpt();
+  loadExcerpt().finally(() => {
+    if (excerpt.value && !nextExcerpt.value) prepareNextExcerpt();
+  });
 });
 onBeforeUnmount(() => {
   window.clearTimeout(switchTimer);

@@ -315,3 +315,10 @@
 - 本轮重做 `ExcerptCard.vue` 状态机：拖动阶段只计算 `--progress`，连续控制当前卡跟手、底层新卡透明度、旧字淡出和新字淡入；不再提前触发翻页。松手按位移与速度决定是否提交，未达条件用 380ms 弹性曲线归位。提交时当前卡直接隐藏，旧内容复制为独立 `outgoing` 快照从最后手指位置飞离；新卡固定在原位、transform 恒为 `none`，只做透明度与文字淡入，彻底消除横向回弹。
 - 破坏效果改为 CSS3 的 10×18 像素网格：每格用 `::before` 做瓷面镂空、`::after` 做纸白/墨色/青瓷/朱砂粒子，按稳定伪随机种子生成方向、旋转、透明度与 0–150ms 错峰延迟；`steps()` 与 `cubic-bezier` 组合模拟逐像素离散飞散，不依赖 Canvas、WebGL、图片快照或第三方库。按钮/键盘复用同一提交状态，`prefers-reduced-motion` 隐藏粒子层并直接换句。
 - Browser E2E 改为验证拖动 72px 时仍是 `is-dragging`、没有 `is-turning`、新卡 transform 为 `none`；松手后才进入 `is-committing`，180 个像素粒子中超过 20 个进入飞散动画，新卡 transform 仍为 `none`。桌面 1440px 与移动 390px 的 24px/96px/提交 120ms/提交 360ms/静止帧复核，新卡始终居中，旧卡以像素块向右上离散。`git diff --check`、lint、39 项单测、build、资源 smoke、音频校验、Browser E2E、14 视口细节/状态审计全通过，CLS 0.0000、控制台/网络错误 0。
+
+## 摘录卡静默落纸与毛笔书写 — 2026-11-12 02:10 CST
+
+- 用户指出「没有甩出去的感觉、松手后会卡一下、文字应有毛笔书写感」，并明确拖动时底层卡已经更新，不应在甩走时再刷新。复核根因：`ReadView.beginExcerptTurn(direction)` 过去对左划使用 `excerptPage += 3` 并另取一句，而 `ExcerptCard` 冻结的是右侧预取 incoming；同时 `commitTimer`、`settleFallback`、父级 `props.excerpt` watcher 与 CSS 长尾缓动相互抢帧，导致提交中途内容倒退、卡片尾段近似停住。
+- 本轮把预取句定为唯一提交结果：`ReadView` 在 `@turn` 只把 `nextExcerpt` 排入 `pendingExcerpt`，不修改 `nextExcerpt`、不按方向请求新数据；`@settled` 在动画结束才交换 `excerpt`、递增页序、清空预取并静默预取再下一句。预取请求用 `requestId` 与 `requestedPage` 双重校验，避免旧请求把下一句写成当前句。`ExcerptCard` 在拖动开始冻结 current/incoming/saved，提交时用快照生成 outgoing，动画期间不依赖父级 props 变化。
+- 飞出改为 560ms 线性多关键帧：释放前 90ms 内的采样速度驱动距离和旋转，28%/62%/88%/100% 关键帧持续推进位移、抬起、缩放与透明度；像素飞散在 560ms 前收束，避免卡片已停而粒子拖尾。新句按笔画权重排布逐字延迟，用 `clip-path`、双层墨晕、偏锋、模糊与收锋模拟毛笔书写，出处在诗句后淡入；减少动效直接换句。
+- Browser E2E 增加提交中段 `silentIncoming` 断言，固定 560ms 动画时长，并保留毛笔 `brush-write`、像素离散、incoming 无 transform、触屏反向拖动和按钮连续换句断言。`git diff --check`、lint、39 项单测、build、本地资源 smoke、音频校验、Browser E2E 全通过，CLS 0.0000、控制台/网络错误 0；临时 CDP 逐帧探针复核桌面 1440px 与移动 390px 拖动、提交 120ms/360ms、静止帧，底层诗句全程不刷新，飞出位移持续到末段，静止后当前句与预取句稳定切换。未改 GitHub 展示、Pages、Discussion、tag 或 Release，未执行外部宣发。

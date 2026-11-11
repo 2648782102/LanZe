@@ -18,7 +18,11 @@
           v-for="(character, characterIndex) in characters"
           :key="`${character}-${characterIndex}`"
           class="legacy-card__ink"
-          :style="{ '--ink-delay': `${characterIndex * 24}ms` }"
+          :data-char="character"
+          :style="{
+            '--ink-delay': inkOffsets[characterIndex],
+            '--ink-duration': `${inkDuration}ms`,
+          }"
         >{{ character }}</span>
       </template>
       <template v-else>{{ excerpt.content }}</template>
@@ -45,17 +49,45 @@ const props = defineProps({
   variant: { type: String, required: true },
   interactive: { type: Boolean, default: false },
   ink: { type: Boolean, default: false },
+  inkWindow: { type: Number, default: 520 },
 });
 const emit = defineEmits(["toggle-save"]);
 
 const densityFor = (content) => {
-  const length = Array.from(content || "").length;
-  if (length > 16) return "legacy-card__verse--dense";
-  if (length > 12) return "legacy-card__verse--medium";
+  const graphemes = Array.from(content || "");
+  const length = graphemes.length;
+  const breaks = graphemes.filter((character) => "，。？！；：、".includes(character)).length;
+  if (length > 20 || breaks > 2) return "legacy-card__verse--dense";
+  if (length > 14 || breaks > 1) return "legacy-card__verse--medium";
   return "legacy-card__verse--open";
 };
 const verseDensity = computed(() => densityFor(props.excerpt.content));
 const characters = computed(() => Array.from(props.excerpt?.content || ""));
+const inkDuration = computed(() => props.inkWindow
+  ? Math.min(360, Math.max(220, Math.round(props.inkWindow * 0.58)))
+  : 0);
+const strokeWeight = (character) => {
+  if ("，。？！；：、".includes(character)) return 1;
+  if ("一丨丿乙".includes(character)) return 2;
+  return 4;
+};
+const inkStrokes = computed(() => characters.value.reduce(
+  (total, character) => total + strokeWeight(character),
+  0,
+));
+const inkStagger = computed(() => {
+  if (!props.inkWindow) return 0;
+  const remaining = props.inkWindow - inkDuration.value;
+  return Math.max(2, Math.floor(remaining / Math.max(1, inkStrokes.value - 1)));
+});
+const inkOffsets = computed(() => {
+  let stroke = 0;
+  return characters.value.map((character) => {
+    const delay = stroke * inkStagger.value;
+    stroke += strokeWeight(character);
+    return `${delay}ms`;
+  });
+});
 
 const handleSave = () => {
   if (props.interactive) emit("toggle-save");
@@ -199,7 +231,7 @@ const handleSave = () => {
 .legacy-card__verse--dense {
   font-size: calc(16px * var(--legacy-scale));
   letter-spacing: calc(2px * var(--legacy-scale));
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 .legacy-card__author {
@@ -232,27 +264,107 @@ const handleSave = () => {
 }
 
 .legacy-card__ink {
-  display: inline;
-  opacity: var(--ink-opacity, 1);
-  filter: blur(0);
-  transform: translateY(0);
-  transition:
-    opacity 180ms var(--ease-standard),
-    filter 180ms var(--ease-standard);
+  position: relative;
+  display: inline-block;
+  opacity: 0;
+  clip-path: inset(0 0 100% 0);
+  filter: blur(1.6px);
+  transform: translate3d(-0.08em, 0.12em, 0) rotate(-1.5deg) scale(0.96);
+  transform-origin: 50% 100%;
+  transition: none;
+  will-change: clip-path, opacity, filter, transform;
 }
 
-.legacy-card__box--incoming .legacy-card__verse {
-  opacity: var(--ink-opacity, 1);
-  filter: blur(calc((1 - var(--ink-opacity, 1)) * 3px));
-  transition:
-    opacity 180ms var(--ease-standard),
-    filter 180ms var(--ease-standard);
+.legacy-card__ink::after {
+  position: absolute;
+  inset: 0;
+  color: rgba(22, 44, 43, 0.42);
+  content: attr(data-char);
+  clip-path: inset(0 0 100% 0);
+  opacity: 0;
+  pointer-events: none;
 }
 
-.legacy-card.is-committing .legacy-card__box--incoming .legacy-card__verse,
+.legacy-card.is-committing .legacy-card__box--incoming .legacy-card__ink {
+  animation: brush-write var(--ink-duration) cubic-bezier(0.18, 0.62, 0.3, 1) var(--ink-delay) both;
+}
+
+.legacy-card.is-committing .legacy-card__box--incoming .legacy-card__ink::after {
+  animation: ink-bleed var(--ink-duration) steps(5, end) var(--ink-delay) both;
+}
+
+.legacy-card__box--incoming .legacy-card__author {
+  opacity: 0;
+  filter: blur(2px);
+  transform: translateY(-5px);
+  transition: none;
+}
+
 .legacy-card.is-committing .legacy-card__box--incoming .legacy-card__author {
-  opacity: 1;
-  filter: blur(0);
+  animation: brush-fade var(--author-duration) cubic-bezier(0.22, 0.61, 0.36, 1) var(--author-delay) both;
+}
+
+@keyframes brush-write {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+    filter: blur(2.8px);
+    text-shadow: 0 0 0 rgba(22, 44, 43, 0);
+    transform: translate3d(-0.12em, 0.18em, 0) rotate(-2deg) scale(0.92);
+  }
+  35% {
+    opacity: 0.72;
+    clip-path: inset(0 0 52% 0);
+    filter: blur(1.5px);
+    text-shadow: 0 0 2px rgba(22, 44, 43, 0.34);
+  }
+  72% {
+    opacity: 0.94;
+    clip-path: inset(0 0 12% 0);
+    filter: blur(0.55px);
+    text-shadow: 0 0 3px rgba(22, 44, 43, 0.2);
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    filter: blur(0);
+    text-shadow: 0 0 0 rgba(22, 44, 43, 0);
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes ink-bleed {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+    transform: translate3d(0.04em, -0.02em, 0);
+  }
+  35% {
+    opacity: 0.34;
+    clip-path: inset(0 0 48% 0);
+  }
+  72% {
+    opacity: 0.18;
+    clip-path: inset(0 0 8% 0);
+  }
+  100% {
+    opacity: 0;
+    clip-path: inset(0 0 0 0);
+    transform: translate3d(-0.03em, 0.02em, 0);
+  }
+}
+
+@keyframes brush-fade {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -260,7 +372,8 @@ const handleSave = () => {
   .legacy-card__box::after,
   .legacy-card__save,
   .legacy-card__ink,
-  .legacy-card__box--incoming .legacy-card__verse {
+  .legacy-card__ink::after,
+  .legacy-card__box--incoming .legacy-card__author {
     animation: none !important;
     transition: none !important;
   }
@@ -269,8 +382,11 @@ const handleSave = () => {
     transform: none;
   }
 
-  .legacy-card__ink {
+  .legacy-card__ink,
+  .legacy-card__ink::after,
+  .legacy-card__box--incoming .legacy-card__author {
     opacity: 1;
+    clip-path: none;
     filter: none;
     transform: none;
   }

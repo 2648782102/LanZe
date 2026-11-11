@@ -21,17 +21,18 @@
 
     <ExcerptCardFace
       variant="incoming"
-      :excerpt="incomingExcerpt"
-      :saved="incomingSaved"
+      :excerpt="displayIncoming"
+      :saved="displayIncomingSaved"
+      :ink-window="inkWindow"
       ink
     />
 
     <ExcerptCardFace
       variant="current"
-      :excerpt="excerpt"
-      :saved="saved"
-      interactive
-      @toggle-save="emit('toggle-save', excerpt)"
+      :excerpt="displayCurrent"
+      :saved="displayCurrentSaved"
+      :interactive="!isCommitting"
+      @toggle-save="emit('toggle-save', displayCurrent)"
     />
 
     <div
@@ -42,6 +43,7 @@
         '--outgoing-height': `${cardSize.height}px`,
       }"
       aria-hidden="true"
+      @animationend="handleOutgoingAnimationEnd"
     >
       <ExcerptCardFace
         variant="outgoing"
@@ -61,7 +63,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
+import { computed, nextTick, onBeforeUnmount, ref } from "vue";
 import ExcerptCardFace from "./ExcerptCardFace.vue";
 
 const props = defineProps({
@@ -73,23 +75,38 @@ const props = defineProps({
 });
 const emit = defineEmits(["toggle-save", "needs-next", "turn", "settled"]);
 
+const TURN_DURATION = 560;
+const INK_WINDOW = TURN_DURATION;
 const isDragging = ref(false);
 const isReturning = ref(false);
 const isCommitting = ref(false);
 const isTurning = ref(false);
+const inkWindow = ref(INK_WINDOW);
 const direction = ref("");
 const dragOffset = ref({ x: 0, y: 0 });
 const dragProgress = ref(0);
 const cardSize = ref({ width: 330, height: 620, offset: 16 });
 const outgoingExcerpt = ref(null);
 const outgoingSaved = ref(false);
+const frozenCurrent = ref(null);
+const frozenCurrentSaved = ref(false);
+const frozenIncoming = ref(null);
+const frozenIncomingSaved = ref(false);
 const initialMotion = {
+  duration: TURN_DURATION,
+  ease: "linear",
   exitX: "0px",
-  exitMidX: "0px",
+  exitXEarly: "0px",
+  exitXMid: "0px",
+  exitXLate: "0px",
   exitY: "0px",
-  exitMidY: "0px",
+  exitYEarly: "0px",
+  exitYMid: "0px",
+  exitYLate: "0px",
   exitRot: "0deg",
-  exitRotSmall: "0deg",
+  exitRotEarly: "0deg",
+  exitRotMid: "0deg",
+  exitRotLate: "0deg",
   exitRotY: "0deg",
 };
 const releaseMotion = ref({ ...initialMotion });
@@ -99,14 +116,13 @@ const pointerState = {
   y: 0,
   time: 0,
   velocityX: 0,
+  samples: [],
   frame: 0,
 };
 let commitTimer;
 let returnTimer;
-let settleFallback;
 let settling = false;
 
-const clamp = (value, minimum, maximum) => Math.max(minimum, Math.min(maximum, value));
 const particleSeed = (value) => {
   const wave = Math.sin(value * 12.9898) * 43758.5453;
   return wave - Math.floor(wave);
@@ -119,23 +135,56 @@ const cardStyle = computed(() => ({
   "--drag-tilt": `${Math.max(-9, Math.min(9, dragOffset.value.y * -0.032))}deg`,
   "--drag-lift": `${Math.min(1, Math.hypot(dragOffset.value.x, dragOffset.value.y) / 72)}`,
   "--progress": dragProgress.value.toFixed(3),
-  "--incoming-opacity": (0.04 + 0.96 * dragProgress.value).toFixed(3),
-  "--ink-opacity": clamp((dragProgress.value - 0.22) / 0.6, 0, 1).toFixed(3),
+  "--incoming-opacity": (incomingPrepared.value ? dragProgress.value : 0).toFixed(3),
   "--current-ink-opacity": (1 - 0.72 * dragProgress.value).toFixed(3),
+  "--ink-opacity": clamp((dragProgress.value - 0.28) / 0.58, 0, 1).toFixed(3),
+  "--exit-duration": `${releaseMotion.value.duration}ms`,
+  "--exit-ease": releaseMotion.value.ease,
   "--exit-x": releaseMotion.value.exitX,
-  "--exit-mid-x": releaseMotion.value.exitMidX,
+  "--exit-x-early": releaseMotion.value.exitXEarly,
+  "--exit-x-mid": releaseMotion.value.exitXMid,
+  "--exit-x-late": releaseMotion.value.exitXLate,
   "--exit-y": releaseMotion.value.exitY,
-  "--exit-mid-y": releaseMotion.value.exitMidY,
+  "--exit-y-early": releaseMotion.value.exitYEarly,
+  "--exit-y-mid": releaseMotion.value.exitYMid,
+  "--exit-y-late": releaseMotion.value.exitYLate,
   "--exit-rot": releaseMotion.value.exitRot,
-  "--exit-rot-small": releaseMotion.value.exitRotSmall,
+  "--exit-rot-early": releaseMotion.value.exitRotEarly,
+  "--exit-rot-mid": releaseMotion.value.exitRotMid,
+  "--exit-rot-late": releaseMotion.value.exitRotLate,
   "--exit-rot-y": releaseMotion.value.exitRotY,
+  "--ink-window": `${inkWindow.value}ms`,
+  "--author-duration": `${Math.min(220, Math.max(90, Math.round(inkWindow.value * 0.4)))}ms`,
+  "--author-delay": `${Math.round(inkWindow.value * 0.32)}ms`,
 }));
 
 const incomingExcerpt = computed(() => props.nextExcerpt || props.excerpt);
 const incomingSaved = computed(() => props.nextSaved);
+const visibleCurrent = computed(() => frozenCurrent.value || props.excerpt);
+const displayCurrent = computed(() => visibleCurrent.value);
+const displayCurrentSaved = computed(() => (frozenCurrent.value
+  ? frozenCurrentSaved.value
+  : props.saved));
+const displayIncoming = computed(() => frozenIncoming.value || incomingExcerpt.value);
+const displayIncomingSaved = computed(() => (frozenIncoming.value
+  ? frozenIncomingSaved.value
+  : incomingSaved.value));
+const incomingPrepared = computed(() => {
+  const candidate = frozenIncoming.value || props.nextExcerpt;
+  return Boolean(candidate && candidate.content !== visibleCurrent.value?.content);
+});
 
 const particleColumns = 10;
 const particleRows = 18;
+const particleDelays = computed(() => {
+  const active = Math.round(TURN_DURATION * 0.16);
+  return Array.from({ length: particleColumns * particleRows }, (_, index) => {
+    const column = index % particleColumns;
+    const row = Math.floor(index / particleColumns);
+    const scatter = particleSeed(index + 11);
+    return Math.round((column * 7 + row * 11 + Math.floor(scatter * 50)) % active);
+  });
+});
 const particles = computed(() => Array.from({ length: particleColumns * particleRows }, (_, index) => {
   const column = index % particleColumns;
   const row = Math.floor(index / particleColumns);
@@ -163,49 +212,59 @@ const particles = computed(() => Array.from({ length: particleColumns * particle
     "--dx": `${Math.round(sign * (28 + column * 7) + (scatter - 0.5) * 80)}px`,
     "--dy": `${Math.round(-40 - row * 3 + (drift - 0.5) * 100)}px`,
     "--rot": `${Math.round((spin - 0.5) * 80)}deg`,
-    "--delay": `${(column * 9 + row * 13 + Math.floor(scatter * 90)) % 150}ms`,
+    "--delay": `${particleDelays.value[index]}ms`,
     "--pixel-color": pixelColor,
     "--pixel-opacity": (0.42 + particleSeed(index + 37) * 0.55).toFixed(2),
   };
 }));
 
+const clamp = (value, minimum, maximum) => Math.max(minimum, Math.min(maximum, value));
 const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 const clearTimers = () => {
   window.clearTimeout(commitTimer);
   window.clearTimeout(returnTimer);
-  window.clearTimeout(settleFallback);
   window.cancelAnimationFrame(pointerState.frame);
   pointerState.frame = 0;
 };
 
-const settleAfterContent = async () => {
+const finishTurn = async () => {
   if (!isCommitting.value || settling) return;
   settling = true;
-  window.clearTimeout(settleFallback);
+  clearTimers();
+  const settledExcerpt = frozenIncoming.value || incomingExcerpt.value;
+  const settledSaved = displayIncomingSaved.value;
+  emit("settled");
   await nextTick();
+  if (props.excerpt?.content !== settledExcerpt?.content) {
+    frozenCurrent.value = { ...settledExcerpt };
+    frozenCurrentSaved.value = settledSaved;
+    frozenIncoming.value = { ...settledExcerpt };
+    frozenIncomingSaved.value = settledSaved;
+  }
   isCommitting.value = false;
   isTurning.value = false;
   outgoingExcerpt.value = null;
+  frozenCurrent.value = null;
+  frozenIncoming.value = null;
   dragOffset.value = { x: 0, y: 0 };
   dragProgress.value = 0;
   direction.value = "";
   releaseMotion.value = { ...initialMotion };
+  inkWindow.value = INK_WINDOW;
   pointerState.velocityX = 0;
+  pointerState.samples = [];
   settling = false;
 };
 
-watch(() => props.excerpt, () => {
-  if (isCommitting.value) settleAfterContent();
-}, { flush: "post" });
-
-const finishTurn = () => {
-  emit("settled");
-  settleFallback = window.setTimeout(settleAfterContent, 240);
+const handleOutgoingAnimationEnd = (event) => {
+  if (event.target !== event.currentTarget) return;
+  if (!String(event.animationName || "").includes("card-out")) return;
+  finishTurn();
 };
 
 const commitDistance = (width) => Math.min(180, Math.max(96, width * 0.42));
 const progressFor = ({ x, velocityX }, width) => {
-  const velocityLead = Math.min(72, Math.abs(velocityX) * 0.045);
+  const velocityLead = Math.min(72, Math.abs(velocityX) * 0.055);
   return Math.min(1, (Math.abs(x) + velocityLead) / commitDistance(width));
 };
 const shouldCommit = ({ x, velocityX }, width) =>
@@ -215,31 +274,62 @@ const shouldCommit = ({ x, velocityX }, width) =>
 const startCommit = (turnDirection) => {
   if (isTurning.value || props.disabled) return;
   clearTimers();
+  const currentSnapshot = frozenCurrent.value || props.excerpt;
+  const preparedIncoming = frozenIncoming.value || props.nextExcerpt;
+  if (!preparedIncoming || preparedIncoming.content === currentSnapshot?.content) {
+    emit("needs-next");
+    startReturn();
+    return;
+  }
   const sign = turnDirection === "left" ? -1 : 1;
-  const magnitude = Math.min(260, Math.max(150,
-    Math.abs(dragOffset.value.x) * 1.15 + Math.abs(pointerState.velocityX) * 0.07,
-  ));
-  const exitDistance = Math.round(magnitude);
+  const currentSaved = frozenCurrent.value ? frozenCurrentSaved.value : props.saved;
+  const incomingSavedSnapshot = frozenIncoming.value
+    ? frozenIncomingSaved.value
+    : props.nextSaved;
+  const rawVelocity = Math.sign(pointerState.velocityX) === sign
+    ? Math.abs(pointerState.velocityX)
+    : 0;
+  const momentum = Math.min(280, Math.max(0, rawVelocity * 0.16));
+  const exitDistance = Math.round(Math.min(420, Math.max(160,
+    Math.abs(dragOffset.value.x) * 1.35 + momentum,
+  )));
+  const duration = TURN_DURATION;
+  const verticalLift = -Math.round(24 + exitDistance * 0.06);
+  const rotation = Math.min(24, 10 + rawVelocity * 0.004);
+  const signed = (value) => sign * Math.round(value);
   releaseMotion.value = {
-    exitX: `${sign * exitDistance}px`,
-    exitMidX: `${sign * Math.round(exitDistance * 0.22)}px`,
-    exitY: `${-Math.round(44 + exitDistance * 0.1)}px`,
-    exitMidY: `${-Math.round(12 + exitDistance * 0.025)}px`,
-    exitRot: `${sign * 18}deg`,
-    exitRotSmall: `${sign * 5}deg`,
-    exitRotY: `${-sign * 38}deg`,
+    duration,
+    ease: "linear",
+    exitX: `${signed(exitDistance)}px`,
+    exitXEarly: `${signed(exitDistance * 0.35)}px`,
+    exitXMid: `${signed(exitDistance * 0.72)}px`,
+    exitXLate: `${signed(exitDistance * 0.92)}px`,
+    exitY: `${verticalLift}px`,
+    exitYEarly: `${Math.round(verticalLift * 0.28)}px`,
+    exitYMid: `${Math.round(verticalLift * 0.68)}px`,
+    exitYLate: `${Math.round(verticalLift * 0.9)}px`,
+    exitRot: `${signed(rotation)}deg`,
+    exitRotEarly: `${signed(rotation * 0.24)}deg`,
+    exitRotMid: `${signed(rotation * 0.68)}deg`,
+    exitRotLate: `${signed(rotation * 0.92)}deg`,
+    exitRotY: `${-sign * 28}deg`,
   };
   direction.value = turnDirection;
-  outgoingExcerpt.value = props.excerpt;
-  outgoingSaved.value = props.saved;
+  frozenCurrent.value = { ...currentSnapshot };
+  frozenCurrentSaved.value = currentSaved;
+  frozenIncoming.value = { ...preparedIncoming };
+  frozenIncomingSaved.value = incomingSavedSnapshot;
+  outgoingExcerpt.value = frozenCurrent.value;
+  outgoingSaved.value = frozenCurrentSaved.value;
   isDragging.value = false;
   isReturning.value = false;
   isCommitting.value = true;
   isTurning.value = true;
   dragProgress.value = 1;
+  inkWindow.value = reducedMotion() ? 0 : duration;
   emit("needs-next");
   emit("turn", turnDirection);
-  commitTimer = window.setTimeout(finishTurn, reducedMotion() ? 0 : 760);
+  commitTimer = window.setTimeout(finishTurn, reducedMotion() ? 0 : duration + 80);
 };
 
 const startReturn = () => {
@@ -249,7 +339,13 @@ const startReturn = () => {
   dragOffset.value = { x: 0, y: 0 };
   dragProgress.value = 0;
   direction.value = "";
+  releaseMotion.value = { ...initialMotion };
+  inkWindow.value = INK_WINDOW;
+  outgoingExcerpt.value = null;
+  frozenCurrent.value = null;
+  frozenIncoming.value = null;
   pointerState.velocityX = 0;
+  pointerState.samples = [];
   returnTimer = window.setTimeout(() => {
     isReturning.value = false;
   }, 420);
@@ -290,11 +386,22 @@ const startDrag = (event) => {
   pointerState.y = event.clientY;
   pointerState.time = event.timeStamp;
   pointerState.velocityX = 0;
+  pointerState.samples = [{ x: event.clientX, time: event.timeStamp }];
   pointerState.frame = 0;
   dragOffset.value = { x: 0, y: 0 };
   dragProgress.value = 0;
   releaseMotion.value = { ...initialMotion };
+  inkWindow.value = INK_WINDOW;
   outgoingExcerpt.value = null;
+  frozenCurrent.value = { ...props.excerpt };
+  frozenCurrentSaved.value = props.saved;
+  if (props.nextExcerpt && props.nextExcerpt.content !== props.excerpt.content) {
+    frozenIncoming.value = { ...props.nextExcerpt };
+    frozenIncomingSaved.value = props.nextSaved;
+  } else {
+    frozenIncoming.value = null;
+    frozenIncomingSaved.value = false;
+  }
   direction.value = "";
   isDragging.value = true;
   isReturning.value = false;
@@ -305,9 +412,15 @@ const startDrag = (event) => {
 
 const moveDrag = (event) => {
   if (!isDragging.value || event.pointerId !== pointerOrigin.id) return;
-  const elapsed = Math.max(8, event.timeStamp - pointerState.time);
-  const instantVelocity = (event.clientX - pointerState.x) / elapsed * 1000;
-  pointerState.velocityX = pointerState.velocityX * 0.72 + instantVelocity * 0.28;
+  pointerState.samples.push({ x: event.clientX, time: event.timeStamp });
+  while (pointerState.samples.length > 4
+    || (pointerState.samples.length > 2 && event.timeStamp - pointerState.samples[0].time > 90)) {
+    pointerState.samples.shift();
+  }
+  const firstSample = pointerState.samples[0];
+  const elapsed = Math.max(8, event.timeStamp - firstSample.time);
+  const recentVelocity = (event.clientX - firstSample.x) / elapsed * 1000;
+  pointerState.velocityX = pointerState.velocityX * 0.35 + recentVelocity * 0.65;
   pointerState.x = event.clientX;
   pointerState.y = event.clientY;
   pointerState.time = event.timeStamp;
@@ -349,9 +462,12 @@ const endDrag = (event) => {
 const turnFromButton = () => {
   if (isTurning.value || props.disabled) return;
   pointerState.velocityX = 0;
+  pointerState.samples = [];
   dragOffset.value = { x: 0, y: 0 };
   dragProgress.value = 1;
-  direction.value = "right";
+  releaseMotion.value = { ...initialMotion };
+  frozenCurrent.value = null;
+  frozenIncoming.value = null;
   startCommit("right");
 };
 
@@ -361,10 +477,13 @@ const handleKeydown = (event) => {
     event.preventDefault();
     if (isTurning.value || props.disabled) return;
     pointerState.velocityX = 0;
+    pointerState.samples = [];
     dragOffset.value = { x: 0, y: 0 };
     dragProgress.value = 1;
-    direction.value = event.key === "ArrowLeft" ? "left" : "right";
-    startCommit(direction.value);
+    releaseMotion.value = { ...initialMotion };
+    frozenCurrent.value = null;
+    frozenIncoming.value = null;
+    startCommit(event.key === "ArrowLeft" ? "left" : "right");
   }
 };
 
@@ -410,11 +529,17 @@ onBeforeUnmount(() => {
   --ink-opacity: 0;
   --current-ink-opacity: 1;
   --exit-x: 0px;
-  --exit-mid-x: 0px;
+  --exit-x-early: 0px;
+  --exit-x-mid: 0px;
+  --exit-x-late: 0px;
   --exit-y: 0px;
-  --exit-mid-y: 0px;
+  --exit-y-early: 0px;
+  --exit-y-mid: 0px;
+  --exit-y-late: 0px;
   --exit-rot: 0deg;
-  --exit-rot-small: 0deg;
+  --exit-rot-early: 0deg;
+  --exit-rot-mid: 0deg;
+  --exit-rot-late: 0deg;
   --exit-rot-y: 0deg;
   --drag-transform:
     translate3d(var(--drag-x), var(--drag-y), calc(18px + 18px * var(--drag-lift)))
@@ -467,8 +592,11 @@ onBeforeUnmount(() => {
   z-index: 1;
   opacity: var(--incoming-opacity);
   transform: none;
-  transition: opacity 180ms linear;
   will-change: opacity;
+}
+
+.legacy-card.is-committing .legacy-card__box--incoming {
+  opacity: 1;
 }
 
 .legacy-card__box--current {
@@ -487,7 +615,7 @@ onBeforeUnmount(() => {
 }
 
 .legacy-card.is-dragging .legacy-card__box--incoming {
-  transition: none;
+  transition: none !important;
 }
 
 .legacy-card.is-returning .legacy-card__box--current {
@@ -499,7 +627,7 @@ onBeforeUnmount(() => {
 
 .legacy-card.is-returning .legacy-card__box--incoming {
   opacity: 0;
-  transition: opacity 260ms var(--ease-standard);
+  transition: opacity 260ms var(--ease-standard) !important;
 }
 
 .legacy-card.is-committing .legacy-card__box--current {
@@ -512,7 +640,7 @@ onBeforeUnmount(() => {
 .legacy-card.is-committing .legacy-card__box--incoming {
   opacity: 1;
   transform: none;
-  transition: opacity 260ms var(--ease-standard);
+  transition: none !important;
 }
 
 .legacy-card__box--current :deep(.legacy-card__verse),
@@ -521,9 +649,18 @@ onBeforeUnmount(() => {
   transition: opacity 80ms linear;
 }
 
+.legacy-card.is-committing .legacy-card__box--current :deep(.legacy-card__verse),
+.legacy-card.is-committing .legacy-card__box--current :deep(.legacy-card__author) {
+  opacity: 1;
+  transition: none;
+}
+
 .legacy-card__box--incoming :deep(.legacy-card__author) {
   opacity: var(--ink-opacity);
-  transition: opacity 180ms var(--ease-standard);
+}
+
+.legacy-card.is-committing .legacy-card__box--incoming :deep(.legacy-card__author) {
+  opacity: 1;
 }
 
 .legacy-card__outgoing {
@@ -605,15 +742,15 @@ onBeforeUnmount(() => {
 }
 
 .legacy-card.is-committing .legacy-card__outgoing {
-  animation: card-out 720ms cubic-bezier(0.18, 0.72, 0.28, 1) both;
+  animation: card-out var(--exit-duration) var(--exit-ease) both;
 }
 
 .legacy-card.is-committing .legacy-card__pixel::before {
-  animation: pixel-hole 220ms steps(2, end) var(--delay) forwards;
+  animation: pixel-hole 180ms steps(2, end) var(--delay) forwards;
 }
 
 .legacy-card.is-committing .legacy-card__pixel::after {
-  animation: pixel-fly 560ms cubic-bezier(0.18, 0.72, 0.28, 1) var(--delay) both;
+  animation: pixel-fly calc(var(--exit-duration) - 90ms) var(--exit-ease) var(--delay) both;
 }
 
 @keyframes card-out {
@@ -624,19 +761,37 @@ onBeforeUnmount(() => {
   28% {
     opacity: 1;
     transform:
-      translate3d(calc(var(--drag-x) + var(--exit-mid-x)), calc(var(--drag-y) + var(--exit-mid-y)), 72px)
-      rotateZ(calc(var(--drag-turn) + var(--exit-rot-small)))
+      translate3d(calc(var(--drag-x) + var(--exit-x-early)), calc(var(--drag-y) + var(--exit-y-early)), 68px)
+      rotateZ(calc(var(--drag-turn) + var(--exit-rot-early)))
       rotateY(var(--exit-rot-y))
-      rotateX(5deg);
+      rotateX(4deg);
+  }
+  62% {
+    opacity: 0.82;
+    transform:
+      translate3d(calc(var(--drag-x) + var(--exit-x-mid)), calc(var(--drag-y) + var(--exit-y-mid)), 112px)
+      rotateZ(calc(var(--drag-turn) + var(--exit-rot-mid)))
+      rotateY(var(--exit-rot-y))
+      rotateX(8deg)
+      scale(0.97);
+  }
+  88% {
+    opacity: 0.36;
+    transform:
+      translate3d(calc(var(--drag-x) + var(--exit-x-late)), calc(var(--drag-y) + var(--exit-y-late)), 142px)
+      rotateZ(calc(var(--drag-turn) + var(--exit-rot-late)))
+      rotateY(var(--exit-rot-y))
+      rotateX(11deg)
+      scale(0.92);
   }
   100% {
     opacity: 0;
     transform:
-      translate3d(calc(var(--drag-x) + var(--exit-x)), calc(var(--drag-y) + var(--exit-y)), 120px)
+      translate3d(calc(var(--drag-x) + var(--exit-x)), calc(var(--drag-y) + var(--exit-y)), 154px)
       rotateZ(calc(var(--drag-turn) + var(--exit-rot)))
       rotateY(var(--exit-rot-y))
       rotateX(12deg)
-      scale(0.94);
+      scale(0.88);
   }
 }
 

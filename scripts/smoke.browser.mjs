@@ -540,6 +540,9 @@ const main = async () => {
     return rect ? { x: Math.round(rect.left + rect.width / 2), y: Math.round(rect.top + Math.min(rect.height / 3, 180)) } : null;
   })()`);
   if (!dragOrigin) throw new Error("Excerpt card was not available for pointer dragging");
+  const incomingBeforeDrag = await evaluate(
+    "document.querySelector('.legacy-card__box--incoming .legacy-card__verse')?.textContent?.trim() || ''",
+  );
   await send("Input.dispatchMouseEvent", {
     type: "mousePressed",
     x: dragOrigin.x,
@@ -596,7 +599,7 @@ const main = async () => {
   })()`);
   pointerDrag.gradualProgress = turnFrame.isDragging && !turnFrame.isTurning
     && turnFrame.offset >= 60 && turnFrame.progress > 0.3
-    && turnFrame.incomingOpacity > 0.2 && turnFrame.incomingVerseOpacity < 1;
+    && turnFrame.incomingOpacity > 0.2;
 
   await send("Input.dispatchMouseEvent", {
     type: "mouseReleased",
@@ -616,24 +619,50 @@ const main = async () => {
       return style.animationName.includes('pixel-fly') && Number(style.opacity) > 0;
     });
     const incoming = card?.querySelector('.legacy-card__box--incoming');
+    const ink = incoming?.querySelector('.legacy-card__ink');
+    const inkStyle = ink ? getComputedStyle(ink) : null;
     return {
       isCommitting: Boolean(card?.classList.contains('is-committing')),
       outgoingTransform: outgoing ? getComputedStyle(outgoing).transform : 'none',
+      exitDuration: card?.style.getPropertyValue('--exit-duration') || '',
       pixelCount: pixels.length,
       flyingPixels: flying.length,
       incomingTransform: incoming ? getComputedStyle(incoming).transform : 'none',
+      incomingVerse: incoming?.querySelector('.legacy-card__verse')?.textContent?.trim() || '',
+      brushAnimation: inkStyle?.animationName || '',
+      brushClip: inkStyle?.clipPath || '',
     };
   })()`);
   pointerDrag.committedOnRelease = commitFrame.isCommitting;
   pointerDrag.pixelDisintegration = commitFrame.pixelCount === 180
     && commitFrame.flyingPixels > 20
     && commitFrame.outgoingTransform !== 'none';
-  pointerDrag.incomingStill = commitFrame.incomingTransform === 'none';
+  pointerDrag.incomingStill = commitFrame.incomingTransform === 'none'
+    && commitFrame.incomingVerse === incomingBeforeDrag;
+  pointerDrag.brushWriting = commitFrame.brushAnimation.includes('brush-write')
+    && commitFrame.brushClip !== 'none';
+  pointerDrag.momentumDuration = Number.parseInt(commitFrame.exitDuration, 10) === 560;
+  const midTurnFrame = await evaluate(`(() => {
+    const card = document.querySelector('.legacy-card');
+    const incoming = card?.querySelector('.legacy-card__box--incoming');
+    const outgoing = card?.querySelector('.legacy-card__outgoing');
+    return {
+      isCommitting: Boolean(card?.classList.contains('is-committing')),
+      incomingVerse: incoming?.querySelector('.legacy-card__verse')?.textContent?.trim() || '',
+      incomingTransform: incoming ? getComputedStyle(incoming).transform : 'none',
+      outgoingTransform: outgoing ? getComputedStyle(outgoing).transform : 'none',
+    };
+  })()`);
+  pointerDrag.silentIncoming = midTurnFrame.isCommitting
+    && midTurnFrame.incomingVerse === incomingBeforeDrag
+    && midTurnFrame.incomingTransform === 'none'
+    && midTurnFrame.outgoingTransform !== 'none';
   if (!pointerDrag.isDragging || pointerDrag.lifted === "none" || pointerDrag.offset < 10
     || pointerDrag.incomingOpacity <= 0 || !pointerDrag.incomingVerse
     || pointerDrag.touchAction !== "none" || !pointerDrag.gradualProgress
     || !pointerDrag.committedOnRelease || !pointerDrag.pixelDisintegration
-    || !pointerDrag.incomingStill) {
+    || !pointerDrag.incomingStill || !pointerDrag.brushWriting
+    || !pointerDrag.momentumDuration || !pointerDrag.silentIncoming) {
     throw new Error(`Dragging the excerpt card did not follow the pointer or turn early: ${JSON.stringify(pointerDrag)}`);
   }
   currentStep = "touch excerpt card";
