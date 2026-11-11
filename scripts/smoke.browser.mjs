@@ -467,9 +467,16 @@ const main = async () => {
   }
   if (!await evaluate(`(() => {
     const card = document.querySelector('.legacy-card');
-    return Boolean(card?.getAttribute('tabindex') === '0' && card.querySelector('.legacy-card__turn'));
+    return Boolean(card?.getAttribute('tabindex') === '0' && !card.querySelector('.legacy-card__turn'));
   })()`)) {
     throw new Error("Excerpt card does not expose its drag and keyboard affordance");
+  }
+  if (!await evaluate(`(() => {
+    const card = document.querySelector('.legacy-card');
+    const shards = [...(card?.querySelectorAll('.legacy-card__shard') || [])];
+    return shards.length === 6 && shards.every((shard) => getComputedStyle(shard).clipPath !== 'none');
+  })()`)) {
+    throw new Error("Excerpt card tearing shards did not render");
   }
   const firstExcerpt = excerptCards.firstVerse;
   const dockLayout = await evaluate(`(() => {
@@ -581,11 +588,38 @@ const main = async () => {
       isDragging: Boolean(card?.classList.contains('is-dragging')),
       offset: cardRect && currentRect ? Math.round(currentRect.left - cardRect.left) : 0,
       flingX: Number(card?.style.getPropertyValue('--fling-x').replace('px', '') || 0),
+      shardTransform: card?.querySelector('.legacy-card__shard')
+        ? getComputedStyle(card.querySelector('.legacy-card__shard')).transform : 'none',
+      outgoingVerseOpacity: Number(card?.querySelector('.legacy-card__shard .legacy-card__verse')
+        ? getComputedStyle(card.querySelector('.legacy-card__shard .legacy-card__verse')).opacity : 1),
+      incomingVerseOpacity: Number(card?.querySelector('.legacy-card__box--incoming .legacy-card__verse')
+        ? getComputedStyle(card.querySelector('.legacy-card__box--incoming .legacy-card__verse')).opacity : 1),
     };
   })()`);
   pointerDrag.turnedBeforeRelease = turnFrame.isTurning;
   pointerDrag.continuousAtTurn = turnFrame.isDragging && turnFrame.offset >= 60;
   pointerDrag.keptFlingMomentum = turnFrame.flingX > 0;
+  pointerDrag.tearing = turnFrame.shardTransform !== 'none' && turnFrame.shardTransform !== 'matrix(1, 0, 0, 1, 0, 0)';
+  pointerDrag.fadedText = turnFrame.outgoingVerseOpacity < 1 && turnFrame.incomingVerseOpacity < 1;
+
+  await delay(80);
+  const tearFrame = await evaluate(`(() => {
+    const card = document.querySelector('.legacy-card');
+    const shard = card?.querySelector('.legacy-card__shard');
+    const outgoing = card?.querySelector('.legacy-card__shard .legacy-card__verse');
+    const incoming = card?.querySelector('.legacy-card__box--incoming .legacy-card__verse');
+    return {
+      shardOpacity: shard ? Number(getComputedStyle(shard).opacity) : 0,
+      shardTransform: shard ? getComputedStyle(shard).transform : 'none',
+      outgoingOpacity: outgoing ? Number(getComputedStyle(outgoing).opacity) : 1,
+      incomingOpacity: incoming ? Number(getComputedStyle(incoming).opacity) : 1,
+    };
+  })()`);
+  pointerDrag.tearing = tearFrame.shardOpacity > 0.2
+    && tearFrame.shardTransform !== 'none'
+    && tearFrame.shardTransform !== 'matrix(1, 0, 0, 1, 0, 0)'
+    && tearFrame.outgoingOpacity < 1;
+  pointerDrag.fadedText = tearFrame.incomingOpacity < 1;
   await send("Input.dispatchMouseEvent", {
     type: "mouseReleased",
     x: dragOrigin.x + 72,
@@ -597,7 +631,8 @@ const main = async () => {
   if (!pointerDrag.isDragging || pointerDrag.lifted === "none" || pointerDrag.offset < 10
     || pointerDrag.incomingOpacity <= 0 || !pointerDrag.incomingVerse
     || pointerDrag.touchAction !== "none" || !pointerDrag.turnedBeforeRelease
-    || !pointerDrag.continuousAtTurn || !pointerDrag.keptFlingMomentum) {
+    || !pointerDrag.continuousAtTurn || !pointerDrag.keptFlingMomentum
+    || !pointerDrag.tearing || !pointerDrag.fadedText) {
     throw new Error(`Dragging the excerpt card did not follow the pointer or turn early: ${JSON.stringify(pointerDrag)}`);
   }
   currentStep = "touch excerpt card";
