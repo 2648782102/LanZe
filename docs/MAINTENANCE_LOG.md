@@ -294,5 +294,5 @@
 
 - 用户指出旧交互「卡片不跟手指、松手后才切换、翻页效果不自然」。复核 `ExcerptCard.vue`：旧状态在 `pointermove` 直接写位移、`pointerup` 才按较大距离阈值触发 `turn`，且 `turn` 发出接口请求后依赖 `watch(props.excerpt)` 才把下一句塞入 incoming 卡。
 - 本轮把下一张卡提升为 `ReadView` 的 `nextExcerpt` 预热数据并在输入框未交互时常驻底层；`ExcerptCard` 用 Pointer Events + `requestAnimationFrame` 统一鼠标/触屏采样，记录横向速度，按 `位移 + 速度投影` 在拖拽中越过约 42–64px 等效阈值即提前掀走旧卡。拖动期间上层卡跟手 `translate3d`、轻微 `rotateY/rotateZ/rotateX` 和渐进阴影，底层新卡随抬起渐显；飞离曲线从当前手势位置接续，动画时长收短到 560ms，新卡 80ms 后落纸，显墨按 28ms/字推进，总提交窗口 620–900ms。
-- 按钮和键盘复用同一 `turnCard`；`touch-action: none` 与指针捕获保证触屏不把水平手势让给页面滚动。`prefers-reduced-motion` 下直接换句，卡片比例、白底、竖排诗句、扇舟图、收藏角标和右留白保持不变。Browser E2E 改查拖动 34px 时的真实位移、72px 前已进入 `is-turning`、底层新句可见，并用 CDP `Input.dispatchTouchEvent` 验证触屏反向拖动与连续换句。
+- 按钮和键盘复用同一 `turnCard`；`touch-action: none` 与指针捕获保证触屏不把水平手势让给页面滚动，`pointerup` 会取消待执行 RAF 并提交最后一帧坐标，避免快速甩动漏采。`prefers-reduced-motion` 下直接换句，卡片比例、白底、竖排诗句、扇舟图、收藏角标和右留白保持不变。Browser E2E 改查拖动 18px 时的真实位移、72px 前已进入 `is-turning`、底层新句可见，并用 CDP `Input.dispatchTouchEvent` 验证触屏反向拖动与连续换句。
 - `scripts/smoke.browser.mjs` 增加真实 Pointer 拖动（抬起 transform、进入掀卡状态、换句完成）、卡片键盘/按钮入口、以及登录左栏竖排诗笺断言；保留单卡、白底、720×412 扇舟图、右留白、收藏与来源状态等原契约。

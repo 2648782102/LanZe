@@ -231,7 +231,11 @@ const moveDrag = (event) => {
 };
 
 const commitDragFrame = () => {
-  if (!isDragging.value || pointerState.frame) return;
+  if (!isDragging.value) return;
+  if (pointerState.frame) {
+    window.cancelAnimationFrame(pointerState.frame);
+    pointerState.frame = 0;
+  }
   const nextX = pointerState.x - pointerOrigin.x;
   const nextY = pointerState.y - pointerOrigin.y;
   dragOffset.value = {
