@@ -296,3 +296,9 @@
 - 本轮把下一张卡提升为 `ReadView` 的 `nextExcerpt` 预热数据并在输入框未交互时常驻底层；`ExcerptCard` 用 Pointer Events + `requestAnimationFrame` 统一鼠标/触屏采样，记录横向速度，按 `位移 + 速度投影` 在拖拽中越过约 42–64px 等效阈值即提前掀走旧卡。拖动期间上层卡跟手 `translate3d`、轻微 `rotateY/rotateZ/rotateX` 和渐进阴影，底层新卡随抬起渐显；飞离曲线从当前手势位置接续，动画时长收短到 560ms，新卡 80ms 后落纸，显墨按 28ms/字推进，总提交窗口 620–900ms。
 - 按钮和键盘复用同一 `turnCard`；`touch-action: none` 与指针捕获保证触屏不把水平手势让给页面滚动，`pointerup` 会取消待执行 RAF 并提交最后一帧坐标，避免快速甩动漏采。`prefers-reduced-motion` 下直接换句，卡片比例、白底、竖排诗句、扇舟图、收藏角标和右留白保持不变。Browser E2E 改查拖动 18px 时的真实位移、72px 前已进入 `is-turning`、底层新句可见，并用 CDP `Input.dispatchTouchEvent` 验证触屏反向拖动与连续换句。
 - `scripts/smoke.browser.mjs` 增加真实 Pointer 拖动（抬起 transform、进入掀卡状态、换句完成）、卡片键盘/按钮入口、以及登录左栏竖排诗笺断言；保留单卡、白底、720×412 扇舟图、右留白、收藏与来源状态等原契约。
+
+## 摘录卡手势连续性 — 2026-11-11 22:35 CST
+
+- 用户再次指出拖动应当「跟着手指动、甩出去时更早切换、动画流畅自然且多端一致」。复核已上线版本：提前翻页时 `turnCard()` 会撤掉 `is-dragging`，使 CSS 从跟手 transform 切回动画首帧，快速手势可能出现一帧突变；按钮触发还误用拖动速度，松手与取消也可能重复提交。
+- 本轮把翻页起点固定为最后一次 RAF 提交的位移，提前翻页后仍保留 `is-dragging` 直到 pointerup / pointercancel；飞离关键帧从 `--drag-x/--drag-y` 接续，并叠加按方向裁剪的 `--fling-x`，手动按钮/键盘的速度为零。`turnCard(fromDrag)` 区分两种来源，松手和取消遇到已掀页状态只收束拖动，不重播动画。阈值进一步降到约 34–58px 等效位移，并要求至少两次采样，避免单击误触；飞离 520ms、落纸 420ms、显墨 190ms / 24ms 每字，总窗口仍控制在 620–900ms。
+- Browser E2E 在 18px 跟手检查之外，增加 72px 提前翻页瞬间的 `is-dragging`、实际位移 ≥60px、正向甩动动量与释放后连续换句断言；桌面 1440px、移动 390px 关键帧复核 12px 严格跟随、38px 已飞离并露出下一句、静止态无残留位移。`git diff --check`、lint、39 项单测、build、本地资源 smoke、Browser E2E、14 视口细节审计与状态审计全通过，CLS 0.0000、控制台/网络错误 0。白色历史卡片构图、诗词库、音频库、已发布 Release 与 GitHub 展示均未改动。

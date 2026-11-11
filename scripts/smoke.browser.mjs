@@ -571,7 +571,21 @@ const main = async () => {
     button: "left",
     buttons: 1,
   });
-  pointerDrag.turnedBeforeRelease = await evaluate(`Boolean(document.querySelector('.legacy-card')?.classList.contains('is-turning'))`);
+  const turnFrame = await evaluate(`(() => {
+    const card = document.querySelector('.legacy-card');
+    const current = card?.querySelector('.legacy-card__box--current');
+    const cardRect = card?.getBoundingClientRect();
+    const currentRect = current?.getBoundingClientRect();
+    return {
+      isTurning: Boolean(card?.classList.contains('is-turning')),
+      isDragging: Boolean(card?.classList.contains('is-dragging')),
+      offset: cardRect && currentRect ? Math.round(currentRect.left - cardRect.left) : 0,
+      flingX: Number(card?.style.getPropertyValue('--fling-x').replace('px', '') || 0),
+    };
+  })()`);
+  pointerDrag.turnedBeforeRelease = turnFrame.isTurning;
+  pointerDrag.continuousAtTurn = turnFrame.isDragging && turnFrame.offset >= 60;
+  pointerDrag.keptFlingMomentum = turnFrame.flingX > 0;
   await send("Input.dispatchMouseEvent", {
     type: "mouseReleased",
     x: dragOrigin.x + 72,
@@ -582,7 +596,8 @@ const main = async () => {
   });
   if (!pointerDrag.isDragging || pointerDrag.lifted === "none" || pointerDrag.offset < 10
     || pointerDrag.incomingOpacity <= 0 || !pointerDrag.incomingVerse
-    || pointerDrag.touchAction !== "none" || !pointerDrag.turnedBeforeRelease) {
+    || pointerDrag.touchAction !== "none" || !pointerDrag.turnedBeforeRelease
+    || !pointerDrag.continuousAtTurn || !pointerDrag.keptFlingMomentum) {
     throw new Error(`Dragging the excerpt card did not follow the pointer or turn early: ${JSON.stringify(pointerDrag)}`);
   }
   currentStep = "touch excerpt card";

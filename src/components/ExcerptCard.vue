@@ -36,7 +36,7 @@
           v-for="(character, characterIndex) in incomingCharacters"
           :key="`${character}-${characterIndex}`"
           class="legacy-card__ink"
-          :style="{ '--ink-delay': `${characterIndex * 28}ms` }"
+          :style="{ '--ink-delay': `${characterIndex * 24}ms` }"
         >{{ character }}</span>
       </p>
       <h5 class="legacy-card__author">— {{ incomingExcerpt.author }}</h5>
@@ -106,12 +106,14 @@ const isWriting = ref(false);
 const isTurning = ref(false);
 const direction = ref("");
 const dragOffset = ref({ x: 0, y: 0 });
+const flingX = ref(0);
 const pointerOrigin = { x: 0, y: 0, id: null, target: null };
 const pointerState = {
   x: 0,
   y: 0,
   time: 0,
   velocityX: 0,
+  samples: 0,
   frame: 0,
   turnRequested: false,
 };
@@ -125,6 +127,7 @@ const cardStyle = computed(() => ({
   "--drag-turn": `${dragOffset.value.x * 0.065}deg`,
   "--drag-tilt": `${Math.max(-9, Math.min(9, dragOffset.value.y * -0.032))}deg`,
   "--drag-lift": `${Math.min(1, Math.hypot(dragOffset.value.x, dragOffset.value.y) / 72)}`,
+  "--fling-x": `${flingX.value}px`,
 }));
 
 const densityFor = (content) => {
@@ -144,12 +147,17 @@ const clearTimers = () => {
   window.clearTimeout(writingTimer);
   window.clearTimeout(commitTimer);
   window.clearTimeout(releaseTimer);
+  window.cancelAnimationFrame(pointerState.frame);
+  pointerState.frame = 0;
 };
 const finishTurn = () => {
   isWriting.value = false;
   isDragging.value = false;
   isLifting.value = false;
   dragOffset.value = { x: 0, y: 0 };
+  flingX.value = 0;
+  pointerState.turnRequested = false;
+  pointerState.velocityX = 0;
   releaseTimer = window.setTimeout(() => {
     isTurning.value = false;
     direction.value = "";
@@ -157,14 +165,16 @@ const finishTurn = () => {
   }, 0);
 };
 
-const turnCard = (turnDirection = "right") => {
+const turnCard = (turnDirection = "right", fromDrag = false) => {
   if (isTurning.value || props.disabled) return;
   emit("needs-next");
   clearTimers();
-  window.cancelAnimationFrame(pointerState.frame);
-  pointerState.frame = 0;
+  const rawFling = Math.max(-72, Math.min(72, pointerState.velocityX * 0.028));
+  flingX.value = fromDrag
+    ? (turnDirection === "right" ? Math.max(0, rawFling) : Math.min(0, rawFling))
+    : 0;
   isTurning.value = true;
-  isDragging.value = false;
+  isDragging.value = fromDrag;
   isLifting.value = true;
   isWriting.value = false;
   direction.value = turnDirection;
@@ -175,8 +185,8 @@ const turnCard = (turnDirection = "right") => {
   }
   writingTimer = window.setTimeout(() => {
     isWriting.value = true;
-  }, 210);
-  const writingDuration = Math.max(260, incomingCharacters.value.length * 28 + 180);
+  }, 140);
+  const writingDuration = Math.max(300, incomingCharacters.value.length * 24 + 320);
   commitTimer = window.setTimeout(finishTurn, Math.min(900, Math.max(620, writingDuration)));
 };
 
@@ -192,16 +202,35 @@ const startDrag = (event) => {
   pointerState.y = event.clientY;
   pointerState.time = event.timeStamp;
   pointerState.velocityX = 0;
+  pointerState.samples = 0;
   pointerState.frame = 0;
   pointerState.turnRequested = false;
   dragOffset.value = { x: 0, y: 0 };
+  flingX.value = 0;
   direction.value = "";
   isDragging.value = true;
   emit("needs-next");
 };
 
+const shouldTurn = ({ x, velocityX }, width) => {
+  const projected = Math.abs(x) + Math.abs(velocityX) * 0.065;
+  const threshold = Math.min(58, Math.max(34, width * 0.13));
+  return Math.abs(x) > 10 && projected > threshold;
+};
+
+const drawDragFrame = () => {
+  const nextX = pointerState.x - pointerOrigin.x;
+  const nextY = pointerState.y - pointerOrigin.y;
+  dragOffset.value = {
+    x: Math.max(-220, Math.min(220, nextX)),
+    y: Math.max(-140, Math.min(120, nextY)),
+  };
+  direction.value = dragOffset.value.x < 0 ? "left" : "right";
+};
+
 const moveDrag = (event) => {
-  if (!isDragging.value || event.pointerId !== pointerOrigin.id) return;
+  if (!isDragging.value || isTurning.value || event.pointerId !== pointerOrigin.id) return;
+  pointerState.samples += 1;
   const elapsed = Math.max(8, event.timeStamp - pointerState.time);
   const instantVelocity = (event.clientX - pointerState.x) / elapsed * 1000;
   pointerState.velocityX = pointerState.velocityX * 0.72 + instantVelocity * 0.28;
@@ -212,58 +241,57 @@ const moveDrag = (event) => {
   pointerState.frame = window.requestAnimationFrame(() => {
     pointerState.frame = 0;
     if (!isDragging.value) return;
-    const nextX = pointerState.x - pointerOrigin.x;
-    const nextY = pointerState.y - pointerOrigin.y;
-    dragOffset.value = {
-      x: Math.max(-220, Math.min(220, nextX)),
-      y: Math.max(-140, Math.min(120, nextY)),
-    };
-    direction.value = dragOffset.value.x < 0 ? "left" : "right";
-    const projected = Math.abs(dragOffset.value.x) + Math.abs(pointerState.velocityX) * 0.055;
+    drawDragFrame();
     const width = pointerOrigin.target?.getBoundingClientRect().width || 330;
-    const threshold = Math.min(64, Math.max(42, width * 0.17));
-    if (!pointerState.turnRequested && Math.abs(dragOffset.value.x) > 12 && projected > threshold) {
+    if (!pointerState.turnRequested && pointerState.samples > 1 && shouldTurn(
+      { x: dragOffset.value.x, velocityX: pointerState.velocityX },
+      width,
+    )) {
       pointerState.turnRequested = true;
-      pointerOrigin.target?.releasePointerCapture?.(pointerOrigin.id);
-      turnCard(dragOffset.value.x < 0 ? "left" : "right");
+      turnCard(dragOffset.value.x < 0 ? "left" : "right", true);
     }
   });
 };
 
 const commitDragFrame = () => {
-  if (!isDragging.value) return;
   if (pointerState.frame) {
     window.cancelAnimationFrame(pointerState.frame);
     pointerState.frame = 0;
   }
-  const nextX = pointerState.x - pointerOrigin.x;
-  const nextY = pointerState.y - pointerOrigin.y;
-  dragOffset.value = {
-    x: Math.max(-220, Math.min(220, nextX)),
-    y: Math.max(-140, Math.min(120, nextY)),
-  };
-  direction.value = dragOffset.value.x < 0 ? "left" : "right";
+  drawDragFrame();
 };
 
 const cancelDrag = () => {
-  if (!isDragging.value) return;
-  window.cancelAnimationFrame(pointerState.frame);
-  pointerState.frame = 0;
+  if (isTurning.value) {
+    isDragging.value = false;
+    pointerOrigin.target?.releasePointerCapture?.(pointerOrigin.id);
+    return;
+  }
+  commitDragFrame();
   pointerOrigin.target?.releasePointerCapture?.(pointerOrigin.id);
   isDragging.value = false;
   dragOffset.value = { x: 0, y: 0 };
+  flingX.value = 0;
+  pointerState.velocityX = 0;
+  pointerState.turnRequested = false;
   direction.value = "";
 };
 
 const endDrag = (event) => {
-  if (!isDragging.value || event.pointerId !== pointerOrigin.id) return;
+  if (event.pointerId !== pointerOrigin.id) return;
+  if (!isDragging.value) return;
+  if (isTurning.value) {
+    isDragging.value = false;
+    pointerOrigin.target?.releasePointerCapture?.(event.pointerId);
+    return;
+  }
   commitDragFrame();
   pointerOrigin.target?.releasePointerCapture?.(event.pointerId);
   const width = event.currentTarget.getBoundingClientRect().width || 330;
-  const threshold = Math.min(64, Math.max(42, width * 0.17));
-  const offset = dragOffset.value;
-  const projected = Math.abs(offset.x) + Math.abs(pointerState.velocityX) * 0.055;
-  if (Math.abs(offset.x) > 12 && projected > threshold) turnCard(offset.x < 0 ? "left" : "right");
+  if (shouldTurn(
+    { x: dragOffset.value.x, velocityX: pointerState.velocityX },
+    width,
+  )) turnCard(dragOffset.value.x < 0 ? "left" : "right", true);
   else cancelDrag();
 };
 
@@ -320,6 +348,7 @@ onBeforeUnmount(() => {
   --drag-turn: 0deg;
   --drag-tilt: 0deg;
   --drag-lift: 0;
+  --fling-x: 0px;
   position: relative;
   width: min(100%, 330px);
   margin-inline: auto;
@@ -598,15 +627,15 @@ onBeforeUnmount(() => {
 }
 
 .legacy-card.is-turning.legacy-card--right .legacy-card__box--current {
-  animation: card-lift-right 560ms cubic-bezier(0.18, 0.72, 0.28, 1) both;
+  animation: card-lift-right 520ms cubic-bezier(0.18, 0.72, 0.28, 1) both;
 }
 
 .legacy-card.is-turning.legacy-card--left .legacy-card__box--current {
-  animation: card-lift-left 560ms cubic-bezier(0.18, 0.72, 0.28, 1) both;
+  animation: card-lift-left 520ms cubic-bezier(0.18, 0.72, 0.28, 1) both;
 }
 
 .legacy-card.is-turning .legacy-card__box--incoming {
-  animation: card-settle 480ms cubic-bezier(0.22, 0.61, 0.36, 1) 80ms both;
+  animation: card-settle 420ms cubic-bezier(0.22, 0.61, 0.36, 1) 50ms both;
 }
 
 .legacy-card__box--incoming .legacy-card__verse,
@@ -628,7 +657,7 @@ onBeforeUnmount(() => {
 }
 
 .legacy-card.is-writing .legacy-card__ink {
-  animation: ink-appear 220ms var(--ease-out) var(--ink-delay) both;
+  animation: ink-appear 190ms var(--ease-out) var(--ink-delay) both;
 }
 
 @keyframes card-lift-right {
@@ -640,7 +669,7 @@ onBeforeUnmount(() => {
   }
   28% {
     opacity: 1;
-    transform: translate3d(calc(var(--drag-x) + 9%), calc(var(--drag-y) - 6%), 78px) rotateZ(7deg) rotateY(-24deg) rotateX(9deg);
+    transform: translate3d(calc(var(--drag-x) + var(--fling-x) + 9%), calc(var(--drag-y) - 4%), 78px) rotateZ(7deg) rotateY(-24deg) rotateX(9deg);
   }
   100% {
     opacity: 0;
@@ -657,7 +686,7 @@ onBeforeUnmount(() => {
   }
   28% {
     opacity: 1;
-    transform: translate3d(calc(var(--drag-x) - 9%), calc(var(--drag-y) - 6%), 78px) rotateZ(-7deg) rotateY(24deg) rotateX(9deg);
+    transform: translate3d(calc(var(--drag-x) + var(--fling-x) - 9%), calc(var(--drag-y) - 4%), 78px) rotateZ(-7deg) rotateY(24deg) rotateX(9deg);
   }
   100% {
     opacity: 0;
