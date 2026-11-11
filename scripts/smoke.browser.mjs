@@ -473,10 +473,10 @@ const main = async () => {
   }
   if (!await evaluate(`(() => {
     const card = document.querySelector('.legacy-card');
-    const shards = [...(card?.querySelectorAll('.legacy-card__shard') || [])];
-    return shards.length === 6 && shards.every((shard) => getComputedStyle(shard).clipPath !== 'none');
+    const incoming = card?.querySelector('.legacy-card__box--incoming');
+    return incoming && getComputedStyle(incoming).transform === 'none';
   })()`)) {
-    throw new Error("Excerpt card tearing shards did not render");
+    throw new Error("Incoming excerpt card must stay in place until the turn is committed");
   }
   const firstExcerpt = excerptCards.firstVerse;
   const dockLayout = await evaluate(`(() => {
@@ -587,39 +587,17 @@ const main = async () => {
       isTurning: Boolean(card?.classList.contains('is-turning')),
       isDragging: Boolean(card?.classList.contains('is-dragging')),
       offset: cardRect && currentRect ? Math.round(currentRect.left - cardRect.left) : 0,
-      flingX: Number(card?.style.getPropertyValue('--fling-x').replace('px', '') || 0),
-      shardTransform: card?.querySelector('.legacy-card__shard')
-        ? getComputedStyle(card.querySelector('.legacy-card__shard')).transform : 'none',
-      outgoingVerseOpacity: Number(card?.querySelector('.legacy-card__shard .legacy-card__verse')
-        ? getComputedStyle(card.querySelector('.legacy-card__shard .legacy-card__verse')).opacity : 1),
+      progress: Number(card?.style.getPropertyValue('--progress') || 0),
+      incomingOpacity: Number(card?.querySelector('.legacy-card__box--incoming')
+        ? getComputedStyle(card.querySelector('.legacy-card__box--incoming')).opacity : 0),
       incomingVerseOpacity: Number(card?.querySelector('.legacy-card__box--incoming .legacy-card__verse')
         ? getComputedStyle(card.querySelector('.legacy-card__box--incoming .legacy-card__verse')).opacity : 1),
     };
   })()`);
-  pointerDrag.turnedBeforeRelease = turnFrame.isTurning;
-  pointerDrag.continuousAtTurn = turnFrame.isDragging && turnFrame.offset >= 60;
-  pointerDrag.keptFlingMomentum = turnFrame.flingX > 0;
-  pointerDrag.tearing = turnFrame.shardTransform !== 'none' && turnFrame.shardTransform !== 'matrix(1, 0, 0, 1, 0, 0)';
-  pointerDrag.fadedText = turnFrame.outgoingVerseOpacity < 1 && turnFrame.incomingVerseOpacity < 1;
+  pointerDrag.gradualProgress = turnFrame.isDragging && !turnFrame.isTurning
+    && turnFrame.offset >= 60 && turnFrame.progress > 0.3
+    && turnFrame.incomingOpacity > 0.2 && turnFrame.incomingVerseOpacity < 1;
 
-  await delay(80);
-  const tearFrame = await evaluate(`(() => {
-    const card = document.querySelector('.legacy-card');
-    const shard = card?.querySelector('.legacy-card__shard');
-    const outgoing = card?.querySelector('.legacy-card__shard .legacy-card__verse');
-    const incoming = card?.querySelector('.legacy-card__box--incoming .legacy-card__verse');
-    return {
-      shardOpacity: shard ? Number(getComputedStyle(shard).opacity) : 0,
-      shardTransform: shard ? getComputedStyle(shard).transform : 'none',
-      outgoingOpacity: outgoing ? Number(getComputedStyle(outgoing).opacity) : 1,
-      incomingOpacity: incoming ? Number(getComputedStyle(incoming).opacity) : 1,
-    };
-  })()`);
-  pointerDrag.tearing = tearFrame.shardOpacity > 0.2
-    && tearFrame.shardTransform !== 'none'
-    && tearFrame.shardTransform !== 'matrix(1, 0, 0, 1, 0, 0)'
-    && tearFrame.outgoingOpacity < 1;
-  pointerDrag.fadedText = tearFrame.incomingOpacity < 1;
   await send("Input.dispatchMouseEvent", {
     type: "mouseReleased",
     x: dragOrigin.x + 72,
@@ -628,11 +606,34 @@ const main = async () => {
     buttons: 0,
     clickCount: 1,
   });
+  await delay(80);
+  const commitFrame = await evaluate(`(() => {
+    const card = document.querySelector('.legacy-card');
+    const outgoing = card?.querySelector('.legacy-card__outgoing');
+    const pixels = [...(card?.querySelectorAll('.legacy-card__pixel') || [])];
+    const flying = pixels.filter((pixel) => {
+      const style = getComputedStyle(pixel, '::after');
+      return style.animationName.includes('pixel-fly') && Number(style.opacity) > 0;
+    });
+    const incoming = card?.querySelector('.legacy-card__box--incoming');
+    return {
+      isCommitting: Boolean(card?.classList.contains('is-committing')),
+      outgoingTransform: outgoing ? getComputedStyle(outgoing).transform : 'none',
+      pixelCount: pixels.length,
+      flyingPixels: flying.length,
+      incomingTransform: incoming ? getComputedStyle(incoming).transform : 'none',
+    };
+  })()`);
+  pointerDrag.committedOnRelease = commitFrame.isCommitting;
+  pointerDrag.pixelDisintegration = commitFrame.pixelCount === 180
+    && commitFrame.flyingPixels > 20
+    && commitFrame.outgoingTransform !== 'none';
+  pointerDrag.incomingStill = commitFrame.incomingTransform === 'none';
   if (!pointerDrag.isDragging || pointerDrag.lifted === "none" || pointerDrag.offset < 10
     || pointerDrag.incomingOpacity <= 0 || !pointerDrag.incomingVerse
-    || pointerDrag.touchAction !== "none" || !pointerDrag.turnedBeforeRelease
-    || !pointerDrag.continuousAtTurn || !pointerDrag.keptFlingMomentum
-    || !pointerDrag.tearing || !pointerDrag.fadedText) {
+    || pointerDrag.touchAction !== "none" || !pointerDrag.gradualProgress
+    || !pointerDrag.committedOnRelease || !pointerDrag.pixelDisintegration
+    || !pointerDrag.incomingStill) {
     throw new Error(`Dragging the excerpt card did not follow the pointer or turn early: ${JSON.stringify(pointerDrag)}`);
   }
   currentStep = "touch excerpt card";

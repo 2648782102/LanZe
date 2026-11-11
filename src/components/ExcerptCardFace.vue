@@ -233,33 +233,34 @@ const handleSave = () => {
 
 .legacy-card__ink {
   display: inline;
-  opacity: 0;
-  filter: blur(2px);
-  transform: translateY(-3px);
+  opacity: var(--ink-opacity, 1);
+  filter: blur(0);
+  transform: translateY(0);
+  transition:
+    opacity 180ms var(--ease-standard),
+    filter 180ms var(--ease-standard);
 }
 
-.legacy-card.is-writing .legacy-card__ink {
-  animation: ink-appear 190ms var(--ease-out) var(--ink-delay) both;
+.legacy-card__box--incoming .legacy-card__verse {
+  opacity: var(--ink-opacity, 1);
+  filter: blur(calc((1 - var(--ink-opacity, 1)) * 3px));
+  transition:
+    opacity 180ms var(--ease-standard),
+    filter 180ms var(--ease-standard);
 }
 
-@keyframes ink-appear {
-  from {
-    opacity: 0;
-    filter: blur(2px);
-    transform: translateY(-3px);
-  }
-  to {
-    opacity: 1;
-    filter: blur(0);
-    transform: translateY(0);
-  }
+.legacy-card.is-committing .legacy-card__box--incoming .legacy-card__verse,
+.legacy-card.is-committing .legacy-card__box--incoming .legacy-card__author {
+  opacity: 1;
+  filter: blur(0);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .legacy-card__box,
   .legacy-card__box::after,
   .legacy-card__save,
-  .legacy-card__ink {
+  .legacy-card__ink,
+  .legacy-card__box--incoming .legacy-card__verse {
     animation: none !important;
     transition: none !important;
   }
