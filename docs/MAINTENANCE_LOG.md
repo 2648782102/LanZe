@@ -346,3 +346,10 @@
 - 用户仍感到卡顿，并明确允许完全重写飞出效果。复核上一版发现「新句先写完、旧卡延迟 240ms 再飞」造成视觉上的起飞等待；即使动画事件已降到 20 个，等待本身仍被感知为停顿。
 - 本轮删除延迟、逐字 writing、纸纹裂片与所有旧粒子残留：`ExcerptCardFace` 只渲染静态诗句，不再接收 `ink`；提交时底层新卡已经准备好，只保持 opacity 承接，上层旧卡从当前手指位置立即执行一条 460ms `card-out`，包含位移、旋转、轻微抬升和透明度。`getAnimations().finished` 精确收束，计时器仅兜底；静默预取、hover lock、触屏/按钮/键盘入口与减少动效直接换句均保留。
 - CDP `Animation` 探针显示整套翻页只剩 2 个动画（`card-out` 与新卡 opacity），无逐字/粒子/滤镜；连续合成帧 39 帧覆盖 20–647ms、无超过 60ms 空档，RAF 无长间隔。Browser E2E 改为断言 460ms、零延迟、单动画起飞、incoming 静止、hover lock 与连续换句。历史白色卡构图、竖排诗句、作者、扇舟图和收藏角标不变；未执行外部宣发或付费推广。
+
+## 摘录卡尾帧真实 DOM 动画修复 — 2026-11-13 01:30 CST
+
+- 用户反馈线上仍有「飞到最外面卡住再突然切换」，要求审查完整链路。先复现上一版未提交实现：提交期间卡片存在 460ms WAAPI 动画，但 `computed transform` 在 0–400ms 一直是 `none`，到 500ms 才变成飞离矩阵。根因是 `.is-committing .legacy-card__box--current` 仍保留 `opacity: 0`、`visibility: hidden` 和 `transform: none !important`，把 WAAPI 首帧压成静止，直到动画结束 `fill: both` 才显出尾帧；同时尾帧移除/重建当前卡、诗句与作者并集中写入十余个 CSS 变量。
+- 本轮删除当前卡的隐藏与 `transform: none !important`，只保留 `transition: none !important`；提交前读取当前卡实际 `computed transform` 作为动画首帧，`element.animate()` 同步创建且不等待 `nextTick`。动画期间继续复用当前真实 DOM，不再使用 outgoing 快照；保留拖动开始时的 current/incoming/saved 冻结，确保动画中的文本与收藏角标不受父级后续更新影响。`finished` 后先 `emit("settled")` 让父级静默交换当前句、`await nextTick()` 完成文本更新，再取消动画、清除定时器并回写状态。提交入口先启动动画再切换 `is-committing`，避免 CSS 提交态抢在 WAAPI 前生效；`clearTimers()` 统一取消活跃动画，卸载或新提交不会留下旧动画。
+- 对照探针：旧尾帧 37 个事件，含 `legacy-card__box--current` remove/add、诗句与作者 remove/add 和约 12 次 style 写入；修复后 26 个事件、无卡面重建，诗句/作者仅在既有的下一张预取卡上更新。状态探针在 0/40/80/350/460ms 连续读到递增的飞离矩阵，480ms 后动画数归零并恢复 `none`。连续录屏 40 帧覆盖 2–643ms、没有超过 60ms 的空档。
+- Browser E2E 改为断言当前卡唯一 460ms WAAPI 动画与实时 `transform`、飞出中 hover lock、落定后诗句等于预取句且诗句透明度恢复 1。`git diff --check`、lint、39 项单测、build、本地资源 smoke、音频校验和完整 Browser E2E 均通过，CLS 0.0000、控制台/网络错误 0；历史白色卡构图、静默预取、触屏/按钮/键盘入口与减少动效回退保持不变。

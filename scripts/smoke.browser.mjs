@@ -612,61 +612,82 @@ const main = async () => {
   await delay(80);
   const commitFrame = await evaluate(`(() => {
     const card = document.querySelector('.legacy-card');
-    const outgoing = card?.querySelector('.legacy-card__outgoing');
+    const current = card?.querySelector('.legacy-card__box--current');
     const incoming = card?.querySelector('.legacy-card__box--incoming');
-    const outgoingStyle = outgoing ? getComputedStyle(outgoing) : null;
+    const currentStyle = current ? getComputedStyle(current) : null;
+    const animations = current?.getAnimations?.() || [];
     return {
       isCommitting: Boolean(card?.classList.contains('is-committing')),
-      outgoingTransform: outgoing ? getComputedStyle(outgoing).transform : 'none',
+      currentTransform: currentStyle?.transform || 'none',
       exitDuration: card?.style.getPropertyValue('--exit-duration') || '',
-      outgoingAnimation: outgoingStyle?.animationName || '',
-      outgoingDelay: outgoingStyle?.animationDelay || '0s',
+      currentAnimations: animations.length,
+      animationDuration: animations[0]?.effect?.getTiming?.().duration || 0,
       hoverLocked: Boolean(card?.classList.contains('is-hover-locked')),
       incomingTransform: incoming ? getComputedStyle(incoming).transform : 'none',
       incomingVerse: incoming?.querySelector('.legacy-card__verse')?.textContent?.trim() || '',
     };
   })()`);
   pointerDrag.committedOnRelease = commitFrame.isCommitting;
-  pointerDrag.singleFlight = commitFrame.outgoingAnimation.includes('card-out')
-    && Number.parseFloat(commitFrame.outgoingDelay || '0') === 0
-    && commitFrame.outgoingTransform !== 'none';
+  pointerDrag.singleFlight = commitFrame.currentAnimations === 1
+    && commitFrame.animationDuration === 460
+    && commitFrame.currentTransform !== 'none';
   pointerDrag.incomingStill = commitFrame.incomingTransform === 'none'
     && commitFrame.incomingVerse === incomingBeforeDrag;
   pointerDrag.momentumDuration = Number.parseInt(commitFrame.exitDuration, 10) === 460;
   const midTurnFrame = await evaluate(`(() => {
     const card = document.querySelector('.legacy-card');
     const incoming = card?.querySelector('.legacy-card__box--incoming');
-    const outgoing = card?.querySelector('.legacy-card__outgoing');
+    const current = card?.querySelector('.legacy-card__box--current');
     return {
       isCommitting: Boolean(card?.classList.contains('is-committing')),
       incomingVerse: incoming?.querySelector('.legacy-card__verse')?.textContent?.trim() || '',
       incomingTransform: incoming ? getComputedStyle(incoming).transform : 'none',
-      outgoingTransform: outgoing ? getComputedStyle(outgoing).transform : 'none',
+      currentTransform: current ? getComputedStyle(current).transform : 'none',
     };
   })()`);
   pointerDrag.silentIncoming = midTurnFrame.isCommitting
     && midTurnFrame.incomingVerse === incomingBeforeDrag
     && midTurnFrame.incomingTransform === 'none'
-    && midTurnFrame.outgoingTransform !== 'none';
-  const hoverSettleFrame = await evaluate(`(() => {
+    && midTurnFrame.currentTransform !== 'none';
+  const settlingFrame = await evaluate(`(() => {
     const card = document.querySelector('.legacy-card');
     const current = card?.querySelector('.legacy-card__box--current');
     return {
-      hoverLocked: Boolean(card?.classList.contains('is-hover-locked')),
-      hovered: Boolean(card?.matches(':hover')),
-      currentTransform: current ? getComputedStyle(current).transform : 'none',
+      isCommitting: Boolean(card?.classList.contains('is-committing')),
+      currentAnimations: current?.getAnimations?.().length || 0,
     };
   })()`);
-  pointerDrag.hoverLockSettled = hoverSettleFrame.hoverLocked
-    && hoverSettleFrame.hovered
-    && hoverSettleFrame.currentTransform === 'none';
+  pointerDrag.finalFrame = await waitUntil("pointer excerpt settled", () => evaluate(`(() => {
+    const card = document.querySelector('.legacy-card');
+    const current = card?.querySelector('.legacy-card__box--current');
+    const frame = {
+      hoverLocked: Boolean(card?.classList.contains('is-hover-locked')),
+      hovered: Boolean(card?.matches(':hover')),
+      isCommitting: Boolean(card?.classList.contains('is-committing')),
+      currentAnimations: current?.getAnimations?.().length || 0,
+      currentVerse: current?.querySelector('.legacy-card__verse')?.textContent?.trim() || '',
+      verseOpacity: current?.querySelector('.legacy-card__verse')
+        ? Number(getComputedStyle(current.querySelector('.legacy-card__verse')).opacity) : 0,
+    };
+    return !frame.isCommitting && frame.currentAnimations === 0 ? frame : false;
+  })()`), 32);
+  pointerDrag.hoverLockDuringFlight = settlingFrame.isCommitting
+    && settlingFrame.currentAnimations === 1
+    && pointerDrag.finalFrame.hoverLocked
+    && pointerDrag.finalFrame.hovered;
+  pointerDrag.hoverLockSettled = pointerDrag.finalFrame.hoverLocked
+    && pointerDrag.finalFrame.hovered
+    && !pointerDrag.finalFrame.isCommitting
+    && pointerDrag.finalFrame.currentAnimations === 0
+    && pointerDrag.finalFrame.currentVerse === incomingBeforeDrag
+    && pointerDrag.finalFrame.verseOpacity > 0.99;
   if (!pointerDrag.isDragging || pointerDrag.lifted === "none" || pointerDrag.offset < 10
     || pointerDrag.incomingOpacity <= 0 || !pointerDrag.incomingVerse
     || pointerDrag.touchAction !== "none" || !pointerDrag.gradualProgress
     || !pointerDrag.committedOnRelease || !pointerDrag.singleFlight
     || !pointerDrag.incomingStill
     || !pointerDrag.momentumDuration || !pointerDrag.silentIncoming
-    || !pointerDrag.hoverLockSettled) {
+    || !pointerDrag.hoverLockDuringFlight || !pointerDrag.hoverLockSettled) {
     throw new Error(`Dragging the excerpt card did not follow the pointer or turn early: ${JSON.stringify(pointerDrag)}`);
   }
   currentStep = "touch excerpt card";
