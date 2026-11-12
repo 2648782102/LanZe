@@ -27,7 +27,6 @@
       variant="incoming"
       :excerpt="displayIncoming"
       :saved="displayIncomingSaved"
-      :ink-window="inkWindow"
       ink
     />
 
@@ -80,7 +79,7 @@ const props = defineProps({
 const emit = defineEmits(["toggle-save", "needs-next", "turn", "settled"]);
 
 const TURN_DURATION = 560;
-const INK_WINDOW = TURN_DURATION;
+const INK_WINDOW = 180;
 const isDragging = ref(false);
 const isReturning = ref(false);
 const isCommitting = ref(false);
@@ -98,7 +97,7 @@ const frozenCurrentSaved = ref(false);
 const frozenIncoming = ref(null);
 const frozenIncomingSaved = ref(false);
 const initialMotion = {
-  duration: TURN_DURATION,
+  duration: TURN_DURATION + INK_WINDOW,
   ease: "linear",
   exitX: "0px",
   exitXEarly: "0px",
@@ -327,7 +326,9 @@ const startCommit = (turnDirection) => {
   const exitDistance = Math.round(Math.min(420, Math.max(160,
     Math.abs(dragOffset.value.x) * 1.35 + momentum,
   )));
-  const duration = TURN_DURATION;
+  const reduced = reducedMotion();
+  const startDelay = reduced ? 0 : INK_WINDOW;
+  const duration = reduced ? 0 : TURN_DURATION + startDelay;
   const verticalLift = -Math.round(24 + exitDistance * 0.06);
   const rotation = Math.min(24, 10 + rawVelocity * 0.004);
   const signed = (value) => sign * Math.round(value);
@@ -362,12 +363,12 @@ const startCommit = (turnDirection) => {
   hoverLocked.value = true;
   hoverReleased = false;
   dragProgress.value = 1;
-  inkWindow.value = reducedMotion() ? 0 : duration;
+  inkWindow.value = reduced ? 0 : INK_WINDOW;
   emit("needs-next");
   emit("turn", turnDirection);
   commitTimer = window.setTimeout(() => {
     if (id === turnId && isCommitting.value) finishTurn();
-  }, reducedMotion() ? 0 : duration + 20);
+  }, duration + 20);
   observeOutgoingAnimation(id);
 };
 
@@ -793,11 +794,13 @@ onBeforeUnmount(() => {
 }
 
 .legacy-card.is-committing .legacy-card__outgoing {
-  animation: card-out var(--exit-duration) var(--exit-ease) both;
+  animation: card-out var(--exit-duration) var(--exit-ease) var(--ink-window) both;
 }
 
 .legacy-card.is-committing .legacy-card__pixel::after {
-  animation: pixel-fly calc(var(--exit-duration) - 90ms) var(--exit-ease) var(--delay) both;
+  animation:
+    pixel-fly calc(var(--exit-duration) - 90ms) var(--exit-ease)
+    calc(var(--ink-window) + var(--delay)) both;
 }
 
 @keyframes card-out {
@@ -891,8 +894,11 @@ onBeforeUnmount(() => {
   .legacy-card__box--current :deep(.legacy-card__verse),
   .legacy-card__box--current :deep(.legacy-card__author),
   .legacy-card__box--incoming :deep(.legacy-card__author),
-  .legacy-card__ink {
+  .legacy-card__verse--ink {
     opacity: 1;
+    clip-path: none;
+    filter: none;
+    transform: none;
   }
 }
 </style>

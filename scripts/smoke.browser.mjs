@@ -610,6 +610,24 @@ const main = async () => {
     clickCount: 1,
   });
   await delay(80);
+  const inkLeadFrame = await evaluate(`(() => {
+    const card = document.querySelector('.legacy-card');
+    const outgoing = card?.querySelector('.legacy-card__outgoing');
+    const incoming = card?.querySelector('.legacy-card__box--incoming');
+    const verse = incoming?.querySelector('.legacy-card__verse--ink');
+    const style = verse ? getComputedStyle(verse) : null;
+    return {
+      isCommitting: Boolean(card?.classList.contains('is-committing')),
+      inkAnimation: style?.animationName || '',
+      inkClip: style?.clipPath || '',
+      outgoingAnimation: outgoing ? getComputedStyle(outgoing).animationPlayState : 'idle',
+      outgoingDelay: outgoing ? getComputedStyle(outgoing).animationDelay : '0s',
+    };
+  })()`);
+  pointerDrag.inkLeadsFlight = inkLeadFrame.isCommitting
+    && inkLeadFrame.inkAnimation.includes('brush-write')
+    && inkLeadFrame.inkClip !== 'none'
+    && Number.parseFloat(inkLeadFrame.outgoingDelay || '0') > 0;
   const commitFrame = await evaluate(`(() => {
     const card = document.querySelector('.legacy-card');
     const outgoing = card?.querySelector('.legacy-card__outgoing');
@@ -623,7 +641,7 @@ const main = async () => {
       return style.animationName !== 'none';
     }).length;
     const incoming = card?.querySelector('.legacy-card__box--incoming');
-    const ink = incoming?.querySelector('.legacy-card__ink');
+    const ink = incoming?.querySelector('.legacy-card__verse--ink');
     const inkStyle = ink ? getComputedStyle(ink) : null;
     return {
       isCommitting: Boolean(card?.classList.contains('is-committing')),
@@ -649,7 +667,7 @@ const main = async () => {
     && commitFrame.incomingVerse === incomingBeforeDrag;
   pointerDrag.brushWriting = commitFrame.brushAnimation.includes('brush-write')
     && commitFrame.brushClip !== 'none';
-  pointerDrag.momentumDuration = Number.parseInt(commitFrame.exitDuration, 10) === 560;
+  pointerDrag.momentumDuration = Number.parseInt(commitFrame.exitDuration, 10) === 740;
   const midTurnFrame = await evaluate(`(() => {
     const card = document.querySelector('.legacy-card');
     const incoming = card?.querySelector('.legacy-card__box--incoming');
@@ -683,7 +701,7 @@ const main = async () => {
     || !pointerDrag.committedOnRelease || !pointerDrag.pixelDisintegration
     || !pointerDrag.incomingStill || !pointerDrag.brushWriting
     || !pointerDrag.momentumDuration || !pointerDrag.silentIncoming
-    || !pointerDrag.hoverLockSettled) {
+    || !pointerDrag.hoverLockSettled || !pointerDrag.inkLeadsFlight) {
     throw new Error(`Dragging the excerpt card did not follow the pointer or turn early: ${JSON.stringify(pointerDrag)}`);
   }
   currentStep = "touch excerpt card";

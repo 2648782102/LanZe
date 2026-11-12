@@ -328,3 +328,9 @@
 - 用户反馈「飞出去到最后会卡个一两秒，然后才继续动画」。用 CDP 事件探针与 CPU 6 倍限速复核：卡面自身 560ms 后约 636ms 收束，没有直接长停；但 10×18 网格的 `::before` 镂空与 `::after` 飞散形成 360 个动画，尾段约 1424–1738ms 密集派发 `animationend`，随后鼠标仍在卡上又触发 0.45s 倾斜/阴影与 0.85s 光泽过渡。限速下最大 RAF gap 约 67ms、无 longtask，确认卡顿来自事件风暴与 hover 接管，而不是远程诗词请求。
 - 本轮把镂空层改为静态瓷面，8×12 网格只保留 96 个 `pixel-fly` 动画，delay 收进 0–64ms；移除 outgoing 上的冒泡 `animationend` 监听，改用 `getAnimations()` 的 `finished` 精确收束，计时器仅保留 20ms 兜底。提交开始设置 `is-hover-locked`，动画结束不主动解除悬浮锁，只有 `pointerleave` 或明确不在 `:hover` 时解锁；拖动、归位、提交和锁定态都临时关闭光泽层 transition，避免尾段重新播放 0.85s 光泽与倾斜；归位阶段同样不抢 hover。
 - Browser E2E 改为断言 96 个粒子、超过 12 个进入飞散、镂空层无动画、提交帧带 hover lock；设计契约、变更日志和本维护记录同步说明新时间轴。保持历史白色摘录卡构图、静默预取链路、毛笔书写、`prefers-reduced-motion` 回退和按钮/键盘/触屏共用的状态机不变。
+
+## 摘录卡书写领先飞出 — 2026-11-12 10:20 CST
+
+- 用户反馈线上仍是「飞到最外面以后整体卡住，然后突然进入动画效果」。本轮用 CDP `Animation` 域和 `Page.screencastFrame` 连续帧探针定位：旧卡飞出本身在 560ms 持续推进，但提交结束的同帧会重建新句的 30+ 个 `legacy-card__ink` 动画，其中每个字符同时带 `clip-path`、`filter: blur()`、伪元素墨晕和 `text-shadow`，合成器在飞出末段集中提升这些层，录屏出现 600ms 以上空档，视觉上就是飞出停住后新句突然出现。
+- `ExcerptCardFace` 将逐字双层动画收敛为整句单层 `legacy-card__verse--ink` 书写动画，字符只作为稳定内联节点，不再各自承担动画与墨晕伪元素。新句在提交开始的 180ms 内先完成书写，旧卡与 96 个粒子延后 180ms 再开始 560ms 飞散；提交总窗口为 740ms，`getAnimations().finished` 仍是唯一精确收束点。`prefers-reduced-motion` 直接显示完整诗句并跳过飞出。
+- Browser E2E 增加 `inkLeadsFlight` 断言，确认提交初期书写已运行而旧卡仍在延迟阶段；连续录屏探针复核 56 帧覆盖 12–945ms、无超过 60ms 的空档。lint、build、Browser E2E 通过，设计契约和变更日志同步更新；历史白色卡构图、静默预取、hover lock、触屏/按钮/键盘入口均不变。

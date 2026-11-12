@@ -12,17 +12,13 @@
     >
       {{ saved ? "已藏" : "收藏" }}
     </component>
-    <p class="legacy-card__verse" :class="verseDensity">
+    <p class="legacy-card__verse" :class="[verseDensity, { 'legacy-card__verse--ink': ink }]">
       <template v-if="ink">
         <span
           v-for="(character, characterIndex) in characters"
           :key="`${character}-${characterIndex}`"
-          class="legacy-card__ink"
+          class="legacy-card__glyph"
           :data-char="character"
-          :style="{
-            '--ink-delay': inkOffsets[characterIndex],
-            '--ink-duration': `${inkDuration}ms`,
-          }"
         >{{ character }}</span>
       </template>
       <template v-else>{{ excerpt.content }}</template>
@@ -49,7 +45,6 @@ const props = defineProps({
   variant: { type: String, required: true },
   interactive: { type: Boolean, default: false },
   ink: { type: Boolean, default: false },
-  inkWindow: { type: Number, default: 520 },
 });
 const emit = defineEmits(["toggle-save"]);
 
@@ -63,32 +58,6 @@ const densityFor = (content) => {
 };
 const verseDensity = computed(() => densityFor(props.excerpt.content));
 const characters = computed(() => Array.from(props.excerpt?.content || ""));
-const inkDuration = computed(() => props.inkWindow
-  ? Math.min(360, Math.max(220, Math.round(props.inkWindow * 0.58)))
-  : 0);
-const strokeWeight = (character) => {
-  if ("，。？！；：、".includes(character)) return 1;
-  if ("一丨丿乙".includes(character)) return 2;
-  return 4;
-};
-const inkStrokes = computed(() => characters.value.reduce(
-  (total, character) => total + strokeWeight(character),
-  0,
-));
-const inkStagger = computed(() => {
-  if (!props.inkWindow) return 0;
-  const remaining = props.inkWindow - inkDuration.value;
-  return Math.max(2, Math.floor(remaining / Math.max(1, inkStrokes.value - 1)));
-});
-const inkOffsets = computed(() => {
-  let stroke = 0;
-  return characters.value.map((character) => {
-    const delay = stroke * inkStagger.value;
-    stroke += strokeWeight(character);
-    return `${delay}ms`;
-  });
-});
-
 const handleSave = () => {
   if (props.interactive) emit("toggle-save");
 };
@@ -263,10 +232,13 @@ const handleSave = () => {
   pointer-events: none;
 }
 
-.legacy-card__ink {
-  position: relative;
+.legacy-card__glyph {
   display: inline-block;
-  opacity: 0;
+}
+
+.legacy-card__verse--ink {
+  --ink-duration: 180ms;
+  opacity: 1;
   clip-path: inset(0 0 100% 0);
   filter: blur(1.6px);
   transform: translate3d(-0.08em, 0.12em, 0) rotate(-1.5deg) scale(0.96);
@@ -275,22 +247,8 @@ const handleSave = () => {
   will-change: clip-path, opacity, filter, transform;
 }
 
-.legacy-card__ink::after {
-  position: absolute;
-  inset: 0;
-  color: rgba(22, 44, 43, 0.42);
-  content: attr(data-char);
-  clip-path: inset(0 0 100% 0);
-  opacity: 0;
-  pointer-events: none;
-}
-
-.legacy-card.is-committing .legacy-card__box--incoming .legacy-card__ink {
-  animation: brush-write var(--ink-duration) cubic-bezier(0.18, 0.62, 0.3, 1) var(--ink-delay) both;
-}
-
-.legacy-card.is-committing .legacy-card__box--incoming .legacy-card__ink::after {
-  animation: ink-bleed var(--ink-duration) steps(5, end) var(--ink-delay) both;
+.legacy-card.is-committing .legacy-card__box--incoming .legacy-card__verse--ink {
+  animation: brush-write var(--ink-duration) cubic-bezier(0.18, 0.62, 0.3, 1) both;
 }
 
 .legacy-card__box--incoming .legacy-card__author {
@@ -371,8 +329,7 @@ const handleSave = () => {
   .legacy-card__box,
   .legacy-card__box::after,
   .legacy-card__save,
-  .legacy-card__ink,
-  .legacy-card__ink::after,
+  .legacy-card__verse--ink,
   .legacy-card__box--incoming .legacy-card__author {
     animation: none !important;
     transition: none !important;
@@ -382,8 +339,7 @@ const handleSave = () => {
     transform: none;
   }
 
-  .legacy-card__ink,
-  .legacy-card__ink::after,
+  .legacy-card__verse--ink,
   .legacy-card__box--incoming .legacy-card__author {
     opacity: 1;
     clip-path: none;
