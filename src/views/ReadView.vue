@@ -118,7 +118,7 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import AppIcon from "../components/AppIcon.vue";
 import ExcerptCard from "../components/ExcerptCard.vue";
 import { readStore, writeStore } from "../services/browserStore.js";
@@ -248,8 +248,11 @@ const nextPoem = () => {
 
 const beginExcerptTurn = () => {
   if (excerptStatus.value === "loading" || pendingExcerpt) return;
+  if (!nextExcerpt.value) {
+    prepareNextExcerpt();
+    return;
+  }
   const prepared = nextExcerpt.value;
-  if (!prepared) return;
   pendingExcerpt = {
     decorated: prepared,
     source: nextExcerptSource.value,
@@ -316,6 +319,10 @@ onMounted(() => {
   loadExcerpt().finally(() => {
     if (excerpt.value && !nextExcerpt.value) prepareNextExcerpt();
   });
+});
+
+watch(excerpt, () => {
+  if (excerpt.value && !nextExcerpt.value && !pendingExcerpt) prepareNextExcerpt();
 });
 onBeforeUnmount(() => {
   window.clearTimeout(switchTimer);

@@ -353,3 +353,9 @@
 - 本轮删除当前卡的隐藏与 `transform: none !important`，只保留 `transition: none !important`；提交前读取当前卡实际 `computed transform` 作为动画首帧，`element.animate()` 同步创建且不等待 `nextTick`。动画期间继续复用当前真实 DOM，不再使用 outgoing 快照；保留拖动开始时的 current/incoming/saved 冻结，确保动画中的文本与收藏角标不受父级后续更新影响。`finished` 后先 `emit("settled")` 让父级静默交换当前句、`await nextTick()` 完成文本更新，再取消动画、清除定时器并回写状态。提交入口先启动动画再切换 `is-committing`，避免 CSS 提交态抢在 WAAPI 前生效；`clearTimers()` 统一取消活跃动画，卸载或新提交不会留下旧动画。
 - 对照探针：旧尾帧 37 个事件，含 `legacy-card__box--current` remove/add、诗句与作者 remove/add 和约 12 次 style 写入；修复后 26 个事件、无卡面重建，诗句/作者仅在既有的下一张预取卡上更新。状态探针在 0/40/80/350/460ms 连续读到递增的飞离矩阵，480ms 后动画数归零并恢复 `none`。连续录屏 40 帧覆盖 2–643ms、没有超过 60ms 的空档。
 - Browser E2E 改为断言当前卡唯一 460ms WAAPI 动画与实时 `transform`、飞出中 hover lock、落定后诗句等于预取句且诗句透明度恢复 1。`git diff --check`、lint、39 项单测、build、本地资源 smoke、音频校验和完整 Browser E2E 均通过，CLS 0.0000、控制台/网络错误 0；历史白色卡构图、静默预取、触屏/按钮/键盘入口与减少动效回退保持不变。
+
+## 摘录卡纸幕覆写重构 — 2026-11-13 01:25 CST
+
+- 用户反馈继续卡顿，明确要求不要当前飞出效果、完全换一种机制。本轮不再修飞出动画，而是删除整个 outgoing/预渲染 incoming/WAAPI 整卡飞离链路，改为单层真实卡 + 轻量纸幕覆写：拖动阶段只让真实卡做小角度跟手，松手达到条件后 150ms 白色纸幕覆盖，覆盖期间静默交换当前句，再用 220ms 淡出露出新句。纸幕只有纯色/细线/短笔痕，没有 3D 旋转、粒子、逐字滤镜或大位移。
+- 同步简化 `ReadView`：新增 `watch(excerpt)` 兜底预取下一句，避免新机制下纸幕覆盖期间无预取导致空翻；`beginExcerptTurn` 在没有预取时只触发准备，不修改当前数据。Browser E2E 改为验证纸幕初始隐藏、拖动跟手、唯一覆写动画、当前句在覆盖前不变、最终句等于预取句、纸幕透明度归零与 hover lock 收束；保留鼠标、触屏、按钮、键盘、静默换句与移动端断言。
+- CDP 尾帧事件从上一版 26 次降到 14 次，连续录屏 33 帧覆盖 8–564ms、无超过 60ms 空档。`git diff --check`、lint、39 项单测、build、本地资源 smoke、音频校验和完整 Browser E2E 通过，CLS 0.0000、控制台/网络错误 0。历史白色卡构图、收藏角标、竖排诗句、扇舟图与减少动效回退不变；未执行外部宣发或付费推广。
