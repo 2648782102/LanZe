@@ -19,6 +19,7 @@
           :key="`${character}-${characterIndex}`"
           class="legacy-card__glyph"
           :data-char="character"
+          :style="{ '--glyph-index': characterIndex }"
         >{{ character }}</span>
       </template>
       <template v-else>{{ excerpt.content }}</template>
@@ -237,90 +238,50 @@ const handleSave = () => {
 }
 
 .legacy-card__verse--ink {
-  --ink-duration: 180ms;
+  --ink-duration: 260ms;
   opacity: 1;
-  clip-path: inset(0 0 100% 0);
-  filter: blur(1.6px);
-  transform: translate3d(-0.08em, 0.12em, 0) rotate(-1.5deg) scale(0.96);
-  transform-origin: 50% 100%;
+  clip-path: none;
+  filter: none;
+  transform: none;
   transition: none;
-  will-change: clip-path, opacity, filter, transform;
 }
 
 .legacy-card.is-committing .legacy-card__box--incoming .legacy-card__verse--ink {
-  animation: brush-write var(--ink-duration) cubic-bezier(0.18, 0.62, 0.3, 1) both;
+  animation: none;
+}
+
+.legacy-card.is-committing .legacy-card__box--incoming .legacy-card__glyph {
+  animation: brush-write var(--ink-duration) cubic-bezier(0.22, 0.72, 0.18, 1) both;
+  animation-delay: calc(var(--glyph-index) * 18ms);
 }
 
 .legacy-card__box--incoming .legacy-card__author {
   opacity: 0;
-  filter: blur(2px);
-  transform: translateY(-5px);
   transition: none;
 }
 
 .legacy-card.is-committing .legacy-card__box--incoming .legacy-card__author {
-  animation: brush-fade var(--author-duration) cubic-bezier(0.22, 0.61, 0.36, 1) var(--author-delay) both;
+  animation: brush-fade 240ms cubic-bezier(0.22, 0.72, 0.18, 1) 220ms both;
 }
 
 @keyframes brush-write {
   0% {
     opacity: 0;
-    clip-path: inset(0 0 100% 0);
-    filter: blur(2.8px);
-    text-shadow: 0 0 0 rgba(22, 44, 43, 0);
-    transform: translate3d(-0.12em, 0.18em, 0) rotate(-2deg) scale(0.92);
-  }
-  35% {
-    opacity: 0.72;
-    clip-path: inset(0 0 52% 0);
-    filter: blur(1.5px);
-    text-shadow: 0 0 2px rgba(22, 44, 43, 0.34);
-  }
-  72% {
-    opacity: 0.94;
-    clip-path: inset(0 0 12% 0);
-    filter: blur(0.55px);
-    text-shadow: 0 0 3px rgba(22, 44, 43, 0.2);
+    transform: translate3d(-0.06em, 0.08em, 0);
   }
   100% {
     opacity: 1;
-    clip-path: inset(0 0 0 0);
-    filter: blur(0);
-    text-shadow: 0 0 0 rgba(22, 44, 43, 0);
-    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
-  }
-}
-
-@keyframes ink-bleed {
-  0% {
-    opacity: 0;
-    clip-path: inset(0 0 100% 0);
-    transform: translate3d(0.04em, -0.02em, 0);
-  }
-  35% {
-    opacity: 0.34;
-    clip-path: inset(0 0 48% 0);
-  }
-  72% {
-    opacity: 0.18;
-    clip-path: inset(0 0 8% 0);
-  }
-  100% {
-    opacity: 0;
-    clip-path: inset(0 0 0 0);
-    transform: translate3d(-0.03em, 0.02em, 0);
+    transform: translate3d(0, 0, 0);
   }
 }
 
 @keyframes brush-fade {
   from {
     opacity: 0;
-    filter: blur(2px);
     transform: translateY(-5px);
   }
   to {
     opacity: 1;
-    filter: blur(0);
     transform: translateY(0);
   }
 }
@@ -330,6 +291,7 @@ const handleSave = () => {
   .legacy-card__box::after,
   .legacy-card__save,
   .legacy-card__verse--ink,
+  .legacy-card__glyph,
   .legacy-card__box--incoming .legacy-card__author {
     animation: none !important;
     transition: none !important;
@@ -340,6 +302,7 @@ const handleSave = () => {
   }
 
   .legacy-card__verse--ink,
+  .legacy-card__glyph,
   .legacy-card__box--incoming .legacy-card__author {
     opacity: 1;
     clip-path: none;

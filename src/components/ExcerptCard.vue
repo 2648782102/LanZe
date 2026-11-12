@@ -53,14 +53,15 @@
         :excerpt="outgoingExcerpt"
         :saved="outgoingSaved"
       />
-      <div v-if="isCommitting" class="legacy-card__dust" aria-hidden="true">
-        <span
-          v-for="particle in particles"
-          :key="particle.id"
-          class="legacy-card__pixel"
-          :style="particle"
-        />
-      </div>
+      <div
+        v-if="isCommitting"
+        class="legacy-card__shatter"
+        :style="{
+          '--shatter-x': direction === 'left' ? '-140px' : '140px',
+          '--shatter-y': '-70px',
+        }"
+        aria-hidden="true"
+      />
     </div>
   </article>
 </template>
@@ -78,8 +79,8 @@ const props = defineProps({
 });
 const emit = defineEmits(["toggle-save", "needs-next", "turn", "settled"]);
 
-const TURN_DURATION = 560;
-const INK_WINDOW = 180;
+const TURN_DURATION = 520;
+const INK_WINDOW = 240;
 const isDragging = ref(false);
 const isReturning = ref(false);
 const isCommitting = ref(false);
@@ -98,7 +99,7 @@ const frozenIncoming = ref(null);
 const frozenIncomingSaved = ref(false);
 const initialMotion = {
   duration: TURN_DURATION + INK_WINDOW,
-  ease: "linear",
+  ease: "cubic-bezier(0.22, 0.72, 0.18, 1)",
   exitX: "0px",
   exitXEarly: "0px",
   exitXMid: "0px",
@@ -131,11 +132,6 @@ let hoverReleased = false;
 const cardElement = ref(null);
 const outgoingElement = ref(null);
 
-const particleSeed = (value) => {
-  const wave = Math.sin(value * 12.9898) * 43758.5453;
-  return wave - Math.floor(wave);
-};
-
 const cardStyle = computed(() => ({
   "--drag-x": `${dragOffset.value.x}px`,
   "--drag-y": `${dragOffset.value.y}px`,
@@ -162,8 +158,6 @@ const cardStyle = computed(() => ({
   "--exit-rot-late": releaseMotion.value.exitRotLate,
   "--exit-rot-y": releaseMotion.value.exitRotY,
   "--ink-window": `${inkWindow.value}ms`,
-  "--author-duration": `${Math.min(220, Math.max(90, Math.round(inkWindow.value * 0.4)))}ms`,
-  "--author-delay": `${Math.round(inkWindow.value * 0.32)}ms`,
 }));
 
 const incomingExcerpt = computed(() => props.nextExcerpt || props.excerpt);
@@ -181,50 +175,6 @@ const incomingPrepared = computed(() => {
   const candidate = frozenIncoming.value || props.nextExcerpt;
   return Boolean(candidate && candidate.content !== visibleCurrent.value?.content);
 });
-
-const particleColumns = 8;
-const particleRows = 12;
-const particleDelays = computed(() => {
-  const active = 64;
-  return Array.from({ length: particleColumns * particleRows }, (_, index) => {
-    const column = index % particleColumns;
-    const row = Math.floor(index / particleColumns);
-    const scatter = particleSeed(index + 11);
-    return Math.round((column * 5 + row * 7 + Math.floor(scatter * 30)) % active);
-  });
-});
-const particles = computed(() => Array.from({ length: particleColumns * particleRows }, (_, index) => {
-  const column = index % particleColumns;
-  const row = Math.floor(index / particleColumns);
-  const scatter = particleSeed(index + 11);
-  const drift = particleSeed(index + 29);
-  const spin = particleSeed(index + 47);
-  const toneSeed = particleSeed(index + 91);
-  const sign = direction.value === "left" ? -1 : 1;
-  let pixelColor = "rgba(255, 255, 255, 0.96)";
-  if (row > 5 && row < 14 && column > 1 && column < 9 && toneSeed > 0.78) {
-    pixelColor = "rgba(22, 44, 43, 0.82)";
-  } else if (row > 12 && toneSeed > 0.72) {
-    pixelColor = "rgba(81, 122, 112, 0.58)";
-  } else if (row < 3 && column < 3 && toneSeed > 0.84) {
-    pixelColor = "rgba(161, 65, 52, 0.72)";
-  } else if (toneSeed > 0.9) {
-    pixelColor = "rgba(232, 236, 229, 0.9)";
-  }
-  return {
-    id: index,
-    "--px": `${column / particleColumns * 100}%`,
-    "--py": `${row / particleRows * 100}%`,
-    "--pw": `${100 / particleColumns}%`,
-    "--ph": `${100 / particleRows}%`,
-    "--dx": `${Math.round(sign * (28 + column * 7) + (scatter - 0.5) * 80)}px`,
-    "--dy": `${Math.round(-40 - row * 3 + (drift - 0.5) * 100)}px`,
-    "--rot": `${Math.round((spin - 0.5) * 80)}deg`,
-    "--delay": `${particleDelays.value[index]}ms`,
-    "--pixel-color": pixelColor,
-    "--pixel-opacity": (0.42 + particleSeed(index + 37) * 0.55).toFixed(2),
-  };
-}));
 
 const clamp = (value, minimum, maximum) => Math.max(minimum, Math.min(maximum, value));
 const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -328,13 +278,13 @@ const startCommit = (turnDirection) => {
   )));
   const reduced = reducedMotion();
   const startDelay = reduced ? 0 : INK_WINDOW;
-  const duration = reduced ? 0 : TURN_DURATION + startDelay;
+  const duration = reduced ? 0 : TURN_DURATION;
   const verticalLift = -Math.round(24 + exitDistance * 0.06);
   const rotation = Math.min(24, 10 + rawVelocity * 0.004);
   const signed = (value) => sign * Math.round(value);
   releaseMotion.value = {
     duration,
-    ease: "linear",
+    ease: "cubic-bezier(0.22, 0.72, 0.18, 1)",
     exitX: `${signed(exitDistance)}px`,
     exitXEarly: `${signed(exitDistance * 0.35)}px`,
     exitXMid: `${signed(exitDistance * 0.72)}px`,
@@ -368,7 +318,7 @@ const startCommit = (turnDirection) => {
   emit("turn", turnDirection);
   commitTimer = window.setTimeout(() => {
     if (id === turnId && isCommitting.value) finishTurn();
-  }, duration + 20);
+  }, duration + startDelay + 20);
   observeOutgoingAnimation(id);
 };
 
@@ -763,44 +713,27 @@ onBeforeUnmount(() => {
   pointer-events: none;
 }
 
-.legacy-card__pixel {
-  position: absolute;
-  top: var(--py);
-  left: var(--px);
-  width: var(--pw);
-  height: var(--ph);
-  pointer-events: none;
-}
-
-.legacy-card__pixel::before,
-.legacy-card__pixel::after {
+.legacy-card__shatter {
   position: absolute;
   inset: 0;
-  display: block;
-  content: "";
-  transform-origin: center;
-}
-
-.legacy-card__pixel::before {
-  background: var(--porcelain);
-  opacity: 0.96;
-  transform: scale(1.04);
-}
-
-.legacy-card__pixel::after {
-  background: var(--pixel-color);
+  z-index: 4;
   opacity: 0;
-  will-change: transform, opacity;
+  background-image:
+    linear-gradient(90deg, transparent 0 19%, rgba(22, 44, 43, 0.14) 19.4% 20%, transparent 20.4% 100%),
+    linear-gradient(0deg, transparent 0 31%, rgba(22, 44, 43, 0.11) 31.4% 32%, transparent 32.4% 100%),
+    linear-gradient(90deg, transparent 0 60%, rgba(161, 65, 52, 0.1) 60.4% 61%, transparent 61.4% 100%),
+    linear-gradient(0deg, transparent 0 72%, rgba(22, 44, 43, 0.09) 72.4% 73%, transparent 73.4% 100%);
+  clip-path: polygon(0 0, 100% 0, 100% 38%, 62% 34%, 68% 66%, 31% 61%, 36% 100%, 0 100%);
+  transform-origin: 50% 50%;
+  pointer-events: none;
 }
 
 .legacy-card.is-committing .legacy-card__outgoing {
   animation: card-out var(--exit-duration) var(--exit-ease) var(--ink-window) both;
 }
 
-.legacy-card.is-committing .legacy-card__pixel::after {
-  animation:
-    pixel-fly calc(var(--exit-duration) - 90ms) var(--exit-ease)
-    calc(var(--ink-window) + var(--delay)) both;
+.legacy-card.is-committing .legacy-card__shatter {
+  animation: paper-shatter var(--exit-duration) var(--exit-ease) var(--ink-window) both;
 }
 
 @keyframes card-out {
@@ -811,51 +744,52 @@ onBeforeUnmount(() => {
   28% {
     opacity: 1;
     transform:
-      translate3d(calc(var(--drag-x) + var(--exit-x-early)), calc(var(--drag-y) + var(--exit-y-early)), 68px)
+      translate3d(calc(var(--drag-x) + var(--exit-x-early)), calc(var(--drag-y) + var(--exit-y-early)), 24px)
       rotateZ(calc(var(--drag-turn) + var(--exit-rot-early)))
       rotateY(var(--exit-rot-y))
-      rotateX(4deg);
+      rotateX(2deg)
+      scale(1.015);
   }
   62% {
-    opacity: 0.82;
+    opacity: 0.92;
     transform:
-      translate3d(calc(var(--drag-x) + var(--exit-x-mid)), calc(var(--drag-y) + var(--exit-y-mid)), 112px)
+      translate3d(calc(var(--drag-x) + var(--exit-x-mid)), calc(var(--drag-y) + var(--exit-y-mid)), 56px)
       rotateZ(calc(var(--drag-turn) + var(--exit-rot-mid)))
       rotateY(var(--exit-rot-y))
-      rotateX(8deg)
-      scale(0.97);
+      rotateX(5deg)
+      scale(1.02);
   }
   88% {
-    opacity: 0.36;
+    opacity: 0.48;
     transform:
-      translate3d(calc(var(--drag-x) + var(--exit-x-late)), calc(var(--drag-y) + var(--exit-y-late)), 142px)
+      translate3d(calc(var(--drag-x) + var(--exit-x-late)), calc(var(--drag-y) + var(--exit-y-late)), 86px)
       rotateZ(calc(var(--drag-turn) + var(--exit-rot-late)))
       rotateY(var(--exit-rot-y))
-      rotateX(11deg)
-      scale(0.92);
+      rotateX(8deg)
+      scale(0.98);
   }
   100% {
     opacity: 0;
     transform:
-      translate3d(calc(var(--drag-x) + var(--exit-x)), calc(var(--drag-y) + var(--exit-y)), 154px)
+      translate3d(calc(var(--drag-x) + var(--exit-x)), calc(var(--drag-y) + var(--exit-y)), 108px)
       rotateZ(calc(var(--drag-turn) + var(--exit-rot)))
       rotateY(var(--exit-rot-y))
-      rotateX(12deg)
-      scale(0.88);
+      rotateX(10deg)
+      scale(0.94);
   }
 }
 
-@keyframes pixel-fly {
+@keyframes paper-shatter {
   0% {
-    opacity: var(--pixel-opacity);
-    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.96);
   }
-  18% {
-    opacity: var(--pixel-opacity);
+  38% {
+    opacity: 0.72;
   }
   100% {
     opacity: 0;
-    transform: translate3d(var(--dx), var(--dy), 0) rotate(var(--rot)) scale(0.18);
+    transform: translate3d(var(--shatter-x), var(--shatter-y), 0) rotate(7deg) scale(1.08);
   }
 }
 
@@ -868,7 +802,7 @@ onBeforeUnmount(() => {
 
 @media (prefers-reduced-motion: reduce) {
   .legacy-card__outgoing,
-  .legacy-card__dust {
+  .legacy-card__shatter {
     display: none;
   }
 
@@ -886,7 +820,7 @@ onBeforeUnmount(() => {
   .legacy-card__box::after,
   .legacy-card__save,
   .legacy-card__hint,
-  .legacy-card__pixel::after {
+  .legacy-card__shatter {
     animation: none !important;
     transition: none !important;
   }

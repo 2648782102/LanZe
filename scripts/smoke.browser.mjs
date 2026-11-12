@@ -614,60 +614,51 @@ const main = async () => {
     const card = document.querySelector('.legacy-card');
     const outgoing = card?.querySelector('.legacy-card__outgoing');
     const incoming = card?.querySelector('.legacy-card__box--incoming');
-    const verse = incoming?.querySelector('.legacy-card__verse--ink');
-    const style = verse ? getComputedStyle(verse) : null;
+    const glyph = incoming?.querySelector('.legacy-card__glyph');
+    const style = glyph ? getComputedStyle(glyph) : null;
     return {
       isCommitting: Boolean(card?.classList.contains('is-committing')),
       inkAnimation: style?.animationName || '',
-      inkClip: style?.clipPath || '',
+      inkOpacity: style?.opacity || '',
       outgoingAnimation: outgoing ? getComputedStyle(outgoing).animationPlayState : 'idle',
       outgoingDelay: outgoing ? getComputedStyle(outgoing).animationDelay : '0s',
     };
   })()`);
   pointerDrag.inkLeadsFlight = inkLeadFrame.isCommitting
     && inkLeadFrame.inkAnimation.includes('brush-write')
-    && inkLeadFrame.inkClip !== 'none'
+    && Number.parseFloat(inkLeadFrame.inkOpacity || '0') >= 0
     && Number.parseFloat(inkLeadFrame.outgoingDelay || '0') > 0;
   const commitFrame = await evaluate(`(() => {
     const card = document.querySelector('.legacy-card');
     const outgoing = card?.querySelector('.legacy-card__outgoing');
-    const pixels = [...(card?.querySelectorAll('.legacy-card__pixel') || [])];
-    const flying = pixels.filter((pixel) => {
-      const style = getComputedStyle(pixel, '::after');
-      return style.animationName.includes('pixel-fly') && Number(style.opacity) > 0;
-    });
-    const holeAnimations = pixels.filter((pixel) => {
-      const style = getComputedStyle(pixel, '::before');
-      return style.animationName !== 'none';
-    }).length;
+    const shatter = card?.querySelector('.legacy-card__shatter');
+    const shatterStyle = shatter ? getComputedStyle(shatter) : null;
     const incoming = card?.querySelector('.legacy-card__box--incoming');
-    const ink = incoming?.querySelector('.legacy-card__verse--ink');
+    const ink = incoming?.querySelector('.legacy-card__glyph');
     const inkStyle = ink ? getComputedStyle(ink) : null;
     return {
       isCommitting: Boolean(card?.classList.contains('is-committing')),
       outgoingTransform: outgoing ? getComputedStyle(outgoing).transform : 'none',
       exitDuration: card?.style.getPropertyValue('--exit-duration') || '',
-      pixelCount: pixels.length,
-      flyingPixels: flying.length,
-      pixelHoleAnimations: holeAnimations,
+      shatterAnimation: shatterStyle?.animationName || '',
+      shatterClip: shatterStyle?.clipPath || '',
       hoverLocked: Boolean(card?.classList.contains('is-hover-locked')),
       incomingTransform: incoming ? getComputedStyle(incoming).transform : 'none',
       incomingVerse: incoming?.querySelector('.legacy-card__verse')?.textContent?.trim() || '',
       brushAnimation: inkStyle?.animationName || '',
-      brushClip: inkStyle?.clipPath || '',
+      brushOpacity: inkStyle?.opacity || '',
     };
   })()`);
   pointerDrag.committedOnRelease = commitFrame.isCommitting;
-  pointerDrag.pixelDisintegration = commitFrame.pixelCount === 96
-    && commitFrame.flyingPixels > 12
-    && commitFrame.pixelHoleAnimations === 0
+  pointerDrag.paperShatter = commitFrame.shatterAnimation.includes('paper-shatter')
+    && commitFrame.shatterClip.startsWith('polygon')
     && commitFrame.hoverLocked
     && commitFrame.outgoingTransform !== 'none';
   pointerDrag.incomingStill = commitFrame.incomingTransform === 'none'
     && commitFrame.incomingVerse === incomingBeforeDrag;
   pointerDrag.brushWriting = commitFrame.brushAnimation.includes('brush-write')
-    && commitFrame.brushClip !== 'none';
-  pointerDrag.momentumDuration = Number.parseInt(commitFrame.exitDuration, 10) === 740;
+    && Number.parseFloat(commitFrame.brushOpacity || '0') >= 0;
+  pointerDrag.momentumDuration = Number.parseInt(commitFrame.exitDuration, 10) === 520;
   const midTurnFrame = await evaluate(`(() => {
     const card = document.querySelector('.legacy-card');
     const incoming = card?.querySelector('.legacy-card__box--incoming');
@@ -698,7 +689,7 @@ const main = async () => {
   if (!pointerDrag.isDragging || pointerDrag.lifted === "none" || pointerDrag.offset < 10
     || pointerDrag.incomingOpacity <= 0 || !pointerDrag.incomingVerse
     || pointerDrag.touchAction !== "none" || !pointerDrag.gradualProgress
-    || !pointerDrag.committedOnRelease || !pointerDrag.pixelDisintegration
+    || !pointerDrag.committedOnRelease || !pointerDrag.paperShatter
     || !pointerDrag.incomingStill || !pointerDrag.brushWriting
     || !pointerDrag.momentumDuration || !pointerDrag.silentIncoming
     || !pointerDrag.hoverLockSettled || !pointerDrag.inkLeadsFlight) {
