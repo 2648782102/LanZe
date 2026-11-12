@@ -365,3 +365,8 @@
 - 用户明确指出「越改越乱」，要求清理卡片拖拽与切换动画，并补充澄清：只移除拖拽和切换动效，保留历史光泽动画与 hover 过渡。本轮把 `ExcerptCard.vue` 收束为纯静态展示：不再监听 Pointer Events，不再维护 dragging/committing/turning/hover-lock 状态，不再渲染纸幕层、预取卡或任何 WAAPI/CSS 切换动画。
 - 卡片现在是语义化 button：点击卡片或按 Enter/Space 会同步发出 `needs-next`、`turn`、`settled`，父级立即换句；收藏按钮继续独立触发 `@toggle-save`，不会冒泡换句。视觉上保留 `ExcerptCardFace.vue` 中的历史白色卡构图、悬浮高光、光泽扫过与 hover 过渡；`prefers-reduced-motion` 只关闭过渡，不影响切换。
 - Browser E2E 改为验证静态卡面、无拖拽/纸幕层、点击换句、按钮续换、收藏持久化与桌面/移动端布局；不再断言拖拽跟手、飞出时长、hover lock 或动画帧。`git diff --check`、lint、39 项单测、build、本地资源 smoke、音频校验和完整 Browser E2E 通过，CLS 0.0000、控制台/网络错误 0。未执行外部宣发或付费推广。
+
+## 摘录卡换墨切换动画 — 2026-11-13 01:50 CST
+
+- 用户要求在保留静态点击与历史视觉的前提下，重新加入由我决定的切换动画。选择「换墨」：只动画化诗句与作者文字层，120ms 淡出上移、静默换句、260ms 淡入落位。没有拖拽、纸幕、飞出、粒子、整卡位移或滤镜；卡面、收藏角标、扇舟图与 hover 光泽都保持静态或只保留原有悬停行为。
+- `ExcerptCard.vue` 用 `is-exchanging` 驱动 CSS 变量，并在淡出结束后先发出 `settled` 让父级更新数据，再把本地显示切到已预取诗句。`prefers-reduced-motion` 直接换句；无预取句时也直接换句，不卡住交互。Browser E2E 改为覆盖连续点击换句与无纸幕/无拖拽层。完整质量门通过后提交。

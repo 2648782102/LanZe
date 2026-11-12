@@ -550,21 +550,19 @@ const main = async () => {
   if (!staticTurn) throw new Error("Clicking the static excerpt card did not change the verse");
   await evaluate("document.querySelector('.legacy-card')?.blur(); window.scrollTo({ top: 0, behavior: 'instant' })");
   await waitUntil("page scroll reset after static turn", () => evaluate("scrollY === 0"));
-  if (!await evaluate(`(() => {
-    const button = [...document.querySelectorAll('button')].find((node) => (node.innerText || '').includes('换一句'));
-    if (!button || button.disabled) return false;
-    button.click();
-    return true;
-  })()`)) throw new Error("Excerpt rotation control was not found");
-  const rotatedExcerpts = await waitUntil("rotated historical excerpt", () => evaluate(`
+  const secondStaticExcerpt = await waitUntil("second static excerpt click turn", () => evaluate(`
     (() => {
-      const button = [...document.querySelectorAll('button')].find((node) => (node.innerText || '').includes('换一句'));
       const card = document.querySelector('.legacy-card');
-      const verse = card?.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim();
-      return Boolean(verse) && verse !== ${JSON.stringify(String(staticTurn || ""))} && button && !button.disabled;
+      const verse = card?.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim() || '';
+      if (verse && verse !== ${JSON.stringify(String(staticTurn || ""))}) return verse;
+      if (!card?.classList.contains('is-exchanging')) card?.click();
+      return false;
     })()
   `), 60);
-  if (!rotatedExcerpts) throw new Error("Historical excerpt card did not rotate");
+  if (!secondStaticExcerpt) throw new Error("Second click on the excerpt card did not change the verse");
+  await evaluate("window.scrollTo({ top: 0, behavior: 'instant' })");
+  await waitUntil("page scroll reset", () => evaluate("scrollY === 0"));
+
   await evaluate("window.scrollTo({ top: 0, behavior: 'instant' })");
   await waitUntil("page scroll reset", () => evaluate("scrollY === 0"));
 
