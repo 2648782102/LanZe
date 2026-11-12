@@ -469,15 +469,14 @@ const main = async () => {
     const card = document.querySelector('.legacy-card');
     return Boolean(card?.getAttribute('tabindex') === '0' && !card.querySelector('.legacy-card__turn'));
   })()`)) {
-    throw new Error("Excerpt card does not expose its drag and keyboard affordance");
+    throw new Error("Excerpt card does not expose its click and keyboard affordance");
   }
   if (!await evaluate(`(() => {
     const card = document.querySelector('.legacy-card');
-    const veil = card?.querySelector('.legacy-card__veil');
     const current = card?.querySelector('.legacy-card__box--current');
-    return veil && current && Number(getComputedStyle(veil).opacity) === 0;
+    return Boolean(current && !card.querySelector('.legacy-card__veil') && !card.classList.contains('is-dragging'));
   })()`)) {
-    throw new Error("Excerpt veil must stay hidden until the turn is committed");
+    throw new Error("Excerpt card must be static without drag or veil layers");
   }
   const firstExcerpt = excerptCards.firstVerse;
   const dockLayout = await evaluate(`(() => {
@@ -526,7 +525,7 @@ const main = async () => {
     }
   })()`));
   if (!savedExcerpt) throw new Error("Saving an excerpt did not persist locally");
-  currentStep = "draggable excerpt card";
+  currentStep = "static excerpt card";
   await evaluate(`(() => {
     const card = document.querySelector('.legacy-card');
     if (card) card.scrollIntoView({ block: 'start', behavior: 'instant' });
@@ -536,191 +535,21 @@ const main = async () => {
     const rect = document.querySelector('.legacy-card')?.getBoundingClientRect();
     return Boolean(rect && rect.top >= 0 && rect.top < innerHeight - 180);
   })()`));
-  const dragOrigin = await evaluate(`(() => {
-    const rect = document.querySelector('.legacy-card')?.getBoundingClientRect();
-    return rect ? { x: Math.round(rect.left + rect.width / 2), y: Math.round(rect.top + Math.min(rect.height / 3, 180)) } : null;
-  })()`);
-  if (!dragOrigin) throw new Error("Excerpt card was not available for pointer dragging");
-  await waitUntil("excerpt card settled before preparation", () => evaluate(`
-    Boolean(document.querySelector('.legacy-card')) && !document.querySelector('.legacy-card')?.classList.contains('is-turning')
-  `), 32);
-  const currentBeforeDrag = await evaluate(
+  const firstStaticExcerpt = await evaluate(
     "document.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim() || ''",
   );
-  const incomingBeforeDrag = await waitUntil("next excerpt prepared", () => evaluate(`
-    (() => {
-      const button = [...document.querySelectorAll('button')].find((node) => (node.innerText || '').includes('换一句'));
-      if (!button || button.disabled) return false;
-      const verse = document.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim() || '';
-      const source = document.querySelector('.legacy-card__box--current')?.dataset?.incomingVerse;
-      return source || (verse && verse !== ${JSON.stringify(currentBeforeDrag)} ? verse : false);
-    })()
-  `), 32);
-  await send("Input.dispatchMouseEvent", {
-    type: "mousePressed",
-    x: dragOrigin.x,
-    y: dragOrigin.y,
-    button: "left",
-    buttons: 1,
-    clickCount: 1,
-  });
-  await send("Input.dispatchMouseEvent", {
-    type: "mouseMoved",
-    x: dragOrigin.x + 18,
-    y: dragOrigin.y - 8,
-    button: "left",
-    buttons: 1,
-  });
-  await delay(40);
-  const pointerDrag = await evaluate(`(() => {
-    const card = document.querySelector('.legacy-card');
-    const stage = card?.querySelector('.legacy-card__stage');
-    const veil = card?.querySelector('.legacy-card__veil');
-    const stageRect = stage?.getBoundingClientRect();
-    const cardRect = card?.getBoundingClientRect();
-    return {
-      isDragging: Boolean(card?.classList.contains('is-dragging')),
-      lifted: stage ? getComputedStyle(stage).transform : 'none',
-      offset: stageRect && cardRect ? Math.round(stageRect.left - cardRect.left) : 0,
-      veilOpacity: veil ? Number(getComputedStyle(veil).opacity) : -1,
-      touchAction: card ? getComputedStyle(card).touchAction : '',
-    };
-  })()`);
-  await send("Input.dispatchMouseEvent", {
-    type: "mouseMoved",
-    x: dragOrigin.x + 72,
-    y: dragOrigin.y - 34,
-    button: "left",
-    buttons: 1,
-  });
-  const turnFrame = await evaluate(`(() => {
-    const card = document.querySelector('.legacy-card');
-    const stage = card?.querySelector('.legacy-card__stage');
-    const cardRect = card?.getBoundingClientRect();
-    const stageRect = stage?.getBoundingClientRect();
-    return {
-      isTurning: Boolean(card?.classList.contains('is-turning')),
-      isDragging: Boolean(card?.classList.contains('is-dragging')),
-      offset: cardRect && stageRect ? Math.round(stageRect.left - cardRect.left) : 0,
-      progress: Number(card?.style.getPropertyValue('--progress') || 0),
-      transform: stage ? getComputedStyle(stage).transform : 'none',
-    };
-  })()`);
-  pointerDrag.gradualProgress = turnFrame.isDragging && !turnFrame.isTurning
-    && turnFrame.progress > 0.3 && turnFrame.transform !== 'none';
-
-  await send("Input.dispatchMouseEvent", {
-    type: "mouseReleased",
-    x: dragOrigin.x + 72,
-    y: dragOrigin.y - 34,
-    button: "left",
-    buttons: 0,
-    clickCount: 1,
-  });
-  await delay(40);
-  const commitFrame = await evaluate(`(() => {
-    const card = document.querySelector('.legacy-card');
-    const veil = card?.querySelector('.legacy-card__veil');
-    return {
-      isCommitting: Boolean(card?.classList.contains('is-committing')),
-      exitDuration: card?.style.getPropertyValue('--cover-duration') || '',
-      veilAnimations: veil?.getAnimations?.().length || 0,
-      hoverLocked: Boolean(card?.classList.contains('is-hover-locked')),
-      verse: card?.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim() || '',
-    };
-  })()`);
-  pointerDrag.committedOnRelease = commitFrame.isCommitting;
-  pointerDrag.singleVeil = commitFrame.veilAnimations === 1;
-  pointerDrag.currentStill = commitFrame.verse === currentBeforeDrag;
-  pointerDrag.coverDuration = Number.parseInt(commitFrame.exitDuration, 10) === 150;
-  pointerDrag.finalFrame = await waitUntil("pointer excerpt settled", () => evaluate(`(() => {
-    const card = document.querySelector('.legacy-card');
-    const veil = card?.querySelector('.legacy-card__veil');
-    const current = card?.querySelector('.legacy-card__box--current');
-    const frame = {
-      hoverLocked: Boolean(card?.classList.contains('is-hover-locked')),
-      hovered: Boolean(card?.matches(':hover')),
-      isCommitting: Boolean(card?.classList.contains('is-committing')),
-      veilAnimations: veil?.getAnimations?.().length || 0,
-      veilOpacity: veil ? Number(getComputedStyle(veil).opacity) : -1,
-      currentVerse: current?.querySelector('.legacy-card__verse')?.textContent?.trim() || '',
-      verseOpacity: current?.querySelector('.legacy-card__verse')
-        ? Number(getComputedStyle(current.querySelector('.legacy-card__verse')).opacity) : 0,
-    };
-    return !frame.isCommitting && frame.veilAnimations === 0 ? frame : false;
-  })()`), 32);
-  pointerDrag.hoverLockDuringFlight = commitFrame.isCommitting
-    && commitFrame.veilAnimations === 1
-    && pointerDrag.finalFrame.hoverLocked
-    && pointerDrag.finalFrame.hovered;
-  pointerDrag.hoverLockSettled = pointerDrag.finalFrame.hoverLocked
-    && pointerDrag.finalFrame.hovered
-    && !pointerDrag.finalFrame.isCommitting
-    && pointerDrag.finalFrame.veilAnimations === 0
-    && pointerDrag.finalFrame.veilOpacity === 0
-    && pointerDrag.finalFrame.currentVerse === incomingBeforeDrag
-    && pointerDrag.finalFrame.verseOpacity > 0.99;
-  if (!pointerDrag.isDragging || pointerDrag.lifted === "none" || pointerDrag.offset < 10
-    || pointerDrag.veilOpacity !== 0 || pointerDrag.touchAction !== "none" || !pointerDrag.gradualProgress
-    || !pointerDrag.committedOnRelease || !pointerDrag.singleVeil || !pointerDrag.currentStill
-    || !pointerDrag.coverDuration || !pointerDrag.hoverLockDuringFlight || !pointerDrag.hoverLockSettled) {
-    throw new Error(`Dragging the excerpt card did not follow the pointer or turn early: ${JSON.stringify(pointerDrag)}`);
-  }
-  currentStep = "touch excerpt card";
-  await waitUntil("touch excerpt ready", () => evaluate(
-    "Boolean(document.querySelector('.legacy-card')) && !document.querySelector('.legacy-card')?.classList.contains('is-turning')",
-  ));
-  await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: 2, y: 2, button: "none", buttons: 0 });
-  const touchOrigin = await evaluate(`(() => {
-    const rect = document.querySelector('.legacy-card')?.getBoundingClientRect();
-    return rect ? { x: Math.round(rect.left + rect.width / 2), y: Math.round(rect.top + Math.min(rect.height / 3, 180)) } : null;
-  })()`);
-  if (!touchOrigin) throw new Error("Excerpt card was not available for touch dragging");
-  const touchVerse = await evaluate(`document.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim() || ''`);
-  await send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: touchOrigin.x, y: touchOrigin.y, id: 1 }] });
-  await send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: touchOrigin.x - 28, y: touchOrigin.y - 12, id: 1 }] });
-  await delay(40);
-  const touchDrag = await evaluate(`(() => {
-    const card = document.querySelector('.legacy-card');
-    const current = card?.querySelector('.legacy-card__box--current');
-    const currentRect = current?.getBoundingClientRect();
-    const cardRect = card?.getBoundingClientRect();
-    return {
-      isDragging: Boolean(card?.classList.contains('is-dragging')),
-      offset: currentRect && cardRect ? Math.round(currentRect.left - cardRect.left) : 0,
-    };
-  })()`);
-  await send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: touchOrigin.x - 78, y: touchOrigin.y - 28, id: 1 }] });
-  await send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
-  if (!touchDrag.isDragging || touchDrag.offset > -8) {
-    throw new Error(`Touch dragging did not move the excerpt card with the finger: ${JSON.stringify(touchDrag)}`);
-  }
-  await waitUntil("touch excerpt settled", () => evaluate(`
+  const staticTurn = await waitUntil("static excerpt click turn", () => evaluate(`
     (() => {
       const card = document.querySelector('.legacy-card');
-      const verse = card?.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim();
-      return Boolean(verse) && verse !== ${JSON.stringify(touchVerse)} && !card?.classList.contains('is-turning');
+      const verse = card?.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim() || '';
+      if (verse && verse !== ${JSON.stringify(firstStaticExcerpt)}) return verse;
+      card?.click();
+      return false;
     })()
-  `), 80);
-  const draggedExcerpt = await evaluate(
-    "document.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim() || ''",
-  );
-  const hoverUnlockFrame = await evaluate(`(() => {
-    const card = document.querySelector('.legacy-card');
-    return {
-      hoverLocked: Boolean(card?.classList.contains('is-hover-locked')),
-      hovered: Boolean(card?.matches(':hover')),
-    };
-  })()`);
-  pointerDrag.hoverUnlock = !hoverUnlockFrame.hoverLocked && !hoverUnlockFrame.hovered;
-  if (!draggedExcerpt || draggedExcerpt === firstExcerpt) {
-    throw new Error("Dragged historical excerpt did not settle on a new verse");
-  }
-  if (!pointerDrag.hoverUnlock) {
-    throw new Error(`Excerpt hover lock did not release after the pointer left: ${JSON.stringify(hoverUnlockFrame)}`);
-  }
+  `), 32);
+  if (!staticTurn) throw new Error("Clicking the static excerpt card did not change the verse");
   await evaluate("document.querySelector('.legacy-card')?.blur(); window.scrollTo({ top: 0, behavior: 'instant' })");
-  await waitUntil("page scroll reset after drag", () => evaluate("scrollY === 0"));
+  await waitUntil("page scroll reset after static turn", () => evaluate("scrollY === 0"));
   if (!await evaluate(`(() => {
     const button = [...document.querySelectorAll('button')].find((node) => (node.innerText || '').includes('换一句'));
     if (!button || button.disabled) return false;
@@ -732,8 +561,7 @@ const main = async () => {
       const button = [...document.querySelectorAll('button')].find((node) => (node.innerText || '').includes('换一句'));
       const card = document.querySelector('.legacy-card');
       const verse = card?.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim();
-      return Boolean(verse) && verse !== ${JSON.stringify(String(draggedExcerpt || ""))} && button && !button.disabled
-        && !card?.classList.contains('is-turning');
+      return Boolean(verse) && verse !== ${JSON.stringify(String(staticTurn || ""))} && button && !button.disabled;
     })()
   `), 60);
   if (!rotatedExcerpts) throw new Error("Historical excerpt card did not rotate");
