@@ -474,9 +474,10 @@ const main = async () => {
   if (!await evaluate(`(() => {
     const card = document.querySelector('.legacy-card');
     const current = card?.querySelector('.legacy-card__box--current');
-    return Boolean(current && !card.querySelector('.legacy-card__veil') && !card.classList.contains('is-dragging'));
+    const wash = card?.querySelector('.legacy-card__wash');
+    return Boolean(current && wash && !card.querySelector('.legacy-card__veil') && !card.classList.contains('is-dragging'));
   })()`)) {
-    throw new Error("Excerpt card must be static without drag or veil layers");
+    throw new Error("Excerpt card must be static with the ink wash layer");
   }
   const firstExcerpt = excerptCards.firstVerse;
   const dockLayout = await evaluate(`(() => {
@@ -538,16 +539,28 @@ const main = async () => {
   const firstStaticExcerpt = await evaluate(
     "document.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim() || ''",
   );
+  const washAnimation = await evaluate(`(async () => {
+    const card = document.querySelector('.legacy-card');
+    const wash = card?.querySelector('.legacy-card__wash-paper');
+    card?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    return {
+      exchanging: Boolean(card?.classList.contains('is-exchanging')),
+      washOpacity: wash ? Number(getComputedStyle(wash).opacity) : 0,
+      washShift: wash ? getComputedStyle(wash).transform : 'none',
+    };
+  })()`);
   const staticTurn = await waitUntil("static excerpt click turn", () => evaluate(`
     (() => {
       const card = document.querySelector('.legacy-card');
       const verse = card?.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim() || '';
-      if (verse && verse !== ${JSON.stringify(firstStaticExcerpt)}) return verse;
-      card?.click();
-      return false;
+      return verse && verse !== ${JSON.stringify(firstStaticExcerpt)} && !card?.classList.contains('is-exchanging') ? verse : false;
     })()
-  `), 32);
+  `), 60);
   if (!staticTurn) throw new Error("Clicking the static excerpt card did not change the verse");
+  if (!washAnimation.exchanging || washAnimation.washShift === 'none') {
+    throw new Error(`Ink wash transition did not start: ${JSON.stringify(washAnimation)}`);
+  }
   await evaluate("document.querySelector('.legacy-card')?.blur(); window.scrollTo({ top: 0, behavior: 'instant' })");
   await waitUntil("page scroll reset after static turn", () => evaluate("scrollY === 0"));
   const secondStaticExcerpt = await waitUntil("second static excerpt click turn", () => evaluate(`
@@ -560,9 +573,6 @@ const main = async () => {
     })()
   `), 60);
   if (!secondStaticExcerpt) throw new Error("Second click on the excerpt card did not change the verse");
-  await evaluate("window.scrollTo({ top: 0, behavior: 'instant' })");
-  await waitUntil("page scroll reset", () => evaluate("scrollY === 0"));
-
   await evaluate("window.scrollTo({ top: 0, behavior: 'instant' })");
   await waitUntil("page scroll reset", () => evaluate("scrollY === 0"));
 
