@@ -12,18 +12,7 @@
     >
       {{ saved ? "已藏" : "收藏" }}
     </component>
-    <p class="legacy-card__verse" :class="[verseDensity, { 'legacy-card__verse--ink': ink }]">
-      <template v-if="ink">
-        <span
-          v-for="(character, characterIndex) in characters"
-          :key="`${character}-${characterIndex}`"
-          class="legacy-card__glyph"
-          :data-char="character"
-          :style="{ '--glyph-index': characterIndex }"
-        >{{ character }}</span>
-      </template>
-      <template v-else>{{ excerpt.content }}</template>
-    </p>
+    <p class="legacy-card__verse" :class="verseDensity">{{ excerpt.content }}</p>
     <h5 class="legacy-card__author">— {{ excerpt.author }}</h5>
     <img
       class="legacy-card__art"
@@ -45,7 +34,6 @@ const props = defineProps({
   saved: { type: Boolean, default: false },
   variant: { type: String, required: true },
   interactive: { type: Boolean, default: false },
-  ink: { type: Boolean, default: false },
 });
 const emit = defineEmits(["toggle-save"]);
 
@@ -58,7 +46,6 @@ const densityFor = (content) => {
   return "legacy-card__verse--open";
 };
 const verseDensity = computed(() => densityFor(props.excerpt.content));
-const characters = computed(() => Array.from(props.excerpt?.content || ""));
 const handleSave = () => {
   if (props.interactive) emit("toggle-save");
 };
@@ -233,46 +220,13 @@ const handleSave = () => {
   pointer-events: none;
 }
 
-.legacy-card__glyph {
-  display: inline-block;
-}
-
-.legacy-card__verse--ink {
-  --ink-duration: 260ms;
-  opacity: 1;
-  clip-path: none;
-  filter: none;
-  transform: none;
-  transition: none;
-}
-
-.legacy-card.is-committing .legacy-card__box--incoming .legacy-card__verse--ink {
-  animation: none;
-}
-
-.legacy-card.is-committing .legacy-card__box--incoming .legacy-card__glyph {
-  animation: brush-write var(--ink-duration) cubic-bezier(0.22, 0.72, 0.18, 1) both;
-  animation-delay: calc(var(--glyph-index) * 18ms);
-}
-
 .legacy-card__box--incoming .legacy-card__author {
   opacity: 0;
   transition: none;
 }
 
 .legacy-card.is-committing .legacy-card__box--incoming .legacy-card__author {
-  animation: brush-fade 240ms cubic-bezier(0.22, 0.72, 0.18, 1) 220ms both;
-}
-
-@keyframes brush-write {
-  0% {
-    opacity: 0;
-    transform: translate3d(-0.06em, 0.08em, 0);
-  }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
+  animation: none;
 }
 
 @keyframes brush-fade {
@@ -290,8 +244,6 @@ const handleSave = () => {
   .legacy-card__box,
   .legacy-card__box::after,
   .legacy-card__save,
-  .legacy-card__verse--ink,
-  .legacy-card__glyph,
   .legacy-card__box--incoming .legacy-card__author {
     animation: none !important;
     transition: none !important;
@@ -301,8 +253,6 @@ const handleSave = () => {
     transform: none;
   }
 
-  .legacy-card__verse--ink,
-  .legacy-card__glyph,
   .legacy-card__box--incoming .legacy-card__author {
     opacity: 1;
     clip-path: none;

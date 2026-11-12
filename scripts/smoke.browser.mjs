@@ -610,55 +610,29 @@ const main = async () => {
     clickCount: 1,
   });
   await delay(80);
-  const inkLeadFrame = await evaluate(`(() => {
-    const card = document.querySelector('.legacy-card');
-    const outgoing = card?.querySelector('.legacy-card__outgoing');
-    const incoming = card?.querySelector('.legacy-card__box--incoming');
-    const glyph = incoming?.querySelector('.legacy-card__glyph');
-    const style = glyph ? getComputedStyle(glyph) : null;
-    return {
-      isCommitting: Boolean(card?.classList.contains('is-committing')),
-      inkAnimation: style?.animationName || '',
-      inkOpacity: style?.opacity || '',
-      outgoingAnimation: outgoing ? getComputedStyle(outgoing).animationPlayState : 'idle',
-      outgoingDelay: outgoing ? getComputedStyle(outgoing).animationDelay : '0s',
-    };
-  })()`);
-  pointerDrag.inkLeadsFlight = inkLeadFrame.isCommitting
-    && inkLeadFrame.inkAnimation.includes('brush-write')
-    && Number.parseFloat(inkLeadFrame.inkOpacity || '0') >= 0
-    && Number.parseFloat(inkLeadFrame.outgoingDelay || '0') > 0;
   const commitFrame = await evaluate(`(() => {
     const card = document.querySelector('.legacy-card');
     const outgoing = card?.querySelector('.legacy-card__outgoing');
-    const shatter = card?.querySelector('.legacy-card__shatter');
-    const shatterStyle = shatter ? getComputedStyle(shatter) : null;
     const incoming = card?.querySelector('.legacy-card__box--incoming');
-    const ink = incoming?.querySelector('.legacy-card__glyph');
-    const inkStyle = ink ? getComputedStyle(ink) : null;
+    const outgoingStyle = outgoing ? getComputedStyle(outgoing) : null;
     return {
       isCommitting: Boolean(card?.classList.contains('is-committing')),
       outgoingTransform: outgoing ? getComputedStyle(outgoing).transform : 'none',
       exitDuration: card?.style.getPropertyValue('--exit-duration') || '',
-      shatterAnimation: shatterStyle?.animationName || '',
-      shatterClip: shatterStyle?.clipPath || '',
+      outgoingAnimation: outgoingStyle?.animationName || '',
+      outgoingDelay: outgoingStyle?.animationDelay || '0s',
       hoverLocked: Boolean(card?.classList.contains('is-hover-locked')),
       incomingTransform: incoming ? getComputedStyle(incoming).transform : 'none',
       incomingVerse: incoming?.querySelector('.legacy-card__verse')?.textContent?.trim() || '',
-      brushAnimation: inkStyle?.animationName || '',
-      brushOpacity: inkStyle?.opacity || '',
     };
   })()`);
   pointerDrag.committedOnRelease = commitFrame.isCommitting;
-  pointerDrag.paperShatter = commitFrame.shatterAnimation.includes('paper-shatter')
-    && commitFrame.shatterClip.startsWith('polygon')
-    && commitFrame.hoverLocked
+  pointerDrag.singleFlight = commitFrame.outgoingAnimation.includes('card-out')
+    && Number.parseFloat(commitFrame.outgoingDelay || '0') === 0
     && commitFrame.outgoingTransform !== 'none';
   pointerDrag.incomingStill = commitFrame.incomingTransform === 'none'
     && commitFrame.incomingVerse === incomingBeforeDrag;
-  pointerDrag.brushWriting = commitFrame.brushAnimation.includes('brush-write')
-    && Number.parseFloat(commitFrame.brushOpacity || '0') >= 0;
-  pointerDrag.momentumDuration = Number.parseInt(commitFrame.exitDuration, 10) === 520;
+  pointerDrag.momentumDuration = Number.parseInt(commitFrame.exitDuration, 10) === 460;
   const midTurnFrame = await evaluate(`(() => {
     const card = document.querySelector('.legacy-card');
     const incoming = card?.querySelector('.legacy-card__box--incoming');
@@ -689,10 +663,10 @@ const main = async () => {
   if (!pointerDrag.isDragging || pointerDrag.lifted === "none" || pointerDrag.offset < 10
     || pointerDrag.incomingOpacity <= 0 || !pointerDrag.incomingVerse
     || pointerDrag.touchAction !== "none" || !pointerDrag.gradualProgress
-    || !pointerDrag.committedOnRelease || !pointerDrag.paperShatter
-    || !pointerDrag.incomingStill || !pointerDrag.brushWriting
+    || !pointerDrag.committedOnRelease || !pointerDrag.singleFlight
+    || !pointerDrag.incomingStill
     || !pointerDrag.momentumDuration || !pointerDrag.silentIncoming
-    || !pointerDrag.hoverLockSettled || !pointerDrag.inkLeadsFlight) {
+    || !pointerDrag.hoverLockSettled) {
     throw new Error(`Dragging the excerpt card did not follow the pointer or turn early: ${JSON.stringify(pointerDrag)}`);
   }
   currentStep = "touch excerpt card";

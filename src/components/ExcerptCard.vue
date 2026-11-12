@@ -27,7 +27,6 @@
       variant="incoming"
       :excerpt="displayIncoming"
       :saved="displayIncomingSaved"
-      ink
     />
 
     <ExcerptCardFace
@@ -53,15 +52,6 @@
         :excerpt="outgoingExcerpt"
         :saved="outgoingSaved"
       />
-      <div
-        v-if="isCommitting"
-        class="legacy-card__shatter"
-        :style="{
-          '--shatter-x': direction === 'left' ? '-140px' : '140px',
-          '--shatter-y': '-70px',
-        }"
-        aria-hidden="true"
-      />
     </div>
   </article>
 </template>
@@ -79,14 +69,12 @@ const props = defineProps({
 });
 const emit = defineEmits(["toggle-save", "needs-next", "turn", "settled"]);
 
-const TURN_DURATION = 520;
-const INK_WINDOW = 240;
+const TURN_DURATION = 460;
 const isDragging = ref(false);
 const isReturning = ref(false);
 const isCommitting = ref(false);
 const isTurning = ref(false);
 const hoverLocked = ref(false);
-const inkWindow = ref(INK_WINDOW);
 const direction = ref("");
 const dragOffset = ref({ x: 0, y: 0 });
 const dragProgress = ref(0);
@@ -98,20 +86,11 @@ const frozenCurrentSaved = ref(false);
 const frozenIncoming = ref(null);
 const frozenIncomingSaved = ref(false);
 const initialMotion = {
-  duration: TURN_DURATION + INK_WINDOW,
+  duration: TURN_DURATION,
   ease: "cubic-bezier(0.22, 0.72, 0.18, 1)",
   exitX: "0px",
-  exitXEarly: "0px",
-  exitXMid: "0px",
-  exitXLate: "0px",
   exitY: "0px",
-  exitYEarly: "0px",
-  exitYMid: "0px",
-  exitYLate: "0px",
   exitRot: "0deg",
-  exitRotEarly: "0deg",
-  exitRotMid: "0deg",
-  exitRotLate: "0deg",
   exitRotY: "0deg",
 };
 const releaseMotion = ref({ ...initialMotion });
@@ -145,19 +124,9 @@ const cardStyle = computed(() => ({
   "--exit-duration": `${releaseMotion.value.duration}ms`,
   "--exit-ease": releaseMotion.value.ease,
   "--exit-x": releaseMotion.value.exitX,
-  "--exit-x-early": releaseMotion.value.exitXEarly,
-  "--exit-x-mid": releaseMotion.value.exitXMid,
-  "--exit-x-late": releaseMotion.value.exitXLate,
   "--exit-y": releaseMotion.value.exitY,
-  "--exit-y-early": releaseMotion.value.exitYEarly,
-  "--exit-y-mid": releaseMotion.value.exitYMid,
-  "--exit-y-late": releaseMotion.value.exitYLate,
   "--exit-rot": releaseMotion.value.exitRot,
-  "--exit-rot-early": releaseMotion.value.exitRotEarly,
-  "--exit-rot-mid": releaseMotion.value.exitRotMid,
-  "--exit-rot-late": releaseMotion.value.exitRotLate,
   "--exit-rot-y": releaseMotion.value.exitRotY,
-  "--ink-window": `${inkWindow.value}ms`,
 }));
 
 const incomingExcerpt = computed(() => props.nextExcerpt || props.excerpt);
@@ -209,7 +178,6 @@ const finishTurn = async () => {
   dragProgress.value = 0;
   direction.value = "";
   releaseMotion.value = { ...initialMotion };
-  inkWindow.value = INK_WINDOW;
   pointerState.velocityX = 0;
   pointerState.samples = [];
   hoverLocked.value = cardElement.value?.matches(":hover") && !hoverReleased;
@@ -277,7 +245,6 @@ const startCommit = (turnDirection) => {
     Math.abs(dragOffset.value.x) * 1.35 + momentum,
   )));
   const reduced = reducedMotion();
-  const startDelay = reduced ? 0 : INK_WINDOW;
   const duration = reduced ? 0 : TURN_DURATION;
   const verticalLift = -Math.round(24 + exitDistance * 0.06);
   const rotation = Math.min(24, 10 + rawVelocity * 0.004);
@@ -286,17 +253,8 @@ const startCommit = (turnDirection) => {
     duration,
     ease: "cubic-bezier(0.22, 0.72, 0.18, 1)",
     exitX: `${signed(exitDistance)}px`,
-    exitXEarly: `${signed(exitDistance * 0.35)}px`,
-    exitXMid: `${signed(exitDistance * 0.72)}px`,
-    exitXLate: `${signed(exitDistance * 0.92)}px`,
     exitY: `${verticalLift}px`,
-    exitYEarly: `${Math.round(verticalLift * 0.28)}px`,
-    exitYMid: `${Math.round(verticalLift * 0.68)}px`,
-    exitYLate: `${Math.round(verticalLift * 0.9)}px`,
     exitRot: `${signed(rotation)}deg`,
-    exitRotEarly: `${signed(rotation * 0.24)}deg`,
-    exitRotMid: `${signed(rotation * 0.68)}deg`,
-    exitRotLate: `${signed(rotation * 0.92)}deg`,
     exitRotY: `${-sign * 28}deg`,
   };
   direction.value = turnDirection;
@@ -313,12 +271,11 @@ const startCommit = (turnDirection) => {
   hoverLocked.value = true;
   hoverReleased = false;
   dragProgress.value = 1;
-  inkWindow.value = reduced ? 0 : INK_WINDOW;
   emit("needs-next");
   emit("turn", turnDirection);
   commitTimer = window.setTimeout(() => {
     if (id === turnId && isCommitting.value) finishTurn();
-  }, duration + startDelay + 20);
+  }, duration + 20);
   observeOutgoingAnimation(id);
 };
 
@@ -332,7 +289,6 @@ const startReturn = () => {
   dragProgress.value = 0;
   direction.value = "";
   releaseMotion.value = { ...initialMotion };
-  inkWindow.value = INK_WINDOW;
   outgoingExcerpt.value = null;
   frozenCurrent.value = null;
   frozenIncoming.value = null;
@@ -386,7 +342,6 @@ const startDrag = (event) => {
   dragOffset.value = { x: 0, y: 0 };
   dragProgress.value = 0;
   releaseMotion.value = { ...initialMotion };
-  inkWindow.value = INK_WINDOW;
   outgoingExcerpt.value = null;
   frozenCurrent.value = { ...props.excerpt };
   frozenCurrentSaved.value = props.saved;
@@ -713,27 +668,8 @@ onBeforeUnmount(() => {
   pointer-events: none;
 }
 
-.legacy-card__shatter {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  opacity: 0;
-  background-image:
-    linear-gradient(90deg, transparent 0 19%, rgba(22, 44, 43, 0.14) 19.4% 20%, transparent 20.4% 100%),
-    linear-gradient(0deg, transparent 0 31%, rgba(22, 44, 43, 0.11) 31.4% 32%, transparent 32.4% 100%),
-    linear-gradient(90deg, transparent 0 60%, rgba(161, 65, 52, 0.1) 60.4% 61%, transparent 61.4% 100%),
-    linear-gradient(0deg, transparent 0 72%, rgba(22, 44, 43, 0.09) 72.4% 73%, transparent 73.4% 100%);
-  clip-path: polygon(0 0, 100% 0, 100% 38%, 62% 34%, 68% 66%, 31% 61%, 36% 100%, 0 100%);
-  transform-origin: 50% 50%;
-  pointer-events: none;
-}
-
 .legacy-card.is-committing .legacy-card__outgoing {
-  animation: card-out var(--exit-duration) var(--exit-ease) var(--ink-window) both;
-}
-
-.legacy-card.is-committing .legacy-card__shatter {
-  animation: paper-shatter var(--exit-duration) var(--exit-ease) var(--ink-window) both;
+  animation: card-out var(--exit-duration) var(--exit-ease) both;
 }
 
 @keyframes card-out {
@@ -741,55 +677,14 @@ onBeforeUnmount(() => {
     opacity: 1;
     transform: var(--drag-transform);
   }
-  28% {
-    opacity: 1;
-    transform:
-      translate3d(calc(var(--drag-x) + var(--exit-x-early)), calc(var(--drag-y) + var(--exit-y-early)), 24px)
-      rotateZ(calc(var(--drag-turn) + var(--exit-rot-early)))
-      rotateY(var(--exit-rot-y))
-      rotateX(2deg)
-      scale(1.015);
-  }
-  62% {
-    opacity: 0.92;
-    transform:
-      translate3d(calc(var(--drag-x) + var(--exit-x-mid)), calc(var(--drag-y) + var(--exit-y-mid)), 56px)
-      rotateZ(calc(var(--drag-turn) + var(--exit-rot-mid)))
-      rotateY(var(--exit-rot-y))
-      rotateX(5deg)
-      scale(1.02);
-  }
-  88% {
-    opacity: 0.48;
-    transform:
-      translate3d(calc(var(--drag-x) + var(--exit-x-late)), calc(var(--drag-y) + var(--exit-y-late)), 86px)
-      rotateZ(calc(var(--drag-turn) + var(--exit-rot-late)))
-      rotateY(var(--exit-rot-y))
-      rotateX(8deg)
-      scale(0.98);
-  }
   100% {
     opacity: 0;
     transform:
       translate3d(calc(var(--drag-x) + var(--exit-x)), calc(var(--drag-y) + var(--exit-y)), 108px)
       rotateZ(calc(var(--drag-turn) + var(--exit-rot)))
       rotateY(var(--exit-rot-y))
-      rotateX(10deg)
+      rotateX(8deg)
       scale(0.94);
-  }
-}
-
-@keyframes paper-shatter {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 0, 0) scale(0.96);
-  }
-  38% {
-    opacity: 0.72;
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(var(--shatter-x), var(--shatter-y), 0) rotate(7deg) scale(1.08);
   }
 }
 
@@ -802,7 +697,7 @@ onBeforeUnmount(() => {
 
 @media (prefers-reduced-motion: reduce) {
   .legacy-card__outgoing,
-  .legacy-card__shatter {
+  .legacy-card__dust {
     display: none;
   }
 
@@ -820,19 +715,15 @@ onBeforeUnmount(() => {
   .legacy-card__box::after,
   .legacy-card__save,
   .legacy-card__hint,
-  .legacy-card__shatter {
+  .legacy-card__dust {
     animation: none !important;
     transition: none !important;
   }
 
   .legacy-card__box--current :deep(.legacy-card__verse),
   .legacy-card__box--current :deep(.legacy-card__author),
-  .legacy-card__box--incoming :deep(.legacy-card__author),
-  .legacy-card__verse--ink {
+  .legacy-card__box--incoming :deep(.legacy-card__author) {
     opacity: 1;
-    clip-path: none;
-    filter: none;
-    transform: none;
   }
 }
 </style>
