@@ -1,11 +1,13 @@
 <template>
   <article
+    ref="cardElement"
     class="legacy-card"
     :class="{
       'is-dragging': isDragging,
       'is-returning': isReturning,
       'is-committing': isCommitting,
       'is-turning': isTurning,
+      'is-hover-locked': hoverLocked,
       [`legacy-card--${direction}`]: direction,
     }"
     :style="cardStyle"
@@ -15,6 +17,8 @@
     @pointermove="moveDrag"
     @pointerup="endDrag"
     @pointercancel="cancelDrag"
+    @pointerenter="cancelHoverRelease"
+    @pointerleave="releaseHoverLock"
     @keydown="handleKeydown"
   >
     <div class="legacy-card__hint" aria-hidden="true">轻轻一掀，换一句诗</div>
@@ -37,13 +41,13 @@
 
     <div
       v-if="outgoingExcerpt"
+      ref="outgoingElement"
       class="legacy-card__outgoing"
       :style="{
         '--outgoing-offset': `${cardSize.offset}px`,
         '--outgoing-height': `${cardSize.height}px`,
       }"
       aria-hidden="true"
-      @animationend="handleOutgoingAnimationEnd"
     >
       <ExcerptCardFace
         variant="outgoing"
@@ -81,6 +85,7 @@ const isDragging = ref(false);
 const isReturning = ref(false);
 const isCommitting = ref(false);
 const isTurning = ref(false);
+const hoverLocked = ref(false);
 const inkWindow = ref(INK_WINDOW);
 const direction = ref("");
 const dragOffset = ref({ x: 0, y: 0 });
@@ -121,7 +126,11 @@ const pointerState = {
 };
 let commitTimer;
 let returnTimer;
-let settling = false;
+let turnId = 0;
+let finishingTurn = false;
+let hoverReleased = false;
+const cardElement = ref(null);
+const outgoingElement = ref(null);
 
 const particleSeed = (value) => {
   const wave = Math.sin(value * 12.9898) * 43758.5453;
@@ -174,15 +183,15 @@ const incomingPrepared = computed(() => {
   return Boolean(candidate && candidate.content !== visibleCurrent.value?.content);
 });
 
-const particleColumns = 10;
-const particleRows = 18;
+const particleColumns = 8;
+const particleRows = 12;
 const particleDelays = computed(() => {
-  const active = Math.round(TURN_DURATION * 0.16);
+  const active = 64;
   return Array.from({ length: particleColumns * particleRows }, (_, index) => {
     const column = index % particleColumns;
     const row = Math.floor(index / particleColumns);
     const scatter = particleSeed(index + 11);
-    return Math.round((column * 7 + row * 11 + Math.floor(scatter * 50)) % active);
+    return Math.round((column * 5 + row * 7 + Math.floor(scatter * 30)) % active);
   });
 });
 const particles = computed(() => Array.from({ length: particleColumns * particleRows }, (_, index) => {
@@ -225,11 +234,12 @@ const clearTimers = () => {
   window.clearTimeout(returnTimer);
   window.cancelAnimationFrame(pointerState.frame);
   pointerState.frame = 0;
+  turnId += 1;
 };
 
 const finishTurn = async () => {
-  if (!isCommitting.value || settling) return;
-  settling = true;
+  if (!isCommitting.value || finishingTurn) return;
+  finishingTurn = true;
   clearTimers();
   const settledExcerpt = frozenIncoming.value || incomingExcerpt.value;
   const settledSaved = displayIncomingSaved.value;
@@ -253,13 +263,36 @@ const finishTurn = async () => {
   inkWindow.value = INK_WINDOW;
   pointerState.velocityX = 0;
   pointerState.samples = [];
-  settling = false;
+  hoverLocked.value = cardElement.value?.matches(":hover") && !hoverReleased;
+  finishingTurn = false;
 };
 
-const handleOutgoingAnimationEnd = (event) => {
+const observeOutgoingAnimation = (id) => {
+  nextTick().then(() => {
+    if (id !== turnId || !isCommitting.value) return;
+    const animation = outgoingElement.value?.getAnimations?.().find((item) => {
+      const name = String(item.animationName || "");
+      const duration = Number(item.effect?.getTiming?.().duration || 0);
+      return name.includes("card-out") || duration === TURN_DURATION;
+    });
+    if (!animation) return;
+    animation.finished.then(() => {
+      if (id === turnId && isCommitting.value) finishTurn();
+    }).catch(() => {});
+  });
+};
+
+const releaseHoverLock = (event) => {
   if (event.target !== event.currentTarget) return;
-  if (!String(event.animationName || "").includes("card-out")) return;
-  finishTurn();
+  hoverReleased = true;
+  if (!isCommitting.value && !isReturning.value && !isTurning.value) {
+    hoverLocked.value = false;
+  }
+};
+
+const cancelHoverRelease = (event) => {
+  if (event.target !== event.currentTarget) return;
+  hoverReleased = false;
 };
 
 const commitDistance = (width) => Math.min(180, Math.max(96, width * 0.42));
@@ -274,6 +307,7 @@ const shouldCommit = ({ x, velocityX }, width) =>
 const startCommit = (turnDirection) => {
   if (isTurning.value || props.disabled) return;
   clearTimers();
+  const id = ++turnId;
   const currentSnapshot = frozenCurrent.value || props.excerpt;
   const preparedIncoming = frozenIncoming.value || props.nextExcerpt;
   if (!preparedIncoming || preparedIncoming.content === currentSnapshot?.content) {
@@ -325,17 +359,24 @@ const startCommit = (turnDirection) => {
   isReturning.value = false;
   isCommitting.value = true;
   isTurning.value = true;
+  hoverLocked.value = true;
+  hoverReleased = false;
   dragProgress.value = 1;
   inkWindow.value = reducedMotion() ? 0 : duration;
   emit("needs-next");
   emit("turn", turnDirection);
-  commitTimer = window.setTimeout(finishTurn, reducedMotion() ? 0 : duration + 80);
+  commitTimer = window.setTimeout(() => {
+    if (id === turnId && isCommitting.value) finishTurn();
+  }, reducedMotion() ? 0 : duration + 20);
+  observeOutgoingAnimation(id);
 };
 
 const startReturn = () => {
   clearTimers();
   isDragging.value = false;
   isReturning.value = true;
+  hoverLocked.value = true;
+  hoverReleased = false;
   dragOffset.value = { x: 0, y: 0 };
   dragProgress.value = 0;
   direction.value = "";
@@ -348,6 +389,7 @@ const startReturn = () => {
   pointerState.samples = [];
   returnTimer = window.setTimeout(() => {
     isReturning.value = false;
+    hoverLocked.value = cardElement.value?.matches(":hover") && !hoverReleased;
   }, 420);
 };
 
@@ -369,6 +411,8 @@ const startDrag = (event) => {
   if (isTurning.value || props.disabled || event.target.closest("button")) return;
   if (event.pointerType === "mouse" && event.button !== 0) return;
   clearTimers();
+  hoverLocked.value = false;
+  hoverReleased = false;
   const currentBox = event.currentTarget.querySelector(".legacy-card__box--current");
   const cardRect = event.currentTarget.getBoundingClientRect();
   const boxRect = currentBox?.getBoundingClientRect();
@@ -614,6 +658,13 @@ onBeforeUnmount(() => {
   transition: none;
 }
 
+.legacy-card.is-dragging .legacy-card__box--current::after,
+.legacy-card.is-returning .legacy-card__box--current::after,
+.legacy-card.is-turning .legacy-card__box--current::after,
+.legacy-card.is-hover-locked .legacy-card__box--current::after {
+  transition: none;
+}
+
 .legacy-card.is-dragging .legacy-card__box--incoming {
   transition: none !important;
 }
@@ -727,26 +778,22 @@ onBeforeUnmount(() => {
   display: block;
   content: "";
   transform-origin: center;
-  will-change: transform, opacity;
 }
 
 .legacy-card__pixel::before {
   background: var(--porcelain);
-  opacity: 0;
-  transform: scale(0);
+  opacity: 0.96;
+  transform: scale(1.04);
 }
 
 .legacy-card__pixel::after {
   background: var(--pixel-color);
   opacity: 0;
+  will-change: transform, opacity;
 }
 
 .legacy-card.is-committing .legacy-card__outgoing {
   animation: card-out var(--exit-duration) var(--exit-ease) both;
-}
-
-.legacy-card.is-committing .legacy-card__pixel::before {
-  animation: pixel-hole 180ms steps(2, end) var(--delay) forwards;
 }
 
 .legacy-card.is-committing .legacy-card__pixel::after {
@@ -795,21 +842,6 @@ onBeforeUnmount(() => {
   }
 }
 
-@keyframes pixel-hole {
-  0% {
-    opacity: 0;
-    transform: scale(0);
-  }
-  45% {
-    opacity: 1;
-    transform: scale(1.12);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1.04);
-  }
-}
-
 @keyframes pixel-fly {
   0% {
     opacity: var(--pixel-opacity);
@@ -851,7 +883,6 @@ onBeforeUnmount(() => {
   .legacy-card__box::after,
   .legacy-card__save,
   .legacy-card__hint,
-  .legacy-card__pixel::before,
   .legacy-card__pixel::after {
     animation: none !important;
     transition: none !important;

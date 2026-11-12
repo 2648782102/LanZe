@@ -618,6 +618,10 @@ const main = async () => {
       const style = getComputedStyle(pixel, '::after');
       return style.animationName.includes('pixel-fly') && Number(style.opacity) > 0;
     });
+    const holeAnimations = pixels.filter((pixel) => {
+      const style = getComputedStyle(pixel, '::before');
+      return style.animationName !== 'none';
+    }).length;
     const incoming = card?.querySelector('.legacy-card__box--incoming');
     const ink = incoming?.querySelector('.legacy-card__ink');
     const inkStyle = ink ? getComputedStyle(ink) : null;
@@ -627,6 +631,8 @@ const main = async () => {
       exitDuration: card?.style.getPropertyValue('--exit-duration') || '',
       pixelCount: pixels.length,
       flyingPixels: flying.length,
+      pixelHoleAnimations: holeAnimations,
+      hoverLocked: Boolean(card?.classList.contains('is-hover-locked')),
       incomingTransform: incoming ? getComputedStyle(incoming).transform : 'none',
       incomingVerse: incoming?.querySelector('.legacy-card__verse')?.textContent?.trim() || '',
       brushAnimation: inkStyle?.animationName || '',
@@ -634,8 +640,10 @@ const main = async () => {
     };
   })()`);
   pointerDrag.committedOnRelease = commitFrame.isCommitting;
-  pointerDrag.pixelDisintegration = commitFrame.pixelCount === 180
-    && commitFrame.flyingPixels > 20
+  pointerDrag.pixelDisintegration = commitFrame.pixelCount === 96
+    && commitFrame.flyingPixels > 12
+    && commitFrame.pixelHoleAnimations === 0
+    && commitFrame.hoverLocked
     && commitFrame.outgoingTransform !== 'none';
   pointerDrag.incomingStill = commitFrame.incomingTransform === 'none'
     && commitFrame.incomingVerse === incomingBeforeDrag;
@@ -657,18 +665,32 @@ const main = async () => {
     && midTurnFrame.incomingVerse === incomingBeforeDrag
     && midTurnFrame.incomingTransform === 'none'
     && midTurnFrame.outgoingTransform !== 'none';
+  const hoverSettleFrame = await evaluate(`(() => {
+    const card = document.querySelector('.legacy-card');
+    const current = card?.querySelector('.legacy-card__box--current');
+    return {
+      hoverLocked: Boolean(card?.classList.contains('is-hover-locked')),
+      hovered: Boolean(card?.matches(':hover')),
+      currentTransform: current ? getComputedStyle(current).transform : 'none',
+    };
+  })()`);
+  pointerDrag.hoverLockSettled = hoverSettleFrame.hoverLocked
+    && hoverSettleFrame.hovered
+    && hoverSettleFrame.currentTransform === 'none';
   if (!pointerDrag.isDragging || pointerDrag.lifted === "none" || pointerDrag.offset < 10
     || pointerDrag.incomingOpacity <= 0 || !pointerDrag.incomingVerse
     || pointerDrag.touchAction !== "none" || !pointerDrag.gradualProgress
     || !pointerDrag.committedOnRelease || !pointerDrag.pixelDisintegration
     || !pointerDrag.incomingStill || !pointerDrag.brushWriting
-    || !pointerDrag.momentumDuration || !pointerDrag.silentIncoming) {
+    || !pointerDrag.momentumDuration || !pointerDrag.silentIncoming
+    || !pointerDrag.hoverLockSettled) {
     throw new Error(`Dragging the excerpt card did not follow the pointer or turn early: ${JSON.stringify(pointerDrag)}`);
   }
   currentStep = "touch excerpt card";
   await waitUntil("touch excerpt ready", () => evaluate(
     "Boolean(document.querySelector('.legacy-card')) && !document.querySelector('.legacy-card')?.classList.contains('is-turning')",
   ));
+  await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: 2, y: 2, button: "none", buttons: 0 });
   const touchOrigin = await evaluate(`(() => {
     const rect = document.querySelector('.legacy-card')?.getBoundingClientRect();
     return rect ? { x: Math.round(rect.left + rect.width / 2), y: Math.round(rect.top + Math.min(rect.height / 3, 180)) } : null;
@@ -703,8 +725,19 @@ const main = async () => {
   const draggedExcerpt = await evaluate(
     "document.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim() || ''",
   );
+  const hoverUnlockFrame = await evaluate(`(() => {
+    const card = document.querySelector('.legacy-card');
+    return {
+      hoverLocked: Boolean(card?.classList.contains('is-hover-locked')),
+      hovered: Boolean(card?.matches(':hover')),
+    };
+  })()`);
+  pointerDrag.hoverUnlock = !hoverUnlockFrame.hoverLocked && !hoverUnlockFrame.hovered;
   if (!draggedExcerpt || draggedExcerpt === firstExcerpt) {
     throw new Error("Dragged historical excerpt did not settle on a new verse");
+  }
+  if (!pointerDrag.hoverUnlock) {
+    throw new Error(`Excerpt hover lock did not release after the pointer left: ${JSON.stringify(hoverUnlockFrame)}`);
   }
   await evaluate("document.querySelector('.legacy-card')?.blur(); window.scrollTo({ top: 0, behavior: 'instant' })");
   await waitUntil("page scroll reset after drag", () => evaluate("scrollY === 0"));

@@ -322,3 +322,9 @@
 - 本轮把预取句定为唯一提交结果：`ReadView` 在 `@turn` 只把 `nextExcerpt` 排入 `pendingExcerpt`，不修改 `nextExcerpt`、不按方向请求新数据；`@settled` 在动画结束才交换 `excerpt`、递增页序、清空预取并静默预取再下一句。预取请求用 `requestId` 与 `requestedPage` 双重校验，避免旧请求把下一句写成当前句。`ExcerptCard` 在拖动开始冻结 current/incoming/saved，提交时用快照生成 outgoing，动画期间不依赖父级 props 变化。
 - 飞出改为 560ms 线性多关键帧：释放前 90ms 内的采样速度驱动距离和旋转，28%/62%/88%/100% 关键帧持续推进位移、抬起、缩放与透明度；像素飞散在 560ms 前收束，避免卡片已停而粒子拖尾。新句按笔画权重排布逐字延迟，用 `clip-path`、双层墨晕、偏锋、模糊与收锋模拟毛笔书写，出处在诗句后淡入；减少动效直接换句。
 - Browser E2E 增加提交中段 `silentIncoming` 断言，固定 560ms 动画时长，并保留毛笔 `brush-write`、像素离散、incoming 无 transform、触屏反向拖动和按钮连续换句断言。`git diff --check`、lint、39 项单测、build、本地资源 smoke、音频校验、Browser E2E 全通过，CLS 0.0000、控制台/网络错误 0；临时 CDP 逐帧探针复核桌面 1440px 与移动 390px 拖动、提交 120ms/360ms、静止帧，底层诗句全程不刷新，飞出位移持续到末段，静止后当前句与预取句稳定切换。未改 GitHub 展示、Pages、Discussion、tag 或 Release，未执行外部宣发。
+
+## 摘录卡末段事件风暴治理 — 2026-11-12 09:45 CST
+
+- 用户反馈「飞出去到最后会卡个一两秒，然后才继续动画」。用 CDP 事件探针与 CPU 6 倍限速复核：卡面自身 560ms 后约 636ms 收束，没有直接长停；但 10×18 网格的 `::before` 镂空与 `::after` 飞散形成 360 个动画，尾段约 1424–1738ms 密集派发 `animationend`，随后鼠标仍在卡上又触发 0.45s 倾斜/阴影与 0.85s 光泽过渡。限速下最大 RAF gap 约 67ms、无 longtask，确认卡顿来自事件风暴与 hover 接管，而不是远程诗词请求。
+- 本轮把镂空层改为静态瓷面，8×12 网格只保留 96 个 `pixel-fly` 动画，delay 收进 0–64ms；移除 outgoing 上的冒泡 `animationend` 监听，改用 `getAnimations()` 的 `finished` 精确收束，计时器仅保留 20ms 兜底。提交开始设置 `is-hover-locked`，动画结束不主动解除悬浮锁，只有 `pointerleave` 或明确不在 `:hover` 时解锁；拖动、归位、提交和锁定态都临时关闭光泽层 transition，避免尾段重新播放 0.85s 光泽与倾斜；归位阶段同样不抢 hover。
+- Browser E2E 改为断言 96 个粒子、超过 12 个进入飞散、镂空层无动画、提交帧带 hover lock；设计契约、变更日志和本维护记录同步说明新时间轴。保持历史白色摘录卡构图、静默预取链路、毛笔书写、`prefers-reduced-motion` 回退和按钮/键盘/触屏共用的状态机不变。
