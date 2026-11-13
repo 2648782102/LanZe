@@ -122,7 +122,8 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import AppIcon from "../components/AppIcon.vue";
 import ExcerptCard from "../components/ExcerptCard.vue";
 import { readStore, writeStore } from "../services/browserStore.js";
-import { loadExcerptFromSource } from "../services/poetrySource.js";
+import { loadExcerptFromSource, makeLocalExcerpt } from "../services/poetrySource.js";
+import { poetrySourceConfig } from "../config/poetrySource.js";
 import { useLibrary } from "../composables/useLibrary.js";
 import { notify } from "../composables/useNotices.js";
 import { curatedPoems, getDailyLibraryPoem, asLibraryPoem } from "../data/poetryCatalog.js";
@@ -151,6 +152,8 @@ const excerptSource = ref("local");
 let excerptRequest = 0;
 let nextExcerptRequest = 0;
 let pendingExcerpt = null;
+let remoteExcerpt = null;
+let remoteExcerptSource = "local";
 const excerptCardRef = ref(null);
 const storedExcerptSaves = readStore("lanze_saved_excerpts", []);
 const excerptSaved = ref(Array.isArray(storedExcerptSaves) ? storedExcerptSaves.map(String) : []);
@@ -191,6 +194,18 @@ const decorateExcerpt = (source) => ({
   titleNote: "本页只展示一句摘录，不替代完整底本。",
 });
 
+const localExcerptFor = (index) => decorateExcerpt(makeLocalExcerpt(index));
+
+const ensurePendingExcerpt = () => {
+  if (pendingExcerpt) return;
+  const fallback = nextExcerpt.value || localExcerptFor(excerptPage.value + 1);
+  pendingExcerpt = {
+    decorated: fallback,
+    source: nextExcerptSource.value,
+    reason: "",
+  };
+};
+
 const loadExcerpt = async () => {
   const requestId = ++excerptRequest;
   const { excerpt: next, source, reason } = await loadExcerptFromSource({
@@ -208,19 +223,22 @@ const loadExcerpt = async () => {
 
 const prepareNextExcerpt = async () => {
   if (nextExcerpt.value || pendingExcerpt) return;
+  nextExcerpt.value = localExcerptFor(excerptPage.value + 1);
+  nextExcerptSource.value = "local";
+  if (!poetrySourceConfig.enabled) return;
   const requestId = ++nextExcerptRequest;
   const nextIndex = excerptPage.value + 1;
   const requestedPage = excerptPage.value;
-  const { excerpt: upcoming, source } = await loadExcerptFromSource({
+  const { excerpt: upcoming, source, reason } = await loadExcerptFromSource({
     index: nextIndex,
     previousContent: excerpt.value?.content || "",
   });
   if (requestId !== nextExcerptRequest
     || requestedPage !== excerptPage.value
-    || pendingExcerpt
-    || nextExcerpt.value) return;
-  nextExcerpt.value = decorateExcerpt(upcoming);
-  nextExcerptSource.value = source;
+    || pendingExcerpt) return;
+  if (reason) return;
+  remoteExcerpt = decorateExcerpt(upcoming);
+  remoteExcerptSource = source;
 };
 
 const reportExcerptSource = ({ source, reason }) => {
@@ -247,17 +265,8 @@ const nextPoem = () => {
 };
 
 const beginExcerptTurn = () => {
-  if (excerptStatus.value === "loading" || pendingExcerpt) return;
-  if (!nextExcerpt.value) {
-    prepareNextExcerpt();
-    return;
-  }
-  const prepared = nextExcerpt.value;
-  pendingExcerpt = {
-    decorated: prepared,
-    source: nextExcerptSource.value,
-    reason: "",
-  };
+  if (excerptStatus.value === "loading") return;
+  ensurePendingExcerpt();
 };
 
 const finishExcerptTurn = () => {
@@ -271,6 +280,12 @@ const finishExcerptTurn = () => {
   nextExcerpt.value = null;
   nextExcerptSource.value = "local";
   nextExcerptRequest += 1;
+  if (remoteExcerpt && remoteExcerpt.content !== excerpt.value.content) {
+    nextExcerpt.value = remoteExcerpt;
+    nextExcerptSource.value = remoteExcerptSource;
+  }
+  remoteExcerpt = null;
+  remoteExcerptSource = "local";
   prepareNextExcerpt();
 };
 

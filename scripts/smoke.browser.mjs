@@ -153,6 +153,7 @@ const main = async () => {
     },
   ];
   let poetryRequestIndex = 0;
+  const poetryResponseDelay = Number(process.env.BROWSER_SMOKE_POETRY_DELAY_MS || 1200);
   socket.addEventListener("message", async (event) => {
     const message = JSON.parse(event.data);
     if (message.method !== "Fetch.requestPaused") return;
@@ -163,6 +164,7 @@ const main = async () => {
     }
     const payload = poetryResponses[poetryRequestIndex % poetryResponses.length];
     poetryRequestIndex += 1;
+    if (poetryResponseDelay > 0) await delay(poetryResponseDelay);
     await send("Fetch.fulfillRequest", {
       requestId,
       responseCode: 200,
@@ -1118,8 +1120,11 @@ const main = async () => {
     }),
   ];
   if (problems.length) throw new Error(`Browser reported problems: ${problems.join(" | ")}`);
-  if (!excerptCards.sourceLabel.includes("诗句源：仓库内置摘录")) {
-    throw new Error("Local excerpt source was not reported in offline default mode");
+  const expectedSourceLabel = process.env.VITE_POETRY_SOURCE === "remote"
+    ? "诗句源：随机古诗词 API"
+    : "诗句源：仓库内置摘录";
+  if (!excerptCards.sourceLabel.includes(expectedSourceLabel)) {
+    throw new Error(`Excerpt source label did not match the build mode: ${expectedSourceLabel}`);
   }
   const cumulativeLayoutShift = layoutShifts.reduce((total, score) => total + score, 0);
   if (cumulativeLayoutShift > 0.05) {
