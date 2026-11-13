@@ -467,7 +467,10 @@ const main = async () => {
   }
   if (!await evaluate(`(() => {
     const card = document.querySelector('.legacy-card');
-    return Boolean(card?.getAttribute('tabindex') === '0' && !card.querySelector('.legacy-card__turn'));
+    return Boolean(card?.getAttribute('tabindex') === '0'
+      && card.querySelector('.legacy-card__gesture')
+      && card.style.getPropertyValue('--swipe-progress') !== ''
+      && !card.querySelector('.legacy-card__turn'));
   })()`)) {
     throw new Error("Excerpt card does not expose its click and keyboard affordance");
   }
@@ -475,9 +478,10 @@ const main = async () => {
     const card = document.querySelector('.legacy-card');
     const current = card?.querySelector('.legacy-card__box--current');
     const wash = card?.querySelector('.legacy-card__wash');
-    return Boolean(current && wash && !card.querySelector('.legacy-card__veil') && !card.classList.contains('is-dragging'));
+    return Boolean(current && wash && !card.querySelector('.legacy-card__veil')
+      && !card.classList.contains('is-dragging'));
   })()`)) {
-    throw new Error("Excerpt card must be static with the ink wash layer");
+    throw new Error("Excerpt card must keep a static face with the ink wash layer");
   }
   const firstExcerpt = excerptCards.firstVerse;
   const dockLayout = await evaluate(`(() => {
@@ -573,6 +577,54 @@ const main = async () => {
     })()
   `), 60);
   if (!secondStaticExcerpt) throw new Error("Second click on the excerpt card did not change the verse");
+  await evaluate(`(() => {
+    const card = document.querySelector('.legacy-card');
+    if (card) card.scrollIntoView({ block: 'start', behavior: 'instant' });
+    return true;
+  })()`);
+  await waitUntil("excerpt card settled before swipe", () => evaluate(`
+    (() => {
+      const card = document.querySelector('.legacy-card');
+      return Boolean(card) && !card.classList.contains('is-exchanging') && !card.classList.contains('is-arriving');
+    })()
+  `), 32);
+  const beforeSwipeExcerpt = await evaluate(
+    "document.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim() || ''",
+  );
+  const swipeOrigin = await evaluate(`(() => {
+    const rect = document.querySelector('.legacy-card')?.getBoundingClientRect();
+    return rect ? { x: Math.round(rect.left + rect.width / 2), y: Math.round(rect.top + Math.min(rect.height / 3, 180)) } : null;
+  })()`);
+  if (!swipeOrigin) throw new Error("Excerpt card was not available for a swipe gesture");
+  const swipeFrame = await evaluate(`(async () => {
+    const card = document.querySelector('.legacy-card');
+    const pointerOptions = { pointerId: 71, pointerType: 'mouse', isPrimary: true, bubbles: true, cancelable: true, button: 0, buttons: 1 };
+    card.dispatchEvent(new PointerEvent('pointerdown', { ...pointerOptions, clientX: ${swipeOrigin.x}, clientY: ${swipeOrigin.y} }));
+    card.dispatchEvent(new PointerEvent('pointermove', { ...pointerOptions, clientX: ${swipeOrigin.x + 28}, clientY: ${swipeOrigin.y - 6} }));
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    const face = card?.querySelector('.legacy-card__box--current');
+    const frame = {
+      swiping: Boolean(card?.classList.contains('is-swiping')),
+      progress: Number(card?.style.getPropertyValue('--swipe-progress') || 0),
+      direction: card?.getAttribute('data-direction'),
+      faceOffset: face && card ? Math.round(face.getBoundingClientRect().left - (card.getBoundingClientRect().left + parseFloat(getComputedStyle(card).paddingLeft))) : -1,
+    };
+    card.dispatchEvent(new PointerEvent('pointermove', { ...pointerOptions, clientX: ${swipeOrigin.x + 72}, clientY: ${swipeOrigin.y - 10} }));
+    card.dispatchEvent(new PointerEvent('pointerup', { ...pointerOptions, clientX: ${swipeOrigin.x + 72}, clientY: ${swipeOrigin.y - 10}, buttons: 0 }));
+    return frame;
+  })()`);
+  if (!swipeFrame.swiping || swipeFrame.progress <= 0 || swipeFrame.direction !== 'right'
+    || swipeFrame.faceOffset !== 0) {
+    throw new Error(`Excerpt swipe did not keep the card face static: ${JSON.stringify(swipeFrame)}`);
+  }
+  const swipedExcerpt = await waitUntil("swipe excerpt turn", () => evaluate(`
+    (() => {
+      const card = document.querySelector('.legacy-card');
+      const verse = card?.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim() || '';
+      return verse && verse !== ${JSON.stringify(beforeSwipeExcerpt)} && !card?.classList.contains('is-exchanging') ? verse : false;
+    })()
+  `), 60);
+  if (!swipedExcerpt) throw new Error("Swiping the excerpt card did not change the verse");
   await evaluate("window.scrollTo({ top: 0, behavior: 'instant' })");
   await waitUntil("page scroll reset", () => evaluate("scrollY === 0"));
 

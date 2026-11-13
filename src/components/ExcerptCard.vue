@@ -1,17 +1,24 @@
 <template>
   <article
+    ref="cardElement"
     class="legacy-card"
+    data-direction="right"
     :class="{
       'is-exchanging': isExchanging,
       'is-arriving': isArriving,
+      'is-swiping': isSwiping,
       'is-disabled': props.disabled,
     }"
-    :aria-label="props.disabled ? '今日摘录卡片' : '今日摘录卡片，点击可换一句'"
+    :aria-label="props.disabled ? '今日摘录卡片' : '今日摘录卡片，点击或横向轻拂可换一句'"
+    :style="cardStyle"
     :tabindex="props.disabled ? -1 : 0"
     :role="props.disabled ? undefined : 'button'"
-    @click="turnExcerpt"
-    @keydown.enter.prevent="turnExcerpt"
-    @keydown.space.prevent="turnExcerpt"
+    @click="handleClick"
+    @pointerdown="startSwipe"
+    @pointermove="moveSwipe"
+    @pointerup="endSwipe"
+    @pointercancel="cancelSwipe"
+    @keydown="handleKeydown"
   >
     <span class="legacy-card__corner legacy-card__corner--top" aria-hidden="true"></span>
     <span class="legacy-card__corner legacy-card__corner--bottom" aria-hidden="true"></span>
@@ -30,7 +37,12 @@
       <span class="legacy-card__wash-seal"></span>
     </div>
 
-    <p class="legacy-card__hint" aria-hidden="true">点击换一句</p>
+    <div class="legacy-card__gesture" aria-hidden="true">
+      <span class="legacy-card__gesture-ink"></span>
+      <span class="legacy-card__gesture-dot"></span>
+    </div>
+
+    <p class="legacy-card__hint" aria-hidden="true">点击或轻拂换一句</p>
   </article>
 </template>
 
@@ -49,16 +61,25 @@ const emit = defineEmits(["toggle-save", "needs-next", "turn", "settled"]);
 
 const WITHER_DURATION = 160;
 const ARRIVE_DURATION = 420;
+const SWIPE_COMMIT = 42;
+const SWIPE_VELOCITY = 420;
 const isExchanging = ref(false);
 const isArriving = ref(false);
+const isSwiping = ref(false);
+const swipeProgress = ref(0);
 const currentExcerpt = ref(props.excerpt);
 const currentSaved = ref(props.saved);
 let witherTimer;
 let arriveTimer;
 let turnId = 0;
+let swipe = null;
+let suppressClick = false;
+let suppressClickTimer;
+const cardElement = ref(null);
 
 const displayExcerpt = computed(() => currentExcerpt.value || props.excerpt);
 const displaySaved = computed(() => currentSaved.value);
+const cardStyle = computed(() => ({ "--swipe-progress": swipeProgress.value.toFixed(3) }));
 const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
 const stopExchange = () => {
@@ -66,6 +87,13 @@ const stopExchange = () => {
   window.clearTimeout(arriveTimer);
   isExchanging.value = false;
   isArriving.value = false;
+};
+
+const clearSwipe = () => {
+  swipe = null;
+  isSwiping.value = false;
+  swipeProgress.value = 0;
+  cardElement.value?.setAttribute("data-direction", "right");
 };
 
 const settleDisplay = async (next, nextSaved) => {
@@ -84,12 +112,12 @@ const finishAnimation = (id) => {
   }, ARRIVE_DURATION);
 };
 
-const turnExcerpt = async () => {
+const turnExcerpt = async (turnDirection = "right") => {
   if (props.disabled || isExchanging.value) return;
   emit("needs-next");
   await Promise.resolve();
   await nextTick();
-  emit("turn", "right");
+  emit("turn", turnDirection);
   const id = ++turnId;
   const next = props.nextExcerpt;
   const nextSaved = props.nextSaved;
@@ -108,6 +136,82 @@ const turnExcerpt = async () => {
   }, WITHER_DURATION);
 };
 
+const handleClick = () => {
+  if (suppressClick) {
+    suppressClick = false;
+    return;
+  }
+  turnExcerpt("right");
+};
+
+const handleKeydown = (event) => {
+  if (!["Enter", " ", "ArrowLeft", "ArrowRight"].includes(event.key)) return;
+  event.preventDefault();
+  turnExcerpt(event.key === "ArrowLeft" ? "left" : "right");
+};
+
+const startSwipe = (event) => {
+  if (props.disabled || isExchanging.value || event.target.closest("button")) return;
+  if (event.pointerType === "mouse" && typeof event.button === "number" && event.button !== 0) return;
+  swipe = {
+    id: event.pointerId,
+    originX: event.clientX,
+    x: event.clientX,
+    time: event.timeStamp,
+    velocity: 0,
+    moved: false,
+    target: event.currentTarget,
+  };
+  try {
+    swipe.target.setPointerCapture?.(event.pointerId);
+  } catch {}
+};
+
+const moveSwipe = (event) => {
+  if (!swipe || event.pointerId !== swipe.id || isExchanging.value) return;
+  const distance = event.clientX - swipe.originX;
+  const elapsed = Math.max(8, event.timeStamp - swipe.time);
+  swipe.x = event.clientX;
+  swipe.time = event.timeStamp;
+  swipe.velocity = swipe.velocity * 0.3 + (event.clientX - (swipe.previousX || swipe.originX)) / elapsed * 1000 * 0.7;
+  swipe.previousX = event.clientX;
+  if (Math.abs(distance) < 6) return;
+  if (!swipe.moved) {
+    swipe.moved = true;
+    isSwiping.value = true;
+  }
+  const direction = distance < 0 ? "left" : "right";
+  cardElement.value?.setAttribute("data-direction", direction);
+  swipeProgress.value = Math.min(1, Math.abs(distance) / 96);
+};
+
+const endSwipe = (event) => {
+  if (!swipe || event.pointerId !== swipe.id) return;
+  const distance = swipe.x - swipe.originX;
+  const shouldTurn = swipe.moved
+    && (Math.abs(distance) >= SWIPE_COMMIT
+      || Math.abs(swipe.velocity) >= SWIPE_VELOCITY && Math.abs(distance) >= 14);
+  try {
+    swipe.target?.releasePointerCapture?.(event.pointerId);
+  } catch {}
+  clearSwipe();
+  if (!shouldTurn) return;
+  suppressClick = true;
+  window.clearTimeout(suppressClickTimer);
+  suppressClickTimer = window.setTimeout(() => {
+    suppressClick = false;
+  }, 350);
+  turnExcerpt(distance < 0 ? "left" : "right");
+};
+
+const cancelSwipe = (event) => {
+  if (!swipe || event.pointerId !== swipe.id) return;
+  try {
+    swipe.target?.releasePointerCapture?.(event.pointerId);
+  } catch {}
+  clearSwipe();
+};
+
 watch(() => props.excerpt, (value) => {
   if (!isExchanging.value) {
     currentExcerpt.value = value;
@@ -123,7 +227,11 @@ defineExpose({
   turn: turnExcerpt,
   isTurning: isExchanging,
 });
-onBeforeUnmount(stopExchange);
+onBeforeUnmount(() => {
+  stopExchange();
+  clearSwipe();
+  window.clearTimeout(suppressClickTimer);
+});
 </script>
 
 <style>
@@ -159,16 +267,22 @@ onBeforeUnmount(stopExchange);
   --brush-shift: -40px;
   --seal-opacity: 0;
   --seal-scale: 0.88;
+  --swipe-progress: 0;
   position: relative;
   width: min(100%, 330px);
   margin-inline: auto;
   padding: calc(16px * var(--legacy-scale));
   cursor: pointer;
+  touch-action: pan-y;
   user-select: none;
 }
 
 .legacy-card.is-disabled {
   cursor: default;
+}
+
+.legacy-card.is-swiping {
+  --swipe-progress: 1;
 }
 
 .legacy-card.is-exchanging {
@@ -234,6 +348,62 @@ onBeforeUnmount(stopExchange);
   letter-spacing: 0.08em;
   text-align: center;
   pointer-events: none;
+}
+
+.legacy-card__gesture {
+  position: absolute;
+  right: calc(24px * var(--legacy-scale));
+  bottom: calc(24px * var(--legacy-scale));
+  left: calc(24px * var(--legacy-scale));
+  z-index: 6;
+  height: calc(2px * var(--legacy-scale));
+  pointer-events: none;
+}
+
+.legacy-card__gesture-ink {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg,
+    rgba(22, 49, 46, 0),
+    rgba(22, 49, 46, 0.24) 18%,
+    rgba(122, 70, 52, 0.16) 52%,
+    rgba(22, 49, 46, 0));
+  opacity: calc(var(--swipe-progress) * 0.9);
+  transform: scaleX(var(--swipe-progress));
+  transform-origin: left center;
+  transition: opacity 120ms ease-out, transform 120ms ease-out;
+}
+
+.legacy-card[data-direction="left"] .legacy-card__gesture-ink {
+  transform-origin: right center;
+}
+
+.legacy-card__gesture-dot {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: calc(7px * var(--legacy-scale));
+  height: calc(7px * var(--legacy-scale));
+  border: 1px solid rgba(161, 65, 52, 0.42);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.86);
+  opacity: calc(var(--swipe-progress) * 0.8);
+  transform: translate(-50%, -50%) translateX(calc(var(--swipe-progress) * 100%));
+  transition: opacity 120ms ease-out;
+}
+
+.legacy-card[data-direction="left"] .legacy-card__gesture-dot {
+  right: 0;
+  left: auto;
+  transform: translate(50%, -50%) translateX(calc(var(--swipe-progress) * -100%));
+}
+
+.legacy-card.is-swiping .legacy-card__gesture-ink,
+.legacy-card.is-swiping .legacy-card__gesture-dot {
+  transition: none;
 }
 
 .legacy-card :deep(.legacy-card__box--current) {
