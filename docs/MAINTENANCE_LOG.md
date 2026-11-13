@@ -387,3 +387,8 @@
 - 用户反馈轻拂后仍会卡一下才换句，怀疑由网络请求导致。复核链路：`ExcerptCard` 触发 `needs-next` 后等待父级异步 `prepareNextExcerpt()`，`beginExcerptTurn()` 又只读取 `nextExcerpt`；显式开启远程源时 `loadExcerptFromSource()` 会等待 `fetch` 返回或 4 秒超时，因此下一句可能赶不上动画中段。
 - 本轮把下一句拆成同步本地句与后台远程增强：`prepareNextExcerpt()` 立即写入 `makeLocalExcerpt(index)` 生成的本地句；`ensurePendingExcerpt()` 在本地队列为空时同步兜底；远程结果只保存为后续备用句，不参与当前 `pendingExcerpt`。`finishExcerptTurn()` 交换当前句后再用远程备用句补充预取，使点击、按钮、键盘和轻拂完全不依赖网络。
 - Browser E2E 增加 `BROWSER_SMOKE_POETRY_DELAY_MS`，默认把拦截的远端诗句响应延迟 1.2 秒，并让来源标签按构建模式校验；另以 `VITE_POETRY_SOURCE=remote`、2.5 秒响应延迟单独跑通完整 E2E，确认远程请求不进入切换关键路径。默认本地构建与全量质量门通过后提交。
+
+## 摘录卡提前预载队列 — 2026-11-14 02:20 CST
+
+- 用户追问「不能提前加载吗」。上一版虽已让切换不等待网络，但仍只在准备未来一句时发请求。本轮把 `ReadView` 改为有深度的预载队列：首屏同步生成 6 句本地摘录，`onMounted` 立即发起远程源的 4 路并行预取；`turn` 只读队首，`finishExcerptTurn` 消费后补齐本地槽位并把后台远程结果追加到未来队列。远程请求只在挂载时发生，后续点击、轻拂、按钮和键盘都不会触发新的诗句请求。
+- Browser E2E 通过 `data-excerpt-queue-depth` 检查交互前队列深度，记录轻拂前后的 `Network.requestWillBeSent` 数量并断言不增长；`VITE_POETRY_SOURCE=remote` + 2.5 秒响应延迟下完整流程通过。默认构建与全量质量门通过后提交。

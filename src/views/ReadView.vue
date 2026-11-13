@@ -76,6 +76,7 @@
           <ExcerptCard
             ref="excerptCardRef"
             v-if="excerpt"
+            :data-excerpt-queue-depth="excerptQueueDepth"
             :excerpt="excerpt"
             :next-excerpt="nextExcerpt"
             :next-saved="Boolean(nextExcerpt) && excerptSaved.includes(`excerpt-${nextExcerpt.content}`)"
@@ -149,11 +150,12 @@ const nextExcerpt = ref(null);
 const nextExcerptSource = ref("local");
 const excerptStatus = ref("loading");
 const excerptSource = ref("local");
-let excerptRequest = 0;
-let nextExcerptRequest = 0;
+const excerptQueueDepth = ref(0);
+const EXCERPT_QUEUE_SIZE = 6;
+const REMOTE_PREFETCH_SIZE = 4;
 let pendingExcerpt = null;
-let remoteExcerpt = null;
-let remoteExcerptSource = "local";
+let excerptQueue = [];
+let remoteRequested = false;
 const excerptCardRef = ref(null);
 const storedExcerptSaves = readStore("lanze_saved_excerpts", []);
 const excerptSaved = ref(Array.isArray(storedExcerptSaves) ? storedExcerptSaves.map(String) : []);
@@ -196,49 +198,80 @@ const decorateExcerpt = (source) => ({
 
 const localExcerptFor = (index) => decorateExcerpt(makeLocalExcerpt(index));
 
-const ensurePendingExcerpt = () => {
-  if (pendingExcerpt) return;
-  const fallback = nextExcerpt.value || localExcerptFor(excerptPage.value + 1);
-  pendingExcerpt = {
-    decorated: fallback,
-    source: nextExcerptSource.value,
-    reason: "",
-  };
+const fillLocalQueue = () => {
+  const knownContent = new Set([
+    excerpt.value?.content,
+    ...excerptQueue.map((entry) => entry.decorated.content),
+  ].filter(Boolean));
+  let offset = excerptQueue.length + 1;
+  while (excerptQueue.length < EXCERPT_QUEUE_SIZE) {
+    const candidate = localExcerptFor(excerptPage.value + offset);
+    offset += 1;
+    if (knownContent.has(candidate.content)) continue;
+    excerptQueue.push({ decorated: candidate, source: "local" });
+    knownContent.add(candidate.content);
+  }
+  const head = excerptQueue[0] || { decorated: localExcerptFor(excerptPage.value + 1), source: "local" };
+  nextExcerpt.value = head.decorated;
+  nextExcerptSource.value = head.source;
+  excerptQueueDepth.value = excerptQueue.length;
 };
 
-const loadExcerpt = async () => {
-  const requestId = ++excerptRequest;
-  const { excerpt: next, source, reason } = await loadExcerptFromSource({
-    index: excerptPage.value,
-    previousContent: excerpt.value?.content || "",
-  });
-  if (requestId !== excerptRequest) return;
-  const decorated = decorateExcerpt(next);
-  excerpt.value = decorated;
-  excerptSource.value = source;
-  excerptStatus.value = source === "remote" ? "ready" : "fallback";
-  const failure = { source, reason };
-  reportExcerptSource(failure);
+const syncQueueHead = () => {
+  const head = excerptQueue[0];
+  if (!head) {
+    fillLocalQueue();
+    return;
+  }
+  nextExcerpt.value = head.decorated;
+  nextExcerptSource.value = head.source;
+};
+
+const ensurePendingExcerpt = () => {
+  if (pendingExcerpt) return;
+  fillLocalQueue();
+  pendingExcerpt = excerptQueue.shift() || {
+    decorated: localExcerptFor(excerptPage.value + 1),
+    source: "local",
+  };
+  syncQueueHead();
+};
+
+const loadExcerpt = () => {
+  excerpt.value = localExcerptFor(excerptPage.value);
+  excerptSource.value = "local";
+  excerptStatus.value = "fallback";
+  fillLocalQueue();
 };
 
 const prepareNextExcerpt = async () => {
-  if (nextExcerpt.value || pendingExcerpt) return;
-  nextExcerpt.value = localExcerptFor(excerptPage.value + 1);
-  nextExcerptSource.value = "local";
-  if (!poetrySourceConfig.enabled) return;
-  const requestId = ++nextExcerptRequest;
-  const nextIndex = excerptPage.value + 1;
-  const requestedPage = excerptPage.value;
-  const { excerpt: upcoming, source, reason } = await loadExcerptFromSource({
-    index: nextIndex,
-    previousContent: excerpt.value?.content || "",
-  });
-  if (requestId !== nextExcerptRequest
-    || requestedPage !== excerptPage.value
-    || pendingExcerpt) return;
-  if (reason) return;
-  remoteExcerpt = decorateExcerpt(upcoming);
-  remoteExcerptSource = source;
+  fillLocalQueue();
+  if (!poetrySourceConfig.enabled || remoteRequested) return;
+  remoteRequested = true;
+  const basePage = excerptPage.value;
+  const previousContent = excerpt.value?.content || "";
+  const remoteResults = await Promise.all(
+    Array.from({ length: REMOTE_PREFETCH_SIZE }, (_, position) =>
+      loadExcerptFromSource({
+        index: basePage + position + 1,
+        previousContent,
+      })),
+  );
+  if (basePage !== excerptPage.value) return;
+  const knownContent = new Set([
+    excerpt.value?.content,
+    pendingExcerpt?.decorated?.content,
+    ...excerptQueue.map((entry) => entry.decorated.content),
+  ].filter(Boolean));
+  for (const result of remoteResults) {
+    if (result.source !== "remote" || result.reason) continue;
+    const decorated = decorateExcerpt(result.excerpt);
+    if (knownContent.has(decorated.content)) continue;
+    excerptQueue.push({ decorated, source: "remote" });
+    knownContent.add(decorated.content);
+  }
+  fillLocalQueue();
+  syncQueueHead();
 };
 
 const reportExcerptSource = ({ source, reason }) => {
@@ -277,15 +310,8 @@ const finishExcerptTurn = () => {
   excerpt.value = result.decorated;
   excerptSource.value = result.source;
   excerptStatus.value = result.source === "remote" ? "ready" : "fallback";
-  nextExcerpt.value = null;
-  nextExcerptSource.value = "local";
-  nextExcerptRequest += 1;
-  if (remoteExcerpt && remoteExcerpt.content !== excerpt.value.content) {
-    nextExcerpt.value = remoteExcerpt;
-    nextExcerptSource.value = remoteExcerptSource;
-  }
-  remoteExcerpt = null;
-  remoteExcerptSource = "local";
+  fillLocalQueue();
+  syncQueueHead();
   prepareNextExcerpt();
 };
 
@@ -331,13 +357,15 @@ const speakPoem = () => {
 };
 
 onMounted(() => {
-  loadExcerpt().finally(() => {
-    if (excerpt.value && !nextExcerpt.value) prepareNextExcerpt();
-  });
+  loadExcerpt();
+  prepareNextExcerpt();
 });
 
 watch(excerpt, () => {
-  if (excerpt.value && !nextExcerpt.value && !pendingExcerpt) prepareNextExcerpt();
+  if (excerpt.value) {
+    fillLocalQueue();
+    syncQueueHead();
+  }
 });
 onBeforeUnmount(() => {
   window.clearTimeout(switchTimer);

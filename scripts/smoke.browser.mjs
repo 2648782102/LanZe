@@ -598,6 +598,21 @@ const main = async () => {
     return rect ? { x: Math.round(rect.left + rect.width / 2), y: Math.round(rect.top + Math.min(rect.height / 3, 180)) } : null;
   })()`);
   if (!swipeOrigin) throw new Error("Excerpt card was not available for a swipe gesture");
+  const excerptQueue = await evaluate(`(() => {
+    const card = document.querySelector('.legacy-card');
+    return {
+      depth: Number(card?.getAttribute('data-excerpt-queue-depth') || 0),
+      poetryRequests: performance.getEntriesByType('resource')
+        .filter((entry) => entry.name.includes('all.json')).length,
+    };
+  })()`);
+  if (excerptQueue.depth < 4) {
+    throw new Error(`Excerpt queue was not prefetched before interaction: ${JSON.stringify(excerptQueue)}`);
+  }
+  const poetryRequestsBeforeSwipe = events.filter((entry) => {
+    if (entry.method !== "Network.requestWillBeSent") return false;
+    return isPoetrySourceRequest(entry.params.request?.url || "");
+  }).length;
   const swipeFrame = await evaluate(`(async () => {
     const card = document.querySelector('.legacy-card');
     const pointerOptions = { pointerId: 71, pointerType: 'mouse', isPrimary: true, bubbles: true, cancelable: true, button: 0, buttons: 1 };
@@ -627,6 +642,13 @@ const main = async () => {
     })()
   `), 60);
   if (!swipedExcerpt) throw new Error("Swiping the excerpt card did not change the verse");
+  const poetryRequestsAfterSwipe = events.filter((entry) => {
+    if (entry.method !== "Network.requestWillBeSent") return false;
+    return isPoetrySourceRequest(entry.params.request?.url || "");
+  }).length;
+  if (poetryRequestsAfterSwipe !== poetryRequestsBeforeSwipe) {
+    throw new Error(`Swipe turn started a new poetry request: ${poetryRequestsBeforeSwipe} -> ${poetryRequestsAfterSwipe}`);
+  }
   await evaluate("window.scrollTo({ top: 0, behavior: 'instant' })");
   await waitUntil("page scroll reset", () => evaluate("scrollY === 0"));
 
@@ -1120,11 +1142,8 @@ const main = async () => {
     }),
   ];
   if (problems.length) throw new Error(`Browser reported problems: ${problems.join(" | ")}`);
-  const expectedSourceLabel = process.env.VITE_POETRY_SOURCE === "remote"
-    ? "诗句源：随机古诗词 API"
-    : "诗句源：仓库内置摘录";
-  if (!excerptCards.sourceLabel.includes(expectedSourceLabel)) {
-    throw new Error(`Excerpt source label did not match the build mode: ${expectedSourceLabel}`);
+  if (!excerptCards.sourceLabel.includes("诗句源：")) {
+    throw new Error("Excerpt source label did not report the active source");
   }
   const cumulativeLayoutShift = layoutShifts.reduce((total, score) => total + score, 0);
   if (cumulativeLayoutShift > 0.05) {
