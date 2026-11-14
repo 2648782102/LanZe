@@ -498,7 +498,7 @@ onBeforeUnmount(() => {
 
 .audio-dock__subtitle {
   color: rgba(247, 248, 244, 0.5);
-  font-size: 12px;
+  font-size: var(--text-note);
   line-height: 1.3;
 }
 
@@ -533,13 +533,13 @@ onBeforeUnmount(() => {
 .audio-dock__time {
   color: rgba(247, 248, 244, 0.64);
   font-family: var(--font-number);
-  font-size: 13px;
+  font-size: var(--text-body);
   white-space: nowrap;
 }
 
 .audio-dock__state {
   color: rgba(247, 248, 244, 0.76);
-  font-size: 12px;
+  font-size: var(--text-note);
   letter-spacing: 0.08em;
   white-space: nowrap;
 }
@@ -640,7 +640,7 @@ onBeforeUnmount(() => {
   flex: 0 0 44px;
   color: var(--dock-brass);
   font-family: var(--font-number);
-  font-size: 13px;
+  font-size: var(--text-body);
   letter-spacing: 0.04em;
   white-space: nowrap;
 }
@@ -717,7 +717,7 @@ onBeforeUnmount(() => {
 .audio-dock.is-collapsed .audio-dock__compact-state {
   display: block;
   color: rgba(247, 248, 244, 0.5);
-  font-size: 12px;
+  font-size: var(--text-note);
   line-height: 1.3;
 }
 

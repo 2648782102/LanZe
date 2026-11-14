@@ -388,7 +388,7 @@ watch([dynasty, genre], () => {
   grid-template-columns: 90px minmax(0, 1fr) auto;
   align-items: end;
   gap: 40px;
-  padding-block: 58px 46px;
+  padding-block: var(--hero-pad-top) var(--hero-pad-bottom);
 }
 
 .index-label {
@@ -427,7 +427,7 @@ watch([dynasty, genre], () => {
   max-width: min(48em, var(--measure-copy));
   margin: 20px 0 0;
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: var(--text-body);
   line-height: var(--leading-copy);
   text-wrap: pretty;
 }
@@ -500,7 +500,7 @@ watch([dynasty, genre], () => {
 .index-search input::placeholder {
   color: var(--ink-faint);
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: var(--text-body);
 }
 
 .index-search__clear {
@@ -520,7 +520,7 @@ watch([dynasty, genre], () => {
   border: 0;
   background: var(--ink);
   color: var(--porcelain-panel);
-  font-size: 13px;
+  font-size: var(--text-body);
   letter-spacing: 0.12em;
 }
 
@@ -555,31 +555,34 @@ watch([dynasty, genre], () => {
 .poem-paths {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 18px;
+  gap: 14px;
+  margin-top: 24px;
 }
 
 .poem-paths button {
   display: grid;
   min-width: 0;
-  min-height: 76px;
+  min-height: 84px;
   grid-template-columns: 28px minmax(0, 1fr);
   align-items: center;
   column-gap: 12px;
   padding: 12px 16px;
-  border: 1px solid var(--line);
-  background: rgba(251, 252, 249, 0.58);
+  border: var(--card-border);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
   color: var(--ink-soft);
   text-align: left;
   transition:
     border-color var(--motion-fast) var(--ease-standard),
     background-color var(--motion-fast) var(--ease-standard),
+    box-shadow var(--motion-base) var(--ease-standard),
     transform var(--motion-fast) var(--ease-out);
 }
 
 .poem-paths button:hover {
   border-color: var(--celadon-deep);
   transform: translateY(-1px);
+  box-shadow: var(--card-shadow-raised);
 }
 
 .poem-paths button:active {
@@ -693,7 +696,7 @@ watch([dynasty, genre], () => {
   border-bottom: 1px solid var(--line);
   background: transparent;
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: var(--text-note);
   text-align: left;
   transition:
     color var(--motion-fast) var(--ease-standard),
@@ -793,7 +796,7 @@ watch([dynasty, genre], () => {
   border-left: 2px solid var(--brass);
   background: var(--porcelain-deep);
   color: var(--ink-soft);
-  font-size: 11px;
+  font-size: var(--text-meta);
 }
 
 .active-filters button {
@@ -805,7 +808,7 @@ watch([dynasty, genre], () => {
   border: 1px solid var(--line);
   background: var(--porcelain-panel);
   color: var(--ink-soft);
-  font-size: 11px;
+  font-size: var(--text-meta);
 }
 
 .active-filters button span {
@@ -841,7 +844,7 @@ watch([dynasty, genre], () => {
 
 .empty-state p {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--text-note);
 }
 
 .pagination {
@@ -851,7 +854,7 @@ watch([dynasty, genre], () => {
   gap: 18px;
   min-height: 76px;
   color: var(--ink-faint);
-  font-size: 11px;
+  font-size: var(--text-meta);
 }
 
 .pagination button {
@@ -943,7 +946,7 @@ watch([dynasty, genre], () => {
     border: 1px solid var(--line-strong);
     background: transparent;
     color: var(--ink);
-    font-size: 12px;
+    font-size: var(--text-note);
   }
 
   .mobile-filter-bar button span {

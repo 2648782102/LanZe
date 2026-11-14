@@ -66,7 +66,7 @@ const firstLine = computed(() =>
 .poem-row__number {
   color: var(--brass);
   font-family: var(--font-number);
-  font-size: 11px;
+  font-size: var(--text-meta);
 }
 
 .poem-row__title {
@@ -104,7 +104,7 @@ const firstLine = computed(() =>
   margin: 0;
   color: var(--ink-soft);
   font-family: var(--font-poem);
-  font-size: 13px;
+  font-size: var(--text-body);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -180,7 +180,7 @@ const firstLine = computed(() =>
 
   .poem-row__line {
     grid-column: 2 / 4;
-    font-size: 12px;
+    font-size: var(--text-note);
   }
 
   .poem-row__arrow {

@@ -362,7 +362,7 @@ onBeforeUnmount(() => {
   gap: 12px;
   margin: 0 0 20px;
   color: var(--brass);
-  font-size: 11px;
+  font-size: var(--text-meta);
   letter-spacing: 0.12em;
 }
 
@@ -455,7 +455,7 @@ onBeforeUnmount(() => {
   border: 1px solid var(--line-strong);
   background: rgba(251, 252, 249, 0.62);
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: var(--text-body);
   letter-spacing: 0.05em;
   transition:
     border-color var(--motion-fast) var(--ease-standard),
@@ -656,7 +656,7 @@ onBeforeUnmount(() => {
   max-width: min(380px, var(--measure-copy));
   margin: 0;
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: var(--text-body);
   line-height: var(--leading-copy);
   text-wrap: pretty;
 }

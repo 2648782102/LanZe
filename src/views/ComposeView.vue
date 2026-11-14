@@ -101,7 +101,7 @@
 
       <aside class="preview-panel" aria-label="作品预览" :class="{ 'is-refreshing': previewChanged }">
         <div class="preview-panel__top">
-          <span>预览</span>
+          <span>预览 · 非定稿</span>
           <span>{{ form.category || "未分类" }} · {{ contentLength }} 字</span>
         </div>
         <div class="preview-sheet">
@@ -113,7 +113,6 @@
           </div>
           <p v-if="form.note" class="preview-note">{{ form.note }}</p>
         </div>
-        <p class="preview-hint">预览不是出版定稿。正式使用前仍需核对文字与来源。</p>
       </aside>
     </div>
   </main>
@@ -268,7 +267,7 @@ onBeforeUnmount(() => {
 }
 
 .compose-head {
-  padding-block: 34px 42px;
+  padding-block: var(--hero-pad-top) var(--hero-pad-bottom);
 }
 
 .back-link {
@@ -277,7 +276,7 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 7px;
   color: var(--ink-faint);
-  font-size: 11px;
+  font-size: var(--text-meta);
 }
 
 .back-link:hover {
@@ -295,7 +294,7 @@ onBeforeUnmount(() => {
 .compose-head__row > div > p {
   margin: 0 0 10px;
   color: var(--brass);
-  font-size: 11px;
+  font-size: var(--text-meta);
   letter-spacing: 0.14em;
 }
 
@@ -312,7 +311,7 @@ onBeforeUnmount(() => {
   max-width: min(400px, var(--measure-copy));
   margin: 0;
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: var(--text-body);
   line-height: var(--leading-copy);
   text-wrap: pretty;
 }
@@ -345,7 +344,7 @@ onBeforeUnmount(() => {
 }
 
 .compose-textarea::placeholder {
-  font-size: 13px;
+  font-size: var(--text-body);
   line-height: 1.7;
 }
 
@@ -398,7 +397,7 @@ onBeforeUnmount(() => {
   border-left: 2px solid var(--brass);
   background: var(--porcelain-deep);
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: var(--text-body);
   line-height: var(--leading-copy);
   text-wrap: pretty;
 }
@@ -442,9 +441,10 @@ onBeforeUnmount(() => {
 .preview-sheet {
   min-height: 420px;
   padding: 42px 34px;
-  border: 1px solid var(--line);
+  border: var(--card-border-strong);
   border-top: 0;
   background: var(--surface);
+  box-shadow: var(--card-shadow-raised);
   box-shadow: var(--shadow-soft);
   text-align: center;
   transition:
@@ -478,7 +478,7 @@ onBeforeUnmount(() => {
   margin: 9px 0 40px;
   color: var(--ink-soft);
   font-family: var(--font-poem);
-  font-size: 13px;
+  font-size: var(--text-body);
   letter-spacing: 0.16em;
 }
 
@@ -503,14 +503,6 @@ onBeforeUnmount(() => {
   font-size: var(--text-note);
   line-height: var(--leading-copy);
   white-space: pre-line;
-}
-
-.preview-hint {
-  margin: 11px 0 0;
-  color: var(--ink-faint);
-  font-size: var(--text-meta);
-  line-height: 1.7;
-  text-wrap: pretty;
 }
 
 @media (max-width: 940px) {

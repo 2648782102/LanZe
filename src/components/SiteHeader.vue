@@ -114,7 +114,7 @@ const isActive = (item) => {
 
 .brand__name {
   font-family: var(--font-poem);
-  font-size: 20px;
+  font-size: var(--text-heading);
   letter-spacing: 0.12em;
   line-height: 1;
 }
@@ -123,7 +123,7 @@ const isActive = (item) => {
   margin-left: 16px;
   align-self: center;
   color: var(--ink-faint);
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 500;
   letter-spacing: 0.16em;
   line-height: 1;
@@ -140,7 +140,7 @@ const isActive = (item) => {
   position: relative;
   padding: 27px 0;
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: var(--text-body);
   letter-spacing: 0.14em;
 }
 

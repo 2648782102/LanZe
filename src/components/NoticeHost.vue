@@ -47,7 +47,7 @@ const { notices, dismissNotice } = useNotices();
   background: rgba(16, 40, 39, 0.96);
   color: var(--porcelain-panel);
   box-shadow: 0 18px 44px rgba(16, 40, 39, 0.22);
-  font-size: 12px;
+  font-size: var(--text-note);
   line-height: 1.55;
   pointer-events: auto;
 }

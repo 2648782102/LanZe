@@ -281,7 +281,7 @@ onMounted(async () => {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
   gap: 60px;
-  padding-block: 66px 52px;
+  padding-block: var(--hero-pad-top) var(--hero-pad-bottom);
 }
 
 .collection-kicker {
@@ -304,7 +304,7 @@ onMounted(async () => {
   max-width: min(610px, var(--measure-copy));
   margin: 20px 0 0;
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: var(--text-body);
   line-height: var(--leading-copy);
   text-wrap: pretty;
 }
@@ -360,7 +360,7 @@ onMounted(async () => {
   border-bottom: 1px solid transparent;
   background: transparent;
   color: var(--ink-faint);
-  font-size: 13px;
+  font-size: var(--text-body);
 }
 
 .collection-tabs button.is-active {
@@ -388,7 +388,7 @@ onMounted(async () => {
 .works-toolbar p {
   margin: 0;
   color: var(--ink-faint);
-  font-size: 11px;
+  font-size: var(--text-meta);
 }
 
 .works-list {
@@ -427,7 +427,7 @@ onMounted(async () => {
   margin: 8px 0 0;
   color: var(--ink-soft);
   font-family: var(--font-poem);
-  font-size: 13px;
+  font-size: var(--text-body);
 }
 
 .work-item > :deep(svg) {
@@ -438,8 +438,9 @@ onMounted(async () => {
   position: sticky;
   top: 104px;
   padding: 28px;
-  border: 1px solid var(--line);
+  border: var(--card-border-strong);
   background: var(--surface);
+  box-shadow: var(--card-shadow-raised);
 }
 
 .account-identity {
@@ -478,7 +479,7 @@ onMounted(async () => {
 .account-panel > p {
   margin: 18px 0;
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: var(--text-body);
   line-height: var(--leading-copy);
   text-wrap: pretty;
 }
@@ -497,7 +498,7 @@ onMounted(async () => {
 .profile-editor summary {
   cursor: pointer;
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: var(--text-note);
 }
 
 .profile-editor form {
@@ -585,7 +586,7 @@ onMounted(async () => {
 
   .collection-copy {
     margin-top: 14px;
-    font-size: 13px;
+    font-size: var(--text-body);
     line-height: 1.8;
   }
 
@@ -638,7 +639,7 @@ onMounted(async () => {
 
   .collection-tabs button {
     padding-inline: 8px;
-    font-size: 12px;
+    font-size: var(--text-note);
   }
 
   .empty-state {

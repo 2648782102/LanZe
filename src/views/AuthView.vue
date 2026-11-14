@@ -390,7 +390,7 @@ watch(
   align-items: center;
   gap: 7px;
   color: var(--ink-faint);
-  font-size: 11px;
+  font-size: var(--text-meta);
 }
 
 .auth-back:hover {
@@ -422,7 +422,7 @@ watch(
   margin: 16px 0 28px;
   color: var(--ink-soft);
   max-width: var(--measure-copy);
-  font-size: 13px;
+  font-size: var(--text-body);
   line-height: var(--leading-copy);
   text-wrap: pretty;
 }
@@ -443,7 +443,7 @@ watch(
   padding: 10px 12px;
   border-bottom: 1px solid transparent;
   color: var(--ink-faint);
-  font-size: 12px;
+  font-size: var(--text-note);
 }
 
 .auth-tabs a.is-active {
@@ -491,7 +491,7 @@ watch(
   border-left: 2px solid var(--brass);
   background: rgba(168, 130, 69, 0.09);
   color: #735629;
-  font-size: 11px;
+  font-size: var(--text-meta);
   line-height: 1.6;
 }
 

@@ -43,8 +43,26 @@
   --font-ui: "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   --font-number: "SF Pro Display", "Avenir Next", sans-serif;
   --font-accent: var(--font-number);
+  /* 字号阶梯：11 / 12 / 13 / 15 / 17 / 20 / 24 */
   --text-meta: 11px;
   --text-note: 12px;
+  --text-body: 13px;
+  --text-lead: 15px;
+  --text-title: 17px;
+  --text-heading: 20px;
+  --text-display: 24px;
+  --hero-pad-top: 58px;
+  --hero-pad-bottom: 46px;
+  --leading-tight: 1.35;
+  --leading-body: 1.7;
+  --leading-prose: 1.85;
+  /* 层级：纸面 / 抬升 / 浮层 */
+  --card-border: 1px solid rgba(22, 44, 43, 0.1);
+  --card-border-strong: 1px solid rgba(22, 44, 43, 0.2);
+  --card-shadow: 0 1px 2px rgba(22, 49, 46, 0.03), 0 10px 28px rgba(22, 49, 46, 0.05);
+  --card-shadow-raised: 0 2px 6px rgba(22, 49, 46, 0.05), 0 22px 56px rgba(22, 49, 46, 0.09);
+  --accent-ink: var(--brass);
+  --accent-wash: rgba(168, 130, 69, 0.1);
   --measure-copy: 72ch;
   --leading-copy: 1.85;
   --tracking-poem: 0.08em;
@@ -160,7 +178,7 @@ img {
   border-radius: 0;
   background: transparent;
   color: var(--ink);
-  font-size: 13px;
+  font-size: var(--text-body);
   font-weight: 500;
   line-height: 1;
   letter-spacing: 0.06em;

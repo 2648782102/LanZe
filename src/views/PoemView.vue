@@ -230,7 +230,7 @@ onMounted(loadCatalog);
   gap: 8px;
   min-height: 42px;
   color: var(--ink-faint);
-  font-size: 11px;
+  font-size: var(--text-meta);
 }
 
 .breadcrumb a:hover {
@@ -265,7 +265,7 @@ onMounted(loadCatalog);
 .poem-side__category {
   margin: 0 0 7px;
   color: var(--brass);
-  font-size: 11px;
+  font-size: var(--text-meta);
   letter-spacing: 0.14em;
 }
 
@@ -292,7 +292,7 @@ onMounted(loadCatalog);
   border: 0;
   background: transparent;
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: var(--text-note);
   text-align: left;
 }
 
@@ -309,7 +309,7 @@ onMounted(loadCatalog);
   margin-top: auto;
   padding-top: 30px;
   color: var(--ink-faint);
-  font-size: 11px;
+  font-size: var(--text-meta);
 }
 
 .poem-side__back:hover {
@@ -417,7 +417,7 @@ onMounted(loadCatalog);
 .annotation p {
   margin: 0 0 8px;
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: var(--text-body);
   line-height: var(--leading-copy);
   text-wrap: pretty;
 }
@@ -514,7 +514,7 @@ onMounted(loadCatalog);
   align-items: center;
   gap: 7px;
   color: var(--ink-soft);
-  font-size: 11px;
+  font-size: var(--text-meta);
 }
 
 .related-section header a:hover {
@@ -552,7 +552,7 @@ onMounted(loadCatalog);
 
 .related-list em {
   color: var(--ink-faint);
-  font-size: 11px;
+  font-size: var(--text-meta);
   font-style: normal;
 }
 
