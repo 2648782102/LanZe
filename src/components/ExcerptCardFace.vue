@@ -102,14 +102,14 @@ const handleSave = () => {
   pointer-events: none;
 }
 
-.legacy-card:not(.is-turning):not(.is-dragging):not(.is-hover-locked):hover .legacy-card__box--current {
+.legacy-card:not(.is-turning):not(.is-dragging):not(.is-exchanging):not(.is-hover-locked):hover .legacy-card__box--current {
   transform: rotateX(5deg) translateY(calc(-3px * var(--legacy-scale)));
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.72),
     0 calc(8px * var(--legacy-scale)) calc(18px * var(--legacy-scale)) rgba(22, 49, 46, 0.09);
 }
 
-.legacy-card:not(.is-turning):not(.is-dragging):not(.is-hover-locked):hover .legacy-card__box--current::after {
+.legacy-card:not(.is-turning):not(.is-dragging):not(.is-exchanging):not(.is-hover-locked):hover .legacy-card__box--current::after {
   transform: translateY(100%);
   opacity: 1;
 }

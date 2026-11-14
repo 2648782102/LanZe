@@ -631,8 +631,8 @@ const main = async () => {
     return frame;
   })()`);
   if (!swipeFrame.swiping || swipeFrame.progress <= 0 || swipeFrame.direction !== 'right'
-    || swipeFrame.faceOffset !== 0) {
-    throw new Error(`Excerpt swipe did not keep the card face static: ${JSON.stringify(swipeFrame)}`);
+    || swipeFrame.faceOffset < 6 || swipeFrame.faceOffset > 20) {
+    throw new Error(`Excerpt swipe did not drag the card face with the pointer: ${JSON.stringify(swipeFrame)}`);
   }
   const swipedExcerpt = await waitUntil("swipe excerpt turn", () => evaluate(`
     (() => {
