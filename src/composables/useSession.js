@@ -1,23 +1,12 @@
-import { computed, getCurrentInstance, inject, ref } from "vue";
-import VueCookies from "vue-cookies";
+import { computed, ref } from "vue";
 import { getDemoProfile, mockUpdateProfile } from "../services/mockApi.js";
+import { sessionCookies } from "../services/sessionCookies.js";
 
-export const SESSION_KEY = "$cookies";
-const fallbackCookies = VueCookies;
 const sessionVersion = ref(0);
-
-const getCookies = () => {
-  const instance = getCurrentInstance();
-  return (
-    instance?.proxy?.$cookies ||
-    inject(SESSION_KEY, null) ||
-    fallbackCookies
-  );
-};
 
 const readCookie = (key) => {
   try {
-    return getCookies().get(key);
+    return sessionCookies.get(key);
   } catch {
     return null;
   }
@@ -25,9 +14,7 @@ const readCookie = (key) => {
 
 const writeCookie = (key, value) => {
   try {
-    const cookies = getCookies();
-    cookies.config("1d");
-    cookies.set(key, value);
+    sessionCookies.set(key, value);
     sessionVersion.value += 1;
   } catch {
     return;
@@ -36,7 +23,7 @@ const writeCookie = (key, value) => {
 
 const removeCookie = (key) => {
   try {
-    getCookies().remove(key);
+    sessionCookies.remove(key);
     sessionVersion.value += 1;
   } catch {
     return;
@@ -131,5 +118,3 @@ export const useSession = () => {
     clearSession,
   };
 };
-
-export const useCookies = () => getCookies();

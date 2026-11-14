@@ -427,6 +427,7 @@ const main = async () => {
     const box = cards[0]?.querySelector('.legacy-card__box--current');
     const verse = cards[0]?.querySelector('.legacy-card__box--current .legacy-card__verse');
     const art = cards[0]?.querySelector('.legacy-card__box--current .legacy-card__art');
+    const avifSource = cards[0]?.querySelector('.legacy-card__box--current picture source[type="image/avif"]');
     const boxRect = box?.getBoundingClientRect();
     const verseRect = verse?.getBoundingClientRect();
     const artRect = art?.getBoundingClientRect();
@@ -439,6 +440,8 @@ const main = async () => {
       artLoaded: Boolean(art?.complete && art.naturalWidth > 0),
       artWidth: art?.getAttribute('width') || '',
       artHeight: art?.getAttribute('height') || '',
+      artCurrentSrc: art?.currentSrc || '',
+      avifSrcset: avifSource?.getAttribute('srcset') || '',
       boxBackground: box ? getComputedStyle(box).backgroundColor : '',
       boxOverflow: box ? getComputedStyle(box).overflow : '',
       rightGutter: boxRect && verseRect ? boxRect.right - verseRect.right : 0,
@@ -457,6 +460,9 @@ const main = async () => {
   }
   if (!excerptCards.artLoaded || excerptCards.artWidth !== "720" || excerptCards.artHeight !== "412") {
     throw new Error("Historical artwork did not render with stable dimensions");
+  }
+  if (!excerptCards.avifSrcset.endsWith('.avif') || !excerptCards.artCurrentSrc.includes('.avif')) {
+    throw new Error(`Historical artwork did not load its optimized AVIF source: ${JSON.stringify(excerptCards)}`);
   }
   if (excerptCards.boxBackground !== "rgb(255, 255, 255)" || excerptCards.boxOverflow !== "hidden") {
     throw new Error("Historical card surface did not render");

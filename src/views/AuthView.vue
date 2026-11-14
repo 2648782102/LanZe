@@ -1,7 +1,10 @@
 <template>
   <main class="auth-page">
     <section class="auth-art" aria-hidden="true">
-      <img :src="authImage" alt="" width="960" height="600" decoding="async" />
+      <picture>
+        <source :srcset="authAvif" type="image/avif" />
+        <img :src="authImage" alt="" width="960" height="600" decoding="async" fetchpriority="low" />
+      </picture>
       <div class="auth-art__veil" />
       <router-link class="auth-brand" to="/" tabindex="-1">
         <span>兰</span>
@@ -129,6 +132,7 @@ import { userLogin, userReg } from "../apis/api/login.js";
 import { useSession } from "../composables/useSession.js";
 import { notify } from "../composables/useNotices.js";
 import authImage from "../assets/exhibit/auth-cover-960.jpg";
+import authAvif from "../assets/exhibit/auth-cover-960.avif";
 
 const route = useRoute();
 const router = useRouter();
@@ -232,7 +236,11 @@ watch(
   color: var(--porcelain-panel);
 }
 
-.auth-art > img {
+.auth-art > picture {
+  display: contents;
+}
+
+.auth-art > picture > img {
   position: absolute;
   inset: 0;
   width: 100%;

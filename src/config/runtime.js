@@ -16,8 +16,6 @@ export const createRuntimeConfig = (env = {}) => ({
   apiBaseUrl: normalizeBase(env.VITE_API_BASE_URL),
   apiTimeout: Number(env.VITE_API_TIMEOUT) > 0 ? Number(env.VITE_API_TIMEOUT) : 4000,
   useMock: readFlag(env.VITE_USE_MOCK, !normalizeBase(env.VITE_API_BASE_URL)),
-  supabaseUrl: env.VITE_SUPABASE_URL || "",
-  supabaseKey: env.VITE_SUPABASE_ANON_KEY || "",
   demoUser,
 });
 
@@ -26,7 +24,5 @@ export const runtimeConfig = createRuntimeConfig(
 );
 
 export const hasRemoteApi = (config = runtimeConfig) => Boolean(config.apiBaseUrl) && !config.useMock;
-export const hasSupabase = (config = runtimeConfig) =>
-  Boolean(config.supabaseUrl && config.supabaseKey);
 
 export { demoUser };

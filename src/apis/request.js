@@ -1,4 +1,3 @@
-import axios from "axios";
 import { apiConfig, baseUrl } from "./env.js";
 import { failure, isSuccess, normalizePoemPayload } from "../utils/response.js";
 import { notify } from "../composables/useNotices.js";
@@ -23,6 +22,27 @@ import {
 import { hasRemoteApi } from "../config/runtime.js";
 
 let fallbackNoticeShown = false;
+
+const fetchRemote = async (url, { method, data, params, timeout }) => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
+  const target = new URL(`${baseUrl}${url}`);
+  for (const [key, value] of Object.entries(params || {})) {
+    if (value !== undefined && value !== null) target.searchParams.set(key, String(value));
+  }
+  try {
+    const response = await fetch(target, {
+      method: String(method || "get").toUpperCase(),
+      headers: data === null || data === undefined ? undefined : { "Content-Type": "application/json" },
+      body: data === null || data === undefined ? undefined : JSON.stringify(data),
+      signal: controller.signal,
+    });
+    if (!response.ok) throw new Error(`远端接口返回 ${response.status}`);
+    return await response.json();
+  } finally {
+    clearTimeout(timer);
+  }
+};
 
 const showFallbackNotice = (message) => {
   if (fallbackNoticeShown || typeof document === "undefined") return;
@@ -80,14 +100,13 @@ export const request = async (url, method = "get", data = null, params = null) =
 
   if (useRemote) {
     try {
-      const response = await axios({
-        url: `${baseUrl}${url}`,
+      const response = await fetchRemote(url, {
         method,
         data,
         params,
         timeout: apiConfig.apiTimeout,
       });
-      const normalized = normalizeRemoteResponse(response.data, url, getFallback);
+      const normalized = normalizeRemoteResponse(response, url, getFallback);
       if (!shouldFallback(normalized)) return normalized;
       showFallbackNotice("远端接口未返回有效数据");
       return getFallback();

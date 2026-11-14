@@ -47,14 +47,17 @@
 
         <div class="exhibit-card" aria-label="今日诗意图">
           <div class="exhibit-card__frame">
-            <img
-              :src="exhibitImage"
-              alt="月色与白花构成的青灰色诗意图"
-              width="672"
-              height="768"
-              decoding="async"
-              fetchpriority="high"
-            />
+            <picture>
+              <source :srcset="exhibitAvif" type="image/avif" />
+              <img
+                :src="exhibitImage"
+                alt="月色与白花构成的青灰色诗意图"
+                width="672"
+                height="768"
+                decoding="async"
+                fetchpriority="high"
+              />
+            </picture>
             <span class="exhibit-card__seal">兰泽馆藏</span>
           </div>
           <div class="exhibit-card__caption">
@@ -75,17 +78,17 @@
         <div class="legacy-gallery__card">
           <ExcerptCard
             ref="excerptCardRef"
-            v-if="excerptStack.length"
-            :data-excerpt-queue-depth="excerptQueueDepth"
-            :excerpt="excerptStack[0]"
-            :upcoming-excerpts="excerptStack.slice(1)"
-            :saved="excerptSaved.includes(`excerpt-${excerptStack[0].content}`)"
-            :disabled="excerptStatus === 'loading'"
-            @toggle-save="toggleStackExcerptSave"
-            @needs-next="prepareNextExcerpt"
-            @settled="finishExcerptTurn"
+            v-if="stack.length"
+            :data-excerpt-queue-depth="depth"
+            :excerpt="stack[0]"
+            :upcoming-excerpts="stack.slice(1)"
+            :saved="stack[0].saved"
+            :disabled="status === 'loading'"
+            @toggle-save="toggleSavedExcerpt"
+            @needs-next="prepareRemote"
+            @settled="turn"
           />
-          <p v-if="excerptStatus === 'loading' && !excerptStack.length" class="legacy-card-status" role="status">正在展开今日摘录……</p>
+          <p v-if="status === 'loading' && !stack.length" class="legacy-card-status" role="status">正在展开今日摘录……</p>
         </div>
         <article class="strip-intro">
           <p class="eyebrow">余韵 · 一则</p>
@@ -100,15 +103,15 @@
               class="button button--quiet"
               type="button"
               aria-label="换一句今日摘录"
-              :disabled="excerptStatus === 'loading'"
+              :disabled="status === 'loading'"
               @click="excerptCardRef?.turn()"
             >
               <AppIcon name="chevron-right" :size="15" />
               换一句
             </button>
           </div>
-          <p class="excerpt-source" aria-live="polite" :class="{ 'is-refreshing': excerptStatus === 'loading' }">
-            {{ excerptSource === "remote" ? "诗句源：随机古诗词 API" : "诗句源：仓库内置摘录" }}
+          <p class="excerpt-source" aria-live="polite" :class="{ 'is-refreshing': status === 'loading' }">
+            {{ sourceLabel }}
           </p>
         </article>
       </div>
@@ -117,18 +120,26 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, ref } from "vue";
 import AppIcon from "../components/AppIcon.vue";
 import ExcerptCard from "../components/ExcerptCard.vue";
-import { readStore, writeStore } from "../services/browserStore.js";
-import { loadExcerptFromSource, makeLocalExcerpt } from "../services/poetrySource.js";
-import { poetrySourceConfig } from "../config/poetrySource.js";
 import { useLibrary } from "../composables/useLibrary.js";
+import { useExcerptDeck } from "../composables/useExcerptDeck.js";
 import { notify } from "../composables/useNotices.js";
 import { curatedPoems, getDailyLibraryPoem, asLibraryPoem } from "../data/poetryCatalog.js";
 import exhibitImage from "../assets/exhibit/songci300-768.jpg";
+import exhibitAvif from "../assets/exhibit/songci300-768.avif";
 
 const { isSaved, toggleSaved } = useLibrary();
+const {
+  stack,
+  status,
+  sourceLabel,
+  depth,
+  prepareRemote,
+  turn,
+  toggleSavedExcerpt,
+} = useExcerptDeck();
 const getFeaturedPoems = () => [
   getDailyLibraryPoem(),
   ...curatedPoems.slice(1, 10).map(asLibraryPoem),
@@ -142,21 +153,7 @@ const dateLabel = new Intl.DateTimeFormat("zh-CN", {
 const dayIndex = Math.floor(Date.now() / 86400000);
 const featured = getFeaturedPoems();
 const page = ref(dayIndex % featured.length);
-const excerptPage = ref(dayIndex);
-const excerpt = ref(null);
-const nextExcerpt = ref(null);
-const nextExcerptSource = ref("local");
-const excerptStack = ref([]);
-const excerptStatus = ref("loading");
-const excerptSource = ref("local");
-const excerptQueueDepth = ref(0);
-const EXCERPT_QUEUE_SIZE = 6;
-const REMOTE_PREFETCH_SIZE = 4;
-let excerptQueue = [];
-let remoteRequested = false;
 const excerptCardRef = ref(null);
-const storedExcerptSaves = readStore("lanze_saved_excerpts", []);
-const excerptSaved = ref(Array.isArray(storedExcerptSaves) ? storedExcerptSaves.map(String) : []);
 const isSwitching = ref(false);
 const savePulse = ref(false);
 let switchTimer;
@@ -184,90 +181,6 @@ const titleParts = computed(() => {
 });
 const saved = computed(() => isSaved(poem.value.id));
 
-const decorateExcerpt = (source) => ({
-  ...source,
-  title: source.origin,
-  paragraph: source.content,
-  paragraphs: [source.content],
-  tags: [source.category, "摘录"],
-  type: "legacy",
-  titleNote: "本页只展示一句摘录，不替代完整底本。",
-});
-
-const localExcerptFor = (index) => decorateExcerpt(makeLocalExcerpt(index));
-
-const fillLocalQueue = () => {
-  const knownContent = new Set([
-    excerpt.value?.content,
-    ...excerptQueue.map((entry) => entry.decorated.content),
-  ].filter(Boolean));
-  let offset = excerptQueue.length + 1;
-  while (excerptQueue.length < EXCERPT_QUEUE_SIZE) {
-    const candidate = localExcerptFor(excerptPage.value + offset);
-    offset += 1;
-    if (knownContent.has(candidate.content)) continue;
-    excerptQueue.push({ decorated: candidate, source: "local" });
-    knownContent.add(candidate.content);
-  }
-  const head = excerptQueue[0] || { decorated: localExcerptFor(excerptPage.value + 1), source: "local" };
-  nextExcerpt.value = head.decorated;
-  nextExcerptSource.value = head.source;
-  excerptQueueDepth.value = excerptQueue.length;
-};
-
-const syncQueueHead = () => {
-  const head = excerptQueue[0];
-  if (!head) {
-    fillLocalQueue();
-    return;
-  }
-  nextExcerpt.value = head.decorated;
-  nextExcerptSource.value = head.source;
-  excerptStack.value = [excerpt.value, ...excerptQueue.slice(0, 3).map((entry) => entry.decorated)]
-    .filter(Boolean)
-    .map((entry) => ({
-      ...entry,
-      saved: excerptSaved.value.includes(`excerpt-${entry.content}`),
-    }));
-};
-
-const loadExcerpt = () => {
-  excerpt.value = localExcerptFor(excerptPage.value);
-  excerptSource.value = "local";
-  excerptStatus.value = "fallback";
-  fillLocalQueue();
-  syncQueueHead();
-};
-
-const prepareNextExcerpt = async () => {
-  fillLocalQueue();
-  if (!poetrySourceConfig.enabled || remoteRequested) return;
-  remoteRequested = true;
-  const basePage = excerptPage.value;
-  const previousContent = excerpt.value?.content || "";
-  const remoteResults = await Promise.all(
-    Array.from({ length: REMOTE_PREFETCH_SIZE }, (_, position) =>
-      loadExcerptFromSource({
-        index: basePage + position + 1,
-        previousContent,
-      })),
-  );
-  if (basePage !== excerptPage.value) return;
-  const knownContent = new Set([
-    excerpt.value?.content,
-    ...excerptQueue.map((entry) => entry.decorated.content),
-  ].filter(Boolean));
-  for (const result of remoteResults) {
-    if (result.source !== "remote" || result.reason) continue;
-    const decorated = decorateExcerpt(result.excerpt);
-    if (knownContent.has(decorated.content)) continue;
-    excerptQueue.push({ decorated, source: "remote" });
-    knownContent.add(decorated.content);
-  }
-  fillLocalQueue();
-  syncQueueHead();
-};
-
 const nextPoem = () => {
   if (isSwitching.value) return;
   const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -277,18 +190,6 @@ const nextPoem = () => {
     page.value = (page.value + 1) % featured.length;
     switchTimer = window.setTimeout(() => { isSwitching.value = false; }, prefersReducedMotion ? 0 : 140);
   }, prefersReducedMotion ? 0 : 120);
-};
-
-const finishExcerptTurn = () => {
-  if (excerptStatus.value === "loading" || !excerptQueue.length) return;
-  const result = excerptQueue.shift();
-  excerptPage.value += 1;
-  excerpt.value = result.decorated;
-  excerptSource.value = result.source === "remote" ? "remote" : "local";
-  excerptStatus.value = result.source === "remote" ? "ready" : "fallback";
-  fillLocalQueue();
-  syncQueueHead();
-  prepareNextExcerpt();
 };
 
 const toggleSave = () => {
@@ -307,18 +208,6 @@ const toggleSave = () => {
   notify(added ? "已收入你的诗卷" : "已从诗卷移除", added ? "success" : "info");
 };
 
-const toggleStackExcerptSave = (targetExcerpt) => {
-  const key = `excerpt-${targetExcerpt.content}`;
-  const added = !excerptSaved.value.includes(key);
-  const next = added
-    ? [...excerptSaved.value, key]
-    : excerptSaved.value.filter((id) => id !== key);
-  excerptSaved.value = next;
-  writeStore("lanze_saved_excerpts", next);
-  syncQueueHead();
-  notify(added ? "已收下这一句摘录" : "已取消这句摘录", added ? "success" : "info");
-};
-
 const speakPoem = () => {
   if (!("speechSynthesis" in window)) {
     notify("当前浏览器不支持朗读", "warning");
@@ -332,11 +221,6 @@ const speakPoem = () => {
   utterance.rate = 0.86;
   window.speechSynthesis.speak(utterance);
 };
-
-onMounted(() => {
-  loadExcerpt();
-  prepareNextExcerpt();
-});
 
 onBeforeUnmount(() => {
   window.clearTimeout(switchTimer);
@@ -627,6 +511,10 @@ onBeforeUnmount(() => {
   inset: 5px;
   border: 1px solid rgba(168, 130, 69, 0.28);
   content: "";
+}
+
+.exhibit-card__frame > picture {
+  display: contents;
 }
 
 .exhibit-card__frame img {

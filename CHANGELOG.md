@@ -6,6 +6,13 @@
 
 > 记录 `v0.4.0` 之后、尚未发布的改动。
 
+### Changed
+
+- 整体性能与架构优化：业务请求改用原生 `fetch`，会话改用原生 Cookie 适配器，移除 `axios`、`vue-cookies`、`@supabase/supabase-js` 与未被引用的 Supabase 适配器；首屏不再预加载 62KB 的 `data-vendor` chunk，npm 依赖由 75 个包降至 38 个且 `npm audit` 为 0 漏洞。
+- 三张首屏位图（展品图、登录封面、摘录扇舟图）增加 AVIF 优先源并保留原 JPG/PNG 兜底；浏览器只下载 AVIF，单张资源最多从 439KB 降到 51KB。摘录卡图片标记为低优先级，不与首屏展品图争带宽。
+- `ReadView` 的摘录牌堆状态抽取为 `useExcerptDeck()` composable，视图只保留展厅渲染与事件转发；新增 `sessionCookies` 单测并移除已废弃的 Supabase 配置用例，单测总数为 41。
+- Vite 构建开启 manifest，并由轻量插件为首屏 `ReadView` 的 JS/CSS 注入 `modulepreload` / `preload`；`index.html` 保持哈希资源引用与 CLS 0。
+
 ### Added
 
 - 摘录卡改为真正提前预载：首屏同步生成 6 句本地队列，远程源挂载时并行预取 4 句未来备用句；点击/轻拂只消费队首并自动补齐本地槽位，交互过程中不发起新的诗句请求。Browser E2E 增加预载深度、手势期间请求数不变与远程源 2.5 秒延迟用例。

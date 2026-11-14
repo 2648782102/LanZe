@@ -31,7 +31,7 @@ find src/assets public -type f -print
 
 | 类别 | 当前位置 | 域名 / 用途 | 风险与状态 | 后续动作 |
 | --- | --- | --- | --- | --- |
-| 运行时依赖 | `package.json` / `package-lock.json` | Vue、Vue Router、Axios、Vue Cookies、Supabase JS 与 Vite 工具链 | 当前不再引入 Bootstrap、Font Awesome、Element Plus、Lottie、APlayer 或滑块验证码；npm 包各自许可见 lock 元数据 | 升级时再次核对依赖许可与构建产物中的版权说明 |
+| 运行时依赖 | `package.json` / `package-lock.json` | Vue、Vue Router 与 Vite 工具链；业务请求与 Cookie 均使用浏览器原生能力 | 当前不再引入 Axios、Vue Cookies、Supabase JS、Bootstrap、Font Awesome、Element Plus、Lottie、APlayer 或滑块验证码；npm 包各自许可见 lock 元数据 | 升级时再次核对依赖许可与构建产物中的版权说明 |
 | 默认本地声景与封面 | `public/media/lanze-{qingshan,yuese,wanzhou}.wav`、对应 `-cover.svg`、`audio-manifest.json` | 2026-11-07 由 `scripts/generate-audio-library.mjs` 确定性合成的三段 24 秒 PCM 声景与原创 SVG | 由仓库贡献者提供；不引入第三方录音或美术素材；清单和 SHA-256 随仓库分发 | 修改音轨后运行 `npm run audio:generate && npm run audio:verify`，同步更新校验清单与本节记录 |
 | 可选自定义音源 | `src/config/audio.js`、`src/components/AudioDock.vue`、`VITE_AUDIO_TRACKS` | 部署者显式提供的音轨 URL / 封面 URL | 默认不含任何第三方媒体域；启用后版权、热链与隐私政策由配置者负责 | 仅在授权明确时设置 `VITE_AUDIO_SOURCE=custom`；无效配置自动回退并显示提示，不可达 URL 显示状态并允许重试 |
 | 首页诗句源 | `src/services/poetrySource.js`、`VITE_POETRY_SOURCE_URL` | 默认关闭；显式 `VITE_POETRY_SOURCE=remote` 时才请求 `https://v1.jinrishici.com/all.json` | 第三方服务不随仓库托管，授权与稳定性未核验；不承诺 SLA；默认构建不请求 | 可保持 `VITE_POETRY_SOURCE=local`，或换成自建兼容接口；公开部署前核查服务条款与内容授权 |

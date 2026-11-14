@@ -6,7 +6,7 @@
 
 - 历史基线共 42 次提交；首个提交 `74b4186`（2022-06-03）；v0.2.0 前无 Git tag。
 - 当前 `package.json` 脚本：`dev`、`build`、`preview`、`test`、`lint`；Vite `^6.4.5`，`"type": "module"`。
-- 当前源码形态：Vue 3 SFC + Vue Router 4 hash 模式 + 自有组件/CSS token + Axios；已移除旧 UI 套件、动画运行时与第三方播放器依赖。
+- 当前源码形态：Vue 3 SFC + Vue Router 4 hash 模式 + 自有组件/CSS token + 原生 `fetch`；已移除旧 UI 套件、动画运行时、第三方播放器、Axios、Vue Cookies 与 Supabase JS 依赖。
 - 当前没有随仓库附带的后端、数据库迁移、账号服务或可验证线上 Demo；默认数据源为浏览器本地演示数据。
 
 ## 2. 系统边界
@@ -22,7 +22,7 @@
         ├── src/config/runtime.js → src/apis/env.js：公开环境变量
         ├── src/apis/request.js：优先请求 VITE_API_BASE_URL 对应的自建 API
         ├── src/services/mockApi.js + src/data/：未配置 API / 失败时自动降级
-        └── src/function/supabase.js：仅在配置可选 Supabase 环境变量时启用，否则使用本地适配器
+        └── src/composables/useExcerptDeck.js：首页三层摘录牌堆的预载队列、收藏与来源状态
 
 构建与治理（不在浏览器运行时内）
   ├── npm ci / npm run build / npm run test / npm run lint
@@ -48,11 +48,11 @@
 | `src/views/ComposeView.vue` | 写作台：草稿、实时预览与本地发布 | 未登录时重定向到登录 |
 | `src/views/AuthView.vue` | 登录与注册 | 表单校验、演示账号与本地会话 |
 | `src/components/AudioDock.vue` | 原生音频播放器 | 默认加载 `public/media/` 三段本地声景；支持播放列表、切轨、进度、音量与偏好记忆；无效自定义配置显示回退提示，不可达 URL 显示状态并允许重试 |
-| `src/apis/request.js` | Axios + 本地演示数据双通道请求函数 | 远端返回无效数据时自动降级并提示一次 |
+| `src/apis/request.js` | 原生 `fetch` + 本地演示数据双通道请求函数 | 远端返回无效数据时自动降级并提示一次 |
 | `src/services/poetrySource.js` | 首页历史摘录卡的独立诗句源适配器 | 默认读取仓库内摘录与精校短句；显式开启后才请求随机诗句接口，失败或超时回退并显示来源状态 |
 | `src/apis/env.js` | 从 `src/config/runtime.js` 导出 `baseUrl` 与运行配置 | 不再硬编码后端地址 |
 | `src/apis/api/list.js`、`login.js` | 领域 API 函数 | 真实 API 契约由自建服务定义；本地演示路径见 `src/services/mockApi.js` |
-| `src/function/supabase.js` | 可选 Supabase 兼容适配器 | URL / anon key 仅来自公开环境变量；缺失时使用本地适配器 |
+| `src/services/sessionCookies.js` | 原生 Cookie 会话读写 | 仅存演示账号/资料，带 1 天 max-age 与 SameSite=Lax |
 | `src/config/`、`src/data/`、`src/services/`、`src/composables/`、`src/utils/` | 配置、演示数据、Mock API、会话/诗库/通知、响应与查询工具 | 演示数据不提供真实账号安全 |
 | `src/styles/base.css`、`docs/DESIGN_SYSTEM.md` | 唯一设计 token 与目标模式契约 | 页面组件可局部扩展，但不应重建另一套视觉语言 |
 | `public/` | `favicon.ico`、展示素材与本地演示音源 | OG 图是当前设计衍生插画，不是运行截图 |
@@ -115,7 +115,7 @@ data source adapter
 
 ## 7. 安全与授权边界
 
-- 历史代码中存在两处硬编码 anon key、多个历史外部域名和分散的 Axios 调用；v0.2.0 已清理源码中的硬编码 key 并统一请求入口。若历史部署仍使用这些凭据，应在服务端轮换或撤销。
+- 历史代码中存在两处硬编码 anon key、多个历史外部域名和分散的 Axios 调用；v0.2.0 已清理源码中的硬编码 key 并统一请求入口。当前版本进一步移除 Supabase 适配器、Axios 与 Vue Cookies，仅保留原生浏览器能力；若历史部署仍使用这些凭据，应在服务端轮换或撤销。
 - 浏览器中的 `VITE_` 变量不是秘密；私密配置只属于服务端环境。
 - 字体、图片、自定义音源、诗词文本与 CDN 资源需要单独确认授权；MIT 只覆盖本仓库贡献者提供的代码/文档与仓库生成的默认演示资源。
 - 安全报告的私密流程见根目录 `SECURITY.md`。

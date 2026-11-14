@@ -4,7 +4,7 @@
 
 ### 兰泽诗词是什么？
 
-一个始于 2022 年的中文古诗词前端项目。当前仓库由 Vue 3、Vue Router、自有组件、Vite 6 与 Axios 组成，包含今日展厅、诗词索引、读诗详情、我的诗卷、写作台与登录等界面。2026 年已补齐本地演示数据、单测、lint、治理文档、CI 与发布素材，目标是让它可复现、可贡献、可逐步替换数据源。
+一个始于 2022 年的中文古诗词前端项目。当前仓库由 Vue 3、Vue Router、自有组件、Vite 6 与原生浏览器 API 组成，包含今日展厅、诗词索引、读诗详情、我的诗卷、写作台与登录等界面。2026 年已补齐本地演示数据、单测、lint、治理文档、CI 与发布素材，目标是让它可复现、可贡献、可逐步替换数据源。
 
 ### 这是一个完整的诗词社区产品吗？
 
@@ -50,9 +50,9 @@
 
 `src/config/runtime.js` 统一解析它们：未配置 API 时 `useMock` 默认为 `true`；配置 API 且 `VITE_USE_MOCK=false` 时 `src/apis/request.js` 请求远端；远端失败会自动回到演示数据。其余变量见 `.env.example`。
 
-### 可以把 Supabase 的 anon key 放在前端吗？
+### 当前版本还连接 Supabase 吗？
 
-即使是公开（anon）key，也不等于「可以随意写在源码里」。它仍受 RLS/权限、项目配置和配额约束；v0.2.0 已移除历史硬编码 key，改为可选的 `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`。若旧部署仍使用历史凭据，应轮换或撤销。`service_role`、数据库口令、私人 token 绝不能加 `VITE_` 前缀或提交到仓库。详见 `SECURITY.md`。
+不连接。运行时登录、资料与发布默认全部走浏览器本地演示数据；历史 Supabase 适配器与 SDK 依赖已删除。若要接入真实后端，请通过 `VITE_API_BASE_URL` 配置同源反向代理，并在服务端管理凭据。任何 `service_role`、数据库口令或私人 token 都绝不能加 `VITE_` 前缀或提交到仓库。详见 `SECURITY.md`。
 
 ### 诗句、音乐或图标为什么有时不显示？
 
@@ -70,7 +70,7 @@
 
 ### 为什么 CI 用 `npm run test --if-present`？
 
-`--if-present` 是兼容旧工作流的兜底写法；当前 `package.json` 已定义 `test` 脚本，所以 CI 会实际执行 39 个单测，不假定任何模块格式或测试框架；静态扫描由 Documentation checks job 执行。
+`--if-present` 是兼容旧工作流的兜底写法；当前 `package.json` 已定义 `test` 脚本，所以 CI 会实际执行 41 个单测，不假定任何模块格式或测试框架；静态扫描由 Documentation checks job 执行。
 
 ### 仓库 About、topics、Release、Discussion 在哪里维护？
 

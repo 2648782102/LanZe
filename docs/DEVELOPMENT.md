@@ -71,7 +71,7 @@ VITE_USE_MOCK=true
 核对顺序：
 
 1. 打开 `package.json`，确认实际脚本名与 README/CI 一致。
-2. 打开 `src/config/runtime.js`、`src/config/poetrySource.js` 与 `src/config/audio.js`，确认 `VITE_API_BASE_URL`、`VITE_API_TIMEOUT`、`VITE_USE_MOCK`、`VITE_POETRY_SOURCE*`、Supabase 与音源变量的解析规则；需要重建默认声景时运行 `npm run audio:generate && npm run audio:verify`。
+2. 打开 `src/config/runtime.js`、`src/config/poetrySource.js` 与 `src/config/audio.js`，确认 `VITE_API_BASE_URL`、`VITE_API_TIMEOUT`、`VITE_USE_MOCK`、`VITE_POETRY_SOURCE*` 与音源变量的解析规则；业务请求与会话分别使用 `src/apis/request.js` 和 `src/services/sessionCookies.js` 的原生实现。需要重建默认声景时运行 `npm run audio:generate && npm run audio:verify`。
 3. 打开 `src/apis/request.js`，确认远端优先、失败降级与提示逻辑。
 4. 搜索 `http://`、`https://` 与 `createClient(`，确认页面是否仍有绕过请求层的外部调用或外部素材。
 5. 若源码与文档不一致，以源码事实修文档；若属于现代化遗漏，开 issue 说明。

@@ -82,7 +82,6 @@ npm run build
 | `VITE_USE_MOCK` | `true` | `false`（建议） |
 | `VITE_API_BASE_URL` | 可不填 | `https://api.example.com/` 或 `/api/` |
 | `VITE_API_TIMEOUT` | `4000` | 按后端响应时间调整 |
-| `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` | 可不填 | 仅在确认权限与 RLS 后填写公开配置 |
 | `VITE_POETRY_SOURCE` / `VITE_POETRY_SOURCE_URL` / `VITE_POETRY_SOURCE_TIMEOUT` | `false` / 空 / `4000`（完全离线） | 按服务条款选择默认或自建兼容接口，并配置对应 CSP |
 | `VITE_AUDIO_SOURCE` / `VITE_AUDIO_TRACKS` | `local` / 空 | `custom` 时填写已核验授权的公开音轨 JSON |
 
