@@ -1037,24 +1037,33 @@ watch([dynasty, genre], () => {
 
 @media (max-width: 560px) {
   .index-banner__inner {
+    grid-template-columns: minmax(0, 1fr);
     gap: 12px;
-    padding-block: 28px 20px;
+    padding-block: 26px 22px;
   }
 
-  .index-label span {
-    font-size: 30px;
+  .index-label {
+    display: none;
   }
 
   .index-banner__copy h1 {
-    font-size: clamp(34px, 8.4vw, 48px);
-    line-height: 1.22;
+    font-size: clamp(30px, 7.6vw, 40px);
+    line-height: 1.24;
   }
 
   .index-banner__copy > p {
-    max-width: 34em;
-    margin-top: 10px;
+    max-width: 30em;
+    margin-top: 9px;
     font-size: var(--text-note);
-    line-height: 1.8;
+    line-height: 1.7;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+
+  .index-banner__stats {
+    display: none;
   }
 
   .index-banner__stats dd {

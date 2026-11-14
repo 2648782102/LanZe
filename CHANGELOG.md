@@ -8,6 +8,7 @@
 
 ### Changed
 
+- 移动端做「取舍而非压缩」：≤820px 完全隐藏播放器（`display:none`），底部安全区 132→96px；探索页 hero 改单列、隐藏竖排标签与统计、说明限两行；诗卷页隐藏 hero 统计（与 tab 重复）、客态账号卡前移并压缩（隐藏「客」字、缩小标题与间距）；写作页隐藏预览面板、hero 压缩、说明文案隐藏；首页展品图比例 2.6→1.75 减轻过扁。Browser E2E 的播放器断言改为「移动端不显示」，并放宽安全区与预览断言；a11y 仍 0 违规、性能预算与 70 项响应式扫描全绿。
 - 修复摘录卡轻拂拖动失效：新增的 `.legacy-card__turn` 无障碍按钮本身是 `<button>`，而 `startSwipe` 里的 `event.target.closest("button")` 会连带把它排除，导致指针按下后不进入拖拽。改为只排除收藏按钮 `.legacy-card__save`；该按钮同时移除 `@click`，点击统一由卡片冒泡处理，避免双触发。复测：轻拂 4/4 在松手前切换、`doubleTurnCounts [1,1,1]`、0 掉帧。
 - 无障碍与性能门禁：新增 `npm run audit:a11y`（axe-core，5 路由 × 桌面/移动端，WCAG 2.1 A/AA），实测从 12 组违规降到 **0**：`--ink-faint` #809793→#586965、新增 `--brass-text` #8a6933 并替换 42 处正文用金色、`--celadon-deep`→#476c63、移动端底部导航文字 0.5→0.62 透明度；摘录卡由 `role="button"` 改为 `role="group"` + 内部真按钮 `.legacy-card__turn`，修掉 nested-interactive。新增 `npm run audit:perf`（LCP/CLS/首屏 JS-CSS gzip 预算）：实测 LCP 296ms、CLS 0、首屏 JS 64KB、CSS 10KB，均达标。两者已接入 Browser E2E workflow；`scripts/browser/lab.mjs` 支持 `CHROME_PATH`/`CHROME_BIN` 以便 CI 复用。新增 `useNotices` 单测，单测 41→43。
 - 视觉体系收敛：新增字号阶梯（`--text-body/lead/title/heading/display`）、行高与卡片层级 token（`--card-border/-strong`、`--card-shadow/-raised`），把散落的 11/12/13px 硬编码替换为 token；三页 hero 统一使用 `--hero-pad-top/-bottom` 节奏（写作页由 34px 提到 58px）。诗途卡片改为实心浅底 + 阴影 + hover 抬升，与列表项的细线分隔形成层级差；账号卡与预览纸改用强边框 + 抬升阴影。写作页「预览不是出版定稿」并入顶部「预览 · 非定稿」，避免被固定播放器遮挡。

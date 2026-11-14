@@ -808,24 +808,7 @@ audio {
 
 @media (max-width: 820px) {
   .audio-dock {
-    right: max(12px, env(safe-area-inset-right));
-    bottom: calc(84px + env(safe-area-inset-bottom));
-    left: max(12px, env(safe-area-inset-left));
-    width: auto;
-    margin-left: auto;
-  }
-
-  .audio-dock.is-expanded {
-    width: min(360px, calc(100vw - 24px));
-  }
-
-  .audio-dock.is-collapsed {
-    width: 192px;
-  }
-
-  .audio-dock__playlist {
-    max-height: min(240px, 50dvh);
-    overflow-y: auto;
+    display: none;
   }
 }
 

@@ -511,11 +511,24 @@ onBeforeUnmount(() => {
   }
 
   .preview-panel {
-    position: static;
+    display: none;
   }
 
   .preview-sheet {
     min-height: 420px;
+  }
+
+  .compose-head {
+    padding-block: 24px 20px;
+  }
+
+  .compose-head h1 {
+    font-size: clamp(34px, 9vw, 46px);
+    line-height: 1.15;
+  }
+
+  .compose-head__copy {
+    display: none;
   }
 }
 

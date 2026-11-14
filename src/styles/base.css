@@ -359,7 +359,7 @@ img {
 
 @media (max-width: 820px) {
   :root {
-    --fixed-layer-space: calc(132px + env(safe-area-inset-bottom));
+    --fixed-layer-space: calc(96px + env(safe-area-inset-bottom));
   }
 }
 

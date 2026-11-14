@@ -115,7 +115,7 @@
         </div>
       </section>
 
-      <aside class="account-panel">
+      <aside class="account-panel" :class="{ 'is-guest': !isLoggedIn }">
         <template v-if="isLoggedIn">
           <div class="account-identity">
             <span class="account-avatar">{{ initial }}</span>
@@ -563,6 +563,28 @@ onMounted(async () => {
     grid-template-columns: 1fr;
   }
 
+  .collection-stats {
+    display: none;
+  }
+
+  .account-panel.is-guest {
+    order: -1;
+    padding: 20px;
+  }
+
+  .account-panel.is-guest .account-mark {
+    display: none;
+  }
+
+  .account-panel.is-guest > h2 {
+    font-size: var(--text-heading);
+  }
+
+  .account-panel.is-guest .local-note {
+    margin-top: 14px;
+    padding-top: 12px;
+  }
+
   .account-panel {
     position: static;
   }
@@ -588,6 +610,10 @@ onMounted(async () => {
     margin-top: 14px;
     font-size: var(--text-body);
     line-height: 1.8;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
   }
 
   .collection-stats {

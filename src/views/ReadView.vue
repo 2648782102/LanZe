@@ -831,7 +831,7 @@ onBeforeUnmount(() => {
   }
 
   .exhibit-card__frame img {
-    aspect-ratio: 2.6;
+    aspect-ratio: 1.75;
   }
 
   .exhibit-card__caption {
