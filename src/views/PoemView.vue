@@ -569,18 +569,24 @@ onMounted(loadCatalog);
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 10px 20px;
-    padding: 24px 22px;
+    padding: 14px 22px;
     border-right: 0;
     border-bottom: 1px solid var(--line);
+  }
+
+  .poem-side__category,
+  .poem-side__author {
+    display: none;
   }
 
   .poem-side__actions {
     display: flex;
     grid-column: 1 / -1;
-    grid-row: 2;
+    grid-row: 1;
     gap: 22px;
-    margin-top: 12px;
+    margin-top: 0;
     overflow-x: auto;
+    scrollbar-width: none;
   }
 
   .icon-action {
@@ -592,7 +598,7 @@ onMounted(loadCatalog);
     grid-row: 1;
     align-self: center;
     margin-top: 0;
-    padding-top: 8px;
+    padding-top: 0;
   }
 
   .poem-body {

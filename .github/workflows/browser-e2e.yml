@@ -60,3 +60,6 @@ jobs:
 
       - name: Performance budget (LCP / CLS / initial JS-CSS)
         run: npm run audit:perf
+
+      - name: Touch target audit (mobile)
+        run: npm run audit:touch

@@ -522,12 +522,20 @@ watch(
 
 .demo-box button {
   min-height: 40px;
-  padding: 0 4px;
-  border: 0;
-  border-bottom: 1px solid var(--ink);
-  background: transparent;
+  padding: 0 14px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
   color: var(--ink);
-  font-size: var(--text-meta);
+  font-size: var(--text-note);
+  letter-spacing: 0.04em;
+  transition:
+    border-color var(--motion-fast) var(--ease-standard),
+    background-color var(--motion-fast) var(--ease-standard);
+}
+
+.demo-box button:hover {
+  border-color: var(--brass);
+  background: var(--surface-soft);
 }
 
 .auth-fineprint {

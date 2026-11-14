@@ -73,7 +73,9 @@ const year = new Date().getFullYear();
 .footer-links a {
   display: inline-flex;
   min-height: 44px;
+  min-width: 44px;
   align-items: center;
+  justify-content: center;
 }
 
 @media (max-width: 820px) {
