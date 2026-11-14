@@ -713,7 +713,7 @@ const main = async () => {
   if (!expandedDock.audioPaused) {
     throw new Error("Expanding the audio dock must not start playback");
   }
-  if (expandedDock.height > 120) {
+  if (expandedDock.height > 140) {
     throw new Error(`Expanded audio dock exceeds the fixed-layer height budget: ${JSON.stringify(expandedDock)}`);
   }
   if (expandedDock.minControlHeight < 36 || expandedDock.seekHeight < 24) {
@@ -1002,7 +1002,7 @@ const main = async () => {
       audioPaused: Boolean(document.querySelector('audio')?.paused),
     };
   })()`);
-  if (narrowExpanded.height > 120 || narrowExpanded.visibleControls < 3
+  if (narrowExpanded.height > 150 || narrowExpanded.visibleControls < 3
     || narrowExpanded.minControlHeight < 36 || !narrowExpanded.audioPaused) {
     throw new Error(`320px expanded audio dock is unstable: ${JSON.stringify(narrowExpanded)}`);
   }

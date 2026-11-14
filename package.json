@@ -11,6 +11,8 @@
     "smoke:browser": "node scripts/smoke.browser.mjs",
     "measure:excerpt": "node scripts/measure-excerpt-switch.mjs",
     "capture:audio": "node scripts/capture-audio-dock.mjs",
+    "compare:audio": "node scripts/compare-audio-dock.mjs",
+    "measure:audio": "node scripts/measure-audio-current.mjs",
     "audio:generate": "node scripts/generate-audio-library.mjs",
     "audio:verify": "node scripts/verify-audio-library.mjs",
     "test": "node --test --test-concurrency=1 scripts/*.test.mjs src/config/*.test.js src/data/*.test.js src/services/*.test.js src/utils/*.test.js",
