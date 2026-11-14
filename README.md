@@ -138,7 +138,7 @@ VITE_AUDIO_TRACKS=[{"name":"示例","artist":"作者","url":"/media/example.mp3"
 
 音源与封面的版权、可用性、防盗链与隐私政策由配置者自行负责；配置缺失或 JSON 无效时自动回退到本地声景并显示一次可读提示，URL 不可达或播放失败时播放器会显示「声景不可达」并允许重试。`VITE_` 变量会进入浏览器产物，不要填入私密地址或凭据。
 
-若只想在本机播放自己合法取得的音频（例如早期版本那几首商业平台曲目的自有文件），可把文件放入 `public/media/private/`，然后运行 `npm run audio:private`。该目录与生成的 `.env.local.audio` 均被 `.gitignore` 忽略，不进入 Git、不参与构建产物分发；脚本只读取本地文件并启动 `vite --mode local.audio`。仓库默认音轨与线上 Pages 仍使用已署名的 CC BY 3.0 古筝节选。请勿把无授权的商业录音提交进仓库或部署到公开站点。
+若只想在本机播放自己合法取得的音频（例如早期版本那几首商业平台曲目的自有文件），可把文件放入 `public/media/private/`，然后运行 `npm run audio:private`；曲目名/作者/顺序可用同目录 `tracks.json` 配置，格式见 `docs/PRIVATE_AUDIO.md`。该目录与生成的 `.env.local.audio` 均被 `.gitignore` 忽略，不进入 Git、不参与构建产物分发；脚本只读取本地文件并启动 `vite --mode local.audio`。仓库默认音轨与线上 Pages 仍使用已署名的 CC BY 3.0 古筝节选。公开仓库的分发授权不由「非商用」或使用者确认单独决定，请勿把未取得授权的商业录音提交进仓库或部署到公开站点。
 
 首页摘录卡默认只使用 `src/data/poems.js` 的内置摘录与精校馆藏短句，不发起外部请求；业务诗库来自 `public/data/poetry/` 的离线分卷。仅当显式设置 `VITE_POETRY_SOURCE=remote` 时才请求 `VITE_POETRY_SOURCE_URL`；接口失败、超时、返回空内容或重复当前诗句会自动回退本地摘录，并在页面标注来源。该服务不由本仓库托管，也不承诺 SLA；部署者可换成自建兼容接口。摘录收藏按诗句内容保存在当前浏览器，不依赖随机接口返回的标识。
 

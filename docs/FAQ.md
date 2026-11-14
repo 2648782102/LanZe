@@ -60,7 +60,7 @@
 
 ### 能把早期版本那几首网易云音乐下载下来放进项目吗？
 
-不建议，也不能作为默认或随仓库分发。早期 `src/pages/Audio.vue` 引用的是 `music.163.com` / `music.126.net` 外链，指向商业平台录音；仓库从未持有这些音频的授权，下载后提交会引入版权与分发风险，外链本身也带签名、会失效（其中两首现已 404）。如果只想在本机听自己合法取得的文件，可把它们放进 `public/media/private/`，运行 `npm run audio:private`；该目录与 `.env.local.audio` 均被 `.gitignore` 忽略，不进入 Git、不改变默认曲库、不部署到 Pages。公开部署或提交到仓库的音频，仍须使用授权清晰的素材并按 `docs/THIRD_PARTY_ASSETS.md` 记录署名。
+不建议，也不能作为默认或随仓库分发。早期 `src/pages/Audio.vue` 引用的是 `music.163.com` / `music.126.net` 外链，指向商业平台录音；仓库从未持有这些音频的授权，下载后提交会引入版权与分发风险，外链本身也带签名、会失效（其中两首现已 404）。「非商用」或使用者自行确认不能替代权利人的公开分发授权。如果只想在本机听自己合法取得的文件，可把它们放进 `public/media/private/` 并用 `tracks.json` 恢复旧版曲名/顺序，运行 `npm run audio:private`，配置格式见 `docs/PRIVATE_AUDIO.md`；该目录与 `.env.local.audio` 均被 `.gitignore` 忽略，不进入 Git、不改变默认曲库、不部署到 Pages。公开部署或提交到仓库的音频，仍须使用授权清晰的素材并按 `docs/THIRD_PARTY_ASSETS.md` 记录署名。
 
 ### 收藏、登录态、个人资料会保存吗？
 

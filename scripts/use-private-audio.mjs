@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { access, readdir, writeFile } from "node:fs/promises";
+import { readFile, readdir, writeFile } from "node:fs/promises";
 import { extname, join } from "node:path";
 
 const root = new URL("../", import.meta.url).pathname;
@@ -12,6 +12,43 @@ const titleFromFilename = (filename) =>
     .replace(/\.[^.]+$/, "")
     .replace(/[_-]+/g, " ")
     .trim() || "本地音轨";
+
+const localUrl = (filename) => `./media/private/${encodeURIComponent(filename)}`;
+
+const readTrackManifest = async () => {
+  try {
+    const parsed = JSON.parse(await readFile(join(privateDirectory, "tracks.json"), "utf8"));
+    return Array.isArray(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+};
+
+const normalizeTrack = (entry, index, available) => {
+  if (!entry || typeof entry !== "object") return null;
+  const filename = typeof entry.file === "string" ? entry.file : "";
+  const hasLocalFile = filename && available.has(filename);
+  const url = typeof entry.url === "string" && entry.url.trim()
+    ? entry.url.trim()
+    : hasLocalFile ? localUrl(filename) : "";
+  if (!url) return null;
+  const coverValue = typeof entry.cover === "string" ? entry.cover.trim() : "";
+  const cover = !coverValue
+    ? undefined
+    : /^(https?:\/\/|\.\/|\/)/.test(coverValue)
+      ? coverValue
+      : available.has(coverValue) ? localUrl(coverValue) : undefined;
+  return {
+    id: `private-${index + 1}`,
+    name: typeof entry.name === "string" && entry.name.trim()
+      ? entry.name.trim()
+      : titleFromFilename(filename || url),
+    artist: typeof entry.artist === "string" && entry.artist.trim() ? entry.artist.trim() : "本地私有音轨",
+    mood: typeof entry.mood === "string" && entry.mood.trim() ? entry.mood.trim() : "仅本机使用",
+    url,
+    ...(cover ? { cover } : {}),
+  };
+};
 
 const main = async () => {
   let filenames;
@@ -31,13 +68,23 @@ const main = async () => {
     return;
   }
 
-  const tracks = filenames.map((filename, index) => ({
-    id: `private-${index + 1}`,
-    name: titleFromFilename(filename),
-    artist: "本地私有音轨",
-    mood: "仅本机使用",
-    url: `./media/private/${encodeURIComponent(filename)}`,
-  }));
+  const available = new Set(filenames);
+  const manifest = await readTrackManifest();
+  const tracks = manifest
+    ? manifest.map((entry, index) => normalizeTrack(entry, index, available)).filter(Boolean)
+    : filenames.map((filename, index) => ({
+      id: `private-${index + 1}`,
+      name: titleFromFilename(filename),
+      artist: "本地私有音轨",
+      mood: "仅本机使用",
+      url: localUrl(filename),
+    }));
+
+  if (!tracks.length) {
+    console.error("tracks.json 中没有指向有效本地文件或 URL 的音轨。");
+    process.exitCode = 1;
+    return;
+  }
 
   await writeFile(
     envFile,
