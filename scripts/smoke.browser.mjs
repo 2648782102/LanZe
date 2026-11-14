@@ -465,6 +465,20 @@ const main = async () => {
   if (!excerptCards.sourceLabel.includes("诗句源：")) {
     throw new Error("Excerpt source state did not render");
   }
+  const excerptHintSpacing = await evaluate(`(() => {
+    const card = document.querySelector('.legacy-card');
+    const hint = document.querySelector('.legacy-card__hint');
+    if (!card || !hint) return null;
+    const cardBox = card.getBoundingClientRect();
+    const hintBox = hint.getBoundingClientRect();
+    return {
+      gap: Math.round((hintBox.top - cardBox.bottom) * 10) / 10,
+      hintVisible: getComputedStyle(hint).display !== 'none',
+    };
+  })()`);
+  if (!excerptHintSpacing?.hintVisible || excerptHintSpacing.gap < 10) {
+    throw new Error(`Excerpt hint is too close to the card: ${JSON.stringify(excerptHintSpacing)}`);
+  }
   if (!await evaluate(`(() => {
     const card = document.querySelector('.legacy-card');
     return Boolean(card?.getAttribute('tabindex') === '0'

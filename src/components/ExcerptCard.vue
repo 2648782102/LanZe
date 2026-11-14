@@ -462,9 +462,11 @@ onBeforeUnmount(() => {
 .legacy-card__hint {
   position: absolute;
   right: 0;
-  bottom: -12px;
+  bottom: -32px;
   left: 0;
   z-index: 5;
+  margin: 0;
+  padding-top: 0;
   color: var(--ink-faint);
   font-size: var(--text-meta);
   letter-spacing: 0.08em;

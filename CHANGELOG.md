@@ -8,6 +8,7 @@
 
 ### Changed
 
+- 主动排查并修复系统文案贴边：摘录卡「点击或轻拂换一句」原 `bottom:-12px` 压在卡片下缘（牌堆到提示 -0.6px），改为卡片下方 32px、净距 14px；移动端摘录区与下方文案间距由 30px 提到 44px，提示到下一块由 14px 提到 28px。新增 `npm run inspect:spacing` 无头浏览器探针，覆盖今日/登录/写作/诗卷/索引五条路由、桌面/移动端，自动报告垂直堆叠元素净距 <8px 的情况；Browser E2E 增加提示与卡片底边 ≥10px 的回归断言。
 - 全站系统文案核对：去掉「等比还原 / 仓库内置 / 脚本合成 / 本地演示 / 演示账号 / 纯前端 / 自建 API / 旧版 / 外链直连 / 冒烟测试 / 请检查配置」等开发与防御性口吻，统一为诗馆产品语气；保留「内容留在此浏览器、不跨设备同步、不连接线上社区」等必要事实但改为克制表述。同步更新摘录来源标签、播放器曲目副标题与错误提示、登录/写作/诗卷/页脚/详情页说明、示例作品署名与 E2E 生成内容；古诗词正文不变。
 - 按使用者决定恢复 2022 版播放器的**外链直连**用法：默认五首改为「少年不凡 / 浣纱歌 (伴奏) / 卡农 / River Flows in You（你的心河） / Leaves in the Wind」，直接请求 `music.163.com/song/media/outer/url` 与 `music.126.net` 封面，不下载、不提交音频文件；移除 lint 中对这些域名的默认禁令。`src/config/audio.js` 默认源标记为 `legacy`，`custom` 通道与 `public/media/` 下 CC BY 3.0 古筝备用素材保留。Browser E2E 改为校验 5 首外链、切轨与偏好，放行第三方媒体域名的 `ERR_ABORTED`；README / FAQ / 架构 / 开发 / 部署 / 素材清单同步为外链口径，并注明授权、签名、防盗链与失效风险由平台/部署者承担。
 - 新增 `npm run audio:private` 本机私有音轨通道：把使用者自有且授权清晰的音频放入被忽略的 `public/media/private/`，可用同目录 `tracks.json` 恢复旧版曲名/作者/顺序（模板见 `docs/PRIVATE_AUDIO.md`），脚本生成同样被忽略的 `.env.local.audio` 并以 `vite --mode local.audio` 启动；不下载、不提交、不部署。README / FAQ / `.env.example` 同步说明本机私有音轨边界。
