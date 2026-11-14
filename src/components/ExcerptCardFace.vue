@@ -1,5 +1,10 @@
 <template>
-  <div class="legacy-card__box" :class="`legacy-card__box--${variant}`" :aria-hidden="interactive ? undefined : 'true'">
+  <div
+    class="legacy-card__box"
+    :class="`legacy-card__box--${variant}`"
+    :style="faceStyle"
+    :aria-hidden="interactive ? undefined : 'true'"
+  >
     <component
       :is="interactive ? 'button' : 'span'"
       class="legacy-card__save"
@@ -12,14 +17,8 @@
     >
       {{ saved ? "已藏" : "收藏" }}
     </component>
-    <div class="legacy-card__ink legacy-card__ink--current">
-      <p class="legacy-card__verse" :class="verseDensity">{{ excerpt.content }}</p>
-      <h5 class="legacy-card__author">— {{ excerpt.author }}</h5>
-    </div>
-    <div v-if="ghost" class="legacy-card__ink legacy-card__ink--ghost" aria-hidden="true">
-      <p class="legacy-card__verse" :class="ghostDensity">{{ ghost.content }}</p>
-      <h5 class="legacy-card__author">— {{ ghost.author }}</h5>
-    </div>
+    <p class="legacy-card__verse" :class="verseDensity">{{ excerpt.content }}</p>
+    <h5 class="legacy-card__author">— {{ excerpt.author }}</h5>
     <img
       class="legacy-card__art"
       :src="fanzouImage"
@@ -40,7 +39,7 @@ const props = defineProps({
   saved: { type: Boolean, default: false },
   variant: { type: String, required: true },
   interactive: { type: Boolean, default: false },
-  ghost: { type: Object, default: null },
+  faceStyle: { type: Object, default: null },
 });
 const emit = defineEmits(["toggle-save"]);
 
@@ -53,7 +52,6 @@ const densityFor = (content) => {
   return "legacy-card__verse--open";
 };
 const verseDensity = computed(() => densityFor(props.excerpt.content));
-const ghostDensity = computed(() => densityFor(props.ghost?.content));
 const handleSave = () => {
   if (props.interactive) emit("toggle-save");
 };
@@ -110,14 +108,14 @@ const handleSave = () => {
   pointer-events: none;
 }
 
-.legacy-card:not(.is-turning):not(.is-dragging):not(.is-exchanging):not(.is-hover-locked):hover .legacy-card__box--current {
+.legacy-card:not(.is-swiping):hover .legacy-card__box--current {
   transform: rotateX(5deg) translateY(calc(-3px * var(--legacy-scale)));
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.72),
     0 calc(8px * var(--legacy-scale)) calc(18px * var(--legacy-scale)) rgba(22, 49, 46, 0.09);
 }
 
-.legacy-card:not(.is-turning):not(.is-dragging):not(.is-exchanging):not(.is-hover-locked):hover .legacy-card__box--current::after {
+.legacy-card:not(.is-swiping):hover .legacy-card__box--current::after {
   transform: translateY(100%);
   opacity: 1;
 }
@@ -149,9 +147,11 @@ const handleSave = () => {
   pointer-events: auto;
 }
 
-.legacy-card.is-dragging .legacy-card__save,
-.legacy-card.is-turning .legacy-card__save,
-.legacy-card.is-exchanging .legacy-card__save {
+.legacy-card.is-swiping .legacy-card__box--current .legacy-card__save {
+  pointer-events: none;
+}
+
+.legacy-card__box--ghost .legacy-card__save {
   pointer-events: none;
 }
 
@@ -169,39 +169,6 @@ const handleSave = () => {
 .legacy-card__save--no {
   background-color: transparent;
   color: rgba(84, 103, 100, 0.76);
-}
-
-.legacy-card__ink {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-}
-
-.legacy-card__ink--current {
-  opacity: 1;
-}
-
-.legacy-card__ink--ghost {
-  z-index: 3;
-  pointer-events: none;
-}
-
-.legacy-card.is-exchanging .legacy-card__ink--current {
-  animation: lanze-ink-in 200ms var(--ease-out) both;
-}
-
-.legacy-card.is-exchanging .legacy-card__ink--ghost {
-  animation: lanze-ink-out 160ms cubic-bezier(0.4, 0, 1, 1) both;
-}
-
-@keyframes lanze-ink-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes lanze-ink-out {
-  from { opacity: 1; }
-  to { opacity: 0; }
 }
 
 .legacy-card__verse {
@@ -262,44 +229,15 @@ const handleSave = () => {
   pointer-events: none;
 }
 
-.legacy-card__box--incoming .legacy-card__author {
-  opacity: 0;
-  transition: none;
-}
-
-.legacy-card.is-committing .legacy-card__box--incoming .legacy-card__author {
-  animation: none;
-}
-
-@keyframes brush-fade {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .legacy-card__box,
   .legacy-card__box::after,
-  .legacy-card__save,
-  .legacy-card__ink,
-  .legacy-card__box--incoming .legacy-card__author {
+  .legacy-card__save {
     animation: none !important;
     transition: none !important;
   }
 
-  .legacy-card:not(.is-turning):not(.is-hover-locked):hover .legacy-card__box--current {
-    transform: none;
-  }
-
-  .legacy-card__box--incoming .legacy-card__author {
-    opacity: 1;
-    clip-path: none;
-    filter: none;
+  .legacy-card:not(.is-swiping):hover .legacy-card__box--current {
     transform: none;
   }
 }

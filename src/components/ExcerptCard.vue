@@ -4,12 +4,12 @@
     class="legacy-card"
     data-direction="right"
     :class="{
-      'is-exchanging': isExchanging,
       'is-swiping': isSwiping,
       'is-disabled': props.disabled,
     }"
     :aria-label="props.disabled ? '今日摘录卡片' : '今日摘录卡片，点击或横向轻拂可换一句'"
     :style="cardStyle"
+    :data-turn-count="turnCount"
     :tabindex="props.disabled ? -1 : 0"
     :role="props.disabled ? undefined : 'button'"
     @click="handleClick"
@@ -25,18 +25,26 @@
     <div class="legacy-card__stack">
       <ExcerptCardFace
         variant="current"
-        :excerpt="displayExcerpt"
-        :saved="displaySaved"
-        :ghost="outgoing ? outgoing.excerpt : null"
+        :excerpt="stableExcerpt"
+        :saved="stableSaved"
+        :face-style="faceStyle"
         interactive
-        @toggle-save="emit('toggle-save', displayExcerpt)"
+        @toggle-save="emit('toggle-save', stableExcerpt)"
       />
-    </div>
-
-    <div class="legacy-card__wash" aria-hidden="true">
-      <span class="legacy-card__wash-paper"></span>
-      <span class="legacy-card__wash-brush"></span>
-      <span class="legacy-card__wash-seal"></span>
+      <div
+        v-if="ghost"
+        :key="ghostKey"
+        class="legacy-card__ghost"
+        :style="ghostStyle"
+        aria-hidden="true"
+        @animationend.self="removeGhost"
+      >
+        <ExcerptCardFace
+          variant="ghost"
+          :excerpt="ghost.excerpt"
+          :saved="ghost.saved"
+        />
+      </div>
     </div>
 
     <div class="legacy-card__gesture" aria-hidden="true">
@@ -61,75 +69,121 @@ const props = defineProps({
 });
 const emit = defineEmits(["toggle-save", "needs-next", "turn", "settled"]);
 
-const CROSSFADE_DURATION = 240;
+const FLING_DURATION = 420;
 const SWIPE_COMMIT = 42;
 const SWIPE_VELOCITY = 420;
-const DRAG_DAMPING = 0.4;
-const DRAG_LIMIT = 52;
-const isExchanging = ref(false);
+const DRAG_DAMPING = 0.55;
+const DRAG_LIMIT = 92;
+const FLING_DISTANCE = 680;
+const FLING_ROTATE = 18;
 const isSwiping = ref(false);
 const swipeProgress = ref(0);
-const dragX = ref(0);
-const currentExcerpt = ref(props.excerpt);
-const currentSaved = ref(props.saved);
-const outgoing = ref(null);
-let crossfadeTimer;
+const stableExcerpt = ref(props.excerpt);
+const stableSaved = ref(props.saved);
+const ghost = ref(null);
+const ghostKey = ref(0);
+const ghostDirection = ref(1);
+const ghostStartX = ref(0);
+const ghostStartRot = ref(0);
+const faceX = ref(0);
+const faceRot = ref(0);
+const faceDuration = ref(0);
+const faceEase = ref("cubic-bezier(0.22, 1, 0.36, 1)");
+const turnCount = ref(0);
 let swipe = null;
 let suppressClick = false;
+let ghostTimer;
 const cardElement = ref(null);
 
-const displayExcerpt = computed(() => currentExcerpt.value || props.excerpt);
-const displaySaved = computed(() => currentSaved.value);
+const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
 const cardStyle = computed(() => ({
   "--swipe-progress": swipeProgress.value.toFixed(3),
-  "--drag-x": `${dragX.value.toFixed(2)}px`,
 }));
-const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+const faceStyle = computed(() => ({
+  transform: `translateX(${faceX.value.toFixed(2)}px) rotate(${faceRot.value.toFixed(2)}deg)`,
+  transition: faceDuration.value > 0
+    ? `transform ${faceDuration.value}ms ${faceEase.value}`
+    : "none",
+}));
+const ghostStyle = computed(() => ({
+  "--fling-x": `${ghostDirection.value * FLING_DISTANCE}px`,
+  "--fling-start-x": `${ghostStartX.value.toFixed(2)}px`,
+  "--fling-start-rot": `${ghostStartRot.value.toFixed(2)}deg`,
+  "--fling-y": "-24px",
+  "--fling-rotate": `${ghostDirection.value * FLING_ROTATE}deg`,
+  "--fling-lift": `${ghostDirection.value * 3}deg`,
+  animationDuration: `${FLING_DURATION}ms`,
+}));
+
+const resetFace = () => {
+  faceDuration.value = 0;
+  faceX.value = 0;
+  faceRot.value = 0;
+};
+
+const springBack = () => {
+  faceDuration.value = 260;
+  faceEase.value = "cubic-bezier(0.22, 1, 0.36, 1)";
+  faceX.value = 0;
+  faceRot.value = 0;
+};
 
 const clearSwipe = () => {
   swipe = null;
   isSwiping.value = false;
   swipeProgress.value = 0;
-  dragX.value = 0;
   cardElement.value?.setAttribute("data-direction", "right");
+};
+
+const removeGhost = () => {
+  window.clearTimeout(ghostTimer);
+  ghost.value = null;
+};
+
+const commitTurn = (next, nextSaved, direction = "right") => {
+  turnCount.value += 1;
+  if (reducedMotion()) {
+    removeGhost();
+    resetFace();
+    stableExcerpt.value = next;
+    stableSaved.value = nextSaved;
+    emit("settled");
+    return;
+  }
+  const outgoing = { excerpt: stableExcerpt.value, saved: stableSaved.value };
+  ghostStartX.value = faceX.value;
+  ghostStartRot.value = faceRot.value;
+  stableExcerpt.value = next;
+  stableSaved.value = nextSaved;
+  resetFace();
+  emit("settled");
+  ghost.value = outgoing;
+  ghostDirection.value = direction === "left" ? -1 : 1;
+  ghostKey.value += 1;
+  window.clearTimeout(ghostTimer);
+  ghostTimer = window.setTimeout(removeGhost, FLING_DURATION + 80);
 };
 
 const commitSwipeTurn = (direction) => {
   turnExcerpt(direction);
 };
 
-const commitTurn = (next, nextSaved) => {
-  const previous = { excerpt: displayExcerpt.value, saved: displaySaved.value };
-  currentExcerpt.value = next;
-  currentSaved.value = nextSaved;
-  emit("settled");
-  if (reducedMotion()) {
-    outgoing.value = null;
-    return;
-  }
-  outgoing.value = previous;
-  isExchanging.value = true;
-  window.clearTimeout(crossfadeTimer);
-  crossfadeTimer = window.setTimeout(() => {
-    isExchanging.value = false;
-    outgoing.value = null;
-  }, CROSSFADE_DURATION);
-};
-
 const turnExcerpt = async (turnDirection = "right") => {
-  if (props.disabled || isExchanging.value) return;
+  if (props.disabled) return;
   const next = props.nextExcerpt;
   const nextSaved = props.nextSaved;
   emit("needs-next");
   emit("turn", turnDirection);
   if (next) {
-    commitTurn(next, nextSaved);
+    commitTurn(next, nextSaved, turnDirection);
     return;
   }
   await nextTick();
   const fallback = props.nextExcerpt;
   if (fallback) {
-    commitTurn(fallback, props.nextSaved);
+    commitTurn(fallback, props.nextSaved, turnDirection);
   } else {
     emit("settled");
   }
@@ -150,9 +204,9 @@ const handleKeydown = (event) => {
 };
 
 const startSwipe = (event) => {
-  if (props.disabled || isExchanging.value || event.target.closest("button")) return;
-  if (event.pointerType === "mouse" && typeof event.button === "number" && event.button !== 0) return;
   suppressClick = false;
+  if (props.disabled || event.target.closest("button")) return;
+  if (event.pointerType === "mouse" && typeof event.button === "number" && event.button !== 0) return;
   swipe = {
     id: event.pointerId,
     originX: event.clientX,
@@ -160,6 +214,7 @@ const startSwipe = (event) => {
     time: event.timeStamp,
     velocity: 0,
     moved: false,
+    committed: false,
     target: event.currentTarget,
   };
   try {
@@ -168,7 +223,7 @@ const startSwipe = (event) => {
 };
 
 const moveSwipe = (event) => {
-  if (!swipe || event.pointerId !== swipe.id || isExchanging.value) return;
+  if (!swipe || event.pointerId !== swipe.id) return;
   const distance = event.clientX - swipe.originX;
   const elapsed = Math.max(8, event.timeStamp - swipe.time);
   swipe.velocity = swipe.velocity * 0.3
@@ -185,11 +240,13 @@ const moveSwipe = (event) => {
   const direction = distance < 0 ? "left" : "right";
   cardElement.value?.setAttribute("data-direction", direction);
   swipeProgress.value = Math.min(1, Math.abs(distance) / SWIPE_COMMIT);
-  dragX.value = Math.max(-DRAG_LIMIT, Math.min(DRAG_LIMIT, distance * DRAG_DAMPING));
+  const offset = clamp(distance * DRAG_DAMPING, -DRAG_LIMIT, DRAG_LIMIT);
+  faceDuration.value = 0;
+  faceX.value = offset;
+  faceRot.value = clamp(offset * 0.08, -10, 10);
   if (!swipe.committed && Math.abs(distance) >= SWIPE_COMMIT) {
     swipe.committed = true;
     swipeProgress.value = 0;
-    dragX.value = 0;
     commitSwipeTurn(direction);
   }
 };
@@ -198,7 +255,8 @@ const endSwipe = (event) => {
   if (!swipe || event.pointerId !== swipe.id) return;
   const distance = swipe.x - swipe.originX;
   const committed = Boolean(swipe.committed);
-  const fling = swipe.moved && !committed
+  const moved = Boolean(swipe.moved);
+  const fling = moved && !committed
     && Math.abs(swipe.velocity) >= SWIPE_VELOCITY && Math.abs(distance) >= 14;
   try {
     swipe.target?.releasePointerCapture?.(event.pointerId);
@@ -206,34 +264,40 @@ const endSwipe = (event) => {
   const direction = distance < 0 ? "left" : "right";
   clearSwipe();
   if (committed) return;
-  if (fling) commitSwipeTurn(direction);
+  if (fling) {
+    commitSwipeTurn(direction);
+  } else if (moved) {
+    springBack();
+  }
 };
 
 const cancelSwipe = (event) => {
   if (!swipe || event.pointerId !== swipe.id) return;
+  const moved = Boolean(swipe.moved);
+  const committed = Boolean(swipe.committed);
   try {
     swipe.target?.releasePointerCapture?.(event.pointerId);
   } catch {}
   clearSwipe();
+  if (moved && !committed) springBack();
 };
 
 watch(() => props.excerpt, (value) => {
-  if (!isExchanging.value) {
-    currentExcerpt.value = value;
-    currentSaved.value = props.saved;
-  }
+  stableExcerpt.value = value;
+  stableSaved.value = props.saved;
 });
 
 watch(() => props.saved, (value) => {
-  if (!isExchanging.value) currentSaved.value = value;
+  stableSaved.value = value;
 });
 
 defineExpose({
   turn: turnExcerpt,
-  isTurning: isExchanging,
+  isTurning: computed(() => Boolean(ghost.value)),
 });
 onBeforeUnmount(() => {
-  window.clearTimeout(crossfadeTimer);
+  window.clearTimeout(ghostTimer);
+  removeGhost();
   clearSwipe();
 });
 </script>
@@ -263,7 +327,6 @@ onBeforeUnmount(() => {
   --legacy-scale: 1;
   --legacy-gutter: 12%;
   --swipe-progress: 0;
-  --drag-x: 0px;
   position: relative;
   width: min(100%, 330px);
   margin-inline: auto;
@@ -286,13 +349,50 @@ onBeforeUnmount(() => {
   position: relative;
   z-index: 1;
   width: 100%;
-  transform: translateX(var(--drag-x));
-  transition: transform 240ms var(--ease-out);
+  aspect-ratio: 330 / 620;
+}
+
+.legacy-card__stack :deep(.legacy-card__box) {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  aspect-ratio: auto;
+}
+
+.legacy-card__stack :deep(.legacy-card__box--current) {
+  z-index: 1;
   will-change: transform;
 }
 
-.legacy-card.is-swiping .legacy-card__stack {
-  transition: none;
+.legacy-card__ghost {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  will-change: transform, opacity;
+  transform-origin: 50% 90%;
+  animation-name: lanze-fling-away;
+  animation-timing-function: cubic-bezier(0.32, 0, 0.67, 0);
+  animation-fill-mode: forwards;
+}
+
+@keyframes lanze-fling-away {
+  0% {
+    transform: translate3d(var(--fling-start-x), 0, 0) rotate(var(--fling-start-rot));
+    opacity: 1;
+  }
+
+  16% {
+    transform: translate3d(var(--fling-start-x), var(--fling-y), 0)
+      rotate(calc(var(--fling-start-rot) + var(--fling-lift)));
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate3d(var(--fling-x), calc(var(--fling-y) * 3), 0)
+      rotate(var(--fling-rotate));
+    opacity: 0;
+  }
 }
 
 .legacy-card__corner {
@@ -385,99 +485,6 @@ onBeforeUnmount(() => {
   transition: none;
 }
 
-.legacy-card__wash {
-  position: absolute;
-  inset: calc(16px * var(--legacy-scale));
-  z-index: 3;
-  overflow: hidden;
-  border-radius: calc(0.3rem * var(--legacy-scale));
-  pointer-events: none;
-}
-
-.legacy-card__wash-paper {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(100deg,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.78) 18%,
-      rgba(249, 250, 247, 0.96) 52%,
-      rgba(255, 255, 255, 0.74) 82%,
-      rgba(255, 255, 255, 0) 100%),
-    radial-gradient(ellipse at 30% 52%, rgba(22, 49, 46, 0.028), transparent 42%);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.58);
-  opacity: 0;
-}
-
-.legacy-card.is-exchanging .legacy-card__wash-paper {
-  animation: legacy-wash 240ms var(--ease-standard) both;
-}
-
-@keyframes legacy-wash {
-  0% { opacity: 0; transform: translateX(-16%); }
-  42% { opacity: 0.82; }
-  58% { opacity: 0.82; }
-  100% { opacity: 0; transform: translateX(16%); }
-}
-
-.legacy-card__wash-brush {
-  position: absolute;
-  top: 31%;
-  right: 16%;
-  left: 16%;
-  height: calc(1px * var(--legacy-scale));
-  background: linear-gradient(90deg,
-    rgba(22, 49, 46, 0),
-    rgba(22, 49, 46, 0.34) 16%,
-    rgba(122, 70, 52, 0.22) 48%,
-    rgba(22, 49, 46, 0.12) 82%,
-    rgba(22, 49, 46, 0));
-  box-shadow: 0 calc(3px * var(--legacy-scale)) calc(10px * var(--legacy-scale)) rgba(22, 49, 46, 0.08);
-  opacity: 0;
-}
-
-.legacy-card.is-exchanging .legacy-card__wash-brush {
-  animation: legacy-brush 240ms var(--ease-out) both;
-}
-
-@keyframes legacy-brush {
-  0% { opacity: 0; transform: translateX(-40px) rotate(-8deg); }
-  40% { opacity: 1; transform: translateX(0) rotate(-8deg); }
-  72% { opacity: 1; }
-  100% { opacity: 0; transform: translateX(40px) rotate(-8deg); }
-}
-
-.legacy-card__wash-seal {
-  position: absolute;
-  right: calc(18px * var(--legacy-scale));
-  bottom: calc(20px * var(--legacy-scale));
-  width: calc(18px * var(--legacy-scale));
-  height: calc(18px * var(--legacy-scale));
-  border: 1px solid rgba(161, 65, 52, 0.38);
-  border-radius: 50%;
-  opacity: 0;
-  transform: scale(0.6);
-}
-
-.legacy-card.is-exchanging .legacy-card__wash-seal {
-  animation: legacy-seal 280ms var(--ease-out) 30ms both;
-}
-
-@keyframes legacy-seal {
-  0% { opacity: 0; transform: scale(1.5); }
-  45% { opacity: 1; transform: scale(0.94); }
-  70% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1); }
-}
-
-.legacy-card__wash-seal::after {
-  position: absolute;
-  inset: 4px;
-  border-top: 1px solid rgba(161, 65, 52, 0.26);
-  content: "";
-  transform: rotate(-38deg);
-}
-
 @media (max-width: 560px) {
   .legacy-card {
     --legacy-scale: 0.9090909;
@@ -486,16 +493,12 @@ onBeforeUnmount(() => {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .legacy-card__stack,
-  .legacy-card__wash-paper,
-  .legacy-card__wash-brush,
-  .legacy-card__wash-seal {
-    animation: none !important;
-    transition: none !important;
+  .legacy-card__ghost {
+    display: none;
   }
 
-  .legacy-card__wash {
-    display: none;
+  .legacy-card__stack :deep(.legacy-card__box--current) {
+    transition: none !important;
   }
 }
 </style>

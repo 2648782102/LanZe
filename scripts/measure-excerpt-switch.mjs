@@ -141,6 +141,7 @@ const main = async () => {
   const payload = await evaluate(`(async () => {
     const card = document.querySelector('.legacy-card');
     const verse = () => card.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim() || '';
+    const settled = () => !card.querySelector('.legacy-card__ghost');
     const frames = [];
     const marks = [];
     const longFrames = [];
@@ -161,7 +162,7 @@ const main = async () => {
     const loop = () => {
       frames.push({
         t: Math.round((performance.now() - t0) * 100) / 100,
-        exchanging: card.classList.contains('is-exchanging'),
+        flinging: Boolean(card.querySelector('.legacy-card__ghost')),
       });
       if (performance.now() - t0 < 4000) requestAnimationFrame(loop);
     };
@@ -185,7 +186,7 @@ const main = async () => {
       });
       await new Promise((resolve) => {
         const check = () => {
-          if (!card.classList.contains('is-exchanging')) {
+          if (settled()) {
             marks.push({ type: 'settled', t: Math.round((performance.now() - t0) * 100) / 100 });
             resolve();
           } else {
@@ -216,16 +217,19 @@ const main = async () => {
       card.dispatchEvent(new PointerEvent('pointermove', { ...options, clientX: cx + 48, clientY: cy }));
       marks.push({ type: 'swipeThreshold', t: Math.round(thresholdAt * 100) / 100 });
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      const ghost = card.querySelector('.legacy-card__ghost');
+      const flingTransform = ghost ? getComputedStyle(ghost).transform : 'none';
       const changedBeforeUp = verse() !== before;
       const changedAt = performance.now() - t0;
       card.dispatchEvent(new PointerEvent('pointerup', { ...options, clientX: cx + 48, clientY: cy, buttons: 0 }));
       marks.push({
         type: changedBeforeUp ? 'swipeChangedBeforeUp' : 'swipeChangedAfterUp',
         t: Math.round(changedAt * 100) / 100,
+        flingTransform,
       });
       await new Promise((resolve) => {
         const check = () => {
-          if (verse() !== before && !card.classList.contains('is-exchanging')) resolve();
+          if (settled()) resolve();
           else requestAnimationFrame(check);
         };
         requestAnimationFrame(check);
@@ -246,25 +250,17 @@ const main = async () => {
         button: 0,
         buttons: 1,
       };
+      const beforeTurns = Number(card.getAttribute('data-turn-count') || 0);
       card.dispatchEvent(new PointerEvent('pointerdown', { ...options, clientX: cx, clientY: cy }));
       card.dispatchEvent(new PointerEvent('pointermove', { ...options, clientX: cx + 52, clientY: cy }));
       card.dispatchEvent(new PointerEvent('pointerup', { ...options, clientX: cx + 52, clientY: cy, buttons: 0 }));
       card.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
-      let last = verse();
-      let transitions = 0;
       const start = performance.now();
-      await new Promise((resolve) => {
-        const poll = () => {
-          const now = verse();
-          if (now !== last) {
-            transitions += 1;
-            last = now;
-          }
-          if (performance.now() - start < 600) requestAnimationFrame(poll);
-          else resolve();
-        };
-        requestAnimationFrame(poll);
-      });
+      let transitions = 0;
+      while (performance.now() - start < 600) {
+        transitions = Number(card.getAttribute('data-turn-count') || 0) - beforeTurns;
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+      }
       doubleTurnCounts.push(transitions);
       await new Promise((resolve) => setTimeout(resolve, 160));
     }
