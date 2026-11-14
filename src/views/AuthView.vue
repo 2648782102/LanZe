@@ -394,7 +394,7 @@ watch(
 }
 
 .auth-back:hover {
-  color: var(--brass);
+  color: var(--brass-text);
 }
 
 .auth-form-wrap {
@@ -403,7 +403,7 @@ watch(
 
 .auth-kicker {
   margin: 0 0 12px;
-  color: var(--brass);
+  color: var(--brass-text);
   font-size: var(--text-note);
   letter-spacing: 0.12em;
 }

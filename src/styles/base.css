@@ -17,11 +17,12 @@
   --surface-soft: var(--porcelain-deep);
   --celadon: #a8c4b8;
   --celadon-pale: #dce9e2;
-  --celadon-deep: #517a70;
+  --celadon-deep: #476c63;
   --ink: #162c2b;
   --ink-soft: #536b68;
-  --ink-faint: #809793;
+  --ink-faint: #586965;
   --brass: #a88245;
+  --brass-text: #8a6933;
   --brass-soft: #d8bf8e;
   --mist: #eef2ed;
   --night: #102827;
@@ -161,7 +162,7 @@ img {
 
 .eyebrow {
   margin: 0;
-  color: var(--brass);
+  color: var(--brass-text);
   font-size: var(--text-meta);
   font-weight: 600;
   letter-spacing: 0.15em;

@@ -280,7 +280,7 @@ onBeforeUnmount(() => {
 }
 
 .back-link:hover {
-  color: var(--brass);
+  color: var(--brass-text);
 }
 
 .compose-head__row {
@@ -293,7 +293,7 @@ onBeforeUnmount(() => {
 
 .compose-head__row > div > p {
   margin: 0 0 10px;
-  color: var(--brass);
+  color: var(--brass-text);
   font-size: var(--text-meta);
   letter-spacing: 0.14em;
 }
@@ -459,7 +459,7 @@ onBeforeUnmount(() => {
 
 .preview-category {
   margin: 0 0 22px;
-  color: var(--brass);
+  color: var(--brass-text);
   font-size: var(--text-meta);
   letter-spacing: 0.14em;
 }

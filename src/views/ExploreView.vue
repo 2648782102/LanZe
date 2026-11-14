@@ -398,7 +398,7 @@ watch([dynasty, genre], () => {
 }
 
 .index-label span {
-  color: var(--brass);
+  color: var(--brass-text);
   font-family: var(--font-number);
   font-size: 42px;
   font-weight: 300;
@@ -478,7 +478,7 @@ watch([dynasty, genre], () => {
 }
 
 .index-search > :deep(svg) {
-  color: var(--brass);
+  color: var(--brass-text);
 }
 
 .index-search:focus-within {
@@ -549,7 +549,7 @@ watch([dynasty, genre], () => {
 
 .quick-terms button:hover {
   border-color: var(--brass);
-  color: var(--brass);
+  color: var(--brass-text);
 }
 
 .poem-paths {
@@ -596,7 +596,7 @@ watch([dynasty, genre], () => {
 
 .poem-paths span {
   grid-row: 1 / 3;
-  color: var(--brass);
+  color: var(--brass-text);
   font-family: var(--font-poem);
   font-size: 22px;
 }
@@ -672,7 +672,7 @@ watch([dynasty, genre], () => {
 }
 
 .facet__head button:hover {
-  color: var(--brass);
+  color: var(--brass-text);
 }
 
 .facet__list {
@@ -706,7 +706,7 @@ watch([dynasty, genre], () => {
 
 .facet__list button:hover,
 .facet__list button.is-active {
-  color: var(--brass);
+  color: var(--brass-text);
 }
 
 .facet__list button.is-active span {
@@ -780,7 +780,7 @@ watch([dynasty, genre], () => {
 }
 
 .result-head__right button:hover {
-  color: var(--brass);
+  color: var(--brass-text);
 }
 
 .active-filters {

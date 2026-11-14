@@ -54,3 +54,9 @@ jobs:
 
       - name: Browser smoke
         run: npm run smoke:browser
+
+      - name: Accessibility audit (axe-core)
+        run: npm run audit:a11y
+
+      - name: Performance budget (LCP / CLS / initial JS-CSS)
+        run: npm run audit:perf

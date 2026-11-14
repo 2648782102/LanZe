@@ -16,12 +16,14 @@
     "inspect:spacing": "node scripts/measure-ui-spacing.mjs",
     "audio:generate": "node scripts/import-audio-library.mjs",
     "audio:verify": "node scripts/verify-audio-library.mjs",
-    "test": "node --test --test-concurrency=1 scripts/*.test.mjs src/config/*.test.js src/data/*.test.js src/services/*.test.js src/utils/*.test.js",
+    "test": "node --test --test-concurrency=1 scripts/*.test.mjs src/config/*.test.js src/data/*.test.js src/services/*.test.js src/utils/*.test.js src/composables/*.test.js",
     "lint": "node src/utils/lint.mjs",
     "audio:private": "node scripts/use-private-audio.mjs",
     "capture:brand": "node scripts/capture-brand.mjs",
     "verify:render": "node scripts/browser/verify-render.mjs",
-    "capture:brand:1x1": "node scripts/browser/capture-brand-1x1.mjs"
+    "capture:brand:1x1": "node scripts/browser/capture-brand-1x1.mjs",
+    "audit:a11y": "node scripts/browser/a11y-audit.mjs",
+    "audit:perf": "node scripts/browser/perf-budget.mjs"
   },
   "engines": {
     "node": ">=20",
@@ -33,6 +35,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.10",
+    "axe-core": "^4.10.2",
     "pixelmatch": "^7.0.0",
     "playwright": "^1.56.1",
     "pngjs": "^7.0.0",

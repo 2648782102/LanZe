@@ -286,7 +286,7 @@ onMounted(async () => {
 
 .collection-kicker {
   margin: 0 0 16px;
-  color: var(--brass);
+  color: var(--brass-text);
   font-size: var(--text-note);
   letter-spacing: 0.12em;
 }
@@ -420,7 +420,7 @@ onMounted(async () => {
 }
 
 .work-item h3 a:hover {
-  color: var(--brass);
+  color: var(--brass-text);
 }
 
 .work-item__line {
@@ -456,7 +456,7 @@ onMounted(async () => {
   place-items: center;
   border: 1px solid var(--brass);
   border-radius: 50%;
-  color: var(--brass);
+  color: var(--brass-text);
   font-family: var(--font-poem);
   font-size: 20px;
 }
@@ -518,7 +518,7 @@ onMounted(async () => {
 
 .account-mark {
   margin: 0 0 8px;
-  color: var(--brass);
+  color: var(--brass-text);
   font-family: var(--font-accent);
   font-size: 70px;
   line-height: 1;

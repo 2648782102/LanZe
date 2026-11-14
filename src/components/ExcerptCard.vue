@@ -7,11 +7,11 @@
       'is-swiping': isSwiping,
       'is-disabled': props.disabled,
     }"
-    :aria-label="props.disabled ? '今日摘录卡片' : '今日摘录卡片，点击或横向轻拂可换一句'"
+    :aria-label="props.disabled ? '今日摘录卡片' : '今日摘录卡片，轻拂可换一句'"
     :style="cardStyle"
     :data-turn-count="turnCount"
     :tabindex="props.disabled ? -1 : 0"
-    :role="props.disabled ? undefined : 'button'"
+    :role="props.disabled ? undefined : 'group'"
     @click="handleClick"
     @pointerdown="startSwipe"
     @pointermove="moveSwipe"
@@ -23,6 +23,15 @@
     <span class="legacy-card__corner legacy-card__corner--bottom" aria-hidden="true"></span>
 
     <div class="legacy-card__stack">
+      <button
+        class="legacy-card__turn"
+        type="button"
+        :disabled="props.disabled"
+        :aria-label="'换一句摘录'"
+        @click="handleClick"
+        @keydown.enter.prevent="handleClick"
+        @keydown.space.prevent="handleClick"
+      />
       <ExcerptCardFace
         v-if="flingingEntry"
         :key="`fling-${deckVersion}-${flingingEntry.key}`"
@@ -350,6 +359,21 @@ onBeforeUnmount(() => {
   z-index: 1;
   width: 100%;
   aspect-ratio: 330 / 620;
+}
+
+.legacy-card__turn {
+  position: absolute;
+  inset: 22% 0 0;
+  z-index: 10;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.legacy-card__turn:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: -6px;
 }
 
 .legacy-card__stack :deep(.legacy-card__box) {

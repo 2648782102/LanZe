@@ -56,7 +56,7 @@ const isActive = (item) => {
   min-height: 46px;
   padding: 7px 4px;
   border-radius: 0;
-  color: rgba(251, 252, 249, 0.5);
+  color: rgba(251, 252, 249, 0.62);
   font-size: var(--text-meta);
   line-height: 1.2;
 }

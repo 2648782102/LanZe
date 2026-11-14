@@ -502,12 +502,15 @@ const main = async () => {
   }
   if (!await evaluate(`(() => {
     const card = document.querySelector('.legacy-card');
+    const turn = card?.querySelector('.legacy-card__turn');
     return Boolean(card?.getAttribute('tabindex') === '0'
       && card.querySelector('.legacy-card__gesture')
       && card.style.getPropertyValue('--swipe-progress') !== ''
-      && !card.querySelector('.legacy-card__turn'));
+      && turn
+      && turn.tagName === 'BUTTON'
+      && !turn.disabled);
   })()`)) {
-    throw new Error("Excerpt card does not expose its click and keyboard affordance");
+    throw new Error("Excerpt card does not expose its click, keyboard and button affordance");
   }
   if (!await evaluate(`(() => {
     const card = document.querySelector('.legacy-card');

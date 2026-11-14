@@ -64,7 +64,7 @@ const firstLine = computed(() =>
 }
 
 .poem-row__number {
-  color: var(--brass);
+  color: var(--brass-text);
   font-family: var(--font-number);
   font-size: var(--text-meta);
 }
@@ -117,12 +117,12 @@ const firstLine = computed(() =>
 }
 
 .poem-row__main:hover .poem-row__arrow {
-  color: var(--brass);
+  color: var(--brass-text);
   transform: translateX(3px);
 }
 
 .poem-row__main:hover h3 {
-  color: var(--brass);
+  color: var(--brass-text);
 }
 
 .poem-row__save {
@@ -143,11 +143,11 @@ const firstLine = computed(() =>
 
 .poem-row__save:hover {
   background: rgba(81, 122, 112, 0.1);
-  color: var(--brass);
+  color: var(--brass-text);
 }
 
 .poem-row__save.is-saved {
-  color: var(--brass);
+  color: var(--brass-text);
 }
 
 .poem-row__save.is-saved :deep(svg) {

@@ -330,7 +330,7 @@ onBeforeUnmount(() => {
 }
 
 .room-count span {
-  color: var(--brass);
+  color: var(--brass-text);
   font-size: 34px;
   font-weight: 300;
   line-height: 1;
@@ -361,7 +361,7 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 12px;
   margin: 0 0 20px;
-  color: var(--brass);
+  color: var(--brass-text);
   font-size: var(--text-meta);
   letter-spacing: 0.12em;
 }
@@ -476,7 +476,7 @@ onBeforeUnmount(() => {
 
 .gallery-action.is-confirmed {
   border-color: var(--brass);
-  color: var(--brass);
+  color: var(--brass-text);
   animation: ink-confirm var(--motion-base) var(--ease-out);
 }
 

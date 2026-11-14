@@ -6,7 +6,27 @@ import { chromium } from "playwright";
 import { PNG } from "pngjs";
 import pixelmatch from "pixelmatch";
 
-export const CHROME_PATH = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+const CANDIDATES = [
+  process.env.CHROME_PATH,
+  process.env.CHROME_BIN,
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "/usr/bin/google-chrome",
+  "/usr/bin/google-chrome-stable",
+  "/usr/bin/chromium",
+  "/usr/bin/chromium-browser",
+].filter(Boolean);
+
+const resolveChromePath = async () => {
+  for (const candidate of CANDIDATES) {
+    try {
+      await access(candidate);
+      return candidate;
+    } catch {
+      continue;
+    }
+  }
+  throw new Error(`Chrome was not found; set CHROME_PATH. Tried: ${CANDIDATES.join(", ")}`);
+};
 
 const waitForUrl = async (url, timeout = 15000) => {
   const started = Date.now();
@@ -33,9 +53,9 @@ export const startPreview = async ({ port = 4355, root = process.cwd() } = {}) =
 };
 
 export const openBrowser = async ({ headless = true } = {}) => {
-  await access(CHROME_PATH);
+  const executablePath = await resolveChromePath();
   const browser = await chromium.launch({
-    executablePath: CHROME_PATH,
+    executablePath,
     headless,
     args: ["--no-sandbox", "--disable-dev-shm-usage", "--no-first-run"],
   });

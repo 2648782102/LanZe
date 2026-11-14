@@ -264,7 +264,7 @@ onMounted(loadCatalog);
 
 .poem-side__category {
   margin: 0 0 7px;
-  color: var(--brass);
+  color: var(--brass-text);
   font-size: var(--text-meta);
   letter-spacing: 0.14em;
 }
@@ -298,7 +298,7 @@ onMounted(loadCatalog);
 
 .icon-action:hover,
 .icon-action.is-saved {
-  color: var(--brass);
+  color: var(--brass-text);
 }
 
 .poem-side__back {
@@ -332,7 +332,7 @@ onMounted(loadCatalog);
 
 .poem-head p {
   margin: 0;
-  color: var(--brass);
+  color: var(--brass-text);
   font-size: var(--text-meta);
   letter-spacing: 0.16em;
 }
@@ -388,7 +388,7 @@ onMounted(loadCatalog);
 }
 
 .poem-text p:hover {
-  color: var(--brass);
+  color: var(--brass-text);
 }
 
 .poem-tags {
@@ -472,7 +472,7 @@ onMounted(loadCatalog);
 }
 
 .reading-continuation__link > span {
-  color: var(--brass);
+  color: var(--brass-text);
   font-size: var(--text-meta);
   letter-spacing: 0.1em;
 }
@@ -518,7 +518,7 @@ onMounted(loadCatalog);
 }
 
 .related-section header a:hover {
-  color: var(--brass);
+  color: var(--brass-text);
 }
 
 .related-list {
@@ -539,7 +539,7 @@ onMounted(loadCatalog);
 }
 
 .related-list span {
-  color: var(--brass);
+  color: var(--brass-text);
   font-size: var(--text-meta);
 }
 
@@ -557,7 +557,7 @@ onMounted(loadCatalog);
 }
 
 .related-list a:hover strong {
-  color: var(--brass);
+  color: var(--brass-text);
 }
 
 @media (max-width: 820px) {
