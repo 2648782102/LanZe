@@ -76,7 +76,6 @@ const outgoing = ref(null);
 let crossfadeTimer;
 let swipe = null;
 let suppressClick = false;
-let suppressClickTimer;
 const cardElement = ref(null);
 
 const displayExcerpt = computed(() => currentExcerpt.value || props.excerpt);
@@ -96,11 +95,6 @@ const clearSwipe = () => {
 };
 
 const commitSwipeTurn = (direction) => {
-  suppressClick = true;
-  window.clearTimeout(suppressClickTimer);
-  suppressClickTimer = window.setTimeout(() => {
-    suppressClick = false;
-  }, 400);
   turnExcerpt(direction);
 };
 
@@ -158,6 +152,7 @@ const handleKeydown = (event) => {
 const startSwipe = (event) => {
   if (props.disabled || isExchanging.value || event.target.closest("button")) return;
   if (event.pointerType === "mouse" && typeof event.button === "number" && event.button !== 0) return;
+  suppressClick = false;
   swipe = {
     id: event.pointerId,
     originX: event.clientX,
@@ -185,6 +180,7 @@ const moveSwipe = (event) => {
   if (!swipe.moved) {
     swipe.moved = true;
     isSwiping.value = true;
+    suppressClick = true;
   }
   const direction = distance < 0 ? "left" : "right";
   cardElement.value?.setAttribute("data-direction", direction);
@@ -239,7 +235,6 @@ defineExpose({
 onBeforeUnmount(() => {
   window.clearTimeout(crossfadeTimer);
   clearSwipe();
-  window.clearTimeout(suppressClickTimer);
 });
 </script>
 

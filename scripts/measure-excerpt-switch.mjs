@@ -232,9 +232,45 @@ const main = async () => {
       });
       await new Promise((resolve) => setTimeout(resolve, 160));
     }
+    const doubleTurnCounts = [];
+    for (let i = 0; i < 3; i += 1) {
+      const rect = card.getBoundingClientRect();
+      const cx = Math.round(rect.left + rect.width / 2);
+      const cy = Math.round(rect.top + Math.min(rect.height / 3, 180));
+      const options = {
+        pointerId: 91,
+        pointerType: 'mouse',
+        isPrimary: true,
+        bubbles: true,
+        cancelable: true,
+        button: 0,
+        buttons: 1,
+      };
+      card.dispatchEvent(new PointerEvent('pointerdown', { ...options, clientX: cx, clientY: cy }));
+      card.dispatchEvent(new PointerEvent('pointermove', { ...options, clientX: cx + 52, clientY: cy }));
+      card.dispatchEvent(new PointerEvent('pointerup', { ...options, clientX: cx + 52, clientY: cy, buttons: 0 }));
+      card.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+      let last = verse();
+      let transitions = 0;
+      const start = performance.now();
+      await new Promise((resolve) => {
+        const poll = () => {
+          const now = verse();
+          if (now !== last) {
+            transitions += 1;
+            last = now;
+          }
+          if (performance.now() - start < 600) requestAnimationFrame(poll);
+          else resolve();
+        };
+        requestAnimationFrame(poll);
+      });
+      doubleTurnCounts.push(transitions);
+      await new Promise((resolve) => setTimeout(resolve, 160));
+    }
     observer?.disconnect();
     await new Promise((resolve) => setTimeout(resolve, 400));
-    return { frames, marks, longFrames };
+    return { frames, marks, longFrames, doubleTurnCounts };
   })()`);
 
   const gaps = [];
@@ -277,6 +313,7 @@ const main = async () => {
     swipeChangedBeforeUp,
     swipeChangedAfterUp,
     swipeThresholdToChangeMs: swipeThresholdToChange,
+    doubleTurnCounts: payload.doubleTurnCounts,
     longAnimationFrames: payload.longFrames.filter((frame) => frame.duration > 40),
   }, null, 2));
 
