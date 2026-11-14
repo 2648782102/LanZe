@@ -20,7 +20,8 @@
     "lint": "node src/utils/lint.mjs",
     "audio:private": "node scripts/use-private-audio.mjs",
     "capture:brand": "node scripts/capture-brand.mjs",
-    "verify:render": "node scripts/browser/verify-render.mjs"
+    "verify:render": "node scripts/browser/verify-render.mjs",
+    "capture:brand:1x1": "node scripts/browser/capture-brand-1x1.mjs"
   },
   "engines": {
     "node": ">=20",

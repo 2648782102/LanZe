@@ -8,6 +8,9 @@
 
 ### Changed
 
+- 最终定位品牌区不协调的根因：参考图里图形宽占三段总宽约 42%，此前只占 18%。把三柱加宽加满（38×30、柱宽 5px、间距 6px），使图形 : 中文 : LANZE 的比例与参考一致；真实内置浏览器与本地构建截图均已复核。
+- 新增 `npm run capture:brand:1x1`（`scripts/browser/capture-brand-1x1.mjs`）：以 `.brand` 实际 bounding box 截 2x 品牌区并输出三段几何，修正此前按固定坐标裁切导致的错位截图；配合 `docs/BROWSER_VERIFICATION.md` 的内置浏览器优先流程使用。
+- 品牌区按参考图实测坐标收敛（参考 382×114 @2x → CSS）：图形 26 宽、图形→中文 13、中文 44.8、中文→LANZE 16、LANZE 43.9，总宽 143.7 对上参考 142.5；柱宽 2→3px 让基准线与柱群匹配。新增 `npm run capture:brand:1x1`，用与参考完全相同的 191×57 CSS 裁切框截品牌区，避免此前因裁切框不同造成的「看起来更大/更右」误判；Browser E2E 品牌阈值同步为参考实测量级。
 - 在 Codex 内置浏览器（`cua_repl` / IAB）里直接核对导航栏最左侧品牌区：启动本地 4399 端口、创建可见持久 tab、读取 AX 树与截图，并按真实渲染调整品牌三段比例（图形 42×36、中文 26px、LANZE 12px 下沉、段间 18/22px）；刷新同一内置 tab 后确认布局稳定。Browser E2E 的 `latinOffset` 上限同步放宽到 18px，`docs/BROWSER_VERIFICATION.md` 明确 UI 改动必须先经内置浏览器视觉判断。
 - 补全 Chrome 验证能力：新增 `scripts/browser/lab.mjs` 统一封装系统 Chrome（Playwright `executablePath`）、本地 preview 启动、多路由稳定导航、整页/元素截图、真实鼠标拖拽、控制台/页面/网络错误收集、几何采样与 `pixelmatch` 像素比较；`npm run verify:render` 会同时截本地与线上 GitHub Pages，要求品牌区 `mismatches === 0` 且无浏览器错误，并输出 `/tmp/lanze-render-lab/` 下的截图、差异图与几何报告。新增 `docs/BROWSER_VERIFICATION.md` 说明能力边界与仍缺的跨浏览器/录屏/a11y 项；`playwright`、`pixelmatch`、`pngjs` 作为开发依赖加入，不下载额外浏览器内核。
 - 复核「远端是否更新」：本地 HEAD、`origin/main`、Pages workflow 的 `head_sha` 一致为 `75d6c90`；线上 HTML/CSS/JS 与本地构建字节一致，禁用缓存打开线上 URL 实测 `brand__name=26px` 等旧值，证明不是部署问题而是上一版品牌比例仍不理想。随后按完整页头截图收敛品牌区：不把用户给的 2x 局部放大图尺寸直接套到 1x 页头，恢复克制的图形 34×32、中文 22px、LANZE 11px 下沉，保留段间 12/14px 的舒展关系；Browser E2E 品牌断言同步回到整页尺度。
