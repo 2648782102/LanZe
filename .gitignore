@@ -11,3 +11,5 @@ coverage/
 playwright-report/
 test-results/
 *.log
+measure.out
+measure.err
