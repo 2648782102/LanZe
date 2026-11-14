@@ -414,6 +414,23 @@ const main = async () => {
     "document.querySelector('.audio-dock__title')?.textContent?.trim() === '少年不凡'",
   ));
   if (home.navCount !== 3) throw new Error("Primary navigation did not render");
+  const brandLayout = await evaluate(`(() => {
+    const brand = document.querySelector('.brand');
+    const mark = document.querySelector('.brand__mark');
+    const name = document.querySelector('.brand__name');
+    const latin = document.querySelector('.brand__latin');
+    if (!brand || !mark || !name || !latin) return null;
+    const box = (node) => node.getBoundingClientRect();
+    return {
+      markToName: Math.round((box(name).left - box(mark).right) * 10) / 10,
+      nameToLatin: Math.round((box(latin).left - box(name).right) * 10) / 10,
+      latinOffset: Math.round((box(latin).top - box(name).top) * 10) / 10,
+    };
+  })()`);
+  if (!brandLayout || brandLayout.markToName < 10 || brandLayout.nameToLatin < 12
+    || brandLayout.latinOffset < 0 || brandLayout.latinOffset > 12) {
+    throw new Error(`Brand mark, name and latin label are not spaced consistently: ${JSON.stringify(brandLayout)}`);
+  }
   const excerptCards = await evaluate(`(() => {
     const cards = [...document.querySelectorAll('.legacy-card')];
     const box = cards[0]?.querySelector('.legacy-card__box--current');

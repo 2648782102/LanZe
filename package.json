@@ -18,7 +18,8 @@
     "audio:verify": "node scripts/verify-audio-library.mjs",
     "test": "node --test --test-concurrency=1 scripts/*.test.mjs src/config/*.test.js src/data/*.test.js src/services/*.test.js src/utils/*.test.js",
     "lint": "node src/utils/lint.mjs",
-    "audio:private": "node scripts/use-private-audio.mjs"
+    "audio:private": "node scripts/use-private-audio.mjs",
+    "capture:brand": "node scripts/capture-brand.mjs"
   },
   "engines": {
     "node": ">=20",
