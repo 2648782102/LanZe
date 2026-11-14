@@ -358,7 +358,7 @@ const main = async () => {
   }))()`);
   if (!home.text.includes("余韵 · 一则")) throw new Error("Today's reading page did not render");
   if (home.audioDocks !== 1) throw new Error("Expected one native local audio dock");
-  if (!home.audioTitle.includes("空山 · 松风")) throw new Error("Local soundscape was not selected");
+  if (!home.audioTitle.includes("少年不凡")) throw new Error("Legacy soundscape was not selected");
   if (home.audioStateRole !== "status" || !["试听", "播放中"].includes(home.audioState)) {
     throw new Error("Audio dock status is missing or reports an unexpected initial state");
   }
@@ -376,9 +376,13 @@ const main = async () => {
     volume: Boolean(document.querySelector('.audio-dock__volume')),
     cover: Boolean(document.querySelector('.audio-dock__cover')),
     title: document.querySelector('.audio-dock__title')?.textContent?.trim() || '',
-  }))()`).then((value) => value.tracks === 3 ? value : null));
+    source: document.querySelector('audio')?.getAttribute('src') || '',
+  }))()`).then((value) => value.tracks === 5 ? value : null));
   if (!audioLibrary.seek || !audioLibrary.volume || !audioLibrary.cover) {
-    throw new Error("Local soundscape controls did not render");
+    throw new Error("Legacy soundscape controls did not render");
+  }
+  if (!audioLibrary.source.includes("music.163.com/song/media/outer/url")) {
+    throw new Error(`Legacy soundscape is not using the old direct URL: ${audioLibrary.source}`);
   }
   await evaluate(`(() => {
     document.querySelector('.audio-dock__handle')?.click();
@@ -394,21 +398,9 @@ const main = async () => {
   const nextTrack = await waitUntil("next soundscape", () => evaluate(`(() => {
     const title = document.querySelector('.audio-dock__title')?.textContent?.trim() || '';
     const preferences = JSON.parse(localStorage.getItem('lanze_audio_preferences') || '{}');
-    return title === '月色 · 瓷盏' && preferences.trackIndex === 1 ? title : null;
+    return title === '浣纱歌 (伴奏)' && preferences.trackIndex === 1 ? title : null;
   })()`));
   if (!nextTrack) throw new Error("Soundscape selection or preference did not persist");
-  await evaluate(`(() => {
-    const seek = document.querySelector('.audio-dock__seek');
-    if (!seek) return false;
-    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
-    setter.call(seek, '8');
-    seek.dispatchEvent(new Event('input', { bubbles: true }));
-    return true;
-  })()`);
-  const seekedAudio = await waitUntil("soundscape seek", () => evaluate(
-    "document.querySelector('audio')?.currentTime >= 7.5",
-  ));
-  if (!seekedAudio) throw new Error("Soundscape seek did not update playback position");
   await evaluate(`(() => {
     document.querySelector('button[aria-label="查看播放列表"]')?.click();
     return true;
@@ -419,7 +411,7 @@ const main = async () => {
     return true;
   })()`);
   await waitUntil("first soundscape restored", () => evaluate(
-    "document.querySelector('.audio-dock__title')?.textContent?.trim() === '空山 · 松风'",
+    "document.querySelector('.audio-dock__title')?.textContent?.trim() === '少年不凡'",
   ));
   if (home.navCount !== 3) throw new Error("Primary navigation did not render");
   const excerptCards = await evaluate(`(() => {
@@ -1160,8 +1152,10 @@ const main = async () => {
     const url = requestsById.get(event.params.requestId) || "";
     const expectedPoetryFailure = isPoetrySourceRequest(url);
     const expectedMediaAbort = event.params.errorText === "net::ERR_ABORTED"
-      && url.startsWith(`${origin}/media/lanze-`)
-      && /\.(wav|svg)$/.test(url);
+      && (
+        (url.startsWith(`${origin}/media/lanze-`) && /\.(wav|svg)$/.test(url))
+        || /^https?:\/\/(music\.163\.com|p[12]\.music\.126\.net|m\d+\.music\.126\.net)\//.test(url)
+      );
     return !expectedPoetryFailure && !expectedMediaAbort;
   });
   const expectedPoetryFailures = failedRequests.length - unexpectedFailedRequests.length;

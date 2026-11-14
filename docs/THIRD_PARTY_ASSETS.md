@@ -32,8 +32,8 @@ find src/assets public -type f -print
 | 类别 | 当前位置 | 域名 / 用途 | 风险与状态 | 后续动作 |
 | --- | --- | --- | --- | --- |
 | 运行时依赖 | `package.json` / `package-lock.json` | Vue、Vue Router 与 Vite 工具链；业务请求与 Cookie 均使用浏览器原生能力 | 当前不再引入 Axios、Vue Cookies、Supabase JS、Bootstrap、Font Awesome、Element Plus、Lottie、APlayer 或滑块验证码；npm 包各自许可见 lock 元数据 | 升级时再次核对依赖许可与构建产物中的版权说明 |
-| 默认本地声景与封面 | `public/media/lanze-{qingshan,yuese,wanzhou}.wav`、对应 `-cover.svg`、`audio-manifest.json` | 2026-11-14 从 Wikimedia Commons 上 Antti Luode 的 CC BY 3.0 古筝录音裁切的三段 36 秒 PCM 节选与原创 SVG | CC BY 3.0，署名与来源见 `public/media/AUDIO_CREDITS.md` 与 `audio-manifest.json`；封面 SVG 为本项目原创；清单和 SHA-256 随仓库分发 | 修改音轨后运行 `npm run audio:generate && npm run audio:verify`，同步更新校验清单与本节记录 |
-| 可选自定义音源 | `src/config/audio.js`、`src/components/AudioDock.vue`、`VITE_AUDIO_TRACKS` | 部署者显式提供的音轨 URL / 封面 URL | 默认不含任何第三方媒体域；启用后版权、热链与隐私政策由配置者负责 | 仅在授权明确时设置 `VITE_AUDIO_SOURCE=custom`；无效配置自动回退并显示提示，不可达 URL 显示状态并允许重试 |
+| 默认播放器外链 | `src/config/audio.js`、`music.163.com`、`music.126.net` | 2026-11-14 恢复 2022 版五首外链直连；不下载音频文件 | 第三方平台链接带签名、可能失效；不承诺授权、可用性或离线播放；部署者自行承担 | 外链不可达时播放器显示「声景不可达」；如需离线可切 `VITE_AUDIO_SOURCE=custom` 指向 `public/media/` 的 CC BY 3.0 素材 |
+| 可选自定义音源 | `src/config/audio.js`、`src/components/AudioDock.vue`、`VITE_AUDIO_TRACKS` | 部署者显式提供的音轨 URL / 封面 URL | 默认已含旧版第三方外链；`custom` 模式的版权、热链与隐私政策同样由配置者负责 | 仅在授权明确时设置 `VITE_AUDIO_SOURCE=custom`；无效配置自动回退并显示提示，不可达 URL 显示状态并允许重试 |
 | 首页诗句源 | `src/services/poetrySource.js`、`VITE_POETRY_SOURCE_URL` | 默认关闭；显式 `VITE_POETRY_SOURCE=remote` 时才请求 `https://v1.jinrishici.com/all.json` | 第三方服务不随仓库托管，授权与稳定性未核验；不承诺 SLA；默认构建不请求 | 可保持 `VITE_POETRY_SOURCE=local`，或换成自建兼容接口；公开部署前核查服务条款与内容授权 |
 | 徽章 | `README.md` | `img.shields.io`、GitHub Actions badge | 文档展示外链；不参与运行时核心功能 | 可保留，但离线文档不应依赖其加载 |
 | 文档链接 | 全仓库 | GitHub、Vue、Vite 等官方/项目链接 | 属说明性链接 | 定期检查失效链接，不把其承诺视为本项目能力 |
@@ -72,6 +72,6 @@ find src/assets public -type f -print
 - [ ] 核查当前 WOFF2 子集对应的历史宋体是否允许 Web 嵌入、子集化与仓库再分发。
 - [ ] 核查今日展厅与登录封面压缩图对应的历史原图来源、许可与美术权利；无法确认时替换。
 - [x] 已从当前工作树移除未被源码引用的历史字体、图片与头像文件；原始文件仍可由 Git 历史追溯。
-- [x] 默认音乐演示已升级为三段离线、开放授权古筝节选与原创封面；清单、哈希和无效配置回退提示齐备。
+- [x] 默认播放器恢复旧版五首外链直连；开放授权古筝节选仍作为离线备用保留，清单、哈希和无效配置回退提示齐备。
 - [x] 自定义音源 URL 不可达时，播放器显示可读状态并允许重试，不影响业务页面。
 - [x] 首页诗句源默认关闭；只有显式启用远程接口时才需要核查服务条款、内容版权与公开部署隐私边界。

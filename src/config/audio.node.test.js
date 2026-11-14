@@ -4,12 +4,11 @@ import { createAudioConfig } from "./audio.node.js";
 
 test("uses the local demo track without configuration", () => {
   const config = createAudioConfig({});
-  assert.equal(config.source, "local");
+  assert.equal(config.source, "legacy");
   assert.equal(config.invalidCustom, undefined);
-  assert.equal(config.tracks.length, 3);
-  assert.equal(config.tracks[0].url, "./media/lanze-qingshan.wav");
-  assert.equal(config.tracks[0].cover, "./media/lanze-qingshan-cover.svg");
-  assert.equal(config.tracks[0].duration, 36);
+  assert.equal(config.tracks.length, 5);
+  assert.equal(config.tracks[0].name, "少年不凡");
+  assert.match(config.tracks[0].url, /music\.163\.com\/song\/media\/outer\/url/);
 });
 
 test("uses an explicit custom playlist only when enabled", () => {
@@ -27,7 +26,7 @@ test("uses an explicit custom playlist only when enabled", () => {
     { name: "示例", artist: "作者", url: "/audio/demo.mp3", cover: "/audio/cover.svg" },
     { name: "未命名音轨", artist: "未标注作者", url: "https://audio.example.test/second.mp3" },
   ]);
-  assert.equal(createAudioConfig({ VITE_AUDIO_TRACKS: JSON.stringify(tracks) }).source, "local");
+  assert.equal(createAudioConfig({ VITE_AUDIO_TRACKS: JSON.stringify(tracks) }).source, "legacy");
 });
 
 test("falls back to the local track for invalid custom configuration", () => {
@@ -35,8 +34,8 @@ test("falls back to the local track for invalid custom configuration", () => {
   const emptyList = createAudioConfig({ VITE_AUDIO_SOURCE: "custom", VITE_AUDIO_TRACKS: "[]" });
 
   for (const config of [invalidJson, emptyList]) {
-    assert.equal(config.source, "local");
+    assert.equal(config.source, "legacy");
     assert.equal(config.invalidCustom, true);
-    assert.equal(config.tracks[0].url, "./media/lanze-qingshan.wav");
+    assert.equal(config.tracks[0].name, "少年不凡");
   }
 });

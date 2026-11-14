@@ -49,7 +49,7 @@
 - 🔎 **读诗详情**：居中诗笺、标签、笺注、相关诗目与朗读/复制链接。
 - ✍️ **写作台**：本地草稿、实时预览、资料编辑与作品发布；登录状态由浏览器本地存储支持。
 - 👤 **我的诗卷**：收藏、最近读过与本机作品三类内容，空状态给出下一步。
-- 🎵 **本地声景**：默认提供三段三段 CC BY 3.0 开源古筝录音节选（各 36 秒），含封面、播放列表、切轨、进度拖动、音量/静音与本机偏好记忆；进入页面时收起且不自动播放，显式展开后才呈现完整声景卷，仍可通过公开配置接入授权明确的自定义音源。
+- 🎵 **本地声景**：默认恢复旧版五首网易云外链直连，含封面、播放列表、切轨、进度拖动、音量/静音与本机偏好记忆；进入页面时收起且不自动播放，显式展开后才呈现完整声景卷，仍可通过公开配置接入授权明确的自定义音源。
 - 📱 **响应式布局**：覆盖桌面与 320px 起移动宽度；窄屏筛选折叠、底部导航与默认收起且不播放的吸底播放器分别避让，仍需持续无障碍/视觉回归。
 - 🧩 **现代前端栈**：Vue 3、Vue Router 4、原生 `fetch` / Cookie API，配合 Vite 6 构建与 41 项单测。
 - 📚 **开源治理**：MIT、贡献/行为/安全政策、变更日志、CI、issue/PR 模板、发布与宣发文案。
@@ -64,7 +64,7 @@
 | 构建 | Vite 6 + `@vitejs/plugin-vue`，`package.json` 使用 `"type": "module"`，`base: './'` |
 | 语言 | JavaScript / Vue SFC；npm 脚本使用 `node --test` 与 ESM |
 | 数据 | `src/data/poetryCatalog.js` 统一离线馆藏读取，`public/data/poetry/` 提供 16 个静态分卷；`src/apis/request.js` 仍用于可选自建 API |
-| 动效与媒体 | 浏览器原生音频、CSS/SVG 图标与 `public/media/` 三段 CC BY 3.0 古筝节选/原创 SVG 封面 |
+| 动效与媒体 | 浏览器原生音频、CSS/SVG 图标与 五首旧版外链曲目/第三方封面（不随仓库分发音频文件） |
 | 样式 | `src/styles/base.css` 设计 token、组件内 CSS 与 `src/components/` 自有组件 |
 | 字体与素材 | WOFF2 字体子集与压缩展品图；派生来源与授权审查见 `docs/THIRD_PARTY_ASSETS.md` |
 | 设计系统 | `src/styles/base.css` 与 `docs/DESIGN_SYSTEM.md`；组件、状态与响应式规则集中定义 |
@@ -126,10 +126,10 @@ CI workflow 在 Node 20/22 执行 `npm ci && npm run build && npm run test --if-
 | `VITE_POETRY_SOURCE` | 否 | `local` | 首页摘录卡默认只用仓库内置摘录；设为 `remote` / `jinrishici` 时才请求外部诗句服务 |
 | `VITE_POETRY_SOURCE_URL` | 否 | `https://v1.jinrishici.com/all.json` | 兼容 `content` / `origin` / `author` / `category` 字段的随机诗句接口，可替换为自建服务 |
 | `VITE_POETRY_SOURCE_TIMEOUT` | 否 | `4000` | 诗句源超时（毫秒）；失败或超时会回退内置摘录并显示来源状态 |
-| `VITE_AUDIO_SOURCE` | 否 | `local` | `local` 使用 CC BY 3.0 古筝节选；仅在确认授权后设置为 `custom` |
+| `VITE_AUDIO_SOURCE` | 否 | `legacy` | 默认值；仅显式 `custom` 时读取 `VITE_AUDIO_TRACKS` |
 | `VITE_AUDIO_TRACKS` | 否 | JSON 数组 | `custom` 模式下的音轨列表；每项至少含 `url`，可选 `name`、`artist`、`cover` |
 
-默认情况下播放器只请求 `public/media/` 内的三段古筝节选，不加载第三方音乐或封面。曲库由 `npm run audio:generate` 从已核验授权的源文件裁切生成，`npm run audio:verify` 校验 WAV 头、时长、清单与 SHA-256；当前音轨为「空山 · 松风」「月色 · 瓷盏」「晚舟 · 水纹」。若设置为 `VITE_AUDIO_SOURCE=custom`，`VITE_AUDIO_TRACKS` 必须是 JSON 数组，例如：
+默认情况下播放器直接请求旧版五首 `music.163.com` 外链曲目与 `music.126.net` 封面，不下载音频到仓库；曲目为「少年不凡」「浣纱歌 (伴奏)」「卡农」「River Flows in You（你的心河）」「Leaves in the Wind」。外链可能受平台签名、防盗链、地区与版权策略影响而失效；仓库内 `public/media/` 的 CC BY 3.0 古筝节选仍作为离线素材保留并可经 `custom` 配置启用。若设置为 `VITE_AUDIO_SOURCE=custom`，`VITE_AUDIO_TRACKS` 必须是 JSON 数组，例如：
 
 ```dotenv
 VITE_AUDIO_SOURCE=custom
@@ -138,7 +138,7 @@ VITE_AUDIO_TRACKS=[{"name":"示例","artist":"作者","url":"/media/example.mp3"
 
 音源与封面的版权、可用性、防盗链与隐私政策由配置者自行负责；配置缺失或 JSON 无效时自动回退到本地声景并显示一次可读提示，URL 不可达或播放失败时播放器会显示「声景不可达」并允许重试。`VITE_` 变量会进入浏览器产物，不要填入私密地址或凭据。
 
-若只想在本机播放自己合法取得的音频（例如早期版本那几首商业平台曲目的自有文件），可把文件放入 `public/media/private/`，然后运行 `npm run audio:private`；曲目名/作者/顺序可用同目录 `tracks.json` 配置，格式见 `docs/PRIVATE_AUDIO.md`。该目录与生成的 `.env.local.audio` 均被 `.gitignore` 忽略，不进入 Git、不参与构建产物分发；脚本只读取本地文件并启动 `vite --mode local.audio`。仓库默认音轨与线上 Pages 仍使用已署名的 CC BY 3.0 古筝节选。公开仓库的分发授权不由「非商用」或使用者确认单独决定，请勿把未取得授权的商业录音提交进仓库或部署到公开站点。
+若只想在本机播放自己合法取得的音频（例如早期版本那几首商业平台曲目的自有文件），可把文件放入 `public/media/private/`，然后运行 `npm run audio:private`；曲目名/作者/顺序可用同目录 `tracks.json` 配置，格式见 `docs/PRIVATE_AUDIO.md`。该目录与生成的 `.env.local.audio` 均被 `.gitignore` 忽略，不进入 Git、不参与构建产物分发；脚本只读取本地文件并启动 `vite --mode local.audio`。默认音轨为旧版外链直连；没有把商业录音下载进仓库或随构建产物分发。外链播放的授权与可用性由第三方平台与部署者承担。
 
 首页摘录卡默认只使用 `src/data/poems.js` 的内置摘录与精校馆藏短句，不发起外部请求；业务诗库来自 `public/data/poetry/` 的离线分卷。仅当显式设置 `VITE_POETRY_SOURCE=remote` 时才请求 `VITE_POETRY_SOURCE_URL`；接口失败、超时、返回空内容或重复当前诗句会自动回退本地摘录，并在页面标注来源。该服务不由本仓库托管，也不承诺 SLA；部署者可换成自建兼容接口。摘录收藏按诗句内容保存在当前浏览器，不依赖随机接口返回的标识。
 
@@ -158,7 +158,7 @@ VITE_USE_MOCK=true
 LanZe/
 ├── .github/                 # CI、Browser E2E、Pages、发布 workflow 与模板
 ├── docs/                    # 架构、开发、部署、路线图、FAQ、素材、宣发与巡检
-├── public/                  # favicon、SVG/PNG 展示素材与三段古筝节选/封面
+├── public/                  # favicon、展示素材与离线备用古筝节选/封面
 ├── src/
 │   ├── apis/                # 原生 fetch 请求封装与业务 API 列表
 │   ├── assets/              # WOFF2 字体子集与压缩展品图
@@ -224,7 +224,7 @@ GitHub Pages 静态预览可作为当前构建的页面入口，但不要写成�
 
 - **v0.2.0（已发布）**：Vite 6、本地演示数据、23 项单测、lint、README/许可证/治理文档、CI、模板、发布与宣发文案。
 - **v0.3.0（已发布）**：按「青瓷数字诗馆」目标模式完全重构信息架构与视图层；移除旧 UI 套件，保留单张历史样式摘录卡，收敛静态素材与布局位移，加入 27 项单测、CI Browser E2E 和音源不可达状态。
-- **v0.4.0（当前版本）**：9,350 篇离线馆藏、移动端走查与三段开放授权古筝节选；41 项单测和 CI 浏览器回归覆盖主要演示链路。
+- **v0.4.0（当前版本）**：9,350 篇离线馆藏、移动端走查与旧版五首外链曲目恢复；41 项单测和 CI 浏览器回归覆盖主要演示链路。
 - **v0.4.x（后续）**：跨浏览器/视觉回归、素材授权核验、演示录屏、可选后端契约与内容版本依据。
 - **后续（社区化）**：按真实贡献推进 i18n、内容版本依据与社区讨论，不预设交付期限。
 

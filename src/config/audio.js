@@ -1,30 +1,43 @@
-const LOCAL_AUDIO = Object.freeze([
+const LEGACY_AUDIO = Object.freeze([
   {
-    id: "qingshan",
-    name: "空山 · 松风",
-    artist: "Antti Luode",
-    mood: "清远 · 古筝晨曲",
-    url: "./media/lanze-qingshan.wav",
-    cover: "./media/lanze-qingshan-cover.svg",
-    duration: 36,
+    id: "shaonian",
+    name: "少年不凡",
+    artist: "刘美麟",
+    mood: "旧版曲目 · 外链直连",
+    url: "https://music.163.com/song/media/outer/url?id=1465288704.mp3",
+    cover: "https://p2.music.126.net/lvfb_64QYmbib7ccHgDNJA==/109951165165604312.jpg?param=130y130",
   },
   {
-    id: "yuese",
-    name: "月色 · 瓷盏",
-    artist: "Antti Luode",
-    mood: "疏淡 · 筝语",
-    url: "./media/lanze-yuese.wav",
-    cover: "./media/lanze-yuese-cover.svg",
-    duration: 36,
+    id: "huansha",
+    name: "浣纱歌 (伴奏)",
+    artist: "许多葵 / KasaYAYA / 齐栾 / 逆水寒",
+    mood: "旧版曲目 · 外链直连",
+    url: "https://music.163.com/song/media/outer/url?id=862100710.mp3",
+    cover: "https://p1.music.126.net/H0p9gXKszyJfGCmmjgaFSg==/109951163380162384.jpg?param=130y130",
   },
   {
-    id: "wanzhou",
-    name: "晚舟 · 水纹",
-    artist: "Antti Luode",
-    mood: "悠然 · 筝韵",
-    url: "./media/lanze-wanzhou.wav",
-    cover: "./media/lanze-wanzhou-cover.svg",
-    duration: 36,
+    id: "canon",
+    name: "卡农",
+    artist: "dylanf",
+    mood: "旧版曲目 · 外链直连",
+    url: "https://music.163.com/song/media/outer/url?id=478507889.mp3",
+    cover: "https://p2.music.126.net/fL7FAeRby1s7JreBqoOKjg==/109951165175371079.jpg?param=130y130",
+  },
+  {
+    id: "river",
+    name: "River Flows in You（你的心河）",
+    artist: "Yiruma",
+    mood: "旧版曲目 · 外链直连",
+    url: "https://music.163.com/song/media/outer/url?id=22829932.mp3",
+    cover: "https://p2.music.126.net/hG_GIDqq9UP_uMStU11Tuw==/109951165967036244.jpg?param=130y130",
+  },
+  {
+    id: "leaves",
+    name: "Leaves in the Wind",
+    artist: "Isaac Shepard",
+    mood: "旧版曲目 · 外链直连",
+    url: "https://music.163.com/song/media/outer/url?id=19934760.mp3",
+    cover: "https://p1.music.126.net/Sr0TIlk6ZRKYmiv00beGXA==/109951163935983939.jpg?param=130y130",
   },
 ]);
 
@@ -47,13 +60,13 @@ const toTrack = (value) => {
 
 export const createAudioConfig = (env = {}) => {
   const enabled = String(env.VITE_AUDIO_SOURCE || "").trim().toLowerCase() === "custom";
-  if (!enabled) return { tracks: LOCAL_AUDIO, source: "local" };
+  if (!enabled) return { tracks: LEGACY_AUDIO, source: "legacy" };
 
   let parsed;
   try {
     parsed = JSON.parse(env.VITE_AUDIO_TRACKS || "[]");
   } catch {
-    return { tracks: LOCAL_AUDIO, source: "local", invalidCustom: true };
+    return { tracks: LEGACY_AUDIO, source: "legacy", invalidCustom: true };
   }
 
   const tracks = (Array.isArray(parsed) ? parsed : [parsed])
@@ -61,7 +74,7 @@ export const createAudioConfig = (env = {}) => {
     .filter(Boolean);
   return tracks.length
     ? { tracks, source: "custom" }
-    : { tracks: LOCAL_AUDIO, source: "local", invalidCustom: true };
+    : { tracks: LEGACY_AUDIO, source: "legacy", invalidCustom: true };
 };
 
 export const audioConfig = createAudioConfig(

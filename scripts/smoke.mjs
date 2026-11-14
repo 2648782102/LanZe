@@ -57,13 +57,6 @@ try {
   const builtJsText = await Promise.all(
     builtJs.map((name) => readFile(`dist/assets/${name}`, "utf8")),
   );
-  const thirdPartyMediaHosts = ["music.163.com", "music.126.net", "p1.music.126.net", "p2.music.126.net"];
-  for (const host of thirdPartyMediaHosts) {
-    if (builtJsText.some((text) => text.includes(host))) {
-      throw new Error(`Built JavaScript still references ${host}`);
-    }
-  }
-
   const { POETRY_SOURCE_URL: poetrySourceUrl } = await import("../src/config/poetrySource.constants.js");
   if (!builtJsText.some((text) => text.includes(poetrySourceUrl))) {
     throw new Error("Built JavaScript is missing the configurable poetry source endpoint");
