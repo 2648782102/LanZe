@@ -329,7 +329,7 @@ const main = async () => {
   if (coldStart.overlapsPlinth || coldStart.overlapsPlinthActions) {
     throw new Error("Desktop audio dock overlaps the reading plinth on cold start");
   }
-  if (coldStart.dockWidth > 220 || coldStart.dockHeight > 64) {
+  if (coldStart.dockWidth > 190 || coldStart.dockHeight > 56) {
     throw new Error("Desktop audio dock exceeds its compact fixed-layer budget");
   }
   if (coldStart.coldLayoutShift > 0.05) {
@@ -675,10 +675,11 @@ const main = async () => {
   await waitUntil("expanded audio dock", () => evaluate(
     "!document.querySelector('.audio-dock')?.classList.contains('is-collapsed')",
   ));
-  await waitUntil("expanded audio dock width settles", () => evaluate(`
+  await waitUntil("expanded audio dock size settles", () => evaluate(`
     (() => {
       const dock = document.querySelector('.audio-dock');
-      return Boolean(dock) && Math.round(dock.getBoundingClientRect().width) > 360;
+      return Boolean(dock) && Math.round(dock.getBoundingClientRect().height) > 100
+        && Math.round(dock.getBoundingClientRect().width) > 300;
     })()
   `), 32);
   const expandedDock = await evaluate(`(() => {
@@ -712,7 +713,7 @@ const main = async () => {
   if (!expandedDock.audioPaused) {
     throw new Error("Expanding the audio dock must not start playback");
   }
-  if (expandedDock.height > 190) {
+  if (expandedDock.height > 120) {
     throw new Error(`Expanded audio dock exceeds the fixed-layer height budget: ${JSON.stringify(expandedDock)}`);
   }
   if (expandedDock.minControlHeight < 36 || expandedDock.seekHeight < 24) {
@@ -744,7 +745,7 @@ const main = async () => {
   ));
   await waitUntil("collapsed audio dock settles", () => evaluate(`(() => {
     const dock = document.querySelector('.audio-dock');
-    return dock ? Math.round(dock.getBoundingClientRect().width) <= 210 : false;
+    return dock ? Math.round(dock.getBoundingClientRect().width) <= 190 : false;
   })()`));
   const collapsedDock = await evaluate(`(() => {
     const dock = document.querySelector('.audio-dock');
@@ -758,7 +759,7 @@ const main = async () => {
     };
   })()`);
   if (!collapsedDock.compactTitle || !collapsedDock.stageHidden || !collapsedDock.audioPaused
-    || collapsedDock.width > 210 || collapsedDock.height > 64) {
+    || collapsedDock.width > 190 || collapsedDock.height > 56) {
     throw new Error(`Collapsed audio dock should be a quiet soundscape slip: ${JSON.stringify(collapsedDock)}`);
   }
   if (!collapsedDock.handleIcon.includes('m9 5 7 7-7 7')) {
@@ -1001,7 +1002,7 @@ const main = async () => {
       audioPaused: Boolean(document.querySelector('audio')?.paused),
     };
   })()`);
-  if (narrowExpanded.height > 220 || narrowExpanded.visibleControls < 3
+  if (narrowExpanded.height > 120 || narrowExpanded.visibleControls < 3
     || narrowExpanded.minControlHeight < 36 || !narrowExpanded.audioPaused) {
     throw new Error(`320px expanded audio dock is unstable: ${JSON.stringify(narrowExpanded)}`);
   }

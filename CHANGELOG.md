@@ -8,7 +8,7 @@
 
 ### Changed
 
-播放器 UI 按参考图完全重写：深墨绿横向卡、左侧金色竖线与贯穿式箭头 rail、方形播放键、白底唱片封面、右上时间/状态、缩进的进度条、分隔线与底部单行控制行；收起态是 200px 的静谧横条，展开/收起分别使用左/右箭头。修正 `handleEnded` 里 `trackIndex` ref 未解包的问题；小屏控制行改为不换行的 flex，保留音量滑块。新增 `npm run capture:audio` 无头浏览器截图诊断，E2E 增加箭头方向、区域不越界与展开宽度稳定断言。
+播放器组件删除后从零重建为紧凑版：保留参考图的深墨绿横条、金色竖线、贯穿式箭头 rail、方形播放键、白底唱片封面、右上时间/状态、缩进进度条、分隔线与单行控制行，但整体尺寸收回为展开 360×108、收起 176×48，不再是上一版过大的 612px 卡片。收起/展开分别使用右/左箭头；小屏控制行用不换行 flex，保留音量滑块。修正 `handleEnded` 里 `trackIndex` ref 未解包的问题；新增 `npm run capture:audio` 无头浏览器截图诊断，E2E 增加箭头方向、区域不越界与展开尺寸稳定断言。
 - 整体性能与架构优化：业务请求改用原生 `fetch`，会话改用原生 Cookie 适配器，移除 `axios`、`vue-cookies`、`@supabase/supabase-js` 与未被引用的 Supabase 适配器；首屏不再预加载 62KB 的 `data-vendor` chunk，npm 依赖由 75 个包降至 38 个且 `npm audit` 为 0 漏洞。
 - 三张首屏位图（展品图、登录封面、摘录扇舟图）增加 AVIF 优先源并保留原 JPG/PNG 兜底；浏览器只下载 AVIF，单张资源最多从 439KB 降到 51KB。摘录卡图片标记为低优先级，不与首屏展品图争带宽。
 - `ReadView` 的摘录牌堆状态抽取为 `useExcerptDeck()` composable，视图只保留展厅渲染与事件转发；新增 `sessionCookies` 单测并移除已废弃的 Supabase 配置用例，单测总数为 41。
