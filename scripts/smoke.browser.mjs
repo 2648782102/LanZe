@@ -425,10 +425,14 @@ const main = async () => {
       markToName: Math.round((box(name).left - box(mark).right) * 10) / 10,
       nameToLatin: Math.round((box(latin).left - box(name).right) * 10) / 10,
       latinOffset: Math.round((box(latin).top - box(name).top) * 10) / 10,
+      markWidth: Math.round(box(mark).width * 10) / 10,
+      nameSize: Number.parseFloat(getComputedStyle(name).fontSize),
+      latinSize: Number.parseFloat(getComputedStyle(latin).fontSize),
     };
   })()`);
-  if (!brandLayout || brandLayout.markToName < 10 || brandLayout.nameToLatin < 12
-    || brandLayout.latinOffset < 0 || brandLayout.latinOffset > 12) {
+  if (!brandLayout || brandLayout.markToName < 8 || brandLayout.nameToLatin < 8
+    || brandLayout.latinOffset < 2 || brandLayout.latinOffset > 14
+    || brandLayout.markWidth < 28 || brandLayout.nameSize < 20 || brandLayout.latinSize < 10) {
     throw new Error(`Brand mark, name and latin label are not spaced consistently: ${JSON.stringify(brandLayout)}`);
   }
   const excerptCards = await evaluate(`(() => {

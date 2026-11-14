@@ -88,46 +88,47 @@ const isActive = (item) => {
 
 .brand__mark {
   display: flex;
-  width: 42px;
-  height: 36px;
+  width: 34px;
+  height: 32px;
   align-items: flex-end;
   justify-content: center;
-  gap: 5px;
-  margin-right: 18px;
+  gap: 4px;
+  margin-right: 12px;
   border-bottom: 1px solid var(--brass);
 }
 
 .brand__mark i {
   display: block;
   width: 2px;
-  height: 16px;
+  height: 14px;
   background: var(--brass);
 }
 
 .brand__mark i:nth-child(2) {
-  height: 28px;
+  height: 24px;
 }
 
 .brand__mark i:nth-child(3) {
-  height: 21px;
+  height: 19px;
 }
 
 .brand__name {
   font-family: var(--font-poem);
-  font-size: 26px;
+  font-size: 22px;
   letter-spacing: 0.16em;
   line-height: 1;
 }
 
 .brand__latin {
-  margin-left: 22px;
+  margin-left: 14px;
   align-self: center;
-  padding-top: 10px;
+  padding-top: 0;
   color: var(--ink-faint);
   font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   line-height: 1;
+  transform: translateY(7px);
 }
 
 .main-nav {
