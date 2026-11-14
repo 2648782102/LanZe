@@ -32,7 +32,7 @@
       @click="toggleCollapsed"
     >
       <span class="audio-dock__handle-label" aria-hidden="true">{{ isCollapsed ? "展开声景" : "收束" }}</span>
-      <AppIcon :name="isCollapsed ? 'chevron-right' : 'chevron-left'" :size="16" />
+      <AppIcon :name="isCollapsed ? 'chevron-left' : 'chevron-right'" :size="16" />
     </button>
 
     <div class="audio-dock__body">
@@ -670,15 +670,15 @@ onBeforeUnmount(() => {
 }
 
 .audio-dock.is-collapsed {
-  width: 176px;
-  height: 48px;
+  width: 192px;
+  height: 60px;
 }
 
 .audio-dock.is-collapsed .audio-dock__toggle {
-  top: 9px;
-  left: 32px;
-  width: 28px;
-  height: 28px;
+  top: 13px;
+  left: 40px;
+  width: 34px;
+  height: 34px;
 }
 
 .audio-dock.is-collapsed .audio-dock__stage {
@@ -695,19 +695,19 @@ onBeforeUnmount(() => {
 
 .audio-dock.is-collapsed .audio-dock__compact {
   position: absolute;
-  top: 7px;
-  left: 68px;
-  right: 10px;
+  top: 12px;
+  left: 84px;
+  right: 12px;
   z-index: 1;
   display: grid;
-  gap: 0;
+  gap: 2px;
 }
 
 .audio-dock.is-collapsed .audio-dock__compact-title {
   display: block;
   overflow: hidden;
   font-family: var(--font-poem);
-  font-size: 13px;
+  font-size: 14px;
   letter-spacing: 0.04em;
   line-height: 1.3;
   text-overflow: ellipsis;
@@ -717,7 +717,7 @@ onBeforeUnmount(() => {
 .audio-dock.is-collapsed .audio-dock__compact-state {
   display: block;
   color: rgba(247, 248, 244, 0.5);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.3;
 }
 
@@ -820,7 +820,7 @@ audio {
   }
 
   .audio-dock.is-collapsed {
-    width: 176px;
+    width: 192px;
   }
 
   .audio-dock__playlist {

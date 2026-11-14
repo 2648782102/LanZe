@@ -329,7 +329,7 @@ const main = async () => {
   if (coldStart.overlapsPlinth || coldStart.overlapsPlinthActions) {
     throw new Error("Desktop audio dock overlaps the reading plinth on cold start");
   }
-  if (coldStart.dockWidth > 190 || coldStart.dockHeight > 56) {
+  if (coldStart.dockWidth > 200 || coldStart.dockHeight > 64) {
     throw new Error("Desktop audio dock exceeds its compact fixed-layer budget");
   }
   if (coldStart.coldLayoutShift > 0.05) {
@@ -722,8 +722,8 @@ const main = async () => {
   if (!expandedDock.aligned) {
     throw new Error(`Expanded audio dock regions are not contained and aligned: ${JSON.stringify(expandedDock)}`);
   }
-  if (!expandedDock.handleIcon.includes('m15 5-7 7 7 7')) {
-    throw new Error(`Expanded audio dock must show a left chevron: ${expandedDock.handleIcon}`);
+  if (!expandedDock.handleIcon.includes('m9 5 7 7-7 7')) {
+    throw new Error(`Expanded audio dock must show a right chevron: ${expandedDock.handleIcon}`);
   }
   await evaluate(`(() => {
     const handle = document.querySelector('.audio-dock__handle');
@@ -745,7 +745,7 @@ const main = async () => {
   ));
   await waitUntil("collapsed audio dock settles", () => evaluate(`(() => {
     const dock = document.querySelector('.audio-dock');
-    return dock ? Math.round(dock.getBoundingClientRect().width) <= 190 : false;
+    return dock ? Math.round(dock.getBoundingClientRect().width) <= 200 : false;
   })()`));
   const collapsedDock = await evaluate(`(() => {
     const dock = document.querySelector('.audio-dock');
@@ -759,11 +759,11 @@ const main = async () => {
     };
   })()`);
   if (!collapsedDock.compactTitle || !collapsedDock.stageHidden || !collapsedDock.audioPaused
-    || collapsedDock.width > 190 || collapsedDock.height > 56) {
+    || collapsedDock.width > 200 || collapsedDock.height > 64) {
     throw new Error(`Collapsed audio dock should be a quiet soundscape slip: ${JSON.stringify(collapsedDock)}`);
   }
-  if (!collapsedDock.handleIcon.includes('m9 5 7 7-7 7')) {
-    throw new Error(`Collapsed audio dock must show a right chevron: ${collapsedDock.handleIcon}`);
+  if (!collapsedDock.handleIcon.includes('m15 5-7 7 7 7')) {
+    throw new Error(`Collapsed audio dock must show a left chevron: ${collapsedDock.handleIcon}`);
   }
 
   if (!await clickByText("收入诗卷")) throw new Error("Save-to-collection button was not found");
