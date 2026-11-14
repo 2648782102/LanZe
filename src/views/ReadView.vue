@@ -75,19 +75,17 @@
         <div class="legacy-gallery__card">
           <ExcerptCard
             ref="excerptCardRef"
-            v-if="excerpt"
+            v-if="excerptStack.length"
             :data-excerpt-queue-depth="excerptQueueDepth"
-            :excerpt="excerpt"
-            :next-excerpt="nextExcerpt"
-            :next-saved="Boolean(nextExcerpt) && excerptSaved.includes(`excerpt-${nextExcerpt.content}`)"
-            :saved="excerptSaved.includes(`excerpt-${excerpt.content}`)"
+            :excerpt="excerptStack[0]"
+            :upcoming-excerpts="excerptStack.slice(1)"
+            :saved="excerptSaved.includes(`excerpt-${excerptStack[0].content}`)"
             :disabled="excerptStatus === 'loading'"
-            @toggle-save="toggleExcerptSave(excerpt)"
+            @toggle-save="toggleStackExcerptSave"
             @needs-next="prepareNextExcerpt"
-            @turn="beginExcerptTurn"
             @settled="finishExcerptTurn"
           />
-          <p v-if="excerptStatus === 'loading' && !excerpt" class="legacy-card-status" role="status">正在展开今日摘录……</p>
+          <p v-if="excerptStatus === 'loading' && !excerptStack.length" class="legacy-card-status" role="status">正在展开今日摘录……</p>
         </div>
         <article class="strip-intro">
           <p class="eyebrow">余韵 · 一则</p>
@@ -119,7 +117,7 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import AppIcon from "../components/AppIcon.vue";
 import ExcerptCard from "../components/ExcerptCard.vue";
 import { readStore, writeStore } from "../services/browserStore.js";
@@ -148,12 +146,12 @@ const excerptPage = ref(dayIndex);
 const excerpt = ref(null);
 const nextExcerpt = ref(null);
 const nextExcerptSource = ref("local");
+const excerptStack = ref([]);
 const excerptStatus = ref("loading");
 const excerptSource = ref("local");
 const excerptQueueDepth = ref(0);
 const EXCERPT_QUEUE_SIZE = 6;
 const REMOTE_PREFETCH_SIZE = 4;
-let pendingExcerpt = null;
 let excerptQueue = [];
 let remoteRequested = false;
 const excerptCardRef = ref(null);
@@ -225,16 +223,12 @@ const syncQueueHead = () => {
   }
   nextExcerpt.value = head.decorated;
   nextExcerptSource.value = head.source;
-};
-
-const ensurePendingExcerpt = () => {
-  if (pendingExcerpt) return;
-  fillLocalQueue();
-  pendingExcerpt = excerptQueue.shift() || {
-    decorated: localExcerptFor(excerptPage.value + 1),
-    source: "local",
-  };
-  syncQueueHead();
+  excerptStack.value = [excerpt.value, ...excerptQueue.slice(0, 3).map((entry) => entry.decorated)]
+    .filter(Boolean)
+    .map((entry) => ({
+      ...entry,
+      saved: excerptSaved.value.includes(`excerpt-${entry.content}`),
+    }));
 };
 
 const loadExcerpt = () => {
@@ -242,6 +236,7 @@ const loadExcerpt = () => {
   excerptSource.value = "local";
   excerptStatus.value = "fallback";
   fillLocalQueue();
+  syncQueueHead();
 };
 
 const prepareNextExcerpt = async () => {
@@ -260,7 +255,6 @@ const prepareNextExcerpt = async () => {
   if (basePage !== excerptPage.value) return;
   const knownContent = new Set([
     excerpt.value?.content,
-    pendingExcerpt?.decorated?.content,
     ...excerptQueue.map((entry) => entry.decorated.content),
   ].filter(Boolean));
   for (const result of remoteResults) {
@@ -274,18 +268,6 @@ const prepareNextExcerpt = async () => {
   syncQueueHead();
 };
 
-const reportExcerptSource = ({ source, reason }) => {
-  if (source === "local" && reason === "unavailable") {
-    notify("诗句源暂时不可用，已显示仓库内置摘录", "warning", 4200);
-  }
-  if (source === "local" && reason === "timeout") {
-    notify("诗句源响应超时，已显示仓库内置摘录", "warning", 4200);
-  }
-  if (source === "local" && reason === "duplicate") {
-    notify("诗句源重复了当前摘录，已换用仓库内置摘录", "info", 3200);
-  }
-};
-
 const nextPoem = () => {
   if (isSwitching.value) return;
   const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -297,18 +279,12 @@ const nextPoem = () => {
   }, prefersReducedMotion ? 0 : 120);
 };
 
-const beginExcerptTurn = () => {
-  if (excerptStatus.value === "loading") return;
-  ensurePendingExcerpt();
-};
-
 const finishExcerptTurn = () => {
-  const result = pendingExcerpt;
-  if (!result) return;
-  pendingExcerpt = null;
+  if (excerptStatus.value === "loading" || !excerptQueue.length) return;
+  const result = excerptQueue.shift();
   excerptPage.value += 1;
   excerpt.value = result.decorated;
-  excerptSource.value = result.source;
+  excerptSource.value = result.source === "remote" ? "remote" : "local";
   excerptStatus.value = result.source === "remote" ? "ready" : "fallback";
   fillLocalQueue();
   syncQueueHead();
@@ -331,7 +307,7 @@ const toggleSave = () => {
   notify(added ? "已收入你的诗卷" : "已从诗卷移除", added ? "success" : "info");
 };
 
-const toggleExcerptSave = (targetExcerpt) => {
+const toggleStackExcerptSave = (targetExcerpt) => {
   const key = `excerpt-${targetExcerpt.content}`;
   const added = !excerptSaved.value.includes(key);
   const next = added
@@ -339,6 +315,7 @@ const toggleExcerptSave = (targetExcerpt) => {
     : excerptSaved.value.filter((id) => id !== key);
   excerptSaved.value = next;
   writeStore("lanze_saved_excerpts", next);
+  syncQueueHead();
   notify(added ? "已收下这一句摘录" : "已取消这句摘录", added ? "success" : "info");
 };
 
@@ -361,12 +338,6 @@ onMounted(() => {
   prepareNextExcerpt();
 });
 
-watch(excerpt, () => {
-  if (excerpt.value) {
-    fillLocalQueue();
-    syncQueueHead();
-  }
-});
 onBeforeUnmount(() => {
   window.clearTimeout(switchTimer);
   window.clearTimeout(saveTimer);

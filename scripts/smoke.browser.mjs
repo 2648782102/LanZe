@@ -478,11 +478,11 @@ const main = async () => {
   }
   if (!await evaluate(`(() => {
     const card = document.querySelector('.legacy-card');
-    const top = card?.querySelector('.legacy-card__box--current');
-    return Boolean(top && !card.querySelector('.legacy-card__wash')
+    const layers = card?.querySelectorAll('.legacy-card__stack > .legacy-card__box:not(.legacy-card__fling-layer)') || [];
+    return Boolean(layers.length === 3 && !card.querySelector('.legacy-card__wash')
       && card.querySelector('.legacy-card__gesture'));
   })()`)) {
-    throw new Error("Excerpt card must keep a draggable face with its swipe rail");
+    throw new Error("Excerpt card must keep a three-layer deck with its swipe rail");
   }
   const firstExcerpt = excerptCards.firstVerse;
   const dockLayout = await evaluate(`(() => {
@@ -549,7 +549,8 @@ const main = async () => {
     card?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     return {
-      ghost: Boolean(card?.querySelector('.legacy-card__ghost')),
+      layers: card?.querySelectorAll('.legacy-card__stack > .legacy-card__box:not(.legacy-card__fling-layer)').length || 0,
+      flinging: Boolean(card?.querySelector('[data-flinging="true"]')),
       turnCount: Number(card?.getAttribute('data-turn-count') || 0),
     };
   })()`);
@@ -561,7 +562,7 @@ const main = async () => {
     })()
   `), 60);
   if (!staticTurn) throw new Error("Clicking the static excerpt card did not change the verse");
-  if (!flingAnimation.ghost || flingAnimation.turnCount < 1) {
+  if (flingAnimation.layers !== 3 || !flingAnimation.flinging || flingAnimation.turnCount < 1) {
     throw new Error(`Card fling transition did not start: ${JSON.stringify(flingAnimation)}`);
   }
   await evaluate("document.querySelector('.legacy-card')?.blur(); window.scrollTo({ top: 0, behavior: 'instant' })");
@@ -571,7 +572,7 @@ const main = async () => {
       const card = document.querySelector('.legacy-card');
       const verse = card?.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim() || '';
       if (verse && verse !== ${JSON.stringify(String(staticTurn || ""))}) return verse;
-      if (!card?.querySelector('.legacy-card__ghost')) card?.click();
+      if (!card?.querySelector('[data-flinging="true"]')) card?.click();
       return false;
     })()
   `), 60);
@@ -584,7 +585,7 @@ const main = async () => {
   await waitUntil("excerpt card settled before swipe", () => evaluate(`
     (() => {
       const card = document.querySelector('.legacy-card');
-      return Boolean(card) && !card.querySelector('.legacy-card__ghost');
+      return Boolean(card) && !card.querySelector('[data-flinging="true"]');
     })()
   `), 32);
   const beforeSwipeExcerpt = await evaluate(

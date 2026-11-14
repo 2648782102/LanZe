@@ -140,11 +140,20 @@ const main = async () => {
 
   const payload = await evaluate(`(async () => {
     const card = document.querySelector('.legacy-card');
-    const verse = () => card.querySelector('.legacy-card__box--current .legacy-card__verse')?.textContent?.trim() || '';
-    const settled = () => !card.querySelector('.legacy-card__ghost');
+    const verse = () => card.querySelector('.legacy-card__layer--0 .legacy-card__verse')?.textContent?.trim() || '';
+    const turns = () => Number(card.getAttribute('data-turn-count') || 0);
+    const settled = () => !card.querySelector('[data-flinging="true"]');
     const frames = [];
     const marks = [];
     const longFrames = [];
+    const waitFor = (check, limit = 800) => new Promise((resolve) => {
+      const start = performance.now();
+      const poll = () => {
+        if (check() || performance.now() - start > limit) resolve();
+        else requestAnimationFrame(poll);
+      };
+      requestAnimationFrame(poll);
+    });
     let observer;
     try {
       observer = new PerformanceObserver((list) => {
@@ -162,7 +171,7 @@ const main = async () => {
     const loop = () => {
       frames.push({
         t: Math.round((performance.now() - t0) * 100) / 100,
-        flinging: Boolean(card.querySelector('.legacy-card__ghost')),
+        flinging: Boolean(card.querySelector('[data-flinging="true"]')),
       });
       if (performance.now() - t0 < 4000) requestAnimationFrame(loop);
     };
@@ -170,31 +179,14 @@ const main = async () => {
     await new Promise((resolve) => setTimeout(resolve, 350));
     for (let i = 0; i < 6; i += 1) {
       const before = verse();
+      const beforeTurns = turns();
       const clickAt = performance.now() - t0;
       marks.push({ type: 'click', t: Math.round(clickAt * 100) / 100 });
       card.click();
-      await new Promise((resolve) => {
-        const check = () => {
-          if (verse() !== before) {
-            marks.push({ type: 'changed', t: Math.round((performance.now() - t0) * 100) / 100 });
-            resolve();
-          } else {
-            requestAnimationFrame(check);
-          }
-        };
-        requestAnimationFrame(check);
-      });
-      await new Promise((resolve) => {
-        const check = () => {
-          if (settled()) {
-            marks.push({ type: 'settled', t: Math.round((performance.now() - t0) * 100) / 100 });
-            resolve();
-          } else {
-            requestAnimationFrame(check);
-          }
-        };
-        requestAnimationFrame(check);
-      });
+      await waitFor(() => turns() > beforeTurns);
+      marks.push({ type: 'changed', t: Math.round((performance.now() - t0) * 100) / 100 });
+      await waitFor(settled);
+      marks.push({ type: 'settled', t: Math.round((performance.now() - t0) * 100) / 100 });
       await new Promise((resolve) => setTimeout(resolve, 160));
     }
     for (let i = 0; i < 4; i += 1) {
@@ -217,7 +209,7 @@ const main = async () => {
       card.dispatchEvent(new PointerEvent('pointermove', { ...options, clientX: cx + 48, clientY: cy }));
       marks.push({ type: 'swipeThreshold', t: Math.round(thresholdAt * 100) / 100 });
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-      const ghost = card.querySelector('.legacy-card__ghost');
+      const ghost = card.querySelector('[data-flinging="true"]');
       const flingTransform = ghost ? getComputedStyle(ghost).transform : 'none';
       const changedBeforeUp = verse() !== before;
       const changedAt = performance.now() - t0;
@@ -229,7 +221,7 @@ const main = async () => {
       });
       await new Promise((resolve) => {
         const check = () => {
-          if (settled()) resolve();
+          if (settled() || performance.now() - changedAt > 800) resolve();
           else requestAnimationFrame(check);
         };
         requestAnimationFrame(check);

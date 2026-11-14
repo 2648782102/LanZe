@@ -24,27 +24,31 @@
 
     <div class="legacy-card__stack">
       <ExcerptCardFace
+        v-if="flingingEntry"
+        :key="`fling-${deckVersion}-${flingingEntry.key}`"
         variant="current"
-        :excerpt="stableExcerpt"
-        :saved="stableSaved"
-        :face-style="faceStyle"
-        interactive
-        @toggle-save="emit('toggle-save', stableExcerpt)"
+        class="legacy-card__layer--0 legacy-card__fling-layer"
+        data-flinging="true"
+        :style="flingLayerStyle"
+        :excerpt="flingingEntry.excerpt"
+        :saved="flingingEntry.saved"
       />
-      <div
-        v-if="ghost"
-        :key="ghostKey"
-        class="legacy-card__ghost"
-        :style="ghostStyle"
-        aria-hidden="true"
-        @animationend.self="removeGhost"
-      >
-        <ExcerptCardFace
-          variant="ghost"
-          :excerpt="ghost.excerpt"
-          :saved="ghost.saved"
-        />
-      </div>
+      <ExcerptCardFace
+        v-for="(entry, index) in deck"
+        :key="entry.key"
+        variant="current"
+        :class="[
+          `legacy-card__layer--${index}`,
+          { 'is-promoting': Boolean(flingingEntry) },
+          { 'is-refreshing': Boolean(flingingEntry) && index === 2 },
+          `is-turn-${deckVersion % 2}`,
+        ]"
+        :style="layerStyle(index)"
+        :excerpt="entry.excerpt"
+        :saved="entry.saved"
+        :interactive="index === 0 && !flingingEntry"
+        @toggle-save="emit('toggle-save', entry.excerpt)"
+      />
     </div>
 
     <div class="legacy-card__gesture" aria-hidden="true">
@@ -63,36 +67,42 @@ import ExcerptCardFace from "./ExcerptCardFace.vue";
 const props = defineProps({
   excerpt: { type: Object, required: true },
   saved: { type: Boolean, default: false },
-  nextExcerpt: { type: Object, default: null },
-  nextSaved: { type: Boolean, default: false },
+  upcomingExcerpts: { type: Array, default: () => [] },
   disabled: { type: Boolean, default: false },
 });
-const emit = defineEmits(["toggle-save", "needs-next", "turn", "settled"]);
+const emit = defineEmits(["toggle-save", "needs-next", "settled"]);
 
-const FLING_DURATION = 420;
+const FLING_DURATION = 460;
 const SWIPE_COMMIT = 42;
 const SWIPE_VELOCITY = 420;
 const DRAG_DAMPING = 0.55;
 const DRAG_LIMIT = 92;
-const FLING_DISTANCE = 680;
+const FLING_DISTANCE = 720;
 const FLING_ROTATE = 18;
 const isSwiping = ref(false);
 const swipeProgress = ref(0);
-const stableExcerpt = ref(props.excerpt);
-const stableSaved = ref(props.saved);
-const ghost = ref(null);
-const ghostKey = ref(0);
-const ghostDirection = ref(1);
-const ghostStartX = ref(0);
-const ghostStartRot = ref(0);
-const faceX = ref(0);
-const faceRot = ref(0);
-const faceDuration = ref(0);
-const faceEase = ref("cubic-bezier(0.22, 1, 0.36, 1)");
 const turnCount = ref(0);
+const flingingEntry = ref(null);
+const dragX = ref(0);
+const dragRot = ref(0);
+const dragDuration = ref(0);
+const flingDirection = ref(1);
+const flingStartX = ref(0);
+const flingStartRot = ref(0);
+const makeDeck = () => {
+  const entries = [props.excerpt, ...props.upcomingExcerpts].slice(0, 3);
+  while (entries.length < 3) entries.push(entries[entries.length - 1] || props.excerpt);
+  return entries.map((entry, index) => ({
+    key: `${entry.content || "excerpt"}-${index}`,
+    excerpt: entry,
+    saved: index === 0 ? props.saved : Boolean(entry.saved),
+  }));
+};
+const deck = ref(makeDeck());
+const deckVersion = ref(0);
 let swipe = null;
 let suppressClick = false;
-let ghostTimer;
+let flingTimer;
 const cardElement = ref(null);
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -101,33 +111,35 @@ const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce
 const cardStyle = computed(() => ({
   "--swipe-progress": swipeProgress.value.toFixed(3),
 }));
-const faceStyle = computed(() => ({
-  transform: `translateX(${faceX.value.toFixed(2)}px) rotate(${faceRot.value.toFixed(2)}deg)`,
-  transition: faceDuration.value > 0
-    ? `transform ${faceDuration.value}ms ${faceEase.value}`
-    : "none",
-}));
-const ghostStyle = computed(() => ({
-  "--fling-x": `${ghostDirection.value * FLING_DISTANCE}px`,
-  "--fling-start-x": `${ghostStartX.value.toFixed(2)}px`,
-  "--fling-start-rot": `${ghostStartRot.value.toFixed(2)}deg`,
-  "--fling-y": "-24px",
-  "--fling-rotate": `${ghostDirection.value * FLING_ROTATE}deg`,
-  "--fling-lift": `${ghostDirection.value * 3}deg`,
+
+const flingLayerStyle = computed(() => ({
+  "--fling-x": `${flingDirection.value * FLING_DISTANCE}px`,
+  "--fling-start-x": `${flingStartX.value.toFixed(2)}px`,
+  "--fling-start-rot": `${flingStartRot.value.toFixed(2)}deg`,
+  "--fling-rotate": `${flingDirection.value * FLING_ROTATE}deg`,
+  "--fling-lift": `${flingDirection.value * 3}deg`,
   animationDuration: `${FLING_DURATION}ms`,
 }));
 
-const resetFace = () => {
-  faceDuration.value = 0;
-  faceX.value = 0;
-  faceRot.value = 0;
-};
-
-const springBack = () => {
-  faceDuration.value = 260;
-  faceEase.value = "cubic-bezier(0.22, 1, 0.36, 1)";
-  faceX.value = 0;
-  faceRot.value = 0;
+const layerStyle = (index) => {
+  const slots = [
+    { y: 0, scale: 1 },
+    { y: 10, scale: 0.965 },
+    { y: 20, scale: 0.93 },
+  ];
+  if (index === 0) {
+    return {
+      transform: `translate3d(${dragX.value.toFixed(2)}px, 0, 0) rotate(${dragRot.value.toFixed(2)}deg)`,
+      transition: dragDuration.value > 0
+        ? `transform ${dragDuration.value}ms cubic-bezier(0.22, 1, 0.36, 1)`
+        : "none",
+    };
+  }
+  const slot = slots[index];
+  return {
+    transform: `translate3d(0, ${slot.y}px, 0) scale(${slot.scale})`,
+    transition: "none",
+  };
 };
 
 const clearSwipe = () => {
@@ -137,56 +149,50 @@ const clearSwipe = () => {
   cardElement.value?.setAttribute("data-direction", "right");
 };
 
-const removeGhost = () => {
-  window.clearTimeout(ghostTimer);
-  ghost.value = null;
+const resetDrag = () => {
+  dragDuration.value = 0;
+  dragX.value = 0;
+  dragRot.value = 0;
 };
 
-const commitTurn = (next, nextSaved, direction = "right") => {
-  turnCount.value += 1;
-  if (reducedMotion()) {
-    removeGhost();
-    resetFace();
-    stableExcerpt.value = next;
-    stableSaved.value = nextSaved;
-    emit("settled");
-    return;
-  }
-  const outgoing = { excerpt: stableExcerpt.value, saved: stableSaved.value };
-  ghostStartX.value = faceX.value;
-  ghostStartRot.value = faceRot.value;
-  stableExcerpt.value = next;
-  stableSaved.value = nextSaved;
-  resetFace();
-  emit("settled");
-  ghost.value = outgoing;
-  ghostDirection.value = direction === "left" ? -1 : 1;
-  ghostKey.value += 1;
-  window.clearTimeout(ghostTimer);
-  ghostTimer = window.setTimeout(removeGhost, FLING_DURATION + 80);
+const springBack = () => {
+  dragDuration.value = 260;
+  dragX.value = 0;
+  dragRot.value = 0;
 };
 
-const commitSwipeTurn = (direction) => {
-  turnExcerpt(direction);
+const settleDeck = () => {
+  window.clearTimeout(flingTimer);
+  flingingEntry.value = null;
+  resetDrag();
 };
 
-const turnExcerpt = async (turnDirection = "right") => {
-  if (props.disabled) return;
-  const next = props.nextExcerpt;
-  const nextSaved = props.nextSaved;
+const commitTurn = async (direction = "right") => {
   emit("needs-next");
-  emit("turn", turnDirection);
-  if (next) {
-    commitTurn(next, nextSaved, turnDirection);
+  const outgoing = deck.value[0];
+  if (reducedMotion()) {
+    emit("settled");
+    turnCount.value += 1;
+    deck.value = makeDeck();
     return;
   }
+  flingStartX.value = dragX.value;
+  flingStartRot.value = dragRot.value;
+  flingDirection.value = direction === "left" ? -1 : 1;
+  window.clearTimeout(flingTimer);
+  flingingEntry.value = outgoing;
+  resetDrag();
+  emit("settled");
+  turnCount.value += 1;
+  deckVersion.value += 1;
+  flingTimer = window.setTimeout(settleDeck, FLING_DURATION + 40);
   await nextTick();
-  const fallback = props.nextExcerpt;
-  if (fallback) {
-    commitTurn(fallback, props.nextSaved, turnDirection);
-  } else {
-    emit("settled");
-  }
+  deck.value = makeDeck();
+};
+
+const turnExcerpt = (direction = "right") => {
+  if (props.disabled) return;
+  commitTurn(direction);
 };
 
 const handleClick = () => {
@@ -241,13 +247,13 @@ const moveSwipe = (event) => {
   cardElement.value?.setAttribute("data-direction", direction);
   swipeProgress.value = Math.min(1, Math.abs(distance) / SWIPE_COMMIT);
   const offset = clamp(distance * DRAG_DAMPING, -DRAG_LIMIT, DRAG_LIMIT);
-  faceDuration.value = 0;
-  faceX.value = offset;
-  faceRot.value = clamp(offset * 0.08, -10, 10);
+  dragDuration.value = 0;
+  dragX.value = offset;
+  dragRot.value = clamp(offset * 0.08, -10, 10);
   if (!swipe.committed && Math.abs(distance) >= SWIPE_COMMIT) {
     swipe.committed = true;
     swipeProgress.value = 0;
-    commitSwipeTurn(direction);
+    turnExcerpt(direction);
   }
 };
 
@@ -265,7 +271,7 @@ const endSwipe = (event) => {
   clearSwipe();
   if (committed) return;
   if (fling) {
-    commitSwipeTurn(direction);
+    turnExcerpt(direction);
   } else if (moved) {
     springBack();
   }
@@ -282,22 +288,15 @@ const cancelSwipe = (event) => {
   if (moved && !committed) springBack();
 };
 
-watch(() => props.excerpt, (value) => {
-  stableExcerpt.value = value;
-  stableSaved.value = props.saved;
-});
-
-watch(() => props.saved, (value) => {
-  stableSaved.value = value;
-});
-
 defineExpose({
   turn: turnExcerpt,
-  isTurning: computed(() => Boolean(ghost.value)),
+  isTurning: computed(() => Boolean(flingingEntry.value)),
 });
+watch(() => [props.excerpt, props.saved, props.upcomingExcerpts], () => {
+  if (!flingingEntry.value) deck.value = makeDeck();
+}, { deep: true });
 onBeforeUnmount(() => {
-  window.clearTimeout(ghostTimer);
-  removeGhost();
+  window.clearTimeout(flingTimer);
   clearSwipe();
 });
 </script>
@@ -327,6 +326,7 @@ onBeforeUnmount(() => {
   --legacy-scale: 1;
   --legacy-gutter: 12%;
   --swipe-progress: 0;
+  --fling-duration: 460ms;
   position: relative;
   width: min(100%, 330px);
   margin-inline: auto;
@@ -357,23 +357,65 @@ onBeforeUnmount(() => {
   inset: 0;
   width: auto;
   aspect-ratio: auto;
-}
-
-.legacy-card__stack :deep(.legacy-card__box--current) {
-  z-index: 1;
   will-change: transform;
 }
 
-.legacy-card__ghost {
-  position: absolute;
-  inset: 0;
+.legacy-card__stack :deep(.legacy-card__layer--0) {
+  z-index: 3;
+}
+
+.legacy-card__stack :deep(.legacy-card__layer--1) {
   z-index: 2;
-  pointer-events: none;
-  will-change: transform, opacity;
+}
+
+.legacy-card__stack :deep(.legacy-card__layer--2) {
+  z-index: 1;
+}
+
+.legacy-card__stack :deep(.legacy-card__fling-layer) {
+  z-index: 4;
   transform-origin: 50% 90%;
   animation-name: lanze-fling-away;
   animation-timing-function: cubic-bezier(0.32, 0, 0.67, 0);
   animation-fill-mode: forwards;
+}
+
+.legacy-card__stack :deep(.legacy-card__box.is-promoting) {
+  animation-duration: var(--fling-duration);
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+}
+
+.legacy-card__stack :deep(.legacy-card__layer--0.is-promoting.is-turn-0),
+.legacy-card__stack :deep(.legacy-card__layer--0.is-promoting.is-turn-1) {
+  animation-name: lanze-promote-top;
+}
+
+.legacy-card__stack :deep(.legacy-card__layer--1.is-promoting.is-turn-0),
+.legacy-card__stack :deep(.legacy-card__layer--1.is-promoting.is-turn-1) {
+  animation-name: lanze-promote-middle;
+}
+
+.legacy-card__stack :deep(.legacy-card__layer--2.is-refreshing) {
+  animation-name: lanze-refresh-bottom;
+  animation-duration: var(--fling-duration);
+  animation-timing-function: var(--ease-out);
+  animation-fill-mode: both;
+}
+
+@keyframes lanze-promote-top {
+  from { transform: translate3d(0, 10px, 0) scale(0.965); }
+  to { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes lanze-promote-middle {
+  from { transform: translate3d(0, 20px, 0) scale(0.93); }
+  to { transform: translate3d(0, 10px, 0) scale(0.965); }
+}
+
+@keyframes lanze-refresh-bottom {
+  from { opacity: 0; transform: translate3d(0, 30px, 0) scale(0.9); }
+  to { opacity: 1; transform: translate3d(0, 20px, 0) scale(0.93); }
 }
 
 @keyframes lanze-fling-away {
@@ -383,14 +425,13 @@ onBeforeUnmount(() => {
   }
 
   16% {
-    transform: translate3d(var(--fling-start-x), var(--fling-y), 0)
+    transform: translate3d(var(--fling-start-x), -24px, 0)
       rotate(calc(var(--fling-start-rot) + var(--fling-lift)));
     opacity: 1;
   }
 
   100% {
-    transform: translate3d(var(--fling-x), calc(var(--fling-y) * 3), 0)
-      rotate(var(--fling-rotate));
+    transform: translate3d(var(--fling-x), -72px, 0) rotate(var(--fling-rotate));
     opacity: 0;
   }
 }
@@ -493,12 +534,13 @@ onBeforeUnmount(() => {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .legacy-card__ghost {
-    display: none;
+  .legacy-card__stack :deep(.legacy-card__box) {
+    animation: none !important;
+    transition: none !important;
   }
 
-  .legacy-card__stack :deep(.legacy-card__box--current) {
-    transition: none !important;
+  .legacy-card__stack :deep(.legacy-card__layer--0[data-flinging]) {
+    display: none;
   }
 }
 </style>
