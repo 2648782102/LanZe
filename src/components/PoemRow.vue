@@ -35,7 +35,7 @@ const props = defineProps({
 defineEmits(["toggle"]);
 
 const firstLine = computed(() =>
-  props.poem.paragraph || props.poem.paragraphs?.[0] || props.poem.content || "暂未收录正文",
+  props.poem.paragraph || props.poem.paragraphs?.[0] || props.poem.content || "正文待补",
 );
 </script>
 

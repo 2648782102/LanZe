@@ -17,7 +17,7 @@
         </div>
         <figcaption><span>《越人歌》</span></figcaption>
       </figure>
-      <p class="auth-art__note">读诗不需要登录。登录只用于本地演示的作品与资料。</p>
+      <p class="auth-art__note">读诗不必登录。登录后，可在这里收好自己的作品与题款。</p>
     </section>
 
     <section class="auth-panel">
@@ -27,12 +27,12 @@
       </router-link>
 
       <div class="auth-form-wrap">
-        <p class="auth-kicker">{{ isRegister ? "新的本地账号" : "欢迎回来" }}</p>
+        <p class="auth-kicker">{{ isRegister ? "新启一卷" : "欢迎回来" }}</p>
         <h1>{{ isRegister ? "创建你的诗卷" : "接着读，接着写" }}</h1>
         <p class="auth-copy">
           {{ isRegister
-            ? "账号只保存在当前浏览器，用来演示作品发布与资料编辑。"
-            : "使用演示账号体验完整流程，或继续使用你在这台设备上创建过的账号。" }}
+            ? "为这间诗馆留一个名字。你的作品与资料会安静地保存在此浏览器。"
+            : "可从访客入口随意逛逛，或继续用你在这台设备上留下的名字。" }}
         </p>
 
         <nav class="auth-tabs" aria-label="账号操作">
@@ -112,12 +112,12 @@
         </form>
 
         <div v-if="!isRegister" class="demo-box">
-          <p>本地演示账号</p>
-          <button type="button" @click="fillDemo">填入 demo / lanze2026</button>
+          <p>访客入口</p>
+          <button type="button" @click="fillDemo">一键填入</button>
         </div>
 
         <p class="auth-fineprint">
-          不要在这里输入真实密码。这个演示没有线上密码安全、跨设备同步或找回密码服务。
+          名字与作品只留在这台设备上；请勿填写常用密码。
         </p>
       </div>
     </section>
@@ -197,11 +197,11 @@ const submit = async () => {
       password: form.password,
     });
     if (Number(response?.code) !== 200) {
-      error.value = response?.msg || "登录失败，请检查账号密码";
+      error.value = response?.msg || "未能登录，请再确认账号与密码";
       return;
     }
     setSession({ user: response.data, profile: response.data });
-    notify("已登录本地演示账号", "success");
+    notify("已回到你的诗卷", "success");
     await router.replace(safeNext());
   } catch (requestError) {
     error.value = requestError?.message || "请求失败，请稍后重试";

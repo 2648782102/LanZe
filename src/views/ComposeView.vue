@@ -7,11 +7,11 @@
       </router-link>
       <div class="compose-head__row">
         <div>
-          <p>写作台 · 本地演示</p>
+          <p>写作台 · 一盏灯</p>
           <h1>写一首诗</h1>
         </div>
         <p class="compose-head__copy">
-          写作内容会先留在当前窗口。确认发布后，作品只写入当前浏览器的演示数据。
+          字句先落在纸上，待你确认，再收进这间诗馆里的个人诗卷。
         </p>
       </div>
     </div>
@@ -86,7 +86,7 @@
         </label>
 
         <p v-if="!isLoggedIn" class="compose-login-note" role="status">
-          访客可填写并预览；发布时登录，草稿保存在本机。
+          访客可先写下并预览；发布时留个名字，草稿会替你收好。
           <router-link :to="{ name: 'login', query: { next: '/compose' } }">先去登录</router-link>
         </p>
 
@@ -105,7 +105,7 @@
           <span>{{ form.category || "未分类" }} · {{ contentLength }} 字</span>
         </div>
         <div class="preview-sheet">
-          <p class="preview-category">兰泽 · 本地诗卷</p>
+          <p class="preview-category">兰泽 · 我的诗卷</p>
           <h2>{{ form.title || "无题" }}</h2>
           <p class="preview-author">{{ form.author || profile.user_name || "佚名" }}</p>
           <div class="preview-lines">
@@ -199,7 +199,7 @@ const publish = async () => {
   if (!isLoggedIn.value) {
     persistDraft();
     await new Promise((resolve) => window.setTimeout(resolve, 280));
-    notify("草稿已留在本机，登录后可以继续发布", "info");
+    notify("草稿已收好，登录后可以继续", "info");
     router.push({ path: "/login", query: { next: "/compose" } });
     return;
   }

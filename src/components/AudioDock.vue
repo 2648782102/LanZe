@@ -8,7 +8,7 @@
       'is-playing': isPlaying,
       'is-changing': trackChanged,
     }"
-    aria-label="兰泽本地声景播放器"
+    aria-label="兰泽曲目播放器"
   >
     <audio
       ref="audioRef"
@@ -31,7 +31,7 @@
       :aria-expanded="!isCollapsed"
       @click="toggleCollapsed"
     >
-      <span class="audio-dock__handle-label" aria-hidden="true">{{ isCollapsed ? "展开声景" : "收束" }}</span>
+      <span class="audio-dock__handle-label" aria-hidden="true">{{ isCollapsed ? "展开曲目" : "收起" }}</span>
       <AppIcon :name="isCollapsed ? 'chevron-left' : 'chevron-right'" :size="16" />
     </button>
 
@@ -143,7 +143,7 @@
           <strong>{{ item.name }}</strong>
           <em>{{ item.mood || item.artist }}</em>
         </button>
-        <p>声景由仓库脚本合成，全部随构建产物本地分发；自定义音源仅在你显式配置后启用。</p>
+        <p>挑一支曲子，让读诗的时间慢下来。</p>
       </div>
     </transition>
   </aside>
@@ -171,7 +171,7 @@ const volume = ref(0.72);
 const tracks = computed(() => audioConfig.tracks);
 const trackIndex = ref(0);
 const track = computed(() => tracks.value[trackIndex.value] || {
-  name: "没有可用声景",
+  name: "暂无曲目",
   artist: "兰泽",
   url: "",
 });
@@ -179,7 +179,7 @@ let viewportQuery;
 let trackChangeTimer;
 
 const stateLabel = computed(() => {
-  if (hasError.value) return "声景不可达";
+  if (hasError.value) return "暂时无法播放";
   return isPlaying.value ? "播放中" : "试听";
 });
 const progress = computed(() => duration.value ? Math.min(100, currentTime.value / duration.value * 100) : 0);
@@ -225,7 +225,7 @@ const syncVolume = () => {
 const togglePlayback = async () => {
   const audio = audioRef.value;
   if (!audio?.src) {
-    notify("没有可用声景，请检查配置或改用仓库内的本地声景。", "warning");
+    notify("暂时没有可播放的曲目，请稍后再试。", "warning");
     return;
   }
   if (!audio.paused) {
@@ -239,7 +239,7 @@ const togglePlayback = async () => {
     await audio.play();
   } catch {
     hasError.value = true;
-    notify("浏览器没有开始播放声景，请检查地址、格式或稍后重试。", "warning");
+    notify("曲目未能开始播放，请稍后再试。", "warning");
   }
 };
 
@@ -247,7 +247,7 @@ const handleError = () => {
   isPlaying.value = false;
   currentTime.value = 0;
   hasError.value = true;
-  notify("声景无法加载。请检查自定义音轨地址，或改用仓库内的本地声景。", "warning", 5200);
+  notify("曲目暂时无法加载，请稍后再试。", "warning", 5200);
 };
 
 const handleEnded = () => {
@@ -311,7 +311,7 @@ const selectTrack = async (index, { autoplay = false } = {}) => {
       await current.play();
     } catch {
       hasError.value = true;
-      notify("浏览器没有开始播放下一段声景，请再次点击播放。", "warning");
+      notify("下一段曲目未能开始，请再点一次播放。", "warning");
     }
   }
 };
@@ -334,7 +334,7 @@ const toggleCollapsed = () => {
 
 onMounted(() => {
   if (audioConfig.invalidCustom) {
-    notify("自定义音源配置无效，已回退到仓库内的本地声景。", "warning", 5200);
+    notify("音轨设置未能生效，已回到默认曲目。", "warning", 5200);
   }
   const preferences = readStore(AUDIO_PREFERENCES_KEY, {});
   const savedIndex = Number(preferences?.trackIndex);

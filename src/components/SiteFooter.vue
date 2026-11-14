@@ -3,9 +3,9 @@
     <div class="museum-footer__inner">
       <div class="footer-brand">
         <span>兰泽</span>
-        <small>一间可本地运行的数字诗馆</small>
+        <small>一间安静的数字诗馆</small>
       </div>
-      <p>演示数据只保存在当前浏览器；不提供线上账号或托管后端。</p>
+      <p>收藏与作品留在此浏览器，不设线上账号，也不连接托管服务。</p>
       <div class="footer-links">
         <a href="https://github.com/2648782102/LanZe">GitHub</a>
         <router-link to="/explore">索引</router-link>

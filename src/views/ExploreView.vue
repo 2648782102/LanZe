@@ -7,10 +7,9 @@
           <p>诗词索引</p>
         </div>
         <div class="index-banner__copy">
-          <h1>一座可以翻检的<br />离线诗馆</h1>
+          <h1>一座可以翻检的<br />诗馆</h1>
           <p>
-            馆藏来自仓库内的古典诗词选段，按朝代、体裁与字句编排；
-            不依赖外部诗词 API，也不需要联网账号。
+            按朝代、体裁与字句编排，翻到哪一句，便从哪一句读起。
           </p>
         </div>
         <dl class="index-banner__stats">
@@ -185,8 +184,7 @@
           </nav>
 
           <p class="corpus-note">
-            语料来自 <code>chinese-poetry/chinese-poetry</code> 固定提交的 MIT 授权选段与兰泽精校短章；
-            繁简、异体与断句保持上游形态，引用前请核对底本。
+            馆内索引采自开放诗籍与精校短章，保留原有字形与断句；引用前请核对底本。
           </p>
         </section>
       </div>

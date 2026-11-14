@@ -8,6 +8,7 @@
 
 ### Changed
 
+- 全站系统文案核对：去掉「等比还原 / 仓库内置 / 脚本合成 / 本地演示 / 演示账号 / 纯前端 / 自建 API / 旧版 / 外链直连 / 冒烟测试 / 请检查配置」等开发与防御性口吻，统一为诗馆产品语气；保留「内容留在此浏览器、不跨设备同步、不连接线上社区」等必要事实但改为克制表述。同步更新摘录来源标签、播放器曲目副标题与错误提示、登录/写作/诗卷/页脚/详情页说明、示例作品署名与 E2E 生成内容；古诗词正文不变。
 - 按使用者决定恢复 2022 版播放器的**外链直连**用法：默认五首改为「少年不凡 / 浣纱歌 (伴奏) / 卡农 / River Flows in You（你的心河） / Leaves in the Wind」，直接请求 `music.163.com/song/media/outer/url` 与 `music.126.net` 封面，不下载、不提交音频文件；移除 lint 中对这些域名的默认禁令。`src/config/audio.js` 默认源标记为 `legacy`，`custom` 通道与 `public/media/` 下 CC BY 3.0 古筝备用素材保留。Browser E2E 改为校验 5 首外链、切轨与偏好，放行第三方媒体域名的 `ERR_ABORTED`；README / FAQ / 架构 / 开发 / 部署 / 素材清单同步为外链口径，并注明授权、签名、防盗链与失效风险由平台/部署者承担。
 - 新增 `npm run audio:private` 本机私有音轨通道：把使用者自有且授权清晰的音频放入被忽略的 `public/media/private/`，可用同目录 `tracks.json` 恢复旧版曲名/作者/顺序（模板见 `docs/PRIVATE_AUDIO.md`），脚本生成同样被忽略的 `.env.local.audio` 并以 `vite --mode local.audio` 启动；不下载、不提交、不部署。README / FAQ / `.env.example` 同步说明本机私有音轨边界。
 - 默认声景从脚本合成的 24 秒正弦波循环替换为真实开源录音：三段均节选自 Wikimedia Commons 上 Antti Luode 的 CC BY 3.0 古筝曲（`Guzheng Morning`、`Senor Guzheng and the Happy Monks`、`My name is Zheng Zheng GuZheng`），按主题重命名为「空山 · 松风 / 月色 · 瓷盏 / 晚舟 · 水纹」。新增 `scripts/import-audio-library.mjs` 可复现裁切 36 秒片段、降采样到 11.025 kHz 单声道 PCM、加淡入淡出，并写出 `audio-manifest.json`、`SHA256SUMS.txt` 与 `public/media/AUDIO_CREDITS.md` 署名；`npm run audio:generate` 指向新脚本，校验脚本改为从清单读取采样率/时长并强制检查每段署名。三段总大小约 2.3 MB，小于原合成曲库；README、FAQ、开发/架构/部署/素材清单同步为 CC BY 3.0 口径。

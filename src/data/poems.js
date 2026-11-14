@@ -166,14 +166,14 @@ export const demoPoems = Object.freeze([
   {
     id: "demo-user-work",
     title: "兰泽即兴",
-    author: "兰泽演示用户",
+    author: "兰泽来客",
     category: "用户作品",
     paragraph: "一池清露承新月，半卷诗书待晓风。",
     paragraphs: [
       "一池清露承新月，",
       "半卷诗书待晓风。",
     ],
-    tags: ["用户作品", "演示"],
+    tags: ["用户作品", "即兴"],
     type: "customgushici",
   },
   {

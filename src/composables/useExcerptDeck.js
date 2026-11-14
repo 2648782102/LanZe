@@ -26,7 +26,7 @@ export const useExcerptDeck = () => {
   const status = ref("loading");
   const source = ref("local");
   const depth = ref(0);
-  const sourceLabel = computed(() => source.value === "remote" ? "诗句源：随机古诗词 API" : "诗句源：仓库内置摘录");
+  const sourceLabel = computed(() => source.value === "remote" ? "诗句源：在线诗笺" : "诗句源：馆内诗笺");
   const storedSaves = readStore(SAVES_KEY, []);
   const saves = ref(Array.isArray(storedSaves) ? storedSaves.map(String) : []);
   let queue = [];

@@ -47,8 +47,8 @@ export const curatedPoems = Object.freeze(
         collection: "兰泽精校",
         source: "兰泽精校",
         note: poem.type === "customgushici"
-          ? "演示用户作品，仅存于当前浏览器。"
-          : "兰泽精校演示篇目，短章用于界面展示；引用前请核对底本。",
+          ? "写于此处的作品，留在此设备上。"
+          : "馆内精校短章，供阅读与检索；引用前请核对底本。",
       },
       index,
       true,

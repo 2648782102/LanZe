@@ -19,7 +19,7 @@
             <dd>{{ recentPoems.length }}</dd>
           </div>
           <div>
-            <dt>本地作品</dt>
+            <dt>我的作品</dt>
             <dd>{{ works.length }}</dd>
           </div>
         </dl>
@@ -88,7 +88,7 @@
 
           <div v-else>
             <div class="works-toolbar">
-              <p>发布后会立即写入当前浏览器的演示数据。</p>
+              <p>写下的句子，会收进这台设备上的诗卷。</p>
               <router-link class="button button--solid" to="/compose">
                 <AppIcon name="pen" :size="16" />
                 写一首诗
@@ -108,7 +108,7 @@
             </div>
             <div v-else class="empty-state">
               <h2>还没有自己的作品</h2>
-              <p>可以从一句此刻想到的话开始。表单不会上传到服务器，除非你配置了自建 API。</p>
+              <p>从一句此刻想到的话开始就好，写完便会留在这一页。</p>
               <router-link class="button button--solid" to="/compose">打开写作台</router-link>
             </div>
           </div>
@@ -154,15 +154,15 @@
           <p class="account-mark" aria-hidden="true">客</p>
           <h2>登录后再写一首</h2>
           <p>
-            收藏和最近阅读不需要登录；登录只用于本地演示作品发布与资料保存。
+            收藏与最近阅读不必登录；留个名字，还可以收好自己的作品与题款。
           </p>
           <router-link class="button button--solid" to="/login?next=/collection">登录或创建账号</router-link>
-          <p class="demo-note">演示账号：demo / lanze2026</p>
+          <p class="demo-note">体验账号：demo / lanze2026</p>
         </template>
 
         <div class="local-note">
           <span aria-hidden="true" />
-          <p>这里是纯前端演示。账号和作品不跨设备同步，也不构成线上社区服务。</p>
+          <p>账号与作品保存在此浏览器，不跨设备同步，也不连接线上社区。</p>
         </div>
       </aside>
     </div>
@@ -243,7 +243,7 @@ const saveProfile = () => {
 const logout = () => {
   clearSession();
   router.replace("/");
-  notify("已退出本地演示账号", "info");
+  notify("已离开诗卷", "info");
 };
 
 watch(

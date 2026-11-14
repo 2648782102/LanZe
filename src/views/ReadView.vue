@@ -88,12 +88,12 @@
             @needs-next="prepareRemote"
             @settled="turn"
           />
-          <p v-if="status === 'loading' && !stack.length" class="legacy-card-status" role="status">正在展开今日摘录……</p>
+          <p v-if="status === 'loading' && !stack.length" class="legacy-card-status" role="status">正在铺开诗笺……</p>
         </div>
         <article class="strip-intro">
           <p class="eyebrow">余韵 · 一则</p>
           <h2>读完一首，<br />让句子再走一段。</h2>
-          <p>按历史首页的白色摘录卡等比还原，保留旋转收藏角标、竖排诗句、作者与扇舟图；拖动卡片即可换一句，默认只用仓库内置摘录与精校馆藏短句。</p>
+          <p>留一枚书签，收一句心动。轻拂或点击卡片，便可换一页诗笺；题句、落款与扇舟小景，都留在这一方白纸里。</p>
           <div class="strip-actions">
             <router-link class="button" to="/explore">
               进入诗词索引
@@ -160,7 +160,7 @@ let switchTimer;
 let saveTimer;
 
 const poem = computed(() => featured[page.value % featured.length] || getDailyLibraryPoem());
-const poemLines = computed(() => poem.value.paragraphs || [poem.value.paragraph || "正在展开诗笺……"]);
+const poemLines = computed(() => poem.value.paragraphs || [poem.value.paragraph || "正在铺开诗笺……"]);
 const titleScale = computed(() => {
   const length = String(poem.value.title || "").length;
   if (length >= 10 || String(poem.value.title || "").includes("·")) return "long";

@@ -61,7 +61,7 @@
           </section>
 
           <p class="poem-disclaimer">
-            演示文本用于界面展示。引用、出版或教学使用前，请自行核对底本与点校信息。
+            馆内文本供阅读与检索。引用、出版或教学使用前，请核对底本与点校。
           </p>
 
           <nav v-if="adjacent.previous || adjacent.next" class="reading-continuation" aria-label="连续阅读">
@@ -88,8 +88,8 @@
       </article>
 
       <section v-else class="empty-state">
-        <h2>这首诗没有留在索引里</h2>
-        <p>链接可能来自旧版页面，或数据只存在于创建它的浏览器中。</p>
+        <h2>这一页暂时没有找到</h2>
+        <p>或许是链接已旧，或那一句只留在写下它的设备里。</p>
         <router-link class="button button--solid" to="/explore">回到诗词索引</router-link>
       </section>
 
@@ -140,7 +140,7 @@ const legacyPoem = computed(() => {
     id: `legacy-${details.title}`,
     title: details.title,
     author: details.author,
-    category: "旧版摘录",
+    category: "诗笺摘录",
     tags: details.tags,
     paragraphs: details.paragraphs,
     paragraph: details.paragraphs[0] || "",

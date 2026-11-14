@@ -54,7 +54,7 @@ const publicUser = (user) => ({
   username: user.username,
   user_name: user.user_name || user.username,
   head_img: user.head_img || "hoad1.jpg",
-  intro: user.intro || "这个人很神秘，还没有留下简介。",
+  intro: user.intro || "还没有写下简介。",
 });
 
 const getWorks = () => {
@@ -225,7 +225,7 @@ export const mockLogin = (payload = {}, config = {}) => {
       : null);
 
   if (!user || user.password !== password) {
-    return result(null, 401, "账号或密码错误，可使用 demo / lanze2026");
+    return result(null, 401, "账号或密码不正确，可试用体验账号");
   }
   const profile = publicUser(user);
   writeStore(PROFILE_KEY, profile);
@@ -245,7 +245,7 @@ export const mockRegister = (payload = {}) => {
     password,
     user_name: username,
     head_img: "hoad1.jpg",
-    intro: "这个人很神秘，还没有留下简介。",
+    intro: "还没有写下简介。",
   };
   saveUsers([...users, user]);
   return result(publicUser(user), 200, "注册成功");

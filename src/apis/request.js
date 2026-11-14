@@ -47,7 +47,7 @@ const fetchRemote = async (url, { method, data, params, timeout }) => {
 const showFallbackNotice = (message) => {
   if (fallbackNoticeShown || typeof document === "undefined") return;
   fallbackNoticeShown = true;
-  notify(`${message}，已切换为本地演示数据`, "warning", 4200);
+  notify(`${message}，已显示馆内内容`, "warning", 4200);
 };
 
 const getMockResponse = (url, method, data, params) => {
@@ -69,7 +69,7 @@ const getMockResponse = (url, method, data, params) => {
   if (path === "user/profile") return mockGetUserProfile(payload.id);
   if (path === "user/profile/update") return mockUpdateProfile(payload);
   if (path === "user/poem/publish") return mockPublishPoem(payload);
-  return result(null, 404, "本地演示数据暂不支持此接口");
+  return result(null, 404, "暂时无法完成这次请求");
 };
 
 const shouldFallback = (payload) => {
@@ -108,14 +108,14 @@ export const request = async (url, method = "get", data = null, params = null) =
       });
       const normalized = normalizeRemoteResponse(response, url, getFallback);
       if (!shouldFallback(normalized)) return normalized;
-      showFallbackNotice("远端接口未返回有效数据");
+      showFallbackNotice("在线内容暂时没有回应");
       return getFallback();
     } catch (error) {
       remoteError = error;
     }
   }
 
-  if (remoteError) showFallbackNotice("远端接口不可用");
+  if (remoteError) showFallbackNotice("在线内容暂时无法读取");
   return getFallback();
 };
 
