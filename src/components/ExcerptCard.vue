@@ -27,8 +27,7 @@
         class="legacy-card__turn"
         type="button"
         :disabled="props.disabled"
-        :aria-label="'换一句摘录'"
-        @click="handleClick"
+        aria-label="换一句摘录"
         @keydown.enter.prevent="handleClick"
         @keydown.space.prevent="handleClick"
       />
@@ -220,7 +219,7 @@ const handleKeydown = (event) => {
 
 const startSwipe = (event) => {
   suppressClick = false;
-  if (props.disabled || event.target.closest("button")) return;
+  if (props.disabled || event.target.closest(".legacy-card__save")) return;
   if (event.pointerType === "mouse" && typeof event.button === "number" && event.button !== 0) return;
   swipe = {
     id: event.pointerId,
