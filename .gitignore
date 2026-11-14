@@ -13,3 +13,5 @@ test-results/
 *.log
 measure.out
 measure.err
+public/media/private/
+.env.local.audio
