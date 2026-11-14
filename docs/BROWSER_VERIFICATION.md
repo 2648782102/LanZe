@@ -2,6 +2,8 @@
 
 本仓库不再只靠手写 CDP 片段和肉眼截图。统一浏览器能力层位于 `scripts/browser/lab.mjs`，复用系统 Chrome；`npm run verify:render` 是日常验证闭环入口。
 
+另外，Codex 桌面本身提供 `cua_repl` / `@Browser` 内置浏览器能力：应先启动本地端口，再用 `cua.createBrowserTab("iab", ...)` 打开页面、`getScreenshot()` / `getAXState()` 看真实渲染与交互，`visibility.set(true)` 并 `markDeliverable()` / `markHandoff()` 让用户侧边栏可见。UI 改动后的首要视觉判断必须来自这个内置浏览器，而不是自建无头 Chrome；Playwright/CDP 脚本只用于自动回归和线上/本地像素一致性。
+
 ## 现有能力
 
 - 启动本地 `vite preview` 与系统 Chrome（Playwright `executablePath`），无需下载额外浏览器内核。
@@ -10,7 +12,7 @@
 - 真实输入：`page.mouse.down/move/up` 驱动摘录卡拖拽，而不是只合成 PointerEvent。
 - 状态采集：关键元素几何、computed style、console error、pageerror、requestfailed。
 - 网络：拦截请求、忽略旧外链曲目的 `ERR_ABORTED`，但保留其他网络错误为失败条件。
-- 线上闭环：禁缓存打开 GitHub Pages，截品牌区；与本地构建的品牌区做 `pixelmatch` 像素比较，要求 `mismatches === 0`。
+- 线上闭环（可选，`RENDER_COMPARE=online`）：禁缓存打开 GitHub Pages，截品牌区；与本地构建的品牌区做 `pixelmatch` 像素比较，尺寸不一致或 `mismatches > 0` 都会失败。默认只跑本地渲染、几何、真实拖拽与错误检查，避免把「尚未部署」误报成视觉回归。
 - 多路由覆盖：今日、寻诗、登录、写作、诗卷；每条路由留整页截图和几何数据。
 
 ## 用法
@@ -18,6 +20,8 @@
 ```bash
 npm run build
 npm run verify:render
+# 需要核对线上部署时
+RENDER_COMPARE=online npm run verify:render
 ```
 
 输出在 `/tmp/lanze-render-lab/`：

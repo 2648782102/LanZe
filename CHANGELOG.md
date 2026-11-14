@@ -8,6 +8,7 @@
 
 ### Changed
 
+- 在 Codex 内置浏览器（`cua_repl` / IAB）里直接核对导航栏最左侧品牌区：启动本地 4399 端口、创建可见持久 tab、读取 AX 树与截图，并按真实渲染调整品牌三段比例（图形 42×36、中文 26px、LANZE 12px 下沉、段间 18/22px）；刷新同一内置 tab 后确认布局稳定。Browser E2E 的 `latinOffset` 上限同步放宽到 18px，`docs/BROWSER_VERIFICATION.md` 明确 UI 改动必须先经内置浏览器视觉判断。
 - 补全 Chrome 验证能力：新增 `scripts/browser/lab.mjs` 统一封装系统 Chrome（Playwright `executablePath`）、本地 preview 启动、多路由稳定导航、整页/元素截图、真实鼠标拖拽、控制台/页面/网络错误收集、几何采样与 `pixelmatch` 像素比较；`npm run verify:render` 会同时截本地与线上 GitHub Pages，要求品牌区 `mismatches === 0` 且无浏览器错误，并输出 `/tmp/lanze-render-lab/` 下的截图、差异图与几何报告。新增 `docs/BROWSER_VERIFICATION.md` 说明能力边界与仍缺的跨浏览器/录屏/a11y 项；`playwright`、`pixelmatch`、`pngjs` 作为开发依赖加入，不下载额外浏览器内核。
 - 复核「远端是否更新」：本地 HEAD、`origin/main`、Pages workflow 的 `head_sha` 一致为 `75d6c90`；线上 HTML/CSS/JS 与本地构建字节一致，禁用缓存打开线上 URL 实测 `brand__name=26px` 等旧值，证明不是部署问题而是上一版品牌比例仍不理想。随后按完整页头截图收敛品牌区：不把用户给的 2x 局部放大图尺寸直接套到 1x 页头，恢复克制的图形 34×32、中文 22px、LANZE 11px 下沉，保留段间 12/14px 的舒展关系；Browser E2E 品牌断言同步回到整页尺度。
 - 真在浏览器里核对页头品牌区：用无头 Chrome 把当前品牌与参考局部图做 1:1 并排截图，发现中文字号、三根柱高与 LANZE 间距比例失衡；按参考重排为图形 42×36、中文 26px、LANZE 11px 下沉、段间 18/22px，并确认完整首页里品牌→导航 337px、导航→工具 432px 未受挤压。新增 `npm run capture:brand` 截图工具与 Browser E2E 品牌坐标断言，避免以后只看数值不看渲染。

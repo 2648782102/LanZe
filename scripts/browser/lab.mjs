@@ -104,10 +104,20 @@ export const comparePng = async (leftPath, rightPath, diffPath, { threshold = 0.
   const rightPng = PNG.sync.read(right);
   const width = Math.min(leftPng.width, rightPng.width);
   const height = Math.min(leftPng.height, rightPng.height);
+  const crop = (source) => {
+    if (source.width === width && source.height === height) return source.data;
+    const data = Buffer.alloc(width * height * 4);
+    for (let y = 0; y < height; y += 1) {
+      const from = (y * source.width) * 4;
+      const to = (y * width) * 4;
+      source.data.copy(data, to, from, from + width * 4);
+    }
+    return data;
+  };
   const diff = new PNG({ width, height });
   const mismatches = pixelmatch(
-    leftPng.data,
-    rightPng.data,
+    crop(leftPng),
+    crop(rightPng),
     diff.data,
     width,
     height,
@@ -117,7 +127,15 @@ export const comparePng = async (leftPath, rightPath, diffPath, { threshold = 0.
     await mkdir(join(diffPath, ".."), { recursive: true }).catch(() => {});
     await writeFile(diffPath, PNG.sync.write(diff));
   }
-  return { width, height, mismatches, ratio: mismatches / (width * height) };
+  return {
+    width,
+    height,
+    sizeMismatch: leftPng.width !== rightPng.width || leftPng.height !== rightPng.height,
+    leftSize: [leftPng.width, leftPng.height],
+    rightSize: [rightPng.width, rightPng.height],
+    mismatches,
+    ratio: mismatches / (width * height),
+  };
 };
 
 export const realDrag = async (page, selector, { from, to, steps = 12 } = {}) => {

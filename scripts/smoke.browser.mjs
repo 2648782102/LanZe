@@ -431,7 +431,7 @@ const main = async () => {
     };
   })()`);
   if (!brandLayout || brandLayout.markToName < 8 || brandLayout.nameToLatin < 8
-    || brandLayout.latinOffset < 2 || brandLayout.latinOffset > 14
+    || brandLayout.latinOffset < 2 || brandLayout.latinOffset > 18
     || brandLayout.markWidth < 28 || brandLayout.nameSize < 20 || brandLayout.latinSize < 10) {
     throw new Error(`Brand mark, name and latin label are not spaced consistently: ${JSON.stringify(brandLayout)}`);
   }

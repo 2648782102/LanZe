@@ -13,6 +13,7 @@ import {
 } from "./lab.mjs";
 
 const outDir = process.env.RENDER_LAB_DIR || "/tmp/lanze-render-lab";
+const compareOnline = process.env.RENDER_COMPARE === "online";
 const onlineUrl = `https://2648782102.github.io/LanZe/?render=${Date.now()}#/`;
 const routes = ["/#/", "/#/explore", "/#/login", "/#/compose", "/#/collection"];
 
@@ -55,21 +56,27 @@ const main = async () => {
     const localDock = join(outDir, "local-audio-expanded.png");
     await captureElement(page, ".audio-dock", localDock, { padding: 6 });
 
-    await gotoStable(page, onlineUrl, { settle: 900 });
-    const onlineHome = join(outDir, "online-today.png");
-    await captureViewport(page, onlineHome);
-    const onlineBrand = join(outDir, "online-brand.png");
-    await captureElement(page, ".brand", onlineBrand, { padding: 8 });
     const localBrand = join(outDir, "local-brand.png");
     await gotoStable(page, `${preview.origin}/#/`);
     await captureElement(page, ".brand", localBrand, { padding: 8 });
 
-    report.comparisons.brand = await comparePng(localBrand, onlineBrand, join(outDir, "diff-brand.png"));
-    if (report.comparisons.brand.mismatches > 0) {
-      throw new Error(`Online brand render differs from local build: ${JSON.stringify(report.comparisons.brand)}`);
+    if (compareOnline) {
+      await gotoStable(page, onlineUrl, { settle: 900 });
+      const onlineHome = join(outDir, "online-today.png");
+      await captureViewport(page, onlineHome);
+      const onlineBrand = join(outDir, "online-brand.png");
+      await captureElement(page, ".brand", onlineBrand, { padding: 8 });
+      report.online.today = onlineHome;
+      report.online.brand = onlineBrand;
+      const comparison = await comparePng(localBrand, onlineBrand, join(outDir, "diff-brand.png"));
+      report.comparisons.brand = comparison;
+      if (comparison.sizeMismatch) {
+        throw new Error(`Online brand box size differs from local build: ${JSON.stringify(comparison)}`);
+      }
+      if (comparison.mismatches > 0) {
+        throw new Error(`Online brand render differs from local build: ${JSON.stringify(comparison)}`);
+      }
     }
-    report.online.today = onlineHome;
-    report.online.brand = onlineBrand;
     report.local.brand = localBrand;
     report.local.audioExpanded = localDock;
 
