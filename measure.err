@@ -1,0 +1,18 @@
+[preview] pid 87568
+[waitFor] http://127.0.0.1:4311 attempt 0 failed: ECONNREFUSED
+[waitFor] http://127.0.0.1:9227/json/version attempt 0 failed: ECONNREFUSED
+
+DevTools listening on ws://127.0.0.1:9227/devtools/browser/b7a6faa7-9b48-46cd-8ede-7ceb27e2df59
+Trying to load the allocator multiple times. This is *not* supported.
+[87576:4856308:1114/131504.412928:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[87576:4856308:1114/131504.414545:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[87576:4856308:1114/131504.414642:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[87576:4856308:1114/131506.379810:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[87576:4856308:1114/131506.418282:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[87576:4856308:1114/131506.466998:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[87576:4856308:1114/131506.519963:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[87576:4856308:1114/131506.539507:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[87576:4856308:1114/131506.574662:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[87576:4856308:1114/131506.675871:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[87576:4856308:1114/131506.731155:ERROR:ui/display/mac/cv_display_link_mac.mm:188] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[preview] exit: 143 null

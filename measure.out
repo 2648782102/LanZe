@@ -1,0 +1,39 @@
+{
+  "frameCount": 215,
+  "maxFrameGapMs": 18.3,
+  "topFrameGapsMs": [
+    18.3,
+    18.3,
+    18.2,
+    18.2,
+    18.2,
+    18.2,
+    18.2,
+    18.1
+  ],
+  "gapsOver34ms": 0,
+  "gapsOver50ms": 0,
+  "turnLatencyToChangeMs": [
+    3.3,
+    2.5,
+    3.4,
+    3.4,
+    5.7,
+    3.8
+  ],
+  "exchangeDurationMs": [
+    303.3,
+    320.5,
+    304,
+    303.3,
+    305.8,
+    303.8
+  ],
+  "longAnimationFrames": [
+    {
+      "start": 23.4,
+      "duration": 50.4,
+      "blocking": 0
+    }
+  ]
+}

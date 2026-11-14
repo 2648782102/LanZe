@@ -12,8 +12,14 @@
     >
       {{ saved ? "已藏" : "收藏" }}
     </component>
-    <p class="legacy-card__verse" :class="verseDensity">{{ excerpt.content }}</p>
-    <h5 class="legacy-card__author">— {{ excerpt.author }}</h5>
+    <div class="legacy-card__ink legacy-card__ink--current">
+      <p class="legacy-card__verse" :class="verseDensity">{{ excerpt.content }}</p>
+      <h5 class="legacy-card__author">— {{ excerpt.author }}</h5>
+    </div>
+    <div v-if="ghost" class="legacy-card__ink legacy-card__ink--ghost" aria-hidden="true">
+      <p class="legacy-card__verse" :class="ghostDensity">{{ ghost.content }}</p>
+      <h5 class="legacy-card__author">— {{ ghost.author }}</h5>
+    </div>
     <img
       class="legacy-card__art"
       :src="fanzouImage"
@@ -34,6 +40,7 @@ const props = defineProps({
   saved: { type: Boolean, default: false },
   variant: { type: String, required: true },
   interactive: { type: Boolean, default: false },
+  ghost: { type: Object, default: null },
 });
 const emit = defineEmits(["toggle-save"]);
 
@@ -46,6 +53,7 @@ const densityFor = (content) => {
   return "legacy-card__verse--open";
 };
 const verseDensity = computed(() => densityFor(props.excerpt.content));
+const ghostDensity = computed(() => densityFor(props.ghost?.content));
 const handleSave = () => {
   if (props.interactive) emit("toggle-save");
 };
@@ -142,7 +150,8 @@ const handleSave = () => {
 }
 
 .legacy-card.is-dragging .legacy-card__save,
-.legacy-card.is-turning .legacy-card__save {
+.legacy-card.is-turning .legacy-card__save,
+.legacy-card.is-exchanging .legacy-card__save {
   pointer-events: none;
 }
 
@@ -160,6 +169,39 @@ const handleSave = () => {
 .legacy-card__save--no {
   background-color: transparent;
   color: rgba(84, 103, 100, 0.76);
+}
+
+.legacy-card__ink {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.legacy-card__ink--current {
+  opacity: 1;
+}
+
+.legacy-card__ink--ghost {
+  z-index: 3;
+  pointer-events: none;
+}
+
+.legacy-card.is-exchanging .legacy-card__ink--current {
+  animation: lanze-ink-in 240ms var(--ease-out) 30ms both;
+}
+
+.legacy-card.is-exchanging .legacy-card__ink--ghost {
+  animation: lanze-ink-out 200ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+@keyframes lanze-ink-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes lanze-ink-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
 .legacy-card__verse {
@@ -244,6 +286,7 @@ const handleSave = () => {
   .legacy-card__box,
   .legacy-card__box::after,
   .legacy-card__save,
+  .legacy-card__ink,
   .legacy-card__box--incoming .legacy-card__author {
     animation: none !important;
     transition: none !important;

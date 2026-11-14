@@ -24,15 +24,10 @@
 
     <div class="legacy-card__stack">
       <ExcerptCardFace
-        v-if="outgoing"
-        variant="outgoing"
-        :excerpt="outgoing.excerpt"
-        :saved="outgoing.saved"
-      />
-      <ExcerptCardFace
         variant="current"
         :excerpt="displayExcerpt"
         :saved="displaySaved"
+        :ghost="outgoing ? outgoing.excerpt : null"
         interactive
         @toggle-save="emit('toggle-save', displayExcerpt)"
       />
@@ -286,7 +281,6 @@ onBeforeUnmount(() => {
   position: relative;
   z-index: 1;
   width: 100%;
-  aspect-ratio: 330 / 620;
   transform: translateX(var(--drag-x));
   transition: transform 340ms var(--ease-out);
   will-change: transform;
@@ -294,39 +288,6 @@ onBeforeUnmount(() => {
 
 .legacy-card.is-swiping .legacy-card__stack {
   transition: none;
-}
-
-.legacy-card__stack :deep(.legacy-card__box) {
-  position: absolute;
-  inset: 0;
-  aspect-ratio: auto;
-}
-
-.legacy-card__stack :deep(.legacy-card__box--outgoing) {
-  z-index: 2;
-}
-
-.legacy-card__stack :deep(.legacy-card__box--current) {
-  z-index: 1;
-}
-
-.legacy-card.is-exchanging .legacy-card__stack :deep(.legacy-card__box--outgoing) {
-  animation: legacy-outgoing 200ms cubic-bezier(0.4, 0, 1, 1) both;
-}
-
-.legacy-card.is-exchanging .legacy-card__stack :deep(.legacy-card__box--current) {
-  animation: legacy-incoming 240ms var(--ease-out) 30ms both;
-  pointer-events: none;
-}
-
-@keyframes legacy-outgoing {
-  from { opacity: 1; }
-  to { opacity: 0; }
-}
-
-@keyframes legacy-incoming {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 .legacy-card__corner {
@@ -521,7 +482,6 @@ onBeforeUnmount(() => {
 
 @media (prefers-reduced-motion: reduce) {
   .legacy-card__stack,
-  .legacy-card__stack :deep(.legacy-card__box),
   .legacy-card__wash-paper,
   .legacy-card__wash-brush,
   .legacy-card__wash-seal {
