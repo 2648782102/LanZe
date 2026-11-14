@@ -8,6 +8,7 @@
 
 ### Changed
 
+- 响应式细查与修复：新增 `scripts/browser/responsive-sweep.mjs`（5 条路由 × 14 个断点 320–1920，检测横向溢出、贴边元素、触控目标 <24px、标题截断，输出截图与 JSON 报告）。实测发现 768–820px（平板竖屏）空白带：`poem-plinth` 的 `min-height: 440px` 到 560px 断点才解除、摘录区仍双列、`gallery__room` 拉伸居中，导致内容间约 600px 空白且展品图被底部导航遮盖。修复为 ≤768px 时摘录区改单列、`poem-plinth`/`gallery__room` 的最小高度归零并对齐起点；sweep 复测 70 项零问题。
 - 最终定位品牌区不协调的根因：参考图里图形宽占三段总宽约 42%，此前只占 18%。把三柱加宽加满（38×30、柱宽 5px、间距 6px），使图形 : 中文 : LANZE 的比例与参考一致；真实内置浏览器与本地构建截图均已复核。
 - 新增 `npm run capture:brand:1x1`（`scripts/browser/capture-brand-1x1.mjs`）：以 `.brand` 实际 bounding box 截 2x 品牌区并输出三段几何，修正此前按固定坐标裁切导致的错位截图；配合 `docs/BROWSER_VERIFICATION.md` 的内置浏览器优先流程使用。
 - 品牌区按参考图实测坐标收敛（参考 382×114 @2x → CSS）：图形 26 宽、图形→中文 13、中文 44.8、中文→LANZE 16、LANZE 43.9，总宽 143.7 对上参考 142.5；柱宽 2→3px 让基准线与柱群匹配。新增 `npm run capture:brand:1x1`，用与参考完全相同的 191×57 CSS 裁切框截品牌区，避免此前因裁切框不同造成的「看起来更大/更右」误判；Browser E2E 品牌阈值同步为参考实测量级。

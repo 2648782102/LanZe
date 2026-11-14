@@ -719,6 +719,23 @@ onBeforeUnmount(() => {
     padding-block: 28px 52px;
   }
 
+  @media (max-width: 768px) {
+    .poem-plinth {
+      min-height: 0;
+    }
+
+    .gallery__room {
+      min-height: 0;
+      align-items: start;
+      padding-bottom: 24px;
+    }
+
+    .room-grid {
+      gap: 24px;
+      padding-block: 12px 24px;
+    }
+  }
+
   .poem-plinth h1 {
     font-size: clamp(40px, 10vw, 66px);
   }
@@ -764,6 +781,24 @@ onBeforeUnmount(() => {
     grid-column: 1;
     grid-row: 1;
     max-width: 560px;
+  }
+
+  @media (max-width: 768px) {
+    .legacy-gallery {
+      grid-template-columns: 1fr;
+      gap: 44px;
+      padding-block: 44px 108px;
+    }
+
+    .legacy-gallery__card,
+    .strip-intro {
+      grid-column: 1;
+      grid-row: auto;
+    }
+
+    .legacy-gallery__card {
+      min-height: 0;
+    }
   }
 }
 
