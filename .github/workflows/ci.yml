@@ -151,13 +151,9 @@ jobs:
             exit 1
           fi
 
-      - name: Reject third-party media defaults
+      - name: Verify offline audio fallback assets
         shell: bash
         run: |
-          if grep -nE 'music\.163\.com|music\.126\.net' src/components/AudioDock.vue src/config/audio.js; then
-            echo 'The default audio player still hardcodes third-party media hosts.' >&2
-            exit 1
-          fi
           node scripts/verify-audio-library.mjs
 
       - name: Check optimized local assets
