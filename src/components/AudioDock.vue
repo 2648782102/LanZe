@@ -10,17 +10,6 @@
     }"
     aria-label="兰泽本地声景播放器"
   >
-    <button
-      class="audio-dock__handle"
-      type="button"
-      :aria-label="isCollapsed ? '展开播放器' : '收起播放器'"
-      :aria-expanded="!isCollapsed"
-      @click="toggleCollapsed"
-    >
-      <span class="audio-dock__handle-label" aria-hidden="true">{{ isCollapsed ? "展开声景" : "收束" }}</span>
-      <AppIcon :name="isCollapsed ? 'chevron-right' : 'chevron-left'" :size="13" />
-    </button>
-
     <audio
       ref="audioRef"
       :src="track.url"
@@ -35,53 +24,72 @@
       @volumechange="syncVolume"
     />
 
-    <button
-      class="audio-dock__toggle"
-      type="button"
-      :aria-label="isPlaying ? '暂停声景' : hasError ? '重试声景' : '播放声景'"
-      @click="togglePlayback"
-    >
-      <AppIcon :name="isPlaying ? 'pause' : 'play'" :size="17" />
-    </button>
+    <div class="audio-dock__bar">
+      <button
+        class="audio-dock__handle"
+        type="button"
+        :aria-label="isCollapsed ? '展开播放器' : '收起播放器'"
+        :aria-expanded="!isCollapsed"
+        @click="toggleCollapsed"
+      >
+        <span class="audio-dock__handle-label" aria-hidden="true">{{ isCollapsed ? "展开声景" : "收束" }}</span>
+        <AppIcon :name="isCollapsed ? 'chevron-right' : 'chevron-left'" :size="13" />
+      </button>
 
-    <div class="audio-dock__stage">
-      <div class="audio-dock__meta">
-        <span class="audio-dock__index" aria-hidden="true">{{ String(trackIndex + 1).padStart(2, "0") }} / {{ String(tracks.length).padStart(2, "0") }}</span>
-        <img
-          class="audio-dock__cover"
-          :src="track.cover || './media/lanze-qingshan-cover.svg'"
-          alt=""
-          width="38"
-          height="38"
-        />
-        <div class="audio-dock__copy">
-          <p class="audio-dock__title">{{ track.name }}</p>
-          <p>{{ track.mood || track.artist }}</p>
+      <button
+        class="audio-dock__toggle"
+        type="button"
+        :aria-label="isPlaying ? '暂停声景' : hasError ? '重试声景' : '播放声景'"
+        @click="togglePlayback"
+      >
+        <AppIcon :name="isPlaying ? 'pause' : 'play'" :size="17" />
+      </button>
+
+      <div class="audio-dock__stage">
+        <div class="audio-dock__meta">
+          <img
+            class="audio-dock__cover"
+            :src="track.cover || './media/lanze-qingshan-cover.svg'"
+            alt=""
+            width="38"
+            height="38"
+          />
+          <div class="audio-dock__copy">
+            <p class="audio-dock__title">{{ track.name }}</p>
+            <p class="audio-dock__subtitle">{{ track.mood || track.artist }}</p>
+          </div>
+          <span class="audio-dock__time" aria-live="off">{{ currentTimeLabel }} / {{ durationLabel }}</span>
         </div>
-        <span class="audio-dock__time" aria-live="off">{{ currentTimeLabel }} / {{ durationLabel }}</span>
+        <div class="audio-dock__seek-wrap">
+          <input
+            class="audio-dock__seek"
+            type="range"
+            min="0"
+            :max="Math.max(1, duration)"
+            step="0.1"
+            :value="currentTime"
+            :style="{ '--seek': `${progress}%` }"
+            aria-label="播放进度"
+            :aria-valuetext="`${currentTimeLabel} / ${durationLabel}`"
+            :disabled="hasError || !duration"
+            @input="seek"
+          />
+        </div>
       </div>
-      <div class="audio-dock__seek-wrap">
-        <input
-          class="audio-dock__seek"
-          type="range"
-          min="0"
-          :max="Math.max(1, duration)"
-          step="0.1"
-          :value="currentTime"
-          :style="{ '--seek': `${progress}%` }"
-          aria-label="播放进度"
-          :aria-valuetext="`${currentTimeLabel} / ${durationLabel}`"
-          :disabled="hasError || !duration"
-          @input="seek"
-        />
+
+      <span class="audio-dock__state" role="status" aria-live="polite">{{ stateLabel }}</span>
+      <div class="audio-dock__compact">
+        <span class="audio-dock__compact-title">{{ track.name }}</span>
+        <span class="audio-dock__compact-state" role="status" aria-live="polite">{{ stateLabel }}</span>
       </div>
     </div>
 
     <div class="audio-dock__controls">
-      <button type="button" aria-label="上一首声景" @click="selectTrack(trackIndex - 1)">
+      <span class="audio-dock__index" aria-hidden="true">{{ String(trackIndex + 1).padStart(2, "0") }} / {{ String(tracks.length).padStart(2, "0") }}</span>
+      <button class="audio-dock__control--previous" type="button" aria-label="上一首声景" @click="selectTrack(trackIndex - 1)">
         <AppIcon name="skip-previous" :size="15" />
       </button>
-      <button type="button" aria-label="下一首声景" @click="selectTrack(trackIndex + 1)">
+      <button class="audio-dock__control--next" type="button" aria-label="下一首声景" @click="selectTrack(trackIndex + 1)">
         <AppIcon name="skip-next" :size="15" />
       </button>
       <button
@@ -105,6 +113,7 @@
       />
       <button
         type="button"
+        class="audio-dock__playlist-toggle"
         aria-label="查看播放列表"
         :aria-expanded="playlistOpen"
         aria-controls="audio-playlist"
@@ -113,10 +122,6 @@
         <AppIcon name="list" :size="15" />
       </button>
     </div>
-
-    <span class="audio-dock__state" role="status" aria-live="polite">{{ stateLabel }}</span>
-    <span class="audio-dock__compact-title">{{ track.name }}</span>
-    <span class="audio-dock__compact-state" role="status" aria-live="polite">{{ stateLabel }}</span>
 
     <transition name="playlist">
       <div v-if="playlistOpen && !isCollapsed" id="audio-playlist" class="audio-dock__playlist" role="list">
@@ -361,64 +366,39 @@ onBeforeUnmount(() => {
   position: fixed;
   right: 18px;
   bottom: 18px;
-  left: auto;
   z-index: 70;
   display: flex;
-  width: 168px;
-  min-height: 52px;
-  align-items: center;
-  gap: 9px;
-  padding: 6px 7px 6px 4px;
+  width: min(388px, calc(100vw - 36px));
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
   border: 1px solid rgba(168, 196, 184, 0.34);
   border-left: 2px solid var(--brass-soft);
   background: var(--night);
   color: var(--porcelain-panel);
   transition:
     width var(--motion-base) var(--ease-standard),
-    min-height var(--motion-base) var(--ease-standard),
     background-color var(--motion-fast) var(--ease-standard),
     border-color var(--motion-fast) var(--ease-standard);
 }
 
-.audio-dock.is-expanded,
-.audio-dock.is-collapsed {
-  display: grid;
-}
-
-.audio-dock.is-expanded {
-  width: min(388px, calc(100vw - 36px));
-  min-height: 108px;
-  max-height: 108px;
-  grid-template-columns: 32px 40px minmax(0, 1fr) auto;
-  grid-template-areas:
-    "handle toggle stage state"
-    "handle controls controls controls";
-  align-content: center;
-  align-items: center;
-  gap: 2px 9px;
-  padding: 6px 11px 5px 6px;
-}
-
 .audio-dock.is-collapsed {
   width: 176px;
-  max-height: 48px;
-  min-height: 48px;
-  grid-template-columns: 28px 40px minmax(0, 1fr);
-  grid-template-areas:
-    "handle toggle compact"
-    "handle toggle compact-state";
+}
+
+.audio-dock__bar {
+  display: grid;
+  min-height: 50px;
+  grid-template-columns: 28px 40px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0 8px;
-  padding: 5px 8px 5px 4px;
-  border-left-width: 2px;
+  gap: 0 9px;
+  padding: 3px 10px 3px 5px;
 }
 
 .audio-dock__handle {
-  grid-area: handle;
   display: grid;
   width: 28px;
   height: 40px;
-  align-self: center;
   place-items: center;
   padding: 0;
   border: 0;
@@ -436,14 +416,12 @@ onBeforeUnmount(() => {
 }
 
 .audio-dock__toggle {
-  grid-area: toggle;
   display: grid;
   width: 40px;
   height: 40px;
   place-items: center;
   padding: 0;
   border: 1px solid rgba(168, 196, 184, 0.36);
-  border-radius: 0;
   background: rgba(168, 196, 184, 0.06);
   color: var(--porcelain-panel);
 }
@@ -454,75 +432,22 @@ onBeforeUnmount(() => {
   color: var(--brass-soft);
 }
 
-.audio-dock.is-expanded .audio-dock__handle {
-  width: 32px;
-  height: 86px;
-}
-
-.audio-dock.is-expanded .audio-dock__toggle {
-  width: 40px;
-  height: 40px;
-}
-
-.audio-dock.is-collapsed .audio-dock__handle {
-  height: 38px;
-  border-right: 0;
-}
-
-.audio-dock.is-collapsed .audio-dock__toggle {
-  width: 38px;
-  height: 38px;
-}
-
-.audio-dock.is-collapsed .audio-dock__stage,
-.audio-dock.is-collapsed .audio-dock__state,
-.audio-dock.is-collapsed .audio-dock__controls,
-.audio-dock.is-collapsed .audio-dock__playlist {
-  display: none;
-}
-
-.audio-dock__compact-title,
-.audio-dock__compact-state {
-  display: none;
-}
-
-.audio-dock.is-collapsed .audio-dock__compact-title {
-  grid-area: compact;
-  display: block;
-  overflow: hidden;
-  color: var(--porcelain-panel);
-  font-family: var(--font-poem);
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  line-height: 1.3;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.audio-dock.is-collapsed .audio-dock__compact-state {
-  grid-area: compact-state;
-  display: block;
-  color: rgba(251, 252, 249, 0.5);
-  font-size: var(--text-meta);
-  line-height: 1.3;
-}
-
 .audio-dock__stage {
-  grid-area: stage;
   display: grid;
   min-width: 0;
-  gap: 2px;
+  gap: 0;
 }
 
 .audio-dock__meta {
   display: grid;
   min-width: 0;
-  grid-template-columns: 24px 32px minmax(0, 1fr) auto;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .audio-dock__index {
+  padding-left: 2px;
   color: var(--brass-soft);
   font-family: var(--font-number);
   font-size: var(--text-meta);
@@ -577,7 +502,7 @@ onBeforeUnmount(() => {
   to { transform: scale(1); }
 }
 
-.audio-dock__copy > p:nth-child(2) {
+.audio-dock__subtitle {
   color: rgba(251, 252, 249, 0.48);
   font-size: var(--text-meta);
   line-height: 1.4;
@@ -590,14 +515,9 @@ onBeforeUnmount(() => {
   white-space: nowrap;
 }
 
-.audio-dock :focus-visible {
-  outline: 2px solid var(--brass-soft);
-  outline-offset: 2px;
-}
-
 .audio-dock__seek-wrap {
   min-width: 0;
-  padding-left: 30px;
+  padding-left: 40px;
 }
 
 .audio-dock__seek,
@@ -652,14 +572,37 @@ onBeforeUnmount(() => {
   background: var(--brass-soft);
 }
 
+.audio-dock :focus-visible {
+  outline: 2px solid var(--brass-soft);
+  outline-offset: 2px;
+}
+
+.audio-dock__state {
+  align-self: center;
+  color: rgba(251, 252, 249, 0.5);
+  font-size: var(--text-meta);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.audio-dock__compact {
+  display: none;
+  min-width: 0;
+}
+
+.audio-dock__compact-title,
+.audio-dock__compact-state {
+  display: none;
+}
+
 .audio-dock__controls {
-  grid-area: controls;
   display: grid;
-  grid-template-columns: repeat(3, 36px) minmax(48px, 1fr) 36px;
+  min-height: 40px;
+  grid-template-columns: 28px repeat(3, 36px) minmax(48px, 1fr) 36px;
   align-items: center;
-  gap: 5px;
-  margin-top: 0;
-  padding-top: 4px;
+  gap: 8px;
+  margin: 0 10px 0 42px;
+  padding: 2px 0 3px;
   border-top: 1px solid rgba(168, 196, 184, 0.18);
 }
 
@@ -681,14 +624,52 @@ onBeforeUnmount(() => {
   color: var(--brass-soft);
 }
 
-.audio-dock__state {
-  grid-area: state;
-  align-self: start;
-  padding-top: 2px;
+.audio-dock.is-collapsed .audio-dock__stage,
+.audio-dock.is-collapsed .audio-dock__state,
+.audio-dock.is-collapsed .audio-dock__controls,
+.audio-dock.is-collapsed .audio-dock__playlist {
+  display: none;
+}
+
+.audio-dock.is-collapsed .audio-dock__bar {
+  min-height: 46px;
+  grid-template-columns: 28px 38px minmax(0, 1fr);
+  gap: 0 8px;
+  padding: 4px 8px 4px 4px;
+}
+
+.audio-dock.is-collapsed .audio-dock__handle {
+  height: 38px;
+  border-right: 0;
+}
+
+.audio-dock.is-collapsed .audio-dock__toggle {
+  width: 38px;
+  height: 38px;
+}
+
+.audio-dock.is-collapsed .audio-dock__compact {
+  display: grid;
+  gap: 1px;
+}
+
+.audio-dock.is-collapsed .audio-dock__compact-title {
+  display: block;
+  overflow: hidden;
+  color: var(--porcelain-panel);
+  font-family: var(--font-poem);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.audio-dock.is-collapsed .audio-dock__compact-state {
+  display: block;
   color: rgba(251, 252, 249, 0.5);
   font-size: var(--text-meta);
-  letter-spacing: 0.06em;
-  white-space: nowrap;
+  line-height: 1.3;
 }
 
 .audio-dock.is-error {
@@ -781,48 +762,30 @@ audio {
     right: max(12px, env(safe-area-inset-right));
     bottom: calc(84px + env(safe-area-inset-bottom));
     left: max(12px, env(safe-area-inset-left));
-    width: 176px;
-    max-height: 108px;
-    margin-left: auto;
-    border-color: rgba(168, 196, 184, 0.34);
-    border-bottom: 0;
-  }
-
-  .audio-dock.is-expanded {
     width: auto;
-    min-height: 108px;
-    max-height: 108px;
-    grid-template-columns: 28px 40px minmax(0, 1fr) auto;
-    grid-template-areas:
-      "handle toggle stage state"
-      "handle controls controls controls";
-    gap: 2px 8px;
-    padding: 5px 9px 4px 4px;
-  }
-
-  .audio-dock__state {
-    padding-top: 0;
+    margin-left: auto;
+    border-bottom: 0;
   }
 
   .audio-dock.is-collapsed {
     width: 176px;
-    min-height: 46px;
-    max-height: 48px;
-    grid-template-columns: 28px 38px minmax(0, 1fr);
-    grid-template-areas:
-      "handle toggle compact"
-      "handle toggle compact-state";
+  }
+
+  .audio-dock__bar {
+    grid-template-columns: 28px 38px minmax(0, 1fr) auto;
+    gap: 0 8px;
+    padding: 4px 9px 4px 4px;
+  }
+
+  .audio-dock__controls {
+    grid-template-columns: repeat(3, 36px) minmax(48px, 1fr) 36px;
+    margin-left: 38px;
   }
 
   .audio-dock.is-collapsed .audio-dock__handle,
   .audio-dock.is-collapsed .audio-dock__toggle {
     width: 28px;
     height: 36px;
-  }
-
-  .audio-dock.is-expanded .audio-dock__handle {
-    width: 28px;
-    height: 86px;
   }
 
   .audio-dock__playlist {
@@ -832,37 +795,22 @@ audio {
 }
 
 @media (max-width: 420px) {
-  .audio-dock {
-    grid-template-columns: 28px 38px minmax(0, 1fr);
-    grid-template-areas:
-      "handle toggle compact"
-      "handle toggle compact-state";
+  .audio-dock__bar {
+    grid-template-columns: 28px 36px minmax(0, 1fr) auto;
     gap: 0 7px;
     padding-right: 7px;
   }
 
-  .audio-dock.is-expanded {
-    width: auto;
-    grid-template-columns: 28px 38px minmax(0, 1fr) auto;
-    grid-template-areas:
-      "handle toggle stage state"
-      "handle controls controls";
-    gap: 3px 7px;
-    padding-right: 7px;
+  .audio-dock__toggle {
+    width: 36px;
+    height: 36px;
   }
 
-  .audio-dock__time,
-  .audio-dock__controls button:nth-child(2),
-  .audio-dock__volume {
-    display: none;
+  .audio-dock__meta {
+    grid-template-columns: 30px minmax(0, 1fr) auto;
   }
 
-  .audio-dock__controls {
-    grid-template-columns: repeat(3, 36px);
-    justify-content: start;
-  }
-
-  .audio-dock__index {
+  .audio-dock__time {
     display: none;
   }
 
@@ -871,12 +819,19 @@ audio {
     height: 30px;
   }
 
-  .audio-dock__meta {
-    grid-template-columns: 30px minmax(0, 1fr);
+  .audio-dock__seek-wrap {
+    padding-left: 38px;
   }
 
-  .audio-dock__seek-wrap {
-    padding-left: 0;
+  .audio-dock__controls {
+    grid-template-columns: 28px repeat(3, 36px) 36px;
+    justify-content: start;
+    margin-left: 35px;
+  }
+
+  .audio-dock__control--next,
+  .audio-dock__volume {
+    display: none;
   }
 }
 
