@@ -56,7 +56,7 @@
 
 ### 诗句、音乐或图标为什么有时不显示？
 
-业务诗库由 22 首精校短章与 `public/data/poetry/` 的 16 个 MIT 授权分卷组成，共 9,350 篇，按朝代、体裁与字句在浏览器内检索；分卷按需加载，不请求外部诗词 API。语料附带 `SHA256SUMS.txt`、`manifest.json` 与上游许可证，CI、静态冒烟和单测会核对分卷数量、条目数与文件哈希。默认声景与封面来自 `public/media/` 的仓库自制三段曲库，由 `npm run audio:generate` 可复现生成并按 SHA-256 校验；图标由仓库内 SVG 组件绘制。首页历史摘录卡默认只用内置摘录与精校馆藏短句，不请求外部服务；显式设置 `VITE_POETRY_SOURCE=remote` 后才使用 `VITE_POETRY_SOURCE_URL`，失败、超时或返回空内容时回退并显示来源状态。只有显式配置 `VITE_AUDIO_SOURCE=custom` 时，自定义音源才可能受网络、CORS、地区限制、防盗链或服务变更影响，且不在本仓库控制范围内；无效 JSON 或空列表会回退本地声景并显示提示，URL 不可达或播放失败时播放器显示「声景不可达」并允许重试。首页摘录卡的随机句接口是可选增强，不是业务诗库；CI 不依赖外部服务。
+业务诗库由 22 首精校短章与 `public/data/poetry/` 的 16 个 MIT 授权分卷组成，共 9,350 篇，按朝代、体裁与字句在浏览器内检索；分卷按需加载，不请求外部诗词 API。语料附带 `SHA256SUMS.txt`、`manifest.json` 与上游许可证，CI、静态冒烟和单测会核对分卷数量、条目数与文件哈希。默认声景与封面来自 `public/media/` 的三段 CC BY 3.0 古筝节选及原创 SVG，由 `npm run audio:generate` 裁切生成并按 SHA-256 校验，署名见 `public/media/AUDIO_CREDITS.md`；图标由仓库内 SVG 组件绘制。首页历史摘录卡默认只用内置摘录与精校馆藏短句，不请求外部服务；显式设置 `VITE_POETRY_SOURCE=remote` 后才使用 `VITE_POETRY_SOURCE_URL`，失败、超时或返回空内容时回退并显示来源状态。只有显式配置 `VITE_AUDIO_SOURCE=custom` 时，自定义音源才可能受网络、CORS、地区限制、防盗链或服务变更影响，且不在本仓库控制范围内；无效 JSON 或空列表会回退本地声景并显示提示，URL 不可达或播放失败时播放器显示「声景不可达」并允许重试。首页摘录卡的随机句接口是可选增强，不是业务诗库；CI 不依赖外部服务。
 
 ### 收藏、登录态、个人资料会保存吗？
 
@@ -84,7 +84,7 @@ MIT，见 `LICENSE`：`Copyright (c) 2022-2026 LanZe contributors`。与 README 
 
 ### 字体、图片、音乐和诗词文本也是 MIT 吗？
 
-不一定。MIT 覆盖本仓库贡献者提供的代码与文档；`src/assets/` 中的 WOFF2 字体子集与压缩展品图派生自历史素材，上游 npm 包内的资源、自定义音源配置和精校短章也可能有独立授权。`public/media/` 的默认声景/封面由本仓库脚本合成，不含第三方录音；`public/data/poetry/` 的馆藏分卷来自 `chinese-poetry/chinese-poetry` 的 MIT 授权选段，已固定提交并随附上游许可证，但诗词底本与校勘仍需按用途核对。二次发布、商用或重新分发前，仍需逐项核查其余素材来源与许可，不清楚的素材应替换或移除。贡献指南也要求新增素材时说明来源。
+不一定。MIT 覆盖本仓库贡献者提供的代码与文档；`src/assets/` 中的 WOFF2 字体子集与压缩展品图派生自历史素材，上游 npm 包内的资源、自定义音源配置和精校短章也可能有独立授权。`public/media/` 的默认声景/封面节选自 Antti Luode 的 CC BY 3.0 古筝录音，署名见 `public/media/AUDIO_CREDITS.md`；`public/data/poetry/` 的馆藏分卷来自 `chinese-poetry/chinese-poetry` 的 MIT 授权选段，已固定提交并随附上游许可证，但诗词底本与校勘仍需按用途核对。二次发布、商用或重新分发前，仍需逐项核查其余素材来源与许可，不清楚的素材应替换或移除。贡献指南也要求新增素材时说明来源。
 
 ### 可以提交真实诗词语料吗？
 

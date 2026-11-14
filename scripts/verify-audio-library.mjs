@@ -16,12 +16,16 @@ export const inspectWav = (buffer) => {
   if (buffer.length < 44 || buffer.toString("ascii", 0, 4) !== "RIFF" || buffer.toString("ascii", 8, 12) !== "WAVE") {
     throw new Error("Audio asset is not a RIFF/WAVE file");
   }
+  const formatTag = readUint16(buffer, 20);
   const channels = readUint16(buffer, 22);
   const sampleRate = readUint32(buffer, 24);
+  const byteRate = readUint32(buffer, 28);
+  const blockAlign = readUint16(buffer, 32);
   const bitsPerSample = readUint16(buffer, 34);
   const dataSize = readUint32(buffer, 40);
-  if (channels !== 1 || sampleRate !== 22050 || bitsPerSample !== 16 || dataSize + 44 !== buffer.length) {
-    throw new Error("Audio asset must be 16-bit mono PCM at 22050 Hz with an intact header");
+  if (formatTag !== 1 || channels !== 1 || bitsPerSample !== 16
+    || byteRate !== sampleRate * 2 || blockAlign !== 2 || dataSize + 44 !== buffer.length) {
+    throw new Error("Audio asset must be 16-bit mono PCM with an intact header");
   }
   return { channels, sampleRate, bitsPerSample, seconds: dataSize / (sampleRate * channels * 2) };
 };
@@ -31,14 +35,22 @@ export const verifyAudioLibrary = async () => {
   if (!Array.isArray(manifest.tracks) || manifest.tracks.length !== 3) {
     throw new Error("Audio manifest must describe exactly three local tracks");
   }
+  const expectedRate = Number(String(manifest.format || "").match(/(\d+) Hz/)?.[1]);
+  if (!expectedRate) throw new Error("Audio manifest must declare a sample rate");
   const checksums = [];
   for (const track of manifest.tracks) {
     for (const key of ["id", "name", "artist", "mood", "url", "cover", "duration"]) {
       if (!track[key]) throw new Error(`Audio manifest track is missing ${key}`);
     }
+    for (const key of ["license", "licenseUrl", "source", "sourceUrl"]) {
+      if (!track[key]) throw new Error(`Audio manifest track is missing attribution ${key}`);
+    }
     const audio = await readAsset(track.url);
     const cover = await readAsset(track.cover);
     const format = inspectWav(audio);
+    if (format.sampleRate !== expectedRate) {
+      throw new Error(`Audio sample rate mismatch for ${track.id}`);
+    }
     if (Math.abs(format.seconds - track.duration) > 0.01) {
       throw new Error(`Audio duration mismatch for ${track.id}`);
     }

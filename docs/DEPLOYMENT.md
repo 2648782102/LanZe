@@ -15,7 +15,7 @@
 - [ ] 生产环境变量只含公开配置；`VITE_USE_MOCK` 按需求设置，避免把演示数据误写成正式账号服务。默认首页诗句源离线；若显式启用远程源，确认其服务条款、隐私边界与 CSP；离线部署保持 `VITE_POETRY_SOURCE=local`。
 - [ ] 若关闭 mock，`VITE_API_BASE_URL` 指向可访问的 HTTPS API 或同源 `/api/`；后端已配置 CORS/鉴权/限流。远端失败时前端会自动降级。
 - [ ] MemFire/Vercel 历史地址不再作为生产依赖；源码中不再包含历史硬编码 anon key。
-- [ ] WOFF2 字体子集、压缩展品图、自定义音源/封面与诗词文本的使用符合其授权与隐私要求；默认 `VITE_AUDIO_SOURCE=local` 使用仓库自制三段声景，自定义音源不可达时会显示可重试状态，默认 `VITE_POETRY_SOURCE=local` 不请求第三方公开诗句接口。
+- [ ] WOFF2 字体子集、压缩展品图、自定义音源/封面与诗词文本的使用符合其授权与隐私要求；默认 `VITE_AUDIO_SOURCE=local` 使用三段 CC BY 3.0 古筝节选，自定义音源不可达时会显示可重试状态，默认 `VITE_POETRY_SOURCE=local` 不请求第三方公开诗句接口。
 - [ ] 记录 commit SHA、构建命令、变量清单与回滚方式。
 
 ## 3. GitHub Pages（自动 workflow）

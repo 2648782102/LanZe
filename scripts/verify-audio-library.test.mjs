@@ -14,7 +14,7 @@ test("audio manifest and checksums describe all local assets", async () => {
 
 test("WAV inspector rejects a changed header", async () => {
   const audio = await readFile(`${media}/lanze-qingshan.wav`);
-  assert.equal(inspectWav(audio).seconds, 24);
+  assert.equal(inspectWav(audio).seconds, 36);
   const changed = Buffer.from(audio);
   changed.writeUInt16LE(2, 22);
   assert.throws(() => inspectWav(changed), /16-bit mono PCM/);

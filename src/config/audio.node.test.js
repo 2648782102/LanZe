@@ -9,7 +9,7 @@ test("uses the local demo track without configuration", () => {
   assert.equal(config.tracks.length, 3);
   assert.equal(config.tracks[0].url, "./media/lanze-qingshan.wav");
   assert.equal(config.tracks[0].cover, "./media/lanze-qingshan-cover.svg");
-  assert.equal(config.tracks[0].duration, 24);
+  assert.equal(config.tracks[0].duration, 36);
 });
 
 test("uses an explicit custom playlist only when enabled", () => {
