@@ -419,6 +419,9 @@ onBeforeUnmount(() => {
 .preview-panel {
   position: sticky;
   top: 104px;
+  max-height: calc(100dvh - 104px - 120px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   transition: filter var(--motion-base) var(--ease-standard);
 }
 
@@ -437,7 +440,7 @@ onBeforeUnmount(() => {
 }
 
 .preview-sheet {
-  min-height: 520px;
+  min-height: 420px;
   padding: 42px 34px;
   border: 1px solid var(--line);
   border-top: 0;

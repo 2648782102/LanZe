@@ -42,7 +42,7 @@ const isBare = computed(() => Boolean(route.meta.bare));
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-:where(.app-frame:not(.is-bare) .route-stage > main) {
+.app-frame:not(.is-bare) .route-stage > main {
   padding-bottom: var(--fixed-layer-space);
 }
 

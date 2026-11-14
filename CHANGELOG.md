@@ -8,6 +8,7 @@
 
 ### Changed
 
+- 视觉核对发现桌面端固定播放器会压住写作页预览面板底部：`.preview-panel` 增加 `max-height` + 内部滚动，`.preview-sheet` 最小高度 520→420；同时把 `--fixed-layer-space` 扩展到 ≥821px（88px），并把 `App.vue` 中 `:where()` 选择器提权为真实类选择器，使其对 `collection`/`compose` 页生效。
 - 响应式细查与修复：新增 `scripts/browser/responsive-sweep.mjs`（5 条路由 × 14 个断点 320–1920，检测横向溢出、贴边元素、触控目标 <24px、标题截断，输出截图与 JSON 报告）。实测发现 768–820px（平板竖屏）空白带：`poem-plinth` 的 `min-height: 440px` 到 560px 断点才解除、摘录区仍双列、`gallery__room` 拉伸居中，导致内容间约 600px 空白且展品图被底部导航遮盖。修复为 ≤768px 时摘录区改单列、`poem-plinth`/`gallery__room` 的最小高度归零并对齐起点；sweep 复测 70 项零问题。
 - 最终定位品牌区不协调的根因：参考图里图形宽占三段总宽约 42%，此前只占 18%。把三柱加宽加满（38×30、柱宽 5px、间距 6px），使图形 : 中文 : LANZE 的比例与参考一致；真实内置浏览器与本地构建截图均已复核。
 - 新增 `npm run capture:brand:1x1`（`scripts/browser/capture-brand-1x1.mjs`）：以 `.brand` 实际 bounding box 截 2x 品牌区并输出三段几何，修正此前按固定坐标裁切导致的错位截图；配合 `docs/BROWSER_VERIFICATION.md` 的内置浏览器优先流程使用。

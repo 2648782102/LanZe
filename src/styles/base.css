@@ -344,6 +344,12 @@ img {
   }
 }
 
+@media (min-width: 821px) {
+  :root {
+    --fixed-layer-space: calc(88px + env(safe-area-inset-bottom));
+  }
+}
+
 @media (max-width: 640px) {
   :root {
     --shell: calc(100vw - 28px);
