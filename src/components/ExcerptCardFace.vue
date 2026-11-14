@@ -187,11 +187,11 @@ const handleSave = () => {
 }
 
 .legacy-card.is-exchanging .legacy-card__ink--current {
-  animation: lanze-ink-in 240ms var(--ease-out) 30ms both;
+  animation: lanze-ink-in 200ms var(--ease-out) both;
 }
 
 .legacy-card.is-exchanging .legacy-card__ink--ghost {
-  animation: lanze-ink-out 200ms cubic-bezier(0.4, 0, 1, 1) both;
+  animation: lanze-ink-out 160ms cubic-bezier(0.4, 0, 1, 1) both;
 }
 
 @keyframes lanze-ink-in {

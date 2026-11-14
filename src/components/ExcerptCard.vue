@@ -61,7 +61,7 @@ const props = defineProps({
 });
 const emit = defineEmits(["toggle-save", "needs-next", "turn", "settled"]);
 
-const CROSSFADE_DURATION = 300;
+const CROSSFADE_DURATION = 240;
 const SWIPE_COMMIT = 42;
 const SWIPE_VELOCITY = 420;
 const DRAG_DAMPING = 0.4;
@@ -93,6 +93,15 @@ const clearSwipe = () => {
   swipeProgress.value = 0;
   dragX.value = 0;
   cardElement.value?.setAttribute("data-direction", "right");
+};
+
+const commitSwipeTurn = (direction) => {
+  suppressClick = true;
+  window.clearTimeout(suppressClickTimer);
+  suppressClickTimer = window.setTimeout(() => {
+    suppressClick = false;
+  }, 400);
+  turnExcerpt(direction);
 };
 
 const commitTurn = (next, nextSaved) => {
@@ -181,26 +190,27 @@ const moveSwipe = (event) => {
   cardElement.value?.setAttribute("data-direction", direction);
   swipeProgress.value = Math.min(1, Math.abs(distance) / SWIPE_COMMIT);
   dragX.value = Math.max(-DRAG_LIMIT, Math.min(DRAG_LIMIT, distance * DRAG_DAMPING));
+  if (!swipe.committed && Math.abs(distance) >= SWIPE_COMMIT) {
+    swipe.committed = true;
+    swipeProgress.value = 0;
+    dragX.value = 0;
+    commitSwipeTurn(direction);
+  }
 };
 
 const endSwipe = (event) => {
   if (!swipe || event.pointerId !== swipe.id) return;
   const distance = swipe.x - swipe.originX;
-  const shouldTurn = swipe.moved
-    && (Math.abs(distance) >= SWIPE_COMMIT
-      || Math.abs(swipe.velocity) >= SWIPE_VELOCITY && Math.abs(distance) >= 14);
+  const committed = Boolean(swipe.committed);
+  const fling = swipe.moved && !committed
+    && Math.abs(swipe.velocity) >= SWIPE_VELOCITY && Math.abs(distance) >= 14;
   try {
     swipe.target?.releasePointerCapture?.(event.pointerId);
   } catch {}
   const direction = distance < 0 ? "left" : "right";
   clearSwipe();
-  if (!shouldTurn) return;
-  suppressClick = true;
-  window.clearTimeout(suppressClickTimer);
-  suppressClickTimer = window.setTimeout(() => {
-    suppressClick = false;
-  }, 350);
-  turnExcerpt(direction);
+  if (committed) return;
+  if (fling) commitSwipeTurn(direction);
 };
 
 const cancelSwipe = (event) => {
@@ -282,7 +292,7 @@ onBeforeUnmount(() => {
   z-index: 1;
   width: 100%;
   transform: translateX(var(--drag-x));
-  transition: transform 340ms var(--ease-out);
+  transition: transform 240ms var(--ease-out);
   will-change: transform;
 }
 
@@ -405,7 +415,7 @@ onBeforeUnmount(() => {
 }
 
 .legacy-card.is-exchanging .legacy-card__wash-paper {
-  animation: legacy-wash 300ms var(--ease-standard) both;
+  animation: legacy-wash 240ms var(--ease-standard) both;
 }
 
 @keyframes legacy-wash {
@@ -432,7 +442,7 @@ onBeforeUnmount(() => {
 }
 
 .legacy-card.is-exchanging .legacy-card__wash-brush {
-  animation: legacy-brush 300ms var(--ease-out) both;
+  animation: legacy-brush 240ms var(--ease-out) both;
 }
 
 @keyframes legacy-brush {
@@ -455,7 +465,7 @@ onBeforeUnmount(() => {
 }
 
 .legacy-card.is-exchanging .legacy-card__wash-seal {
-  animation: legacy-seal 360ms var(--ease-out) 40ms both;
+  animation: legacy-seal 280ms var(--ease-out) 30ms both;
 }
 
 @keyframes legacy-seal {

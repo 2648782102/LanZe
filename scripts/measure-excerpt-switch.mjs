@@ -196,6 +196,42 @@ const main = async () => {
       });
       await new Promise((resolve) => setTimeout(resolve, 160));
     }
+    for (let i = 0; i < 4; i += 1) {
+      const before = verse();
+      const rect = card.getBoundingClientRect();
+      const cx = Math.round(rect.left + rect.width / 2);
+      const cy = Math.round(rect.top + Math.min(rect.height / 3, 180));
+      const options = {
+        pointerId: 81,
+        pointerType: 'mouse',
+        isPrimary: true,
+        bubbles: true,
+        cancelable: true,
+        button: 0,
+        buttons: 1,
+      };
+      card.dispatchEvent(new PointerEvent('pointerdown', { ...options, clientX: cx, clientY: cy }));
+      card.dispatchEvent(new PointerEvent('pointermove', { ...options, clientX: cx + 24, clientY: cy }));
+      const thresholdAt = performance.now() - t0;
+      card.dispatchEvent(new PointerEvent('pointermove', { ...options, clientX: cx + 48, clientY: cy }));
+      marks.push({ type: 'swipeThreshold', t: Math.round(thresholdAt * 100) / 100 });
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      const changedBeforeUp = verse() !== before;
+      const changedAt = performance.now() - t0;
+      card.dispatchEvent(new PointerEvent('pointerup', { ...options, clientX: cx + 48, clientY: cy, buttons: 0 }));
+      marks.push({
+        type: changedBeforeUp ? 'swipeChangedBeforeUp' : 'swipeChangedAfterUp',
+        t: Math.round(changedAt * 100) / 100,
+      });
+      await new Promise((resolve) => {
+        const check = () => {
+          if (verse() !== before && !card.classList.contains('is-exchanging')) resolve();
+          else requestAnimationFrame(check);
+        };
+        requestAnimationFrame(check);
+      });
+      await new Promise((resolve) => setTimeout(resolve, 160));
+    }
     observer?.disconnect();
     await new Promise((resolve) => setTimeout(resolve, 400));
     return { frames, marks, longFrames };
@@ -208,12 +244,26 @@ const main = async () => {
   const sorted = [...gaps].sort((a, b) => b - a);
   const latency = [];
   const exchangeDuration = [];
+  const swipeThresholdToChange = [];
+  let swipeChangedBeforeUp = 0;
+  let swipeChangedAfterUp = 0;
   for (let index = 0; index < payload.marks.length; index += 1) {
     if (payload.marks[index].type === "click") {
       const change = payload.marks.find((mark, offset) => offset > index && mark.type === "changed");
       const settled = payload.marks.find((mark, offset) => offset > index && mark.type === "settled");
       if (change) latency.push(Math.round((change.t - payload.marks[index].t) * 100) / 100);
       if (settled) exchangeDuration.push(Math.round((settled.t - payload.marks[index].t) * 100) / 100);
+    }
+    if (payload.marks[index].type === "swipeThreshold") {
+      const beforeUp = payload.marks.find((mark, offset) => offset > index && mark.type === "swipeChangedBeforeUp");
+      const afterUp = payload.marks.find((mark, offset) => offset > index && mark.type === "swipeChangedAfterUp");
+      if (beforeUp) {
+        swipeChangedBeforeUp += 1;
+        swipeThresholdToChange.push(Math.round((beforeUp.t - payload.marks[index].t) * 100) / 100);
+      } else if (afterUp) {
+        swipeChangedAfterUp += 1;
+        swipeThresholdToChange.push(Math.round((afterUp.t - payload.marks[index].t) * 100) / 100);
+      }
     }
   }
   console.log(JSON.stringify({
@@ -224,6 +274,9 @@ const main = async () => {
     gapsOver50ms: gaps.filter((gap) => gap > 50).length,
     turnLatencyToChangeMs: latency,
     exchangeDurationMs: exchangeDuration,
+    swipeChangedBeforeUp,
+    swipeChangedAfterUp,
+    swipeThresholdToChangeMs: swipeThresholdToChange,
     longAnimationFrames: payload.longFrames.filter((frame) => frame.duration > 40),
   }, null, 2));
 
