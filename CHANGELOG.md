@@ -8,7 +8,7 @@
 
 ### Changed
 
-播放器 UI 重构：把原来跨行 grid 错位的布局改为「收起横条 / 展开头部+控制行」单一 flex 结构，统一 handle、播放键、封面、标题、时间、进度条与状态标签的对齐基准；曲目序号移入控制行，移动端展开不再出现 meta 溢出 dock、控制列缺失与按钮错位。新增 `npm run capture:audio` 无头浏览器截图诊断脚本，覆盖桌面/移动端收起、展开与播放列表。
+播放器 UI 按参考图完全重写：深墨绿横向卡、左侧金色竖线与贯穿式箭头 rail、方形播放键、白底唱片封面、右上时间/状态、缩进的进度条、分隔线与底部单行控制行；收起态是 200px 的静谧横条，展开/收起分别使用左/右箭头。修正 `handleEnded` 里 `trackIndex` ref 未解包的问题；小屏控制行改为不换行的 flex，保留音量滑块。新增 `npm run capture:audio` 无头浏览器截图诊断，E2E 增加箭头方向、区域不越界与展开宽度稳定断言。
 - 整体性能与架构优化：业务请求改用原生 `fetch`，会话改用原生 Cookie 适配器，移除 `axios`、`vue-cookies`、`@supabase/supabase-js` 与未被引用的 Supabase 适配器；首屏不再预加载 62KB 的 `data-vendor` chunk，npm 依赖由 75 个包降至 38 个且 `npm audit` 为 0 漏洞。
 - 三张首屏位图（展品图、登录封面、摘录扇舟图）增加 AVIF 优先源并保留原 JPG/PNG 兜底；浏览器只下载 AVIF，单张资源最多从 439KB 降到 51KB。摘录卡图片标记为低优先级，不与首屏展品图争带宽。
 - `ReadView` 的摘录牌堆状态抽取为 `useExcerptDeck()` composable，视图只保留展厅渲染与事件转发；新增 `sessionCookies` 单测并移除已废弃的 Supabase 配置用例，单测总数为 41。

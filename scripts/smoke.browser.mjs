@@ -329,7 +329,7 @@ const main = async () => {
   if (coldStart.overlapsPlinth || coldStart.overlapsPlinthActions) {
     throw new Error("Desktop audio dock overlaps the reading plinth on cold start");
   }
-  if (coldStart.dockWidth > 400 || coldStart.dockHeight > 120) {
+  if (coldStart.dockWidth > 220 || coldStart.dockHeight > 64) {
     throw new Error("Desktop audio dock exceeds its compact fixed-layer budget");
   }
   if (coldStart.coldLayoutShift > 0.05) {
@@ -675,10 +675,25 @@ const main = async () => {
   await waitUntil("expanded audio dock", () => evaluate(
     "!document.querySelector('.audio-dock')?.classList.contains('is-collapsed')",
   ));
+  await waitUntil("expanded audio dock width settles", () => evaluate(`
+    (() => {
+      const dock = document.querySelector('.audio-dock');
+      return Boolean(dock) && Math.round(dock.getBoundingClientRect().width) > 360;
+    })()
+  `), 32);
   const expandedDock = await evaluate(`(() => {
     const dock = document.querySelector('.audio-dock');
     const controls = [...document.querySelectorAll('.audio-dock__controls button')];
     const seek = document.querySelector('.audio-dock__seek');
+    const handleIcon = dock?.querySelector('.audio-dock__handle svg path')?.getAttribute('d') || '';
+    const rect = dock?.getBoundingClientRect();
+    const inside = (selector) => {
+      const node = document.querySelector(selector);
+      if (!node || !rect) return false;
+      const box = node.getBoundingClientRect();
+      return box.left >= rect.left - 1 && box.right <= rect.right + 1
+        && box.top >= rect.top - 1 && box.bottom <= rect.bottom + 1;
+    };
     return {
       isExpanded: Boolean(dock?.classList.contains('is-expanded')),
       stageVisible: getComputedStyle(document.querySelector('.audio-dock__stage')).display !== 'none',
@@ -687,6 +702,8 @@ const main = async () => {
       width: dock ? Math.round(dock.getBoundingClientRect().width) : 0,
       height: dock ? Math.round(dock.getBoundingClientRect().height) : 0,
       audioPaused: Boolean(document.querySelector('audio')?.paused),
+      handleIcon,
+      aligned: ['.audio-dock__toggle', '.audio-dock__meta', '.audio-dock__right', '.audio-dock__seek-wrap', '.audio-dock__controls'].every(inside),
     };
   })()`);
   if (!expandedDock.isExpanded || !expandedDock.stageVisible) {
@@ -695,11 +712,17 @@ const main = async () => {
   if (!expandedDock.audioPaused) {
     throw new Error("Expanding the audio dock must not start playback");
   }
-  if (expandedDock.height > 120) {
+  if (expandedDock.height > 190) {
     throw new Error(`Expanded audio dock exceeds the fixed-layer height budget: ${JSON.stringify(expandedDock)}`);
   }
   if (expandedDock.minControlHeight < 36 || expandedDock.seekHeight < 24) {
     throw new Error("Expanded audio dock controls fell below the touch target floor");
+  }
+  if (!expandedDock.aligned) {
+    throw new Error(`Expanded audio dock regions are not contained and aligned: ${JSON.stringify(expandedDock)}`);
+  }
+  if (!expandedDock.handleIcon.includes('m15 5-7 7 7 7')) {
+    throw new Error(`Expanded audio dock must show a left chevron: ${expandedDock.handleIcon}`);
   }
   await evaluate(`(() => {
     const handle = document.querySelector('.audio-dock__handle');
@@ -721,7 +744,7 @@ const main = async () => {
   ));
   await waitUntil("collapsed audio dock settles", () => evaluate(`(() => {
     const dock = document.querySelector('.audio-dock');
-    return dock ? Math.round(dock.getBoundingClientRect().width) <= 180 : false;
+    return dock ? Math.round(dock.getBoundingClientRect().width) <= 210 : false;
   })()`));
   const collapsedDock = await evaluate(`(() => {
     const dock = document.querySelector('.audio-dock');
@@ -729,13 +752,17 @@ const main = async () => {
       width: dock ? Math.round(dock.getBoundingClientRect().width) : 0,
       height: dock ? Math.round(dock.getBoundingClientRect().height) : 0,
       compactTitle: getComputedStyle(document.querySelector('.audio-dock__compact-title')).display !== 'none',
-      stageHidden: getComputedStyle(document.querySelector('.audio-dock__stage')).display === 'none',
+      stageHidden: getComputedStyle(document.querySelector('.audio-dock__meta')).display === 'none',
       audioPaused: Boolean(document.querySelector('audio')?.paused),
+      handleIcon: dock?.querySelector('.audio-dock__handle svg path')?.getAttribute('d') || '',
     };
   })()`);
   if (!collapsedDock.compactTitle || !collapsedDock.stageHidden || !collapsedDock.audioPaused
-    || collapsedDock.width > 190 || collapsedDock.height > 56) {
+    || collapsedDock.width > 210 || collapsedDock.height > 64) {
     throw new Error(`Collapsed audio dock should be a quiet soundscape slip: ${JSON.stringify(collapsedDock)}`);
+  }
+  if (!collapsedDock.handleIcon.includes('m9 5 7 7-7 7')) {
+    throw new Error(`Collapsed audio dock must show a right chevron: ${collapsedDock.handleIcon}`);
   }
 
   if (!await clickByText("收入诗卷")) throw new Error("Save-to-collection button was not found");
@@ -974,7 +1001,7 @@ const main = async () => {
       audioPaused: Boolean(document.querySelector('audio')?.paused),
     };
   })()`);
-  if (narrowExpanded.height > 120 || narrowExpanded.visibleControls < 3
+  if (narrowExpanded.height > 220 || narrowExpanded.visibleControls < 3
     || narrowExpanded.minControlHeight < 36 || !narrowExpanded.audioPaused) {
     throw new Error(`320px expanded audio dock is unstable: ${JSON.stringify(narrowExpanded)}`);
   }
