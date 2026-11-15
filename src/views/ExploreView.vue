@@ -401,7 +401,7 @@ const selectFacet = (key, name) => {
 };
 
 onMounted(() => {
-  const desktopQuery = window.matchMedia("(min-width: 901px)");
+  const desktopQuery = window.matchMedia("(min-width: 821px)");
   const syncFilters = (event) => {
     if (event.matches) filtersOpen.value = false;
   };
@@ -1020,7 +1020,7 @@ watch([dynasty, genre], () => {
   white-space: nowrap;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 820px) {
   .pagination {
     gap: 8px;
     min-height: 72px;
@@ -1079,7 +1079,35 @@ watch([dynasty, genre], () => {
   font-size: var(--text-meta);
 }
 
-@media (max-width: 900px) {
+@media (min-width: 821px) and (max-width: 1080px) {
+  .index-banner__inner {
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    gap: 24px;
+  }
+
+  .index-label p {
+    writing-mode: horizontal-tb;
+    font-size: var(--text-meta);
+  }
+
+  .index-banner__copy h1 {
+    font-size: clamp(34px, 5.2vw, 54px);
+  }
+
+  .index-banner__copy > p {
+    max-width: 34em;
+  }
+
+  .index-banner__stats {
+    gap: 16px;
+  }
+
+  .index-banner__stats dd {
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 820px) {
   .index-banner__inner {
     grid-template-columns: 40px 1fr;
     gap: 22px;

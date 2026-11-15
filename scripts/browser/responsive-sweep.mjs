@@ -4,7 +4,9 @@ import { assertNoBrowserErrors, gotoStable, openBrowser, startPreview } from "./
 
 const outDir = process.env.SWEEP_DIR || "/tmp/lanze-responsive";
 const port = Number(process.env.SWEEP_PORT || 4361);
-const widths = [320, 360, 390, 414, 480, 560, 640, 768, 820, 900, 1024, 1280, 1440, 1920];
+// 821/901 are the layout breakpoints; sweep both sides so a mismatch between
+// the phone shell and the explore grid cannot slip through.
+const widths = [320, 360, 390, 414, 480, 560, 640, 768, 820, 821, 900, 901, 1024, 1280, 1440, 1920];
 const routes = ["/#/", "/#/explore", "/#/collection", "/#/compose", "/#/login"];
 
 const main = async () => {
@@ -23,6 +25,19 @@ const main = async () => {
         await page.waitForTimeout(140);
         const row = await page.evaluate(() => {
           const doc = document.documentElement;
+          const display = (selector) => {
+            const node = document.querySelector(selector);
+            return node ? getComputedStyle(node).display : null;
+          };
+          // The phone shell (bottom dock) and the explore filter bar must flip
+          // at the same breakpoint, otherwise 821-900px shows neither nav.
+          const mobileShell = display('.mobile-dock') !== 'none';
+          const mobileFilterBar = display('.mobile-filter-bar') !== 'none';
+          const visible = (selector) => {
+            const node = document.querySelector(selector);
+            if (!node) return null;
+            return getComputedStyle(node).display !== 'none';
+          };
           const overflowing = [...document.querySelectorAll('body *')]
             .filter((node) => {
               const rect = node.getBoundingClientRect();
@@ -35,6 +50,10 @@ const main = async () => {
             .map((node) => `${node.tagName.toLowerCase()}.${[...node.classList].slice(0, 2).join('.')}`);
           return {
             viewport: innerWidth,
+            shellMismatch: document.querySelector('.mobile-dock') && document.querySelector('.mobile-filter-bar')
+              ? mobileShell !== mobileFilterBar
+              : false,
+            audioVisible: visible('.audio-dock'),
             overflow: doc.scrollWidth - doc.clientWidth,
             overflowing,
             tightTargets: [...document.querySelectorAll('button, a, [role="button"]')]
@@ -65,7 +84,7 @@ const main = async () => {
     }
     assertNoBrowserErrors(errors);
     await writeFile(join(outDir, 'report.json'), JSON.stringify(report, null, 2));
-    const problems = report.filter((row) => row.overflow > 1);
+    const problems = report.filter((row) => row.overflow > 1 || row.shellMismatch);
     console.log(JSON.stringify({ ok: problems.length === 0, total: report.length, problems }, null, 2));
     if (problems.length) process.exitCode = 1;
   } finally {

@@ -50,7 +50,7 @@ const metaLine = computed(() => {
 <style scoped>
 .poem-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 40px;
+  grid-template-columns: minmax(0, 1fr) 44px;
   align-items: center;
   min-height: 78px;
   min-width: 0;
