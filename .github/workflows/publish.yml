@@ -46,10 +46,11 @@ jobs:
               --notes-file RELEASE_NOTES.md
           else
             echo "Release missing, creating"
+            # tag 已由 push 事件创建，不再传 --verify-tag/--target，避免二者与
+            # 刚推送的 tag 产生校验时序问题。
             gh release create "$TAG_NAME" \
               --title "$RELEASE_TITLE" \
-              --notes-file RELEASE_NOTES.md \
-              --verify-tag
+              --notes-file RELEASE_NOTES.md
           fi
           # gh release edit --title 在「tag 刚重建 / Release 刚由 create 生成」时
           # 可能不写入标题（实测仍显示 tag 名），改用 REST PATCH 显式设置。
