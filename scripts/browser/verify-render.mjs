@@ -46,15 +46,10 @@ const main = async () => {
         brandName: ".brand__name",
         brandLatin: ".brand__latin",
         brandMark: ".brand__mark",
-        audioDock: ".audio-dock",
       });
     }
 
     await gotoStable(page, `${preview.origin}/#/`);
-    await page.locator(".audio-dock__handle").click();
-    await page.waitForTimeout(400);
-    const localDock = join(outDir, "local-audio-expanded.png");
-    await captureElement(page, ".audio-dock", localDock, { padding: 6 });
 
     const localBrand = join(outDir, "local-brand.png");
     await gotoStable(page, `${preview.origin}/#/`);
@@ -78,7 +73,6 @@ const main = async () => {
       }
     }
     report.local.brand = localBrand;
-    report.local.audioExpanded = localDock;
 
     await gotoStable(page, `${preview.origin}/#/`);
     await page.locator(".legacy-card").scrollIntoViewIfNeeded();

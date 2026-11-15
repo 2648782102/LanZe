@@ -11,7 +11,6 @@
     </div>
     <SiteFooter v-if="!isBare" />
     <MobileDock v-if="!isBare" />
-    <AudioDock v-if="!isBare" />
     <NoticeHost />
   </div>
 </template>
@@ -22,7 +21,6 @@ import { useRoute } from "vue-router";
 import SiteHeader from "./components/SiteHeader.vue";
 import SiteFooter from "./components/SiteFooter.vue";
 import MobileDock from "./components/MobileDock.vue";
-import AudioDock from "./components/AudioDock.vue";
 import NoticeHost from "./components/NoticeHost.vue";
 
 const route = useRoute();

@@ -53,7 +53,6 @@ const main = async () => {
             shellMismatch: document.querySelector('.mobile-dock') && document.querySelector('.mobile-filter-bar')
               ? mobileShell !== mobileFilterBar
               : false,
-            audioVisible: visible('.audio-dock'),
             overflow: doc.scrollWidth - doc.clientWidth,
             overflowing,
             tightTargets: [...document.querySelectorAll('button, a, [role="button"]')]

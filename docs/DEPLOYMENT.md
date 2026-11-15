@@ -35,7 +35,7 @@
 - 项目站点地址为 `https://<owner>.github.io/<repo>/`；当前保留 hash 路由与相对资源 `base: './'`，首次部署后按下方清单实测。
 - 首次部署后用浏览器访问首页、刷新一个子路由、打开开发者工具确认静态资源没有 404。
 
-2026-11-07 实测记录：维护者在 Settings → Pages 启用 GitHub Actions 来源后，手动 workflow `42376966164` 在 head `6251b0d` success，`https://2648782102.github.io/LanZe/` 返回 200；入口 JS/CSS、`data/poetry/manifest.json` 与 `media/audio-manifest.json` 均返回 200。GitHub 仓库 Website 字段已改为同一 Pages URL 并经公开 API 回读。此结果只证明静态资源可访问与静态前端可渲染，不构成线上账号、托管后端、内容审核或维护者 SLA 承诺。
+2026-11-07 实测记录：维护者在 Settings → Pages 启用 GitHub Actions 来源后，手动 workflow `42376966164` 在 head `6251b0d` success，`https://2648782102.github.io/LanZe/` 返回 200；入口 JS/CSS 与 `data/poetry/manifest.json` 均返回 200。GitHub 仓库 Website 字段已改为同一 Pages URL 并经公开 API 回读。此结果只证明静态资源可访问与静态前端可渲染，不构成线上账号、托管后端、内容审核或维护者 SLA 承诺。
 
 2026-11-11 补充：此前 `pages.yml` 只有 `workflow_dispatch`，多次代码推送与 CI 成功后 Pages 仍停留在 11 月 7 日的旧 artifact；线上 `index.html` 的 `last-modified` 与入口资源哈希均未更新。手动 workflow `42874012307` 已基于 `7119087` 重新部署，回读线上入口 JS/CSS 与本地 `dist` 一致。随后 workflow 增加 `push: branches: [main]`，避免后续每次提交都需手动触发。
 
@@ -73,7 +73,7 @@ npm run build
 - 用 HTTPS 提供静态文件；不要把 `dist/` 提交进 Git。
 - 若 API 与前端不同源，后端需允许站点 Origin；优先同源 `/api/` 反向代理。
 - 缓存 `index.html` 时使用较短 TTL，静态资源可长缓存并带内容哈希。
-- 默认声景、封面、核心样式、WOFF2 字体子集与 SVG 图标均随构建产物本地分发；只有显式启用 `custom` 音源时，才需要把相应域加入 CSP 白名单，且不可达时的状态不会阻断业务页面。首页诗句源默认离线，不需要为它放宽 CSP；显式设置 `VITE_POETRY_SOURCE=remote` 时才需在 CSP 中允许 `VITE_POETRY_SOURCE_URL` 的 `connect-src`。
+- 核心样式、WOFF2 字体子集与 SVG 图标均随构建产物本地分发；首页诗句源默认离线，不需要为它放宽 CSP；显式设置 `VITE_POETRY_SOURCE=remote` 时才需在 CSP 中允许 `VITE_POETRY_SOURCE_URL` 的 `connect-src`。
 
 ## 7. 环境变量与构建矩阵
 
@@ -83,7 +83,6 @@ npm run build
 | `VITE_API_BASE_URL` | 可不填 | `https://api.example.com/` 或 `/api/` |
 | `VITE_API_TIMEOUT` | `4000` | 按后端响应时间调整 |
 | `VITE_POETRY_SOURCE` / `VITE_POETRY_SOURCE_URL` / `VITE_POETRY_SOURCE_TIMEOUT` | `false` / 空 / `4000`（完全离线） | 按服务条款选择默认或自建兼容接口，并配置对应 CSP |
-| `VITE_AUDIO_SOURCE` / `VITE_AUDIO_TRACKS` | `local` / 空 | `custom` 时填写已核验授权的公开音轨 JSON |
 
 平台构建时变量是在**构建阶段**注入，修改后需要重新构建。不同平台的环境（Production / Preview / Development）应分别配置；不要把生产 API 地址写进 Preview 的公开 demo，除非该 demo 也经过授权。
 

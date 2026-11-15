@@ -6,7 +6,7 @@
 
 - 历史基线共 42 次提交；首个提交 `74b4186`（2022-06-03）；v0.2.0 前无 Git tag。
 - 当前 `package.json` 脚本：`dev`、`build`、`preview`、`test`、`lint`；Vite `^6.4.5`，`"type": "module"`。
-- 当前源码形态：Vue 3 SFC + Vue Router 4 hash 模式 + 自有组件/CSS token + 原生 `fetch`；已移除旧 UI 套件、动画运行时、第三方播放器、Axios、Vue Cookies 与 Supabase JS 依赖。
+- 当前源码形态：Vue 3 SFC + Vue Router 4 hash 模式 + 自有组件/CSS token + 原生 `fetch`；已移除旧 UI 套件、动画运行时、音乐播放器、Axios、Vue Cookies 与 Supabase JS 依赖。
 - 当前没有随仓库附带的后端、数据库迁移、账号服务或可验证线上 Demo；默认数据源为浏览器本地演示数据。
 
 ## 2. 系统边界
@@ -47,7 +47,6 @@
 | `src/views/CollectionView.vue` | 我的诗卷：收藏、最近阅读、本地作品与资料 | 数据只存当前浏览器 |
 | `src/views/ComposeView.vue` | 写作台：草稿、实时预览与本地发布 | 未登录时重定向到登录 |
 | `src/views/AuthView.vue` | 登录与注册 | 表单校验、演示账号与本地会话 |
-| `src/components/AudioDock.vue` | 原生音频播放器 | 默认直连五首旧版外链曲目；支持播放列表、切轨、进度、音量与偏好记忆；无效自定义配置显示回退提示，不可达 URL 显示状态并允许重试 |
 | `src/apis/request.js` | 原生 `fetch` + 本地演示数据双通道请求函数 | 远端返回无效数据时自动降级并提示一次 |
 | `src/services/poetrySource.js` | 首页历史摘录卡的独立诗句源适配器 | 默认读取仓库内摘录与精校短句；显式开启后才请求随机诗句接口，失败或超时回退并显示来源状态 |
 | `src/apis/env.js` | 从 `src/config/runtime.js` 导出 `baseUrl` 与运行配置 | 不再硬编码后端地址 |
@@ -73,9 +72,9 @@
 
 登录/注册通过统一请求层调用本地演示 API；`useSession` 写入 Cookie。写作台先自动保存草稿，发布后写入 `lanze_demo_works`，再刷新诗库并回到「我的诗卷」。
 
-### 4.4 通知与音源
+### 4.4 通知
 
-`useNotices` 提供统一的成功、提示与错误反馈；`src/apis/request.js` 的远端降级提示也复用该通道。`AudioDock` 使用原生 `<audio>` 直连旧版外链曲库，提供播放列表、切轨、进度、音量与偏好记忆；无效自定义配置时给出回退提示，音源不可达时显示可复核状态并允许重试。
+`useNotices` 提供统一的成功、提示与错误反馈；`src/apis/request.js` 的远端降级提示也复用该通道。
 
 ### 4.5 登录/个人中心
 

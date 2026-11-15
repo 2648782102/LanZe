@@ -87,7 +87,7 @@ const probe = `(() => {
       const selectors = [
         '.legacy-card__hint', '.excerpt-source', '.legacy-card-status',
         '.auth-fineprint', '.compose-login-note', '.poem-disclaimer',
-        '.corpus-note', '.audio-dock__playlist > p', '.notice-host .notice',
+        '.corpus-note', '.notice-host .notice',
       ];
       return selectors.flatMap((selector) => {
         const nodes = [...document.querySelectorAll(selector)];

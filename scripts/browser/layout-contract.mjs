@@ -69,11 +69,11 @@ const measure = async (page) => page.evaluate(() => {
     }))
     .sort((a, b) => a.top - b.top);
 
-  // Content sitting under an opaque fixed layer would be unreadable. Only the
-  // floating audio dock and the mobile tab bar sit over page content; the
+  // Content sitting under an opaque fixed layer would be unreadable. The
+  // mobile tab bar is the only persistent element over page content; the
   // notice host is transient and the drawer scrim is intentional.
   const overlays = fixedLayers
-    .filter((layer) => /\.audio-dock|\.mobile-dock/.test(layer.selector))
+    .filter((layer) => /\.mobile-dock/.test(layer.selector))
     .map((layer) => layer.top);
   const highestOverlay = overlays.length ? Math.min(...overlays) : Number.POSITIVE_INFINITY;
   const footerLinks = [...document.querySelectorAll(".footer-links a")]
@@ -85,13 +85,11 @@ const measure = async (page) => page.evaluate(() => {
   const nav = document.querySelector(".main-nav");
   const mobileDock = document.querySelector(".mobile-dock");
   const filterBar = document.querySelector(".mobile-filter-bar");
-  const audioDock = document.querySelector(".audio-dock");
 
   const shells = {
     mobileDock: visible(mobileDock),
     desktopNav: visible(nav),
     mobileFilterBar: visible(filterBar),
-    audioDock: visible(audioDock),
   };
 
   const grid = (selector) => {
@@ -186,8 +184,7 @@ const main = async () => {
         continue;
       }
       if (before.shells?.mobileDock !== facts.shells.mobileDock
-        || before.shells?.mobileFilterBar !== facts.shells.mobileFilterBar
-        || before.shells?.audioDock !== facts.shells.audioDock) {
+        || before.shells?.mobileFilterBar !== facts.shells.mobileFilterBar) {
         drifted.push(`${key}: shell visibility changed`);
       }
       for (const [name, count] of Object.entries(facts.grids)) {

@@ -27,11 +27,6 @@ const forbiddenPatterns = [
     message: "避免全局悬浮层的高成本 backdrop-filter",
     excludeSelf: true,
   },
-  {
-    pattern: /lanze-demo\.wav|lanze-demo-cover\.svg/,
-    message: "默认声景应使用可复现生成的三段本地曲库",
-    excludeSelf: true,
-  },
 ];
 
 const isOwned = (relativePath) =>

@@ -8,6 +8,8 @@
 
 ### Changed
 
+- **移除音乐播放器**：删除 `AudioDock.vue`、`src/config/audio.js`、音频生成/校验/私人音源脚本、`public/media/` 下的示例音轨与封面、`docs/PRIVATE_AUDIO.md`，以及 `VITE_AUDIO_SOURCE` / `VITE_AUDIO_TRACKS` 配置与全部相关 E2E 断言。背景音乐播放器不提供核心价值，且默认外链存在授权与可用性风险，清理后站点不再发起任何音频请求；朗读功能基于 Web Speech API，与播放器无关，继续保留。
+
 - 移动端触控与详情页：新增 `npm run audit:touch`（6 路由 × 移动端，检测 <40px 触控目标）并接入 CI；修复页脚 GitHub/索引导航宽度不足，补 `min-width: 44px`。详情页 ≤820px 隐藏与正文重复的侧栏分类/作者、压缩侧栏内边距、actions 与返回同排并隐藏滚动条；登录页「一键填入」由下划线改为描边按钮，避免被误读为输入框边框。
 - 移动端做「取舍而非压缩」：≤820px 完全隐藏播放器（`display:none`），底部安全区 132→96px；探索页 hero 改单列、隐藏竖排标签与统计、说明限两行；诗卷页隐藏 hero 统计（与 tab 重复）、客态账号卡前移并压缩（隐藏「客」字、缩小标题与间距）；写作页隐藏预览面板、hero 压缩、说明文案隐藏；首页展品图比例 2.6→1.75 减轻过扁。Browser E2E 的播放器断言改为「移动端不显示」，并放宽安全区与预览断言；a11y 仍 0 违规、性能预算与 70 项响应式扫描全绿。
 - 修复摘录卡轻拂拖动失效：新增的 `.legacy-card__turn` 无障碍按钮本身是 `<button>`，而 `startSwipe` 里的 `event.target.closest("button")` 会连带把它排除，导致指针按下后不进入拖拽。改为只排除收藏按钮 `.legacy-card__save`；该按钮同时移除 `@click`，点击统一由卡片冒泡处理，避免双触发。复测：轻拂 4/4 在松手前切换、`doubleTurnCounts [1,1,1]`、0 掉帧。

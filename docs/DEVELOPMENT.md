@@ -34,7 +34,7 @@ npm run dev
 ```bash
 npm run dev                  # 开发服务器
 npm run build                # 生产构建，输出到 dist/
-npm run test                 # 48 个 node --test 单测
+npm run test                 # 42 个 node --test 单测
 npm run lint                 # 静态扫描失效后端地址、硬编码服务与脆弱引用
 npm run preview              # 预览构建产物
 npm run smoke                # 启动预览服务并检查首页与入口静态资源
@@ -89,7 +89,7 @@ VITE_USE_MOCK=true
 核对顺序：
 
 1. 打开 `package.json`，确认实际脚本名与 README/CI 一致。
-2. 打开 `src/config/runtime.js`、`src/config/poetrySource.js` 与 `src/config/audio.js`，确认 `VITE_API_BASE_URL`、`VITE_API_TIMEOUT`、`VITE_USE_MOCK`、`VITE_POETRY_SOURCE*` 与音源变量的解析规则；业务请求与会话分别使用 `src/apis/request.js` 和 `src/services/sessionCookies.js` 的原生实现。开放授权古筝素材仍可用 `npm run audio:generate && npm run audio:verify` 重建，但默认播放器走旧版外链。
+2. 打开 `src/config/runtime.js` 与 `src/config/poetrySource.js`，确认 `VITE_API_BASE_URL`、`VITE_API_TIMEOUT`、`VITE_USE_MOCK` 与 `VITE_POETRY_SOURCE*` 的解析规则；业务请求与会话分别使用 `src/apis/request.js` 和 `src/services/sessionCookies.js` 的原生实现。
 3. 打开 `src/apis/request.js`，确认远端优先、失败降级与提示逻辑。
 4. 搜索 `http://`、`https://` 与 `createClient(`，确认页面是否仍有绕过请求层的外部调用或外部素材。
 5. 若源码与文档不一致，以源码事实修文档；若属于现代化遗漏，开 issue 说明。
@@ -103,7 +103,7 @@ VITE_USE_MOCK=true
 - 行为：未配置业务 API 时，今日展厅使用 22 首精校短章；寻诗与读诗详情从 `public/data/poetry/` 按需加载 16 个分卷，共 9,328 篇 MIT 授权选段，合计 9,350 篇离线馆藏。首页摘录卡默认也只用本地摘录；显式开启 `VITE_POETRY_SOURCE=remote` 时才请求随机句接口，业务诗库不依赖它。
 - 演示数据不能包含真实用户、私人内容、生产密钥或未授权转载的全文数据集。
 - UI 应明确标注「演示数据」，并覆盖加载、空结果、请求失败三种状态。
-- 验收：断开外部业务 API 后首页、文库与搜索结果页仍可展示仓库内演示数据；播放器默认直连五首旧版外链曲目，冷启动收起、暂停且 `currentTime` 为 0，显式展开后切轨、进度、音量与偏好记忆可用，自定义音源不可达时不应导致业务功能白屏。
+- 验收：断开外部业务 API 后首页、文库与搜索结果页仍可展示仓库内演示数据。
 
 ### 方案 B：自建 API
 
@@ -121,8 +121,6 @@ VITE_USE_MOCK=true
 这些路径同时有本地演示实现，但不是已发布的稳定后端规范。自建服务应明确返回结构、状态码、CORS、限流、错误体与鉴权方式，并用 OpenAPI 或示例 JSON 固定契约。生产环境优先同源 `/api/` 代理，避免把任意第三方域暴露给浏览器。
 
 ### 方案 C：可选自定义音源
-
-播放器默认只请求 2022 版 `src/pages/Audio.vue` 使用的五首 `music.163.com` 外链与 `music.126.net` 封面，不下载音频文件；外链返回带签名的临时 CDN 地址，可能 404 或中止。`public/media/` 下仍保留三段 CC BY 3.0 古筝节选作为可离线重建的备用素材，`npm run audio:verify` 与静态冒烟核对它们的 WAV 头、时长、清单与 SHA-256。界面只使用自有 CSS/SVG 图标，冷启动为收起、静默的声景签；只有用户显式展开或播放后才进入完整声景卷，展开动作本身不调用 `play()`。完整态提供播放列表、切轨、自动续播、进度拖动、音量/静音与本机偏好记忆。只有设置 `VITE_AUDIO_SOURCE=custom` 并提供有效 `VITE_AUDIO_TRACKS` JSON 时才会启用自定义音源，其可用性、速率限制、内容授权与隐私政策由配置者负责。无效 JSON 或空列表自动回退到本地声景并显示一次可读提示；URL 不可达或播放失败时播放器显示「声景不可达」，点击播放按钮会重新加载并重试，业务页面保持可用。CI 不依赖第三方站点返回成功。逐项记录见 `docs/THIRD_PARTY_ASSETS.md`。
 
 ## 6. 开发约定
 
@@ -145,7 +143,7 @@ VITE_USE_MOCK=true
 - [ ] `npm run dev` 启动；浏览器控制台无新增 `Uncaught` / 404 静态资源错误。
 - [ ] `npm run build`、`npm run test`、`npm run lint` 成功。
 - [ ] 修改构建配置后，`npm run smoke` 成功。
-- [ ] 修改首页/摘录卡片/导航/播放器/登录/发布链路/路由后 `npm run smoke:browser` 成功。
+- [ ] 修改首页/摘录卡片/导航/登录/发布链路/路由后 `npm run smoke:browser` 成功。
 - [ ] 改动可见 UI 后跑 `npm run audit:a11y`、`npm run audit:perf`、`npm run audit:touch` 全部通过。
 - [ ] 改动动效后跑 `npm run audit:motion`（token 一致性 + 降级 + 按需加载）。
 - [ ] 改动移动端布局后跑 `npm run audit:layout`（CI 里真正生效的那一项），必要时再跑 `npm run audit:visual` 做像素核对。

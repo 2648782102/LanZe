@@ -29,7 +29,6 @@ RENDER_COMPARE=online npm run verify:render
 - `local-*.png`：本地关键页面
 - `online-today.png`、`online-brand.png`：线上真实渲染
 - `diff-brand.png`：像素差异图
-- `local-audio-expanded.png`：展开态播放器
 - 终端 JSON：几何坐标、对比 `ratio`、真实拖拽后的卡片/提示几何
 
 若线上与本地品牌区有像素差异、浏览器控制台报错、或非预期网络失败，脚本会非零退出。
@@ -48,7 +47,7 @@ RENDER_COMPARE=online npm run verify:render
 
 ## 与既有脚本的关系
 
-- `npm run smoke:browser`：业务链路、登录/发布/收藏/搜索/播放器/摘录卡契约。
+- `npm run smoke:browser`：业务链路、登录/发布/收藏/搜索/摘录卡契约。
 - `npm run inspect:spacing`：多路由间距探针，输出 `<8px` 的贴边项。
 - `npm run capture:brand`：品牌区局部截图（旧手写 CDP 工具，保留作快速核对）。
 - `npm run verify:render`：真实渲染、真实输入、线上/本地像素一致性与浏览器错误闭环。

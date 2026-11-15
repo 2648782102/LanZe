@@ -1,6 +1,6 @@
 {
   "note": "Font-independent layout facts; safe to compare across platforms.",
-  "updatedAt": "2026-11-15T09:23:13.198Z",
+  "updatedAt": "2026-11-15T15:34:31.379Z",
   "viewports": [
     320,
     390,
@@ -22,8 +22,7 @@
       "shells": {
         "mobileDock": true,
         "desktopNav": false,
-        "mobileFilterBar": false,
-        "audioDock": false
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -61,8 +60,7 @@
       "shells": {
         "mobileDock": true,
         "desktopNav": false,
-        "mobileFilterBar": false,
-        "audioDock": false
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -100,8 +98,7 @@
       "shells": {
         "mobileDock": true,
         "desktopNav": false,
-        "mobileFilterBar": false,
-        "audioDock": false
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -128,7 +125,7 @@
         "compose": null,
         "legacy": 2
       },
-      "minControlHeight": 40,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
         "footerLinks": 0
@@ -139,8 +136,7 @@
       "shells": {
         "mobileDock": false,
         "desktopNav": true,
-        "mobileFilterBar": false,
-        "audioDock": true
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -149,16 +145,10 @@
           "top": 0,
           "height": 900,
           "zIndex": 0
-        },
-        {
-          "selector": "aside.audio-dock.is-collapsed",
-          "top": 822,
-          "height": 60,
-          "zIndex": 70
         }
       ],
       "overlapped": {
-        "footerLinks": 2
+        "footerLinks": 0
       },
       "grids": {
         "index": null,
@@ -167,7 +157,7 @@
         "compose": null,
         "legacy": 2
       },
-      "minControlHeight": 34,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
         "footerLinks": 0
@@ -178,8 +168,7 @@
       "shells": {
         "mobileDock": false,
         "desktopNav": true,
-        "mobileFilterBar": false,
-        "audioDock": true
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -188,16 +177,10 @@
           "top": 0,
           "height": 900,
           "zIndex": 0
-        },
-        {
-          "selector": "aside.audio-dock.is-collapsed",
-          "top": 822,
-          "height": 60,
-          "zIndex": 70
         }
       ],
       "overlapped": {
-        "footerLinks": 2
+        "footerLinks": 0
       },
       "grids": {
         "index": null,
@@ -206,7 +189,7 @@
         "compose": null,
         "legacy": 2
       },
-      "minControlHeight": 34,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
         "footerLinks": 0
@@ -217,8 +200,7 @@
       "shells": {
         "mobileDock": true,
         "desktopNav": false,
-        "mobileFilterBar": true,
-        "audioDock": false
+        "mobileFilterBar": true
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -256,8 +238,7 @@
       "shells": {
         "mobileDock": true,
         "desktopNav": false,
-        "mobileFilterBar": true,
-        "audioDock": false
+        "mobileFilterBar": true
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -295,8 +276,7 @@
       "shells": {
         "mobileDock": true,
         "desktopNav": false,
-        "mobileFilterBar": true,
-        "audioDock": false
+        "mobileFilterBar": true
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -334,8 +314,7 @@
       "shells": {
         "mobileDock": false,
         "desktopNav": true,
-        "mobileFilterBar": false,
-        "audioDock": true
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -344,16 +323,10 @@
           "top": 0,
           "height": 900,
           "zIndex": 0
-        },
-        {
-          "selector": "aside.audio-dock.is-collapsed",
-          "top": 822,
-          "height": 60,
-          "zIndex": 70
         }
       ],
       "overlapped": {
-        "footerLinks": 2
+        "footerLinks": 0
       },
       "grids": {
         "index": 2,
@@ -362,7 +335,7 @@
         "compose": null,
         "legacy": null
       },
-      "minControlHeight": 34,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
         "footerLinks": 0
@@ -373,8 +346,7 @@
       "shells": {
         "mobileDock": false,
         "desktopNav": true,
-        "mobileFilterBar": false,
-        "audioDock": true
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -383,16 +355,10 @@
           "top": 0,
           "height": 900,
           "zIndex": 0
-        },
-        {
-          "selector": "aside.audio-dock.is-collapsed",
-          "top": 822,
-          "height": 60,
-          "zIndex": 70
         }
       ],
       "overlapped": {
-        "footerLinks": 2
+        "footerLinks": 0
       },
       "grids": {
         "index": 2,
@@ -401,7 +367,7 @@
         "compose": null,
         "legacy": null
       },
-      "minControlHeight": 34,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
         "footerLinks": 0
@@ -412,8 +378,7 @@
       "shells": {
         "mobileDock": true,
         "desktopNav": false,
-        "mobileFilterBar": false,
-        "audioDock": false
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -451,8 +416,7 @@
       "shells": {
         "mobileDock": true,
         "desktopNav": false,
-        "mobileFilterBar": false,
-        "audioDock": false
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -490,8 +454,7 @@
       "shells": {
         "mobileDock": true,
         "desktopNav": false,
-        "mobileFilterBar": false,
-        "audioDock": false
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -529,8 +492,7 @@
       "shells": {
         "mobileDock": false,
         "desktopNav": true,
-        "mobileFilterBar": false,
-        "audioDock": true
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -539,16 +501,10 @@
           "top": 0,
           "height": 900,
           "zIndex": 0
-        },
-        {
-          "selector": "aside.audio-dock.is-collapsed",
-          "top": 822,
-          "height": 60,
-          "zIndex": 70
         }
       ],
       "overlapped": {
-        "footerLinks": 2
+        "footerLinks": 0
       },
       "grids": {
         "index": null,
@@ -557,7 +513,7 @@
         "compose": null,
         "legacy": null
       },
-      "minControlHeight": 34,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
         "footerLinks": 0
@@ -568,8 +524,7 @@
       "shells": {
         "mobileDock": false,
         "desktopNav": true,
-        "mobileFilterBar": false,
-        "audioDock": true
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -578,16 +533,10 @@
           "top": 0,
           "height": 900,
           "zIndex": 0
-        },
-        {
-          "selector": "aside.audio-dock.is-collapsed",
-          "top": 822,
-          "height": 60,
-          "zIndex": 70
         }
       ],
       "overlapped": {
-        "footerLinks": 2
+        "footerLinks": 0
       },
       "grids": {
         "index": null,
@@ -596,7 +545,7 @@
         "compose": null,
         "legacy": null
       },
-      "minControlHeight": 34,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
         "footerLinks": 0
@@ -607,8 +556,7 @@
       "shells": {
         "mobileDock": true,
         "desktopNav": false,
-        "mobileFilterBar": false,
-        "audioDock": false
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -646,8 +594,7 @@
       "shells": {
         "mobileDock": true,
         "desktopNav": false,
-        "mobileFilterBar": false,
-        "audioDock": false
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -685,8 +632,7 @@
       "shells": {
         "mobileDock": true,
         "desktopNav": false,
-        "mobileFilterBar": false,
-        "audioDock": false
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -724,8 +670,7 @@
       "shells": {
         "mobileDock": false,
         "desktopNav": true,
-        "mobileFilterBar": false,
-        "audioDock": true
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -734,16 +679,10 @@
           "top": 0,
           "height": 900,
           "zIndex": 0
-        },
-        {
-          "selector": "aside.audio-dock.is-collapsed",
-          "top": 822,
-          "height": 60,
-          "zIndex": 70
         }
       ],
       "overlapped": {
-        "footerLinks": 2
+        "footerLinks": 0
       },
       "grids": {
         "index": null,
@@ -752,7 +691,7 @@
         "compose": null,
         "legacy": null
       },
-      "minControlHeight": 34,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
         "footerLinks": 0
@@ -763,8 +702,7 @@
       "shells": {
         "mobileDock": false,
         "desktopNav": true,
-        "mobileFilterBar": false,
-        "audioDock": true
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -773,16 +711,10 @@
           "top": 0,
           "height": 900,
           "zIndex": 0
-        },
-        {
-          "selector": "aside.audio-dock.is-collapsed",
-          "top": 822,
-          "height": 60,
-          "zIndex": 70
         }
       ],
       "overlapped": {
-        "footerLinks": 2
+        "footerLinks": 0
       },
       "grids": {
         "index": null,
@@ -791,7 +723,7 @@
         "compose": null,
         "legacy": null
       },
-      "minControlHeight": 34,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
         "footerLinks": 0
@@ -802,8 +734,7 @@
       "shells": {
         "mobileDock": true,
         "desktopNav": false,
-        "mobileFilterBar": false,
-        "audioDock": false
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -841,8 +772,7 @@
       "shells": {
         "mobileDock": true,
         "desktopNav": false,
-        "mobileFilterBar": false,
-        "audioDock": false
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -880,8 +810,7 @@
       "shells": {
         "mobileDock": true,
         "desktopNav": false,
-        "mobileFilterBar": false,
-        "audioDock": false
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -919,8 +848,7 @@
       "shells": {
         "mobileDock": false,
         "desktopNav": true,
-        "mobileFilterBar": false,
-        "audioDock": true
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -929,16 +857,10 @@
           "top": 0,
           "height": 900,
           "zIndex": 0
-        },
-        {
-          "selector": "aside.audio-dock.is-collapsed",
-          "top": 822,
-          "height": 60,
-          "zIndex": 70
         }
       ],
       "overlapped": {
-        "footerLinks": 2
+        "footerLinks": 0
       },
       "grids": {
         "index": null,
@@ -947,7 +869,7 @@
         "compose": 1,
         "legacy": null
       },
-      "minControlHeight": 34,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
         "footerLinks": 0
@@ -958,8 +880,7 @@
       "shells": {
         "mobileDock": false,
         "desktopNav": true,
-        "mobileFilterBar": false,
-        "audioDock": true
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -968,16 +889,10 @@
           "top": 0,
           "height": 900,
           "zIndex": 0
-        },
-        {
-          "selector": "aside.audio-dock.is-collapsed",
-          "top": 822,
-          "height": 60,
-          "zIndex": 70
         }
       ],
       "overlapped": {
-        "footerLinks": 2
+        "footerLinks": 0
       },
       "grids": {
         "index": null,
@@ -986,7 +901,7 @@
         "compose": 2,
         "legacy": null
       },
-      "minControlHeight": 34,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
         "footerLinks": 0
@@ -997,8 +912,7 @@
       "shells": {
         "mobileDock": false,
         "desktopNav": false,
-        "mobileFilterBar": false,
-        "audioDock": false
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -1030,8 +944,7 @@
       "shells": {
         "mobileDock": false,
         "desktopNav": false,
-        "mobileFilterBar": false,
-        "audioDock": false
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -1063,8 +976,7 @@
       "shells": {
         "mobileDock": false,
         "desktopNav": false,
-        "mobileFilterBar": false,
-        "audioDock": false
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -1096,8 +1008,7 @@
       "shells": {
         "mobileDock": false,
         "desktopNav": false,
-        "mobileFilterBar": false,
-        "audioDock": false
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
@@ -1129,8 +1040,7 @@
       "shells": {
         "mobileDock": false,
         "desktopNav": false,
-        "mobileFilterBar": false,
-        "audioDock": false
+        "mobileFilterBar": false
       },
       "shellConsistent": true,
       "fixedLayers": [
