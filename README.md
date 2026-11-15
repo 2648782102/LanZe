@@ -1,7 +1,7 @@
 # 兰泽诗词 · LanZe
 
 <p align="center">
-  <img src="public/og-image.svg" alt="兰泽诗词：以现代前端重新打开的古诗词社区界面" width="720" />
+  <img src="public/og-image.svg" alt="兰泽诗词：一间读诗、寻句、收卷的数字诗馆" width="720" />
 </p>
 
 <p align="center">
