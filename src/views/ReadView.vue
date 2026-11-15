@@ -691,6 +691,17 @@ onBeforeUnmount(() => {
     column-gap: 32px;
   }
 
+  /* 窄一些的桌面/平板横屏下，不再强撑整屏高，避免正文下方出现大片空白。 */
+  .gallery__room {
+    min-height: 0;
+    align-items: start;
+  }
+
+  .room-grid {
+    min-height: 0;
+    padding-block: 40px 44px;
+  }
+
   .poem-plinth h1 {
     font-size: clamp(42px, 6vw, 68px);
   }
