@@ -4,7 +4,7 @@
       <span class="poem-row__number">{{ index }}</span>
       <div class="poem-row__title">
         <h3>{{ poem.title }}</h3>
-        <p>{{ poem.dynasty || "未编年" }} · {{ poem.author }} · {{ poem.category }}</p>
+        <p>{{ metaLine }}</p>
       </div>
       <p class="poem-row__line">{{ firstLine }}</p>
       <AppIcon class="poem-row__arrow" name="arrow-right" :size="17" />
@@ -37,6 +37,14 @@ defineEmits(["toggle"]);
 const firstLine = computed(() =>
   props.poem.paragraph || props.poem.paragraphs?.[0] || props.poem.content || "正文待补",
 );
+
+// 朝代与体裁常来自同一字段，重复出现时只保留一次。
+const metaLine = computed(() => {
+  const parts = [props.poem.dynasty || "未编年", props.poem.author, props.poem.category]
+    .map((part) => (part || "").trim())
+    .filter(Boolean);
+  return [...new Set(parts)].join(" · ");
+});
 </script>
 
 <style scoped>

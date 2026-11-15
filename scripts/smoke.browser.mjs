@@ -936,6 +936,15 @@ const main = async () => {
   if (!mobileLayout.audioPaused) {
     throw new Error("Mobile audio dock should start silently");
   }
+  const rowMeta = await evaluate(`(() => {
+    const meta = document.querySelector('.poem-row__title p');
+    if (!meta) return null;
+    const parts = meta.textContent.split('·').map((part) => part.trim()).filter(Boolean);
+    return { parts, duplicated: new Set(parts).size !== parts.length };
+  })()`);
+  if (!rowMeta || rowMeta.duplicated) {
+    throw new Error(`Poem row meta repeats a facet: ${JSON.stringify(rowMeta)}`);
+  }
   const mobileSearchSize = await evaluate(
     "parseFloat(getComputedStyle(document.querySelector('#global-search')).fontSize)",
   );
@@ -1053,6 +1062,25 @@ const main = async () => {
   if (mobileCollection.scrollWidth > mobileCollection.viewportWidth + 1) {
     throw new Error("Mobile collection page overflows horizontally");
   }
+  await evaluate("window.scrollTo({ top: 0, behavior: 'instant' })");
+  await waitUntil("mobile toast", () => evaluate(`(() => {
+    const button = document.querySelector('.poem-row__save');
+    if (!button) return false;
+    button.click();
+    return true;
+  })()`).then(() => evaluate(`(() => {
+    const host = document.querySelector('.notice-host');
+    const dock = document.querySelector('.mobile-dock');
+    const header = document.querySelector('.museum-header');
+    if (!host || !dock || !header) return null;
+    const box = host.getBoundingClientRect();
+    if (!box.height) return null;
+    return {
+      height: Math.round(box.height),
+      clearsDock: box.bottom <= dock.getBoundingClientRect().top,
+      belowHeader: box.top >= header.getBoundingClientRect().bottom - 1,
+    };
+  })()`).then((value) => (value && value.height > 0 && value.height < 200 ? value : null))));
 
   await send("Page.navigate", { url: `${origin}/#/compose` });
   await waitUntil("guest compose form", () => evaluate("Boolean(document.querySelector('#poem-title'))"));

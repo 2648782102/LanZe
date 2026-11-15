@@ -28,13 +28,35 @@ const { notices, dismissNotice } = useNotices();
 .notice-host {
   position: fixed;
   right: max(24px, env(safe-area-inset-right));
-  bottom: 120px;
+  bottom: calc(24px + env(safe-area-inset-bottom));
   z-index: 120;
   display: grid;
+  align-content: end;
+  height: fit-content;
   gap: 8px;
   width: min(340px, calc(100vw - 48px - env(safe-area-inset-left) - env(safe-area-inset-right)));
   max-width: calc(100vw - 48px - env(safe-area-inset-left) - env(safe-area-inset-right));
   pointer-events: none;
+}
+
+@media (max-width: 820px) {
+  .notice-host {
+    inset: calc(var(--header-height) + 12px) max(14px, env(safe-area-inset-right)) auto max(14px, env(safe-area-inset-left));
+    align-content: start;
+    width: calc(100vw - 28px - env(safe-area-inset-left) - env(safe-area-inset-right));
+  }
+
+  .notice {
+    align-items: center;
+    gap: 10px;
+    padding: 8px 8px 8px 13px;
+    font-size: var(--text-meta);
+  }
+
+  .notice button {
+    width: 44px;
+    height: 44px;
+  }
 }
 
 .notice {
