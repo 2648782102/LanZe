@@ -570,8 +570,8 @@ onBeforeUnmount(() => {
 
 .exhibit-card__caption button {
   display: grid;
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   place-items: center;
   border: 1px solid var(--line-strong);
   border-radius: 50%;
