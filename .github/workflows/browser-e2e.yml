@@ -77,7 +77,16 @@ jobs:
         run: npm run audit:visual
 
       - name: Mobile layout contract
-        run: npm run audit:layout
+        run: npm run audit:layout | tee layout-contract-report.json
+
+      - name: Upload layout contract report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: layout-contract
+          path: layout-contract-report.json
+          retention-days: 7
+          if-no-files-found: ignore
 
       - name: Upload visual diffs
         if: always()

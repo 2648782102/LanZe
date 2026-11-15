@@ -1,6 +1,6 @@
 {
   "note": "Font-independent layout facts; safe to compare across platforms.",
-  "updatedAt": "2026-11-15T09:07:16.709Z",
+  "updatedAt": "2026-11-15T09:23:13.198Z",
   "viewports": [
     320,
     390,
@@ -41,8 +41,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": null,
@@ -51,11 +50,10 @@
         "compose": null,
         "legacy": 1
       },
-      "minControl": 42,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "read@390": {
@@ -82,8 +80,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": null,
@@ -92,11 +89,10 @@
         "compose": null,
         "legacy": 1
       },
-      "minControl": 42,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "read@820": {
@@ -123,8 +119,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": null,
@@ -133,11 +128,10 @@
         "compose": null,
         "legacy": 2
       },
-      "minControl": 40,
+      "minControlHeight": 40,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "read@821": {
@@ -164,8 +158,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": null,
@@ -174,11 +167,10 @@
         "compose": null,
         "legacy": 2
       },
-      "minControl": 30,
-      "minFontSize": 9,
+      "minControlHeight": 34,
+      "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "read@1280": {
@@ -205,8 +197,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": null,
@@ -215,11 +206,10 @@
         "compose": null,
         "legacy": 2
       },
-      "minControl": 30,
-      "minFontSize": 9,
+      "minControlHeight": 34,
+      "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "explore@320": {
@@ -246,8 +236,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": 1,
@@ -256,11 +245,10 @@
         "compose": null,
         "legacy": null
       },
-      "minControl": 36,
+      "minControlHeight": 40,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "explore@390": {
@@ -287,8 +275,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": 1,
@@ -297,11 +284,10 @@
         "compose": null,
         "legacy": null
       },
-      "minControl": 40,
+      "minControlHeight": 40,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "explore@820": {
@@ -328,8 +314,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": 1,
@@ -338,11 +323,10 @@
         "compose": null,
         "legacy": null
       },
-      "minControl": 40,
+      "minControlHeight": 40,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "explore@821": {
@@ -369,8 +353,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": 2,
@@ -379,11 +362,10 @@
         "compose": null,
         "legacy": null
       },
-      "minControl": 30,
-      "minFontSize": 9,
+      "minControlHeight": 34,
+      "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "explore@1280": {
@@ -410,8 +392,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": 2,
@@ -420,11 +401,10 @@
         "compose": null,
         "legacy": null
       },
-      "minControl": 30,
-      "minFontSize": 9,
+      "minControlHeight": 34,
+      "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "poem@320": {
@@ -451,8 +431,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": null,
@@ -461,11 +440,10 @@
         "compose": null,
         "legacy": null
       },
-      "minControl": 42,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "poem@390": {
@@ -492,8 +470,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": null,
@@ -502,11 +479,10 @@
         "compose": null,
         "legacy": null
       },
-      "minControl": 42,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "poem@820": {
@@ -533,8 +509,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": null,
@@ -543,11 +518,10 @@
         "compose": null,
         "legacy": null
       },
-      "minControl": 42,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "poem@821": {
@@ -574,8 +548,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": null,
@@ -584,11 +557,10 @@
         "compose": null,
         "legacy": null
       },
-      "minControl": 30,
-      "minFontSize": 9,
+      "minControlHeight": 34,
+      "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "poem@1280": {
@@ -615,8 +587,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": null,
@@ -625,11 +596,10 @@
         "compose": null,
         "legacy": null
       },
-      "minControl": 30,
-      "minFontSize": 9,
+      "minControlHeight": 34,
+      "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "collection@320": {
@@ -656,8 +626,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": null,
@@ -666,11 +635,10 @@
         "compose": null,
         "legacy": null
       },
-      "minControl": 42,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "collection@390": {
@@ -697,8 +665,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": null,
@@ -707,11 +674,10 @@
         "compose": null,
         "legacy": null
       },
-      "minControl": 42,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "collection@820": {
@@ -738,8 +704,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": null,
@@ -748,11 +713,10 @@
         "compose": null,
         "legacy": null
       },
-      "minControl": 42,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "collection@821": {
@@ -779,8 +743,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": null,
@@ -789,11 +752,10 @@
         "compose": null,
         "legacy": null
       },
-      "minControl": 30,
-      "minFontSize": 9,
+      "minControlHeight": 34,
+      "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "collection@1280": {
@@ -820,8 +782,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": null,
@@ -830,11 +791,10 @@
         "compose": null,
         "legacy": null
       },
-      "minControl": 30,
-      "minFontSize": 9,
+      "minControlHeight": 34,
+      "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "compose@320": {
@@ -861,8 +821,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": null,
@@ -871,11 +830,10 @@
         "compose": 1,
         "legacy": null
       },
-      "minControl": 42,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "compose@390": {
@@ -902,8 +860,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": null,
@@ -912,11 +869,10 @@
         "compose": 1,
         "legacy": null
       },
-      "minControl": 42,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "compose@820": {
@@ -943,8 +899,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": null,
@@ -953,11 +908,10 @@
         "compose": 1,
         "legacy": null
       },
-      "minControl": 42,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "compose@821": {
@@ -984,8 +938,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": null,
@@ -994,11 +947,10 @@
         "compose": 1,
         "legacy": null
       },
-      "minControl": 30,
-      "minFontSize": 9,
+      "minControlHeight": 34,
+      "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "compose@1280": {
@@ -1025,8 +977,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 2,
-        "footerCopy": true
+        "footerLinks": 2
       },
       "grids": {
         "index": null,
@@ -1035,11 +986,10 @@
         "compose": 2,
         "legacy": null
       },
-      "minControl": 30,
-      "minFontSize": 9,
+      "minControlHeight": 34,
+      "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "login@320": {
@@ -1060,8 +1010,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       },
       "grids": {
         "index": null,
@@ -1070,11 +1019,10 @@
         "compose": null,
         "legacy": null
       },
-      "minControl": 42,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "login@390": {
@@ -1095,8 +1043,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       },
       "grids": {
         "index": null,
@@ -1105,11 +1052,10 @@
         "compose": null,
         "legacy": null
       },
-      "minControl": 42,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "login@820": {
@@ -1130,8 +1076,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       },
       "grids": {
         "index": null,
@@ -1140,11 +1085,10 @@
         "compose": null,
         "legacy": null
       },
-      "minControl": 42,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "login@821": {
@@ -1165,8 +1109,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       },
       "grids": {
         "index": null,
@@ -1175,11 +1118,10 @@
         "compose": null,
         "legacy": null
       },
-      "minControl": 42,
+      "minControlHeight": 42,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     },
     "login@1280": {
@@ -1200,8 +1142,7 @@
         }
       ],
       "overlapped": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       },
       "grids": {
         "index": null,
@@ -1210,11 +1151,10 @@
         "compose": null,
         "legacy": null
       },
-      "minControl": 41,
+      "minControlHeight": 41,
       "minFontSize": 11,
       "footerOverlapAtBottom": {
-        "footerLinks": 0,
-        "footerCopy": false
+        "footerLinks": 0
       }
     }
   }
