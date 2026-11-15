@@ -836,6 +836,10 @@ watch([dynasty, genre], () => {
   color: var(--brass-text);
 }
 
+.facet__list button:active {
+  background: var(--porcelain-deep);
+}
+
 .facet__list button.is-active span {
   font-weight: 600;
 }

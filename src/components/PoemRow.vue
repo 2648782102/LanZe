@@ -71,6 +71,18 @@ const metaLine = computed(() => {
   transform: translateX(3px);
 }
 
+@media (hover: hover) {
+  .poem-row__main:active {
+    transform: translateX(1px);
+  }
+}
+
+@media (hover: none) {
+  .poem-row__main:active {
+    background: var(--porcelain-deep);
+  }
+}
+
 .poem-row__number {
   color: var(--brass-text);
   font-family: var(--font-number);
