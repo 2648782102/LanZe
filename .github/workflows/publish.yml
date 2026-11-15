@@ -32,6 +32,11 @@ jobs:
         run: |
           # RELEASE_NOTES.md 的首行就是 Release 标题，避免每次发版改 workflow。
           RELEASE_TITLE="$(head -n 1 RELEASE_NOTES.md | sed 's/^# *//')"
+          if [ -z "$RELEASE_TITLE" ]; then
+            echo "RELEASE_NOTES.md 首行没有可用标题" >&2
+            exit 1
+          fi
+          echo "Release title: $RELEASE_TITLE"
           if gh release view "$TAG_NAME" >/dev/null 2>&1; then
             gh release edit "$TAG_NAME" \
               --title "$RELEASE_TITLE" \
@@ -41,6 +46,12 @@ jobs:
               --title "$RELEASE_TITLE" \
               --notes-file RELEASE_NOTES.md \
               --verify-tag
+          fi
+          # 回读确认标题与正文都已落到线上，避免「工作流成功但页面没变」。
+          actual_title="$(gh release view "$TAG_NAME" --json name --jq .name)"
+          if [ "$actual_title" != "$RELEASE_TITLE" ]; then
+            echo "Release title mismatch: expected '$RELEASE_TITLE', got '$actual_title'" >&2
+            exit 1
           fi
 
       - name: Create or update welcome discussion
