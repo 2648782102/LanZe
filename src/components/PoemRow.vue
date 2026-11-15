@@ -127,8 +127,8 @@ const firstLine = computed(() =>
 
 .poem-row__save {
   display: grid;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   place-items: center;
   padding: 0;
   border: 0;

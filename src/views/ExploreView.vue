@@ -790,7 +790,7 @@ watch([dynasty, genre], () => {
 }
 
 .facet__head button {
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 4px;
   border: 0;
   background: transparent;
@@ -897,7 +897,7 @@ watch([dynasty, genre], () => {
 }
 
 .result-head__right button {
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 2px;
   border: 0;
   border-bottom: 1px solid var(--line-strong);
@@ -930,7 +930,7 @@ watch([dynasty, genre], () => {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  min-height: 40px;
+  min-height: 44px;
   padding: 7px 11px;
   border: 1px solid var(--line);
   background: var(--porcelain-panel);

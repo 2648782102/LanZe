@@ -404,7 +404,7 @@ onBeforeUnmount(() => {
 
 .compose-login-note a {
   display: inline-flex;
-  min-height: 40px;
+  min-height: 44px;
   align-items: center;
   color: var(--celadon-deep);
   text-decoration: underline;

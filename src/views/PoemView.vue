@@ -244,7 +244,8 @@ onMounted(loadCatalog);
 
 .breadcrumb a {
   display: inline-flex;
-  min-height: 40px;
+  min-height: 44px;
+  min-width: 44px;
   align-items: center;
 }
 
@@ -515,7 +516,7 @@ onMounted(loadCatalog);
 
 .related-section header a {
   display: inline-flex;
-  min-height: 40px;
+  min-height: 44px;
   align-items: center;
   gap: 7px;
   color: var(--ink-soft);
@@ -699,7 +700,7 @@ onMounted(loadCatalog);
     grid-column: 1;
     grid-row: 2;
     justify-self: start;
-    min-height: 40px;
+    min-height: 44px;
   }
 }
 </style>

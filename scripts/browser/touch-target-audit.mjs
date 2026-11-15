@@ -2,6 +2,9 @@ import { gotoStable, openBrowser, startPreview } from "./lab.mjs";
 
 const port = Number(process.env.TOUCH_PORT || 4393);
 const MIN = Number(process.env.TOUCH_MIN || 40);
+// Linux headless rounds layout edges down by a fraction of a pixel; keep a
+// tolerance so a 40px target does not fail at 39.99.
+const TOLERANCE = Number(process.env.TOUCH_TOLERANCE || 0.6);
 const routes = ["/#/", "/#/explore", "/#/collection", "/#/compose", "/#/login", "/#/poem/demo-chunxiao"];
 
 const main = async () => {
@@ -12,14 +15,14 @@ const main = async () => {
   try {
     for (const route of routes) {
       await gotoStable(page, `${preview.origin}${route}`);
-      const rows = await page.evaluate((min) => {
+      const rows = await page.evaluate(([min, tolerance]) => {
         const found = [];
         for (const node of document.querySelectorAll("button, a[href], input, summary, [role=button]")) {
           const box = node.getBoundingClientRect();
           if (!box.width || !box.height) continue;
           const style = getComputedStyle(node);
           if (style.visibility === "hidden" || style.display === "none") continue;
-          if (box.height < min || box.width < min) {
+          if (box.height < min - tolerance || box.width < min - tolerance) {
             found.push({
               label: `${node.tagName.toLowerCase()}.${[...node.classList].slice(0, 2).join(".")}`,
               text: (node.textContent || "").trim().slice(0, 12),
@@ -34,7 +37,7 @@ const main = async () => {
           seen.add(key);
           return true;
         });
-      }, MIN);
+      }, [MIN, TOLERANCE]);
       if (rows.length) problems.push({ route, rows });
     }
   } finally {
