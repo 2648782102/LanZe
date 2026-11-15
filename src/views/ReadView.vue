@@ -76,45 +76,23 @@
       </div>
     </section>
 
-    <section class="gallery__strips">
-      <div class="shell legacy-gallery">
-        <div class="legacy-gallery__card">
-          <ExcerptCard
-            v-if="stack.length"
-            :data-excerpt-queue-depth="depth"
-            :excerpt="stack[0]"
-            :upcoming-excerpts="stack.slice(1)"
-            :saved="stack[0].saved"
-            :disabled="status === 'loading'"
-            @toggle-save="toggleSavedExcerpt"
-            @needs-next="prepareRemote"
-            @settled="turn"
-          />
-          <p v-if="status === 'loading' && !stack.length" class="legacy-card-status" role="status">正在铺开诗笺……</p>
-          <p class="excerpt-source" aria-live="polite" :class="{ 'is-refreshing': status === 'loading' }">
-            {{ sourceLabel }}
-          </p>
-        </div>
-        <article class="strip-intro">
-          <p class="eyebrow">余韵 · 一则</p>
-          <h2>读完一首，<br />让句子再走一段。</h2>
-          <p>留一枚书签，收一句心动。题句、落款与扇舟小景，都留在这一方白纸里。</p>
-          <div class="strip-actions">
-            <router-link class="button" to="/explore">
-              进入诗词索引
-              <AppIcon name="arrow-right" :size="16" />
-            </router-link>
-          </div>
-        </article>
-      </div>
-    </section>
+    <ExcerptSection
+      :excerpt="stack[0] || null"
+      :upcoming="stack.slice(1)"
+      :depth="depth"
+      :loading="status === 'loading'"
+      :source-label="sourceLabel"
+      @toggle-save="toggleSavedExcerpt"
+      @needs-next="prepareRemote"
+      @settled="turn"
+    />
   </main>
 </template>
 
 <script setup>
 import { computed, onBeforeUnmount, ref } from "vue";
 import AppIcon from "../components/AppIcon.vue";
-import ExcerptCard from "../components/ExcerptCard.vue";
+import ExcerptSection from "../components/ExcerptSection.vue";
 import { useLibrary } from "../composables/useLibrary.js";
 import { useExcerptDeck } from "../composables/useExcerptDeck.js";
 import { notify } from "../composables/useNotices.js";
@@ -596,100 +574,6 @@ onBeforeUnmount(() => {
   transform: translateX(4px);
 }
 
-.gallery__strips {
-  position: relative;
-  z-index: 1;
-  border-top: 1px solid var(--line);
-  padding-bottom: 0;
-  background: rgba(232, 236, 229, 0.56);
-}
-
-.legacy-gallery {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: center;
-  gap: clamp(64px, 10vw, 160px);
-  /* 唯一的区块收尾留白；strips 不再另加 padding，避免叠加成大片空白。 */
-  padding-block: 56px 64px;
-}
-
-.legacy-gallery__card {
-  display: grid;
-  grid-column: 2;
-  grid-row: 1;
-  min-width: 0;
-  min-height: 652px;
-  place-items: center;
-}
-
-.legacy-card-status {
-  position: absolute;
-  z-index: 4;
-  margin: 0;
-  padding: 8px 10px;
-  background: rgba(251, 252, 249, 0.86);
-  color: var(--ink-faint);
-  font-family: var(--font-poem);
-  font-size: 14px;
-  letter-spacing: 0.12em;
-  writing-mode: vertical-rl;
-  pointer-events: none;
-}
-
-.strip-intro {
-  display: grid;
-  grid-column: 1;
-  grid-row: 1;
-  align-content: start;
-  justify-items: start;
-  gap: 18px;
-}
-
-.strip-intro h2 {
-  margin: 0;
-  font-family: var(--font-poem);
-  font-size: clamp(30px, 4vw, 48px);
-  font-weight: 400;
-  letter-spacing: 0.05em;
-  line-height: 1.35;
-  text-wrap: balance;
-}
-
-.strip-intro > p:not(.eyebrow) {
-  max-width: min(380px, var(--measure-copy));
-  margin: 0;
-  color: var(--ink-soft);
-  font-size: var(--text-body);
-  line-height: var(--leading-copy);
-  text-wrap: pretty;
-}
-
-.strip-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-}
-
-.strip-actions .button:disabled {
-  cursor: wait;
-  opacity: 0.56;
-}
-
-.excerpt-source {
-  align-self: end;
-  justify-self: center;
-  margin: 48px 0 0;
-  color: var(--ink-faint);
-  font-size: var(--text-meta);
-  letter-spacing: 0.12em;
-  transition: opacity var(--motion-fast) var(--ease-standard);
-}
-
-.excerpt-source.is-refreshing {
-  opacity: 0.45;
-}
-
 @media (max-width: 1000px) {
   .room-grid {
     grid-template-columns: minmax(0, 1fr) 250px;
@@ -735,87 +619,6 @@ onBeforeUnmount(() => {
     padding-block: 28px 52px;
   }
 
-  @media (max-width: 768px) {
-    .poem-plinth {
-      min-height: 0;
-    }
-
-    .gallery__room {
-      min-height: 0;
-      align-items: start;
-      padding-bottom: 24px;
-    }
-
-    .room-grid {
-      gap: 24px;
-      padding-block: 12px 24px;
-    }
-  }
-
-  .poem-plinth h1 {
-    font-size: clamp(40px, 10vw, 66px);
-  }
-
-  .poem-plinth h1.title-length--medium {
-    font-size: clamp(34px, 8.6vw, 56px);
-  }
-
-  .poem-plinth h1.title-length--long {
-    font-size: clamp(27px, 6.8vw, 42px);
-  }
-
-  .poem-plinth h1.title-length--long span + span {
-    padding-left: 0.35em;
-  }
-
-  .exhibit-card {
-    justify-self: stretch;
-    width: 100%;
-  }
-
-  .exhibit-card__caption {
-    padding-right: 108px;
-  }
-
-  .exhibit-card__frame img {
-    aspect-ratio: 1.5;
-  }
-
-  .legacy-gallery {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 40px;
-    padding-block: 58px 72px;
-  }
-
-  .legacy-gallery__card {
-    grid-column: 2;
-    grid-row: 1;
-    min-height: 590px;
-  }
-
-  .strip-intro {
-    grid-column: 1;
-    grid-row: 1;
-    max-width: 560px;
-  }
-
-  @media (max-width: 768px) {
-    .legacy-gallery {
-      grid-template-columns: 1fr;
-      gap: 44px;
-      padding-block: 44px 56px;
-    }
-
-    .legacy-gallery__card,
-    .strip-intro {
-      grid-column: 1;
-      grid-row: auto;
-    }
-
-    .legacy-gallery__card {
-      min-height: 0;
-    }
-  }
 }
 
 @media (max-width: 560px) {
@@ -901,33 +704,6 @@ onBeforeUnmount(() => {
     grid-column: 1 / -1;
   }
 
-  .legacy-gallery {
-    grid-template-columns: 1fr;
-    gap: 44px;
-    padding-block: 40px 48px;
-  }
-
-  .legacy-gallery__card {
-    grid-column: 1;
-    grid-row: 1;
-    min-height: 570px;
-  }
-
-  .strip-intro {
-    grid-column: 1;
-    grid-row: 2;
-    max-width: none;
-    gap: 13px;
-  }
-
-  .strip-intro h2 {
-    font-size: 30px;
-  }
-
-  .strip-intro > p:not(.eyebrow) {
-    font-size: var(--text-note);
-    line-height: 1.8;
-  }
 }
 
 @media (max-width: 380px) {
@@ -947,16 +723,5 @@ onBeforeUnmount(() => {
     padding-inline: 10px;
   }
 
-  .legacy-gallery__card {
-    min-height: 550px;
-  }
-
-  .strip-actions {
-    gap: 8px;
-  }
-
-  .strip-actions .button {
-    padding-inline: 12px;
-  }
 }
 </style>
