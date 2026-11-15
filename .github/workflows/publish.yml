@@ -38,11 +38,14 @@ jobs:
             exit 1
           fi
           echo "Release title: $RELEASE_TITLE"
+          # 注意：set -e 下不能用 if gh ... 的判断形式之外再让失败命令逃逸。
           if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            echo "Release exists, updating"
             gh release edit "$TAG_NAME" \
               --title "$RELEASE_TITLE" \
               --notes-file RELEASE_NOTES.md
           else
+            echo "Release missing, creating"
             gh release create "$TAG_NAME" \
               --title "$RELEASE_TITLE" \
               --notes-file RELEASE_NOTES.md \
@@ -50,7 +53,10 @@ jobs:
           fi
           # gh release edit --title 在「tag 刚重建 / Release 刚由 create 生成」时
           # 可能不写入标题（实测仍显示 tag 名），改用 REST PATCH 显式设置。
-          release_id="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG_NAME" --jq .id)"
+          if ! release_id="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG_NAME" --jq .id)"; then
+            echo "创建 Release 后仍按 tag 查询不到，检查 gh release create 的输出" >&2
+            exit 1
+          fi
           jq -n --arg name "$RELEASE_TITLE" --rawfile body RELEASE_NOTES.md \
             '{name: $name, body: $body}' \
             | gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/$release_id" --input -
