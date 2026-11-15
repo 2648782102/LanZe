@@ -342,7 +342,12 @@ const main = async () => {
   await send("Page.navigate", { url: `${origin}/#/` });
   await waitUntil("today's reading view", () => evaluate("Boolean(document.querySelector('.poem-plinth'))"));
   await waitUntil("excerpt source settled", () => evaluate(
-    "Boolean(document.querySelector('.legacy-card')) && !document.querySelector('.button--quiet[aria-label=\"换一句今日摘录\"]')?.disabled",
+    `(() => {
+      const card = document.querySelector('.legacy-card');
+      if (!card || card.getAttribute('aria-label')?.includes('载入')) return false;
+      const turn = card.querySelector('.legacy-card__turn');
+      return Boolean(turn && !turn.disabled);
+    })()`,
   ), 60);
 
   const home = await evaluate(`(() => ({

@@ -83,7 +83,6 @@
       <div class="shell legacy-gallery">
         <div class="legacy-gallery__card">
           <ExcerptCard
-            ref="excerptCardRef"
             v-if="stack.length"
             :data-excerpt-queue-depth="depth"
             :excerpt="stack[0]"
@@ -95,30 +94,20 @@
             @settled="turn"
           />
           <p v-if="status === 'loading' && !stack.length" class="legacy-card-status" role="status">正在铺开诗笺……</p>
+          <p class="excerpt-source" aria-live="polite" :class="{ 'is-refreshing': status === 'loading' }">
+            {{ sourceLabel }}
+          </p>
         </div>
         <article class="strip-intro">
           <p class="eyebrow">余韵 · 一则</p>
           <h2>读完一首，<br />让句子再走一段。</h2>
-          <p>留一枚书签，收一句心动。轻拂或点击卡片，便可换一页诗笺；题句、落款与扇舟小景，都留在这一方白纸里。</p>
+          <p>留一枚书签，收一句心动。题句、落款与扇舟小景，都留在这一方白纸里。</p>
           <div class="strip-actions">
             <router-link class="button" to="/explore">
               进入诗词索引
               <AppIcon name="arrow-right" :size="16" />
             </router-link>
-            <button
-              class="button button--quiet"
-              type="button"
-              aria-label="换一句今日摘录"
-              :disabled="status === 'loading'"
-              @click="excerptCardRef?.turn()"
-            >
-              <AppIcon name="chevron-right" :size="15" />
-              换一句
-            </button>
           </div>
-          <p class="excerpt-source" aria-live="polite" :class="{ 'is-refreshing': status === 'loading' }">
-            {{ sourceLabel }}
-          </p>
         </article>
       </div>
     </section>
@@ -159,7 +148,6 @@ const dateLabel = new Intl.DateTimeFormat("zh-CN", {
 const dayIndex = Math.floor(Date.now() / 86400000);
 const featured = getFeaturedPoems();
 const page = ref(dayIndex % featured.length);
-const excerptCardRef = ref(null);
 const isSwitching = ref(false);
 const isSpeaking = ref(false);
 const savePulse = ref(false);
@@ -687,7 +675,7 @@ onBeforeUnmount(() => {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px 12px;
+  gap: 12px;
 }
 
 .strip-actions .button:disabled {
@@ -696,7 +684,9 @@ onBeforeUnmount(() => {
 }
 
 .excerpt-source {
-  margin: -6px 0 0;
+  align-self: end;
+  justify-self: center;
+  margin: 48px 0 0;
   color: var(--ink-faint);
   font-size: var(--text-meta);
   letter-spacing: 0.12em;

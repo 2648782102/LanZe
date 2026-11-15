@@ -64,7 +64,7 @@
       <span class="legacy-card__gesture-dot"></span>
     </div>
 
-    <p class="legacy-card__hint" aria-hidden="true">点击或轻拂换一句</p>
+    <p class="legacy-card__hint" aria-hidden="true">轻拂卡片，换一句</p>
   </article>
 </template>
 
