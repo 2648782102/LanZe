@@ -47,6 +47,10 @@ jobs:
               --notes-file RELEASE_NOTES.md \
               --verify-tag
           fi
+          # tag 刚重建时 GitHub 可能先用 tag 名作标题，这里再收敛一次。
+          gh release edit "$TAG_NAME" \
+            --title "$RELEASE_TITLE" \
+            --notes-file RELEASE_NOTES.md
           # 回读确认标题与正文都已落到线上，避免「工作流成功但页面没变」。
           actual_title="$(gh release view "$TAG_NAME" --json name --jq .name)"
           if [ "$actual_title" != "$RELEASE_TITLE" ]; then
