@@ -112,8 +112,8 @@ picture {
   transform: translateY(-100%);
   opacity: 0;
   transition:
-    transform 0.85s cubic-bezier(0.165, 0.84, 0.44, 1),
-    opacity 0.2s ease;
+    transform var(--motion-cinematic) var(--ease-out),
+    opacity var(--motion-base) var(--ease-standard);
   content: "";
   pointer-events: none;
 }

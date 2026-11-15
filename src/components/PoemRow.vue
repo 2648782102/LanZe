@@ -1,5 +1,5 @@
 <template>
-  <article class="poem-row">
+  <article class="poem-row" :style="entranceStyle">
     <router-link class="poem-row__main" :to="{ name: 'poem', params: { id: poem.id } }">
       <span class="poem-row__number">{{ index }}</span>
       <div class="poem-row__title">
@@ -30,6 +30,13 @@ const props = defineProps({
   poem: { type: Object, required: true },
   saved: { type: Boolean, default: false },
   index: { type: String, default: "—" },
+  order: { type: Number, default: 0 },
+});
+
+// 列表按序错开入场；超过上限后统一延迟，避免长列表末尾等待过久。
+const entranceStyle = computed(() => {
+  const step = Math.min(props.order, 8);
+  return { "--row-delay": `calc(var(--motion-stagger) * ${step})` };
 });
 
 defineEmits(["toggle"]);
@@ -60,6 +67,14 @@ const metaLine = computed(() => {
   min-height: 78px;
   min-width: 0;
   border-bottom: 1px solid var(--line);
+  animation: row-arrive var(--motion-base) var(--ease-out) backwards;
+  animation-delay: var(--row-delay, 0ms);
+}
+
+@keyframes row-arrive {
+  from {
+    transform: translate3d(0, 6px, 0);
+  }
 }
 
 .poem-row__main {

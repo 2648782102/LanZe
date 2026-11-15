@@ -199,12 +199,13 @@
             </button>
           </div>
 
-          <div v-if="result.items.length" class="poem-list">
+          <div v-if="result.items.length" :key="`${result.page}-${dynasty}-${genre}-${query}`" class="poem-list">
             <PoemRow
               v-for="(poem, index) in result.items"
               :key="poem.id"
               :poem="poem"
               :index="rowNumber(index)"
+              :order="index"
               :saved="isSaved(poem.id)"
               @toggle="savePoem"
             />
@@ -281,6 +282,7 @@ import {
   queryCatalog,
 } from "../composables/useLibrary.js";
 import { notify } from "../composables/useNotices.js";
+import { springIn } from "../composables/useSpringMotion.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -447,8 +449,18 @@ watch(filtersOpen, (open) => {
     lastFocused.value = document.activeElement;
     window.requestAnimationFrame(() => {
       document.querySelector(".filter-wall.is-open .filter-wall__head button")?.focus({ preventScroll: true });
+      // 抽屉从下方带一点过冲抬起，比线性上滑更有「实体面板」的重量感。
+      // motion 在这里按需加载；reduced-motion 时退回 CSS 动画。
+      springIn(document.querySelector(".filter-wall.is-open"), {
+        y: [22, 0],
+        opacity: [0, 1],
+      }, { duration: 0.34 });
     });
   } else {
+    const panel = document.querySelector(".filter-wall");
+    panel?.classList.remove("is-spring-driven");
+    panel?.style.removeProperty("transform");
+    panel?.style.removeProperty("opacity");
     lastFocused.value?.focus?.({ preventScroll: true });
     lastFocused.value = null;
   }
@@ -1296,7 +1308,12 @@ watch([dynasty, genre], () => {
 
   .filter-wall.is-open {
     display: grid;
-    animation: drawer-rise 260ms cubic-bezier(0.22, 0.61, 0.24, 1);
+    /* 弹簧动效由 motion 按需接管；这里只保留 CSS 兜底（含 reduced-motion）。 */
+    animation: drawer-rise var(--motion-base) var(--ease-out);
+  }
+
+  .filter-wall.is-open.is-spring-driven {
+    animation: none;
   }
 
   @keyframes drawer-rise {

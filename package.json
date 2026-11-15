@@ -28,6 +28,7 @@
     "audit:visual:update": "node scripts/browser/visual-baseline.mjs --update",
     "audit:layout": "node scripts/browser/layout-contract.mjs",
     "audit:layout:update": "node scripts/browser/layout-contract.mjs --update",
+    "audit:motion": "node scripts/browser/motion-audit.mjs",
     "audit:touch": "node scripts/browser/touch-target-audit.mjs"
   },
   "engines": {
@@ -35,6 +36,7 @@
     "npm": ">=10"
   },
   "dependencies": {
+    "motion": "^12.43.0",
     "vue": "^3.5.45",
     "vue-router": "^4.6.4"
   },

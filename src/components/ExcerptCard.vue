@@ -80,7 +80,8 @@ const props = defineProps({
 });
 const emit = defineEmits(["toggle-save", "needs-next", "settled"]);
 
-const FLING_DURATION = 460;
+// 与 --motion-cinematic 对齐：翻页是叙事动作，允许比常规过渡更长。
+const FLING_DURATION = 560;
 const SWIPE_COMMIT = 42;
 const SWIPE_VELOCITY = 420;
 const DRAG_DAMPING = 0.55;
@@ -139,7 +140,7 @@ const layerStyle = (index) => {
     return {
       transform: `translate3d(${dragX.value.toFixed(2)}px, 0, 0) rotate(${dragRot.value.toFixed(2)}deg)`,
       transition: dragDuration.value > 0
-        ? `transform ${dragDuration.value}ms cubic-bezier(0.22, 1, 0.36, 1)`
+        ? `transform ${dragDuration.value}ms var(--ease-out)`
         : "none",
     };
   }
@@ -164,7 +165,7 @@ const resetDrag = () => {
 };
 
 const springBack = () => {
-  dragDuration.value = 260;
+  dragDuration.value = 220;
   dragX.value = 0;
   dragRot.value = 0;
 };
@@ -334,7 +335,7 @@ onBeforeUnmount(() => {
   --legacy-scale: 1;
   --legacy-gutter: 12%;
   --swipe-progress: 0;
-  --fling-duration: 460ms;
+  --fling-duration: var(--motion-cinematic);
   position: relative;
   width: min(100%, 330px);
   margin-inline: auto;
@@ -399,13 +400,13 @@ onBeforeUnmount(() => {
   z-index: 4;
   transform-origin: 50% 90%;
   animation-name: lanze-fling-away;
-  animation-timing-function: cubic-bezier(0.32, 0, 0.67, 0);
+  animation-timing-function: var(--ease-exit);
   animation-fill-mode: forwards;
 }
 
 .legacy-card__stack :deep(.legacy-card__box.is-promoting) {
   animation-duration: var(--fling-duration);
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-timing-function: var(--ease-out);
   animation-fill-mode: both;
 }
 
@@ -521,7 +522,7 @@ onBeforeUnmount(() => {
   opacity: calc(var(--swipe-progress) * 0.9);
   transform: scaleX(var(--swipe-progress));
   transform-origin: left center;
-  transition: opacity 120ms ease-out, transform 120ms ease-out;
+  transition: opacity var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
 }
 
 .legacy-card[data-direction="left"] .legacy-card__gesture-ink {
@@ -539,7 +540,7 @@ onBeforeUnmount(() => {
   background: rgba(255, 255, 255, 0.86);
   opacity: calc(var(--swipe-progress) * 0.8);
   transform: translate(-50%, -50%);
-  transition: opacity 120ms ease-out;
+  transition: opacity var(--motion-fast) var(--ease-out);
 }
 
 .legacy-card[data-direction="left"] .legacy-card__gesture-dot {

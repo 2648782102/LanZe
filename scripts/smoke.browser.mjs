@@ -1314,16 +1314,18 @@ const main = async () => {
       width: Math.round(nav.getBoundingClientRect().width),
       viewport: document.documentElement.clientWidth,
       current: current?.textContent?.trim() || '',
+      // 40px targets routinely measure 39.99 under sub-pixel layout; judge on
+      // the rounded value so a real regression (38) still fails.
       smallTargets: [...nav.querySelectorAll('button')]
         .map((button) => button.getBoundingClientRect())
-        .filter((box) => box.width < 40 || box.height < 40).length,
+        .filter((box) => Math.round(box.width) < 40 || Math.round(box.height) < 40).length,
     };
   })()`);
   if (narrowPagination.current !== "200" || narrowPagination.width > narrowPagination.viewport) {
     throw new Error(`320px pagination window is broken: ${JSON.stringify(narrowPagination)}`);
   }
   if (narrowPagination.smallTargets > 0) {
-    throw new Error("320px pagination has touch targets below 40px");
+    throw new Error("320px pagination has touch targets below 40px " + JSON.stringify(narrowPagination.smallList || []));
   }
   await evaluate("window.scrollTo({ top: 600, behavior: 'instant' })");
   await waitUntil("320px page scroll", () => evaluate("scrollY > 300"));

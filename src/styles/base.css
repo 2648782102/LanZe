@@ -73,11 +73,24 @@
   --radius-md: 14px;
   --shell: min(1240px, calc(100vw - 72px));
   --header-height: 78px;
-  --motion-fast: 140ms;
-  --motion-base: 220ms;
-  --motion-slow: 560ms;
-  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
-  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /*
+   * 动效节奏：四档时长 + 三条语义曲线。
+   * 收敛成有限集合后，界面之间的「快慢感」才会一致；新增动效请复用这些
+   * 变量，不要再手写毫秒数或新的 cubic-bezier。
+   */
+  --motion-fast: 140ms;      /* 反馈：hover、按下、勾选 */
+  --motion-base: 220ms;      /* 过渡：展开、切换、位移 */
+  --motion-slow: 380ms;      /* 进场：区块、卡片出现 */
+  --motion-cinematic: 560ms; /* 叙事：翻页、甩出、诗笺离场 */
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);      /* 进场：快起慢收，有落点 */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);   /* 状态变化：对称，不抢戏 */
+  --ease-exit: cubic-bezier(0.32, 0, 0.67, 0);     /* 离场：加速消失，不拖尾 */
+
+  /* 编排用的间隔与最大延迟数量，避免列表过长时入场拖沓。 */
+  --motion-stagger: 45ms;
+  --motion-stagger-max: 8;
 }
 
 * {

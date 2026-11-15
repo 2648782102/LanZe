@@ -512,7 +512,7 @@ onBeforeUnmount(() => {
   align-self: center;
   justify-self: end;
   width: min(100%, 320px);
-  animation: exhibit-arrive var(--motion-slow) var(--ease-out) 80ms both;
+  animation: exhibit-arrive var(--motion-slow) var(--ease-out) var(--motion-stagger) both;
 }
 
 @keyframes exhibit-arrive {

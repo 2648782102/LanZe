@@ -79,6 +79,9 @@ jobs:
       - name: Mobile layout contract
         run: npm run audit:layout | tee layout-contract-report.json
 
+      - name: Motion audit (tokens, reduced-motion, lazy load)
+        run: npm run audit:motion
+
       - name: Upload layout contract report
         if: always()
         uses: actions/upload-artifact@v4

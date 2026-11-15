@@ -57,6 +57,7 @@
                 :key="poem.id"
                 :poem="poem"
                 :index="String(index + 1).padStart(2, '0')"
+                :order="index"
                 :saved="true"
                 @toggle="removeSaved"
               />
@@ -78,6 +79,7 @@
                 :key="poem.id"
                 :poem="poem"
                 :index="String(index + 1).padStart(2, '0')"
+                :order="index"
                 :saved="isSaved(poem.id)"
                 @toggle="toggleSavedPoem"
               />
