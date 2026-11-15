@@ -1095,6 +1095,9 @@ watch([dynasty, genre], () => {
 
   .mobile-filter-bar {
     display: block;
+    position: sticky;
+    top: var(--header-height);
+    z-index: 4;
     border-bottom: 1px solid var(--line);
     background: var(--porcelain-panel);
   }
@@ -1105,9 +1108,6 @@ watch([dynasty, genre], () => {
     justify-content: space-between;
     gap: 14px;
     min-height: 56px;
-    position: sticky;
-    top: var(--header-height);
-    z-index: 4;
   }
 
   .mobile-filter-bar button {

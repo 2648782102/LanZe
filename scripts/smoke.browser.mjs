@@ -936,6 +936,19 @@ const main = async () => {
   if (!mobileLayout.audioPaused) {
     throw new Error("Mobile audio dock should start silently");
   }
+  await evaluate("window.scrollTo({ top: 700, behavior: 'instant' })");
+  await waitUntil("mobile filter bar pinned", () => evaluate(`(() => {
+    const bar = document.querySelector('.mobile-filter-bar');
+    const header = document.querySelector('.museum-header');
+    if (!bar || !header) return false;
+    const barTop = bar.getBoundingClientRect().top;
+    const headerBottom = header.getBoundingClientRect().bottom;
+    return window.scrollY > 300 && Math.abs(barTop - headerBottom) < 3;
+  })()`));
+  await evaluate("window.scrollTo({ top: 0, behavior: 'instant' })");
+  await waitUntil("mobile filter bar released", () => evaluate(
+    "window.scrollY === 0 && document.querySelector('.mobile-filter-bar').getBoundingClientRect().top > 100",
+  ));
   if (!await evaluate(`(() => {
     const button = document.querySelector('.mobile-filter-bar button');
     if (!button) return false;
