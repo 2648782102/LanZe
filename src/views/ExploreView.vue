@@ -268,144 +268,104 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import AppIcon from "../components/AppIcon.vue";
 import PoemRow from "../components/PoemRow.vue";
 import EmptyState from "../components/EmptyState.vue";
 import {
-  getLibraryFacets,
-  getLibraryStats,
   useLibrary,
-  useCatalogVersion,
   loadCatalog,
-  queryCatalog,
 } from "../composables/useLibrary.js";
+import { useExploreQuery } from "../composables/useExploreQuery.js";
 import { notify } from "../composables/useNotices.js";
 import { springIn } from "../composables/useSpringMotion.js";
 
-const route = useRoute();
-const router = useRouter();
 const { isSaved, toggleSaved, catalogError, loading: catalogLoading } = useLibrary();
-const catalogVersion = useCatalogVersion();
+const {
+  draftQuery,
+  query,
+  dynasty,
+  genre,
+  stats,
+  dynasties,
+  genres,
+  result,
+  hasFilters,
+  activeFilterCount,
+  resultHeading,
+  resultSummary,
+  rowNumber,
+  pageWindow,
+  submitSearch: rawSubmitSearch,
+  pickHint: rawPickHint,
+  enterPath: rawEnterPath,
+  clearSearch: rawClearSearch,
+  selectFacet,
+  resetFacet,
+  resetFilters: rawResetFilters,
+  goToPage: rawGoToPage,
+  isPathActive,
+} = useExploreQuery();
+
 const hints = ["月亮", "李白", "宋词", "春天", "关雎"];
 const poemPaths = [
   { index: "一", label: "月与夜", note: "明月、夜色与独坐", keyword: "月", genre: "全部" },
   { index: "二", label: "春与归", note: "春风、花开与归程", keyword: "春", genre: "全部" },
   { index: "三", label: "宋词小令", note: "从短句进入词牌", keyword: "", genre: "宋词" },
 ];
-const pageSize = 24;
+
 const filtersOpen = ref(false);
 const lastFocused = ref(null);
 
-const stats = computed(() => ({ ...getLibraryStats(), version: catalogVersion.value }));
-const facets = computed(() => ({ ...getLibraryFacets(), version: catalogVersion.value }));
-const draftQuery = ref(String(route.query.q || ""));
-const query = ref(String(route.query.q || ""));
-const dynasty = ref(String(route.query.dynasty || "全部"));
-const genre = ref(String(route.query.genre || route.query.category || "全部"));
-const page = ref(Math.max(1, Number(route.query.page) || 1));
-
-const withAll = (items) => [{ name: "全部", count: stats.value.total }, ...items];
-const dynasties = computed(() => withAll(facets.value.dynasties));
-const genres = computed(() => withAll(facets.value.genres));
-
-const result = computed(() => {
-  catalogVersion.value;
-  return queryCatalog({
-    keyword: query.value,
-    dynasty: dynasty.value,
-    genre: genre.value,
-    page: page.value,
-    pageSize,
-  });
-});
-const hasFilters = computed(() => Boolean(query.value.trim()) || dynasty.value !== "全部" || genre.value !== "全部");
-const activeFilterCount = computed(() =>
-  Number(Boolean(query.value.trim())) + Number(dynasty.value !== "全部") + Number(genre.value !== "全部"),
-);
-const resultHeading = computed(() => {
-  if (query.value.trim()) return `“${query.value.trim()}”`;
-  if (dynasty.value !== "全部" && genre.value !== "全部") return `${dynasty.value} · ${genre.value}`;
-  if (dynasty.value !== "全部") return dynasty.value;
-  if (genre.value !== "全部") return genre.value;
-  return "全部馆藏";
-});
-const resultSummary = computed(() =>
-  `找到 ${result.value.total.toLocaleString("zh-CN")} 篇 · 本页 ${result.value.items.length} 篇`,
-);
-
-const rowNumber = (index) =>
-  String((result.value.page - 1) * result.value.pageSize + index + 1).padStart(2, "0");
-
-const pageWindow = computed(() => {
-  const total = result.value.totalPages;
-  const current = result.value.page;
-  if (total <= 7) return Array.from({ length: total }, (_, index) => index + 1);
-  const pages = new Set([1, total, current, current - 1, current + 1]);
-  if (current <= 3) [2, 3, 4].forEach((page) => pages.add(page));
-  if (current >= total - 2) [total - 3, total - 2, total - 1].forEach((page) => pages.add(page));
-  const sorted = [...pages].filter((page) => page >= 1 && page <= total).sort((a, b) => a - b);
-  return sorted.reduce((list, page, index) => {
-    if (index && page - sorted[index - 1] > 1) list.push("…");
-    list.push(page);
-    return list;
-  }, []);
-});
-
-const syncRoute = ({ resetPage = false } = {}) => {
-  const nextQuery = {};
-  if (query.value.trim()) nextQuery.q = query.value.trim();
-  if (dynasty.value !== "全部") nextQuery.dynasty = dynasty.value;
-  if (genre.value !== "全部") nextQuery.genre = genre.value;
-  if (!resetPage && page.value > 1) nextQuery.page = page.value;
-  router.replace({ name: "explore", query: nextQuery });
-};
-
-const submitSearch = () => {
-  query.value = draftQuery.value.trim();
-  page.value = 1;
-  filtersOpen.value = false;
-  syncRoute({ resetPage: true });
-};
-
-const pickHint = (hint) => {
-  draftQuery.value = hint;
-  query.value = hint;
-  page.value = 1;
-  filtersOpen.value = false;
-  syncRoute({ resetPage: true });
-};
-
-const isPathActive = (path) =>
-  query.value.trim() === path.keyword && (path.genre === "全部" || genre.value === path.genre);
-
-const enterPath = (path) => {
-  draftQuery.value = path.keyword;
-  query.value = path.keyword;
-  dynasty.value = "全部";
-  genre.value = path.genre;
-  page.value = 1;
-  filtersOpen.value = false;
-  syncRoute({ resetPage: true });
+const scrollToResults = () => {
   window.requestAnimationFrame(() => {
-    document.querySelector(".result-room")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const room = document.querySelector(".result-room");
+    if (!room) return;
+    const header = getComputedStyle(document.documentElement).getPropertyValue("--header-height").trim();
+    const offset = Number.parseInt(header, 10) || 72;
+    const top = room.getBoundingClientRect().top + window.scrollY - offset - 12;
+    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
   });
 };
 
-const clearSearch = () => {
-  draftQuery.value = "";
-  query.value = "";
-  page.value = 1;
+// 查询动作统一在关闭抽屉后执行：状态逻辑归 composable，视图只管 UI。
+const withDrawerClosed = (action) => (...args) => {
   filtersOpen.value = false;
-  syncRoute({ resetPage: true });
+  action(...args);
 };
 
-const selectFacet = (key, name) => {
-  if (key === "dynasty") dynasty.value = name;
-  if (key === "genre") genre.value = name;
-  page.value = 1;
-  syncRoute({ resetPage: true });
+const submitSearch = withDrawerClosed(rawSubmitSearch);
+const pickHint = withDrawerClosed(rawPickHint);
+const clearSearch = withDrawerClosed(rawClearSearch);
+const resetFilters = withDrawerClosed(rawResetFilters);
+const enterPath = (path) => {
+  rawEnterPath(path);
+  filtersOpen.value = false;
+  scrollToResults();
+};
+
+const goToPage = (nextPage) => {
+  if (!rawGoToPage(nextPage)) return;
+  scrollToResults();
+  window.requestAnimationFrame(() => {
+    const room = document.querySelector(".result-room");
+    room?.setAttribute("tabindex", "-1");
+    room?.focus({ preventScroll: true });
+  });
+};
+
+const applyFilters = () => {
+  filtersOpen.value = false;
+  scrollToResults();
+};
+
+const retryCatalog = () => {
+  if (!catalogLoading.value) loadCatalog({ force: true });
+};
+
+const savePoem = (poem) => {
+  const added = toggleSaved(poem);
+  notify(added ? `已收藏《${poem.title}》` : `已取消收藏《${poem.title}》`, added ? "success" : "info");
 };
 
 onMounted(() => {
@@ -415,6 +375,7 @@ onMounted(() => {
   };
   desktopQuery.addEventListener("change", syncFilters);
   onBeforeUnmount(() => desktopQuery.removeEventListener("change", syncFilters));
+
   const onKeydown = (event) => {
     if (event.key === "Escape" && filtersOpen.value) filtersOpen.value = false;
     if (event.key !== "Tab" || !filtersOpen.value) return;
@@ -428,9 +389,7 @@ onMounted(() => {
     if (!panel.contains(document.activeElement)) {
       event.preventDefault();
       first.focus({ preventScroll: true });
-      return;
-    }
-    if (!event.shiftKey && document.activeElement === last) {
+    } else if (!event.shiftKey && document.activeElement === last) {
       event.preventDefault();
       first.focus({ preventScroll: true });
     } else if (event.shiftKey && document.activeElement === first) {
@@ -449,8 +408,6 @@ watch(filtersOpen, (open) => {
     lastFocused.value = document.activeElement;
     window.requestAnimationFrame(() => {
       document.querySelector(".filter-wall.is-open .filter-wall__head button")?.focus({ preventScroll: true });
-      // 抽屉从下方带一点过冲抬起，比线性上滑更有「实体面板」的重量感。
-      // motion 在这里按需加载；reduced-motion 时退回 CSS 动画。
       springIn(document.querySelector(".filter-wall.is-open"), {
         y: [22, 0],
         opacity: [0, 1],
@@ -467,77 +424,6 @@ watch(filtersOpen, (open) => {
 });
 
 onBeforeUnmount(() => document.documentElement.classList.remove("is-drawer-open"));
-
-const resetFacet = (key) => selectFacet(key, "全部");
-
-const scrollToResults = () => {
-  window.requestAnimationFrame(() => {
-    const room = document.querySelector(".result-room");
-    if (!room) return;
-    const header = getComputedStyle(document.documentElement).getPropertyValue("--header-height").trim();
-    const offset = Number.parseInt(header, 10) || 72;
-    const top = room.getBoundingClientRect().top + window.scrollY - offset - 12;
-    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
-  });
-};
-
-const applyFilters = () => {
-  filtersOpen.value = false;
-  scrollToResults();
-};
-
-const resetFilters = () => {
-  draftQuery.value = "";
-  query.value = "";
-  dynasty.value = "全部";
-  genre.value = "全部";
-  page.value = 1;
-  filtersOpen.value = false;
-  syncRoute({ resetPage: true });
-};
-
-const goToPage = (nextPage) => {
-  const target = Math.max(1, Math.min(result.value.totalPages, nextPage));
-  if (target === page.value) return;
-  page.value = target;
-  syncRoute();
-  scrollToResults();
-  window.requestAnimationFrame(() => {
-    const room = document.querySelector(".result-room");
-    room?.setAttribute("tabindex", "-1");
-    room?.focus({ preventScroll: true });
-  });
-};
-
-const retryCatalog = () => {
-  if (catalogLoading.value) return;
-  loadCatalog({ force: true });
-};
-
-const savePoem = (poem) => {
-  const added = toggleSaved(poem);
-  notify(added ? `已收藏《${poem.title}》` : `已取消收藏《${poem.title}》`, added ? "success" : "info");
-};
-
-watch(() => route.query, (value) => {
-  const nextQuery = String(value.q || "");
-  const nextDynasty = String(value.dynasty || "全部");
-  const nextGenre = String(value.genre || value.category || "全部");
-  const nextPage = Math.max(1, Number(value.page) || 1);
-  if (nextQuery !== query.value) {
-    query.value = nextQuery;
-    draftQuery.value = nextQuery;
-  }
-  if (nextDynasty !== dynasty.value) dynasty.value = nextDynasty;
-  if (nextGenre !== genre.value) genre.value = nextGenre;
-  if (nextPage !== page.value) page.value = nextPage;
-}, { deep: true });
-
-watch([dynasty, genre], () => {
-  if (dynasty.value !== "全部" && !facets.value.dynasties.some((item) => item.name === dynasty.value)) dynasty.value = "全部";
-  if (genre.value !== "全部" && !facets.value.genres.some((item) => item.name === genre.value)) genre.value = "全部";
-});
-
 </script>
 
 <style scoped>

@@ -61,7 +61,7 @@
 
 ### 4.1 诗库与检索
 
-`useLibrary` 通过 `loadCatalog()` 读取 `public/data/poetry/manifest.json` 和 16 个静态分卷，再由 `getLibraryPage()` 做关键词、朝代、体裁筛选与分页；`ExploreView` 把这些状态同步到 URL query。未配置业务 API 时始终使用离线馆藏，首页摘录卡与业务诗库互不依赖。
+`useLibrary` 通过 `loadCatalog()` 读取 `public/data/poetry/manifest.json` 和 16 个静态分卷；`getLibraryPage()` 做关键词、朝代、体裁筛选与分页，并按「条件 + 馆藏版本」缓存匹配结果，统计只在载入时一次遍历算出。`useExploreQuery` 独立负责 URL query 与筛选/分页状态同步，`ExploreView` 只保留抽屉、焦点、滚动等视图行为。未配置业务 API 时始终使用离线馆藏，首页摘录卡与业务诗库互不依赖。
 
 首页历史摘录卡是单句装饰，由 `src/services/poetrySource.js` 单独加载。它与业务诗库、`VITE_API_BASE_URL` 解耦，默认只交替读取 `demoExcerpts` 与精校馆藏短句；显式设置 `VITE_POETRY_SOURCE=remote` 后才读取 `VITE_POETRY_SOURCE_URL`，接口不可达时回退本地并在界面标注实际来源。
 

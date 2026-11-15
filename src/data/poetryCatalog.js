@@ -57,6 +57,7 @@ export const curatedPoems = Object.freeze(
 );
 
 export let poetryCatalog = Object.freeze([...curatedPoems]);
+let catalogVersion = 0;
 export let poetryStats = {
   total: curatedPoems.length,
   curated: curatedPoems.length,
@@ -71,27 +72,45 @@ export let poetryFacets = {
   authors: [],
 };
 
-const countBy = (key) => {
-  const counts = new Map();
-  for (const poem of poetryCatalog) counts.set(poem[key], (counts.get(poem[key]) || 0) + 1);
-  return [...counts.entries()]
+/*
+ * 一次遍历同时算出总量、作者/合集去重与各分面计数；旧实现要遍历 6 遍
+ * 并对每个分面单独做 localeCompare 排序，9,350 条时会形成一个可见长任务。
+ */
+const refreshStats = () => {
+  const authors = new Set();
+  const collections = new Set();
+  const dynasties = new Map();
+  const genres = new Map();
+  const collectionCounts = new Map();
+  const authorCounts = new Map();
+
+  const bump = (counts, key) => counts.set(key, (counts.get(key) || 0) + 1);
+
+  for (const poem of poetryCatalog) {
+    authors.add(poem.author);
+    collections.add(poem.collection);
+    bump(dynasties, poem.dynasty);
+    bump(genres, poem.category);
+    bump(collectionCounts, poem.collection);
+    bump(authorCounts, poem.author);
+  }
+
+  const toFacet = (counts) => [...counts.entries()]
     .map(([name, count]) => ({ name, count }))
     .sort((left, right) => right.count - left.count || left.name.localeCompare(right.name, "zh-CN"));
-};
 
-const refreshStats = () => {
   Object.assign(poetryStats, {
     total: poetryCatalog.length,
     curated: curatedPoems.length,
-    authors: new Set(poetryCatalog.map((poem) => poem.author)).size,
-    collections: new Set(poetryCatalog.map((poem) => poem.collection)).size,
+    authors: authors.size,
+    collections: collections.size,
     loaded: true,
   });
   Object.assign(poetryFacets, {
-    dynasties: countBy("dynasty"),
-    genres: countBy("category"),
-    collections: countBy("collection"),
-    authors: countBy("author"),
+    dynasties: toFacet(dynasties),
+    genres: toFacet(genres),
+    collections: toFacet(collectionCounts),
+    authors: toFacet(authorCounts),
   });
 };
 
@@ -120,6 +139,7 @@ export const loadPoetryCatalog = async ({ force = false } = {}) => {
       items.map((poem, index) => asRecord(poem, `${collectionIndex}-${index}`)),
     );
     poetryCatalog = Object.freeze([...curatedPoems, ...corpusPoems]);
+    catalogVersion += 1;
     refreshStats();
     return poetryCatalog;
   })().catch((error) => {
@@ -156,13 +176,36 @@ export const getLibraryPoem = (id) => {
   return record ? asLibraryPoem(record) : null;
 };
 
-export const getLibraryPage = ({ keyword = "", dynasty = "全部", genre = "全部", page = 1, pageSize = 24 } = {}) => {
+/*
+ * 匹配结果按「条件 + 馆藏版本」缓存：翻页、切换收藏态、组件重渲染都可能
+ * 反复调用同一组条件，没必要每次重新线性扫 9,350 条并做 includes。
+ * 缓存只保存命中的记录引用，切片与归一化仍每次现算（数据量只有一页）。
+ */
+const matchCache = new Map();
+let cachedVersion = -1;
+
+const matchedPoems = (keyword, dynasty, genre) => {
+  if (cachedVersion !== catalogVersion) {
+    matchCache.clear();
+    cachedVersion = catalogVersion;
+  }
   const normalized = String(keyword || "").trim().toLowerCase();
+  const key = `${normalized}\u0000${dynasty}\u0000${genre}`;
+  const hit = matchCache.get(key);
+  if (hit) return hit;
   const matched = poetryCatalog.filter((poem) => {
     if (dynasty !== "全部" && poem.dynasty !== dynasty) return false;
     if (genre !== "全部" && poem.category !== genre) return false;
     return !normalized || poem.searchText.includes(normalized);
   });
+  // 只保留有限条目，避免用户输入大量不同关键词时缓存无限增长。
+  if (matchCache.size > 24) matchCache.clear();
+  matchCache.set(key, matched);
+  return matched;
+};
+
+export const getLibraryPage = ({ keyword = "", dynasty = "全部", genre = "全部", page = 1, pageSize = 24 } = {}) => {
+  const matched = matchedPoems(keyword, dynasty, genre);
   const safePageSize = Math.max(1, Math.min(60, Number(pageSize) || 24));
   const totalPages = Math.max(1, Math.ceil(matched.length / safePageSize));
   const safePage = Math.max(1, Math.min(totalPages, Number(page) || 1));

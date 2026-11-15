@@ -52,11 +52,12 @@ export const queryCatalog = ({
   pageSize = 24,
 } = {}) => {
   const result = getLibraryPage({ keyword, dynasty, genre, page, pageSize });
-  const works = normalizePoemList(readStore("lanze_demo_works", []));
-  if (keyword.trim()) {
-    const normalizedKeyword = keyword.trim().toLowerCase();
+  const normalizedKeyword = String(keyword || "").trim().toLowerCase();
+  if (normalizedKeyword) {
+    const works = normalizePoemList(readStore("lanze_demo_works", []));
     const matchingWorks = works.filter((poem) =>
-      [poem.title, poem.author, poem.content, ...(poem.tags || [])].join(" ").toLowerCase().includes(normalizedKeyword),
+      [poem.title, poem.author, poem.content, ...(poem.tags || [])]
+        .join(" ").toLowerCase().includes(normalizedKeyword),
     );
     if (matchingWorks.length && result.page === 1) {
       result.items = [...matchingWorks, ...result.items].slice(0, result.pageSize);

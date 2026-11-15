@@ -608,8 +608,10 @@ onBeforeUnmount(() => {
   position: relative;
   z-index: 1;
   border-top: 1px solid var(--line);
+  /* 延伸到 main 的固定层安全区，避免余韵区与页脚之间露出一条瓷白 padding。 */
+  margin-bottom: calc(-1 * var(--fixed-layer-space));
+  padding-bottom: calc(64px + var(--fixed-layer-space));
   background: rgba(232, 236, 229, 0.56);
-  padding-bottom: 64px;
 }
 
 .legacy-gallery {
