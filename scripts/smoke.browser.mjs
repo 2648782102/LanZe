@@ -1065,6 +1065,33 @@ const main = async () => {
   if (mobileFiltersClosed.bodyLocked) {
     throw new Error("Mobile filter drawer did not release the scroll lock on close");
   }
+  await evaluate("document.querySelector('.mobile-filter-bar button').focus()");
+  await evaluate("document.querySelector('.mobile-filter-bar button').click()");
+  await waitUntil("mobile filter drawer reopened", () => evaluate(
+    "Boolean(document.querySelector('.filter-wall.is-open'))",
+  ));
+  let focusEscapes = 0;
+  for (let step = 0; step < 40; step += 1) {
+    await send("Input.dispatchKeyEvent", { type: "rawKeyDown", windowsVirtualKeyCode: 9, key: "Tab" });
+    await send("Input.dispatchKeyEvent", { type: "keyUp", windowsVirtualKeyCode: 9, key: "Tab" });
+    const inside = await evaluate(
+      "Boolean(document.querySelector('.filter-wall.is-open')?.contains(document.activeElement))",
+    );
+    if (!inside) focusEscapes += 1;
+  }
+  if (focusEscapes > 0) {
+    throw new Error(`Focus escaped the mobile filter drawer ${focusEscapes} times`);
+  }
+  await evaluate("document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))");
+  const focusReturned = await waitUntil("filter drawer focus return", () => evaluate(`(() => {
+    const panel = document.querySelector('.filter-wall');
+    if (panel.classList.contains('is-open')) return null;
+    const active = document.activeElement;
+    return active?.closest('.mobile-filter-bar') ? true : null;
+  })()`));
+  if (!focusReturned) {
+    throw new Error("Focus was not returned to the filter trigger after closing");
+  }
   if (!await setInput("#global-search", "春晓")) throw new Error("Mobile search input was not found");
   currentStep = "mobile search";
   await evaluate("document.querySelector('#global-search').closest('form').requestSubmit()");

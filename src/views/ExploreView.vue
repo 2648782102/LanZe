@@ -294,6 +294,7 @@ const poemPaths = [
 ];
 const pageSize = 24;
 const filtersOpen = ref(false);
+const lastFocused = ref(null);
 
 const stats = computed(() => ({ ...getLibraryStats(), version: catalogVersion.value }));
 const facets = computed(() => ({ ...getLibraryFacets(), version: catalogVersion.value }));
@@ -414,6 +415,26 @@ onMounted(() => {
   onBeforeUnmount(() => desktopQuery.removeEventListener("change", syncFilters));
   const onKeydown = (event) => {
     if (event.key === "Escape" && filtersOpen.value) filtersOpen.value = false;
+    if (event.key !== "Tab" || !filtersOpen.value) return;
+    const panel = document.querySelector(".filter-wall.is-open");
+    if (!panel) return;
+    const focusable = [...panel.querySelectorAll("button:not(:disabled), [href], input, select, textarea")]
+      .filter((node) => node.offsetParent !== null);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (!panel.contains(document.activeElement)) {
+      event.preventDefault();
+      first.focus({ preventScroll: true });
+      return;
+    }
+    if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus({ preventScroll: true });
+    } else if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus({ preventScroll: true });
+    }
   };
   window.addEventListener("keydown", onKeydown);
   onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
@@ -423,9 +444,13 @@ onMounted(() => {
 watch(filtersOpen, (open) => {
   document.documentElement.classList.toggle("is-drawer-open", open);
   if (open) {
+    lastFocused.value = document.activeElement;
     window.requestAnimationFrame(() => {
       document.querySelector(".filter-wall.is-open .filter-wall__head button")?.focus({ preventScroll: true });
     });
+  } else {
+    lastFocused.value?.focus?.({ preventScroll: true });
+    lastFocused.value = null;
   }
 });
 
