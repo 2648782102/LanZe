@@ -1132,6 +1132,44 @@ const main = async () => {
     throw new Error("320px sticky header did not remain pinned while scrolling");
   }
 
+  currentStep = "narrow poem actions";
+  await send("Page.navigate", { url: `${origin}/#/poem/demo-shuidiaoge` });
+  await waitUntil("narrow poem sheet", () => evaluate(
+    "Boolean(document.querySelector('.poem-side__actions .icon-action'))",
+  ));
+  const narrowPoemActions = await evaluate(`(() => {
+    const actions = document.querySelector('.poem-side__actions');
+    const back = document.querySelector('.poem-side__back');
+    if (!actions || !back) return null;
+    const boxes = [...actions.querySelectorAll('.icon-action')].map((button) => {
+      const rect = button.getBoundingClientRect();
+      return { text: button.textContent.trim(), width: rect.width };
+    });
+    const backBox = back.getBoundingClientRect();
+    return {
+      backLeft: Math.round(backBox.left),
+      backTop: Math.round(backBox.top),
+      actionsTop: Math.round(actions.getBoundingClientRect().top),
+      clipped: actions.scrollWidth > actions.clientWidth + 1,
+      labels: boxes.map((box) => box.text),
+      scrollWidth: document.documentElement.scrollWidth,
+      viewportWidth: document.documentElement.clientWidth,
+    };
+  })()`);
+  if (!narrowPoemActions) throw new Error("Poem side actions did not render at 320px");
+  if (narrowPoemActions.clipped) {
+    throw new Error("320px poem action toolbar clips its buttons");
+  }
+  if (narrowPoemActions.scrollWidth > narrowPoemActions.viewportWidth + 1) {
+    throw new Error("320px poem page overflows horizontally");
+  }
+  if (narrowPoemActions.labels.length !== 3) {
+    throw new Error(`Poem toolbar lost actions: ${narrowPoemActions.labels.join(", ")}`);
+  }
+  if (!(narrowPoemActions.backTop > narrowPoemActions.actionsTop)) {
+    throw new Error("320px poem back link should sit below the action toolbar");
+  }
+
   await clearLocalState();
   await send("Emulation.setDeviceMetricsOverride", {
     width: 1280,

@@ -24,6 +24,8 @@
     "capture:brand:1x1": "node scripts/browser/capture-brand-1x1.mjs",
     "audit:a11y": "node scripts/browser/a11y-audit.mjs",
     "audit:perf": "node scripts/browser/perf-budget.mjs",
+    "audit:visual": "node scripts/browser/visual-baseline.mjs",
+    "audit:visual:update": "node scripts/browser/visual-baseline.mjs --update",
     "audit:touch": "node scripts/browser/touch-target-audit.mjs"
   },
   "engines": {

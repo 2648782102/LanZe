@@ -2,7 +2,7 @@ name: Browser E2E
 
 on:
   push:
-    branches: [main]
+    branches: [main, "codex/**"]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -63,3 +63,14 @@ jobs:
 
       - name: Touch target audit (mobile)
         run: npm run audit:touch
+
+      - name: Mobile visual regression
+        run: npm run audit:visual
+
+      - name: Upload visual diffs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-diffs
+          path: tests/visual/.actual
+          retention-days: 7

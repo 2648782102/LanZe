@@ -10,6 +10,7 @@ dist-ssr
 coverage/
 playwright-report/
 test-results/
+tests/visual/.actual/
 *.log
 measure.out
 measure.err

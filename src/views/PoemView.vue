@@ -572,8 +572,9 @@ onMounted(loadCatalog);
 
   .poem-side {
     display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 10px 20px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0 12px;
     padding: 14px 22px;
     border-right: 0;
     border-bottom: 1px solid var(--line);
@@ -586,12 +587,17 @@ onMounted(loadCatalog);
 
   .poem-side__actions {
     display: flex;
-    grid-column: 1 / -1;
+    grid-column: 1;
     grid-row: 1;
-    gap: 22px;
+    min-width: 0;
+    gap: 18px;
     margin-top: 0;
     overflow-x: auto;
     scrollbar-width: none;
+  }
+
+  .poem-side__actions::-webkit-scrollbar {
+    display: none;
   }
 
   .icon-action {
@@ -602,8 +608,10 @@ onMounted(loadCatalog);
     grid-column: 2;
     grid-row: 1;
     align-self: center;
+    flex: 0 0 auto;
     margin-top: 0;
     padding-top: 0;
+    white-space: nowrap;
   }
 
   .poem-body {
@@ -669,6 +677,29 @@ onMounted(loadCatalog);
 
   .poem-text p {
     font-size: 19px;
+  }
+}
+
+@media (max-width: 420px) {
+  .poem-side {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    padding: 12px 18px;
+  }
+
+  .poem-side__actions {
+    grid-column: 1;
+    grid-row: 1;
+    justify-content: space-between;
+    gap: 6px;
+    overflow: visible;
+  }
+
+  .poem-side__back {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+    min-height: 40px;
   }
 }
 </style>
