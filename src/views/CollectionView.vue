@@ -61,11 +61,14 @@
                 @toggle="removeSaved"
               />
             </div>
-            <div v-else class="empty-state">
-              <h2>诗卷还没有折角</h2>
-              <p>在今日读诗或诗词索引里点一下书签，喜欢的那首就会留在这里。</p>
+            <EmptyState
+              v-else
+              mark="签"
+              title="诗卷还没有折角"
+              description="在今日读诗或诗词索引里点一下书签，喜欢的那首就会留在这里。"
+            >
               <router-link class="button button--solid" to="/explore">去寻一首诗</router-link>
-            </div>
+            </EmptyState>
           </div>
 
           <div v-else-if="activeTab === 'recent'">
@@ -79,11 +82,14 @@
                 @toggle="toggleSavedPoem"
               />
             </div>
-            <div v-else class="empty-state">
-              <h2>还没有最近读诗</h2>
-              <p>打开任意一首诗的详情页，它就会安静地记在这里，最多保留十二首。</p>
+            <EmptyState
+              v-else
+              mark="近"
+              title="还没有最近读诗"
+              description="打开任意一首诗的详情页，它就会安静地记在这里，最多保留十二首。"
+            >
               <router-link class="button button--solid" to="/">从今日读诗开始</router-link>
-            </div>
+            </EmptyState>
           </div>
 
           <div v-else>
@@ -106,11 +112,14 @@
                 <AppIcon name="arrow-right" :size="18" />
               </article>
             </div>
-            <div v-else class="empty-state">
-              <h2>还没有自己的作品</h2>
-              <p>从一句此刻想到的话开始就好，写完便会留在这一页。</p>
+            <EmptyState
+              v-else
+              mark="写"
+              title="还没有自己的作品"
+              description="从一句此刻想到的话开始就好，写完便会留在这一页。"
+            >
               <router-link class="button button--solid" to="/compose">打开写作台</router-link>
-            </div>
+            </EmptyState>
           </div>
         </div>
       </section>
@@ -174,6 +183,7 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import AppIcon from "../components/AppIcon.vue";
 import PoemRow from "../components/PoemRow.vue";
+import EmptyState from "../components/EmptyState.vue";
 import { loadCatalog, useLibrary } from "../composables/useLibrary.js";
 import { useSession } from "../composables/useSession.js";
 import { PoetryCustom } from "../apis/api/list.js";
@@ -666,14 +676,6 @@ onMounted(async () => {
   .collection-tabs button {
     padding-inline: 8px;
     font-size: var(--text-note);
-  }
-
-  .empty-state {
-    padding: 42px 0;
-  }
-
-  .empty-state h2 {
-    font-size: 24px;
   }
 
   .account-panel {

@@ -87,11 +87,15 @@
         </div>
       </article>
 
-      <section v-else class="empty-state">
-        <h2>这一页暂时没有找到</h2>
-        <p>或许是链接已旧，或那一句只留在写下它的设备里。</p>
+      <EmptyState
+        v-else
+        class="poem-empty"
+        mark="佚"
+        title="这一页暂时没有找到"
+        description="或许是链接已旧，或那一句只留在写下它的设备里。"
+      >
         <router-link class="button button--solid" to="/explore">回到诗词索引</router-link>
-      </section>
+      </EmptyState>
 
       <section v-if="related.length" class="related-section" aria-labelledby="related-heading">
         <header>
@@ -121,6 +125,7 @@
 import { computed, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import AppIcon from "../components/AppIcon.vue";
+import EmptyState from "../components/EmptyState.vue";
 import { normalizePoem } from "../data/poems.js";
 import { loadCatalog, relatedLibraryPoems, useCatalogVersion, useLibrary } from "../composables/useLibrary.js";
 import { getAdjacentLibraryPoems } from "../data/poetryCatalog.js";

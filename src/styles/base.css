@@ -316,30 +316,6 @@ img {
   text-wrap: pretty;
 }
 
-.empty-state {
-  display: grid;
-  justify-items: start;
-  gap: 16px;
-  padding: 56px 0;
-  border-top: 1px solid var(--line);
-  color: var(--ink-soft);
-}
-
-.empty-state h2 {
-  margin: 0;
-  color: var(--ink);
-  font-family: var(--font-poem);
-  font-size: 26px;
-  font-weight: 400;
-}
-
-.empty-state p {
-  max-width: 520px;
-  margin: 0;
-  line-height: var(--leading-copy);
-  text-wrap: pretty;
-}
-
 .porcelain-grid {
   position: fixed;
   top: 0;

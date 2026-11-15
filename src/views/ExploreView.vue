@@ -192,11 +192,14 @@
               @toggle="savePoem"
             />
           </div>
-          <div v-else class="empty-state">
-            <h2>这一格暂时空着</h2>
-            <p>换一个作者名，或减少朝代、体裁条件；也可以清除全部条件再翻检。</p>
+          <EmptyState
+            v-else
+            mark="空"
+            title="这一格暂时空着"
+            description="换一个作者名，或减少朝代、体裁条件；也可以清除全部条件再翻检。"
+          >
             <button class="button" type="button" @click="resetFilters">查看全部馆藏</button>
-          </div>
+          </EmptyState>
 
           <nav v-if="result.totalPages > 1" class="pagination" aria-label="检索结果分页">
             <button type="button" :disabled="result.page <= 1" aria-label="上一页" @click="goToPage(result.page - 1)">
@@ -227,6 +230,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import AppIcon from "../components/AppIcon.vue";
 import PoemRow from "../components/PoemRow.vue";
+import EmptyState from "../components/EmptyState.vue";
 import {
   getLibraryFacets,
   getLibraryStats,
@@ -880,28 +884,6 @@ watch([dynasty, genre], () => {
 
 .poem-list {
   border-bottom: 1px solid var(--line);
-}
-
-.empty-state {
-  min-height: 320px;
-  display: grid;
-  place-content: center;
-  justify-items: start;
-  gap: 14px;
-  border-bottom: 1px solid var(--line);
-  color: var(--ink-soft);
-}
-
-.empty-state h2 {
-  margin: 0;
-  font-family: var(--font-poem);
-  font-size: 30px;
-  font-weight: 400;
-}
-
-.empty-state p {
-  margin: 0;
-  font-size: var(--text-note);
 }
 
 .pagination {
