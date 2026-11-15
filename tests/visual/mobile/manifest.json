@@ -1,0 +1,16 @@
+{
+  "platform": "darwin",
+  "deviceScaleFactor": 2,
+  "routes": [
+    "/#/explore",
+    "/#/",
+    "/#/poem/demo-shuidiaoge",
+    "/#/collection"
+  ],
+  "widths": [
+    320,
+    390,
+    430
+  ],
+  "updatedAt": "2026-11-15T05:44:36.754Z"
+}

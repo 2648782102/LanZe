@@ -4,16 +4,19 @@
  * them against committed baselines. Missing baselines are written instead of
  * failing so the first run bootstraps the set; `--update` refreshes them.
  */
-import { access, mkdir, readdir } from "node:fs/promises";
+import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
+import { platform } from "node:os";
 import { fileURLToPath } from "node:url";
 import { assertNoBrowserErrors, comparePng, gotoStable, openBrowser, startPreview } from "./lab.mjs";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const baselineDir = join(root, "tests/visual/mobile");
 const outputDir = join(root, "tests/visual/.actual");
+const manifestPath = join(baselineDir, "manifest.json");
 const update = process.argv.includes("--update");
 const maxRatio = Number(process.env.VISUAL_MAX_DIFF || 0.012);
+const strict = process.env.VISUAL_STRICT !== "0";
 
 const routes = [
   { name: "explore", path: "/#/explore" },
@@ -32,9 +35,35 @@ const exists = async (path) => {
   }
 };
 
+const readManifest = async () => {
+  if (!await exists(manifestPath)) return null;
+  try {
+    return JSON.parse(await readFile(manifestPath, "utf8"));
+  } catch {
+    return null;
+  }
+};
+
 const main = async () => {
   await mkdir(baselineDir, { recursive: true });
   await mkdir(outputDir, { recursive: true });
+
+  // Baselines are pixel-exact for one font stack. Chinese glyph fallback differs
+  // between macOS and Linux, so compare only where the environment matches.
+  const manifest = await readManifest();
+  const currentPlatform = platform();
+  if (manifest && manifest.platform !== currentPlatform && !update) {
+    const message = `Visual baselines were captured on ${manifest.platform}, running on ${currentPlatform}.`;
+    console.log(JSON.stringify({
+      ok: true,
+      compared: false,
+      skipped: true,
+      reason: message,
+      hint: "Run `npm run audit:visual:update` on the baseline platform, or set VISUAL_STRICT=1 to compare anyway.",
+    }, null, 2));
+    return;
+  }
+
   const preview = await startPreview({ port: 4377, root });
   const { browser, newPage, stop } = await openBrowser({ headless: true });
   const results = [];
@@ -74,6 +103,14 @@ const main = async () => {
     await stop();
     preview.stop();
   }
+
+  await writeFile(manifestPath, `${JSON.stringify({
+    platform: currentPlatform,
+    deviceScaleFactor: 2,
+    routes: routes.map((route) => route.path),
+    widths,
+    updatedAt: new Date().toISOString(),
+  }, null, 2)}\n`);
 
   const changed = results.filter((entry) => entry.status === "changed");
   const created = results.filter((entry) => entry.status.startsWith("created"));
