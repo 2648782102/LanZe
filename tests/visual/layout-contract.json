@@ -1,0 +1,1221 @@
+{
+  "note": "Font-independent layout facts; safe to compare across platforms.",
+  "updatedAt": "2026-11-15T09:07:16.709Z",
+  "viewports": [
+    320,
+    390,
+    820,
+    821,
+    1280
+  ],
+  "routes": [
+    "read",
+    "explore",
+    "poem",
+    "collection",
+    "compose",
+    "login"
+  ],
+  "views": {
+    "read@320": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": true,
+        "desktopNav": false,
+        "mobileFilterBar": false,
+        "audioDock": false
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 720,
+          "zIndex": 0
+        },
+        {
+          "selector": "nav.mobile-dock",
+          "top": 647,
+          "height": 61,
+          "zIndex": 80
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": null,
+        "room": 1,
+        "collection": null,
+        "compose": null,
+        "legacy": 1
+      },
+      "minControl": 42,
+      "minFontSize": 11,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "read@390": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": true,
+        "desktopNav": false,
+        "mobileFilterBar": false,
+        "audioDock": false
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 844,
+          "zIndex": 0
+        },
+        {
+          "selector": "nav.mobile-dock",
+          "top": 771,
+          "height": 61,
+          "zIndex": 80
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": null,
+        "room": 1,
+        "collection": null,
+        "compose": null,
+        "legacy": 1
+      },
+      "minControl": 42,
+      "minFontSize": 11,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "read@820": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": true,
+        "desktopNav": false,
+        "mobileFilterBar": false,
+        "audioDock": false
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 900,
+          "zIndex": 0
+        },
+        {
+          "selector": "nav.mobile-dock",
+          "top": 827,
+          "height": 61,
+          "zIndex": 80
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": null,
+        "room": 1,
+        "collection": null,
+        "compose": null,
+        "legacy": 2
+      },
+      "minControl": 40,
+      "minFontSize": 11,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "read@821": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": false,
+        "desktopNav": true,
+        "mobileFilterBar": false,
+        "audioDock": true
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 900,
+          "zIndex": 0
+        },
+        {
+          "selector": "aside.audio-dock.is-collapsed",
+          "top": 822,
+          "height": 60,
+          "zIndex": 70
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": null,
+        "room": 2,
+        "collection": null,
+        "compose": null,
+        "legacy": 2
+      },
+      "minControl": 30,
+      "minFontSize": 9,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "read@1280": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": false,
+        "desktopNav": true,
+        "mobileFilterBar": false,
+        "audioDock": true
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 900,
+          "zIndex": 0
+        },
+        {
+          "selector": "aside.audio-dock.is-collapsed",
+          "top": 822,
+          "height": 60,
+          "zIndex": 70
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": null,
+        "room": 2,
+        "collection": null,
+        "compose": null,
+        "legacy": 2
+      },
+      "minControl": 30,
+      "minFontSize": 9,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "explore@320": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": true,
+        "desktopNav": false,
+        "mobileFilterBar": true,
+        "audioDock": false
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 720,
+          "zIndex": 0
+        },
+        {
+          "selector": "nav.mobile-dock",
+          "top": 647,
+          "height": 61,
+          "zIndex": 80
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": 1,
+        "room": null,
+        "collection": null,
+        "compose": null,
+        "legacy": null
+      },
+      "minControl": 36,
+      "minFontSize": 11,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "explore@390": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": true,
+        "desktopNav": false,
+        "mobileFilterBar": true,
+        "audioDock": false
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 844,
+          "zIndex": 0
+        },
+        {
+          "selector": "nav.mobile-dock",
+          "top": 771,
+          "height": 61,
+          "zIndex": 80
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": 1,
+        "room": null,
+        "collection": null,
+        "compose": null,
+        "legacy": null
+      },
+      "minControl": 40,
+      "minFontSize": 11,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "explore@820": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": true,
+        "desktopNav": false,
+        "mobileFilterBar": true,
+        "audioDock": false
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 900,
+          "zIndex": 0
+        },
+        {
+          "selector": "nav.mobile-dock",
+          "top": 827,
+          "height": 61,
+          "zIndex": 80
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": 1,
+        "room": null,
+        "collection": null,
+        "compose": null,
+        "legacy": null
+      },
+      "minControl": 40,
+      "minFontSize": 11,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "explore@821": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": false,
+        "desktopNav": true,
+        "mobileFilterBar": false,
+        "audioDock": true
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 900,
+          "zIndex": 0
+        },
+        {
+          "selector": "aside.audio-dock.is-collapsed",
+          "top": 822,
+          "height": 60,
+          "zIndex": 70
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": 2,
+        "room": null,
+        "collection": null,
+        "compose": null,
+        "legacy": null
+      },
+      "minControl": 30,
+      "minFontSize": 9,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "explore@1280": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": false,
+        "desktopNav": true,
+        "mobileFilterBar": false,
+        "audioDock": true
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 900,
+          "zIndex": 0
+        },
+        {
+          "selector": "aside.audio-dock.is-collapsed",
+          "top": 822,
+          "height": 60,
+          "zIndex": 70
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": 2,
+        "room": null,
+        "collection": null,
+        "compose": null,
+        "legacy": null
+      },
+      "minControl": 30,
+      "minFontSize": 9,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "poem@320": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": true,
+        "desktopNav": false,
+        "mobileFilterBar": false,
+        "audioDock": false
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 720,
+          "zIndex": 0
+        },
+        {
+          "selector": "nav.mobile-dock",
+          "top": 647,
+          "height": 61,
+          "zIndex": 80
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": null,
+        "room": null,
+        "collection": null,
+        "compose": null,
+        "legacy": null
+      },
+      "minControl": 42,
+      "minFontSize": 11,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "poem@390": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": true,
+        "desktopNav": false,
+        "mobileFilterBar": false,
+        "audioDock": false
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 844,
+          "zIndex": 0
+        },
+        {
+          "selector": "nav.mobile-dock",
+          "top": 771,
+          "height": 61,
+          "zIndex": 80
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": null,
+        "room": null,
+        "collection": null,
+        "compose": null,
+        "legacy": null
+      },
+      "minControl": 42,
+      "minFontSize": 11,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "poem@820": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": true,
+        "desktopNav": false,
+        "mobileFilterBar": false,
+        "audioDock": false
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 900,
+          "zIndex": 0
+        },
+        {
+          "selector": "nav.mobile-dock",
+          "top": 827,
+          "height": 61,
+          "zIndex": 80
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": null,
+        "room": null,
+        "collection": null,
+        "compose": null,
+        "legacy": null
+      },
+      "minControl": 42,
+      "minFontSize": 11,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "poem@821": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": false,
+        "desktopNav": true,
+        "mobileFilterBar": false,
+        "audioDock": true
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 900,
+          "zIndex": 0
+        },
+        {
+          "selector": "aside.audio-dock.is-collapsed",
+          "top": 822,
+          "height": 60,
+          "zIndex": 70
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": null,
+        "room": null,
+        "collection": null,
+        "compose": null,
+        "legacy": null
+      },
+      "minControl": 30,
+      "minFontSize": 9,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "poem@1280": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": false,
+        "desktopNav": true,
+        "mobileFilterBar": false,
+        "audioDock": true
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 900,
+          "zIndex": 0
+        },
+        {
+          "selector": "aside.audio-dock.is-collapsed",
+          "top": 822,
+          "height": 60,
+          "zIndex": 70
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": null,
+        "room": null,
+        "collection": null,
+        "compose": null,
+        "legacy": null
+      },
+      "minControl": 30,
+      "minFontSize": 9,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "collection@320": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": true,
+        "desktopNav": false,
+        "mobileFilterBar": false,
+        "audioDock": false
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 720,
+          "zIndex": 0
+        },
+        {
+          "selector": "nav.mobile-dock",
+          "top": 647,
+          "height": 61,
+          "zIndex": 80
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": null,
+        "room": null,
+        "collection": 1,
+        "compose": null,
+        "legacy": null
+      },
+      "minControl": 42,
+      "minFontSize": 11,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "collection@390": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": true,
+        "desktopNav": false,
+        "mobileFilterBar": false,
+        "audioDock": false
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 844,
+          "zIndex": 0
+        },
+        {
+          "selector": "nav.mobile-dock",
+          "top": 771,
+          "height": 61,
+          "zIndex": 80
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": null,
+        "room": null,
+        "collection": 1,
+        "compose": null,
+        "legacy": null
+      },
+      "minControl": 42,
+      "minFontSize": 11,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "collection@820": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": true,
+        "desktopNav": false,
+        "mobileFilterBar": false,
+        "audioDock": false
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 900,
+          "zIndex": 0
+        },
+        {
+          "selector": "nav.mobile-dock",
+          "top": 827,
+          "height": 61,
+          "zIndex": 80
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": null,
+        "room": null,
+        "collection": 1,
+        "compose": null,
+        "legacy": null
+      },
+      "minControl": 42,
+      "minFontSize": 11,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "collection@821": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": false,
+        "desktopNav": true,
+        "mobileFilterBar": false,
+        "audioDock": true
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 900,
+          "zIndex": 0
+        },
+        {
+          "selector": "aside.audio-dock.is-collapsed",
+          "top": 822,
+          "height": 60,
+          "zIndex": 70
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": null,
+        "room": null,
+        "collection": 1,
+        "compose": null,
+        "legacy": null
+      },
+      "minControl": 30,
+      "minFontSize": 9,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "collection@1280": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": false,
+        "desktopNav": true,
+        "mobileFilterBar": false,
+        "audioDock": true
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 900,
+          "zIndex": 0
+        },
+        {
+          "selector": "aside.audio-dock.is-collapsed",
+          "top": 822,
+          "height": 60,
+          "zIndex": 70
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": null,
+        "room": null,
+        "collection": 2,
+        "compose": null,
+        "legacy": null
+      },
+      "minControl": 30,
+      "minFontSize": 9,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "compose@320": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": true,
+        "desktopNav": false,
+        "mobileFilterBar": false,
+        "audioDock": false
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 720,
+          "zIndex": 0
+        },
+        {
+          "selector": "nav.mobile-dock",
+          "top": 647,
+          "height": 61,
+          "zIndex": 80
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": null,
+        "room": null,
+        "collection": null,
+        "compose": 1,
+        "legacy": null
+      },
+      "minControl": 42,
+      "minFontSize": 11,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "compose@390": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": true,
+        "desktopNav": false,
+        "mobileFilterBar": false,
+        "audioDock": false
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 844,
+          "zIndex": 0
+        },
+        {
+          "selector": "nav.mobile-dock",
+          "top": 771,
+          "height": 61,
+          "zIndex": 80
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": null,
+        "room": null,
+        "collection": null,
+        "compose": 1,
+        "legacy": null
+      },
+      "minControl": 42,
+      "minFontSize": 11,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "compose@820": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": true,
+        "desktopNav": false,
+        "mobileFilterBar": false,
+        "audioDock": false
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 900,
+          "zIndex": 0
+        },
+        {
+          "selector": "nav.mobile-dock",
+          "top": 827,
+          "height": 61,
+          "zIndex": 80
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": null,
+        "room": null,
+        "collection": null,
+        "compose": 1,
+        "legacy": null
+      },
+      "minControl": 42,
+      "minFontSize": 11,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "compose@821": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": false,
+        "desktopNav": true,
+        "mobileFilterBar": false,
+        "audioDock": true
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 900,
+          "zIndex": 0
+        },
+        {
+          "selector": "aside.audio-dock.is-collapsed",
+          "top": 822,
+          "height": 60,
+          "zIndex": 70
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": null,
+        "room": null,
+        "collection": null,
+        "compose": 1,
+        "legacy": null
+      },
+      "minControl": 30,
+      "minFontSize": 9,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "compose@1280": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": false,
+        "desktopNav": true,
+        "mobileFilterBar": false,
+        "audioDock": true
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 900,
+          "zIndex": 0
+        },
+        {
+          "selector": "aside.audio-dock.is-collapsed",
+          "top": 822,
+          "height": 60,
+          "zIndex": 70
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 2,
+        "footerCopy": true
+      },
+      "grids": {
+        "index": null,
+        "room": null,
+        "collection": null,
+        "compose": 2,
+        "legacy": null
+      },
+      "minControl": 30,
+      "minFontSize": 9,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "login@320": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": false,
+        "desktopNav": false,
+        "mobileFilterBar": false,
+        "audioDock": false
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 720,
+          "zIndex": 0
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 0,
+        "footerCopy": false
+      },
+      "grids": {
+        "index": null,
+        "room": null,
+        "collection": null,
+        "compose": null,
+        "legacy": null
+      },
+      "minControl": 42,
+      "minFontSize": 11,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "login@390": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": false,
+        "desktopNav": false,
+        "mobileFilterBar": false,
+        "audioDock": false
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 844,
+          "zIndex": 0
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 0,
+        "footerCopy": false
+      },
+      "grids": {
+        "index": null,
+        "room": null,
+        "collection": null,
+        "compose": null,
+        "legacy": null
+      },
+      "minControl": 42,
+      "minFontSize": 11,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "login@820": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": false,
+        "desktopNav": false,
+        "mobileFilterBar": false,
+        "audioDock": false
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 900,
+          "zIndex": 0
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 0,
+        "footerCopy": false
+      },
+      "grids": {
+        "index": null,
+        "room": null,
+        "collection": null,
+        "compose": null,
+        "legacy": null
+      },
+      "minControl": 42,
+      "minFontSize": 11,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "login@821": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": false,
+        "desktopNav": false,
+        "mobileFilterBar": false,
+        "audioDock": false
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 900,
+          "zIndex": 0
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 0,
+        "footerCopy": false
+      },
+      "grids": {
+        "index": null,
+        "room": null,
+        "collection": null,
+        "compose": null,
+        "legacy": null
+      },
+      "minControl": 42,
+      "minFontSize": 11,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    },
+    "login@1280": {
+      "overflowX": 0,
+      "shells": {
+        "mobileDock": false,
+        "desktopNav": false,
+        "mobileFilterBar": false,
+        "audioDock": false
+      },
+      "shellConsistent": true,
+      "fixedLayers": [
+        {
+          "selector": "div.porcelain-grid",
+          "top": 0,
+          "height": 900,
+          "zIndex": 0
+        }
+      ],
+      "overlapped": {
+        "footerLinks": 0,
+        "footerCopy": false
+      },
+      "grids": {
+        "index": null,
+        "room": null,
+        "collection": null,
+        "compose": null,
+        "legacy": null
+      },
+      "minControl": 41,
+      "minFontSize": 11,
+      "footerOverlapAtBottom": {
+        "footerLinks": 0,
+        "footerCopy": false
+      }
+    }
+  }
+}

@@ -76,6 +76,9 @@ jobs:
       - name: Mobile visual regression
         run: npm run audit:visual
 
+      - name: Mobile layout contract
+        run: npm run audit:layout
+
       - name: Upload visual diffs
         if: always()
         uses: actions/upload-artifact@v4

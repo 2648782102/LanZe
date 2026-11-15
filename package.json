@@ -26,6 +26,8 @@
     "audit:perf": "node scripts/browser/perf-budget.mjs",
     "audit:visual": "node scripts/browser/visual-baseline.mjs",
     "audit:visual:update": "node scripts/browser/visual-baseline.mjs --update",
+    "audit:layout": "node scripts/browser/layout-contract.mjs",
+    "audit:layout:update": "node scripts/browser/layout-contract.mjs --update",
     "audit:touch": "node scripts/browser/touch-target-audit.mjs"
   },
   "engines": {

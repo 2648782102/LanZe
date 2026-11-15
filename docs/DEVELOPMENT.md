@@ -43,6 +43,7 @@ npm run audit:a11y           # axe-core：5 条路由 × 桌面/移动，WCAG 2.
 npm run audit:perf           # LCP / CLS / 首屏 JS-CSS / 传输量预算
 npm run audit:touch          # 6 条路由 × 390px 触控目标下限 40px
 npm run audit:visual         # 4 条路由 × 320/390/430 移动端像素基线
+npm run audit:layout         # 6 条路由 × 5 个断点的布局约定（跨平台可比）
 ```
 
 CI 的等价步骤是：
@@ -58,11 +59,14 @@ npm run audit:a11y
 npm run audit:perf
 npm run audit:touch
 npm run audit:visual
+npm run audit:layout
 ```
 
 `npm run smoke:browser` 使用临时 Chrome / Chromium profile 与 CDP，在 1280×800、390×844 和 320×720 下验证今日展厅、单张历史摘录卡及竖排/扇舟图/收藏/换句、本地诗目收藏与吸底音源、桌面/窄屏搜索、移动端筛选抽屉（贴底、滚动锁定、关闭释放）、吸附式筛选栏、分页窗口与翻页定位、诗页工具栏不裁切、访客草稿、窄屏导航与 320px 无横向溢出，再完成演示登录、作品发布与诗卷回读；脚本要求控制台错误、未捕获异常、意外失败请求为 0，并统计非用户输入引起的 CLS（预算 0.05），结束后清理临时 Cookie 和 `localStorage` 演示数据。独立的 `.github/workflows/browser-e2e.yml` 在 Ubuntu 用 `browser-actions/setup-chrome@v2` 安装 Chromium，并通过 action 的 `chrome-path` 输出设置 `CHROME_PATH` 后运行同一脚本（含 a11y / 性能 / 触控 / 视觉四项审计）。本机也可用 `CHROME_PATH`、`BROWSER_SMOKE_PORT`、`BROWSER_SMOKE_DEBUG_PORT` 覆盖；脚本仍不覆盖真实后端或跨浏览器矩阵。
 
 视觉基线存放在 `tests/visual/mobile/`，`manifest.json` 记录采集平台。中文字形回退在 macOS 与 Linux 间不同，因此平台不一致时脚本默认跳过比对（`VISUAL_STRICT=1` 可强制比对）。确认改动符合预期后，用 `npm run audit:visual:update` 主动刷新基线；失败时的实际截图与 diff 留在 `tests/visual/.actual/`，CI 会把它作为构建产物上传。
+
+像素基线只在录制平台上有效，所以 CI 里真正把关的是 `npm run audit:layout`：它把 6 条路由 × 320/390/820/821/1280 五个断点的**结构性事实**写入 `tests/visual/layout-contract.json`，包括横向溢出、移动壳与筛选栏是否同时翻转、固定层是否压住页脚、栅格列数、控件尺寸下限与正文字号下限。这些数值不依赖字形度量，可以在 macOS 录基线、在 Linux 比对。硬规则（溢出、断点不一致、页脚被压、字号过小）每次都会失败；结构变化（栅格列数、壳可见性、控件下限缩小）与基线不一致时也会失败，确认无误后用 `npm run audit:layout:update` 更新。
 
 CI 的 Node 20/22 build job 使用 `npm run test --if-present` 以兼容外部旧流程，Documentation checks job 执行 `npm run lint`；Browser E2E job 执行构建与 `npm run smoke:browser`。本地开发建议直接运行上述全部命令。
 
@@ -139,7 +143,8 @@ VITE_USE_MOCK=true
 - [ ] 修改构建配置后，`npm run smoke` 成功。
 - [ ] 修改首页/摘录卡片/导航/播放器/登录/发布链路/路由后 `npm run smoke:browser` 成功。
 - [ ] 改动可见 UI 后跑 `npm run audit:a11y`、`npm run audit:perf`、`npm run audit:touch` 全部通过。
-- [ ] 改动移动端布局后跑 `npm run audit:visual`；确认差异符合预期再用 `npm run audit:visual:update` 刷新基线，并把基线图片一并提交。
+- [ ] 改动移动端布局后跑 `npm run audit:layout`（CI 里真正生效的那一项），必要时再跑 `npm run audit:visual` 做像素核对。
+- [ ] 确认布局变化符合预期后，用 `npm run audit:layout:update` 更新约定快照、用 `npm run audit:visual:update` 刷新图片基线，并把两者一并提交。
 - [ ] `dist/` 未被提交；`.env*` 未出现在 diff 中。
 
 ### 页面路径

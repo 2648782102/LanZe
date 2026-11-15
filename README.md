@@ -105,9 +105,10 @@ npm run audit:a11y   # axe-core 无障碍审计（WCAG 2.1 A/AA）
 npm run audit:perf   # LCP / CLS / 首屏资源预算
 npm run audit:touch  # 移动端 40px 触控下限
 npm run audit:visual # 移动端像素基线比对
+npm run audit:layout # 移动端布局约定（跨平台可比，CI 实际把关项）
 ```
 
-CI workflow 在 Node 20/22 执行 `npm ci && npm run build && npm run test --if-present && npm run smoke`，Documentation checks 另执行 `npm run lint`；独立的 Browser E2E workflow 在 Ubuntu 安装 Chromium 后执行 `npm run smoke:browser`，并追加 a11y、性能、触控与移动端视觉基线四项审计。该 CDP 冒烟用独立临时 profile 验证今日展厅、单张摘录卡、桌面/390px/320px 搜索与布局、移动端筛选抽屉、吸附筛选栏、分页窗口、访客草稿、响应式导航、本地收藏、演示登录、作品发布、吸底音源、控制台/网络错误与布局位移预算；本机可用 `CHROME_PATH` 覆盖 Chrome / Chromium 路径。视觉基线存放在 `tests/visual/mobile/`，平台不一致时自动跳过比对（中文字形回退不同），差异截图会作为 CI 产物上传。审计仍不覆盖真实后端或跨浏览器矩阵。
+CI workflow 在 Node 20/22 执行 `npm ci && npm run build && npm run test --if-present && npm run smoke`，Documentation checks 另执行 `npm run lint`；独立的 Browser E2E workflow 在 Ubuntu 安装 Chromium 后执行 `npm run smoke:browser`，并追加 a11y、性能、触控、移动端像素基线与布局约定五项审计。该 CDP 冒烟用独立临时 profile 验证今日展厅、单张摘录卡、桌面/390px/320px 搜索与布局、移动端筛选抽屉、吸附筛选栏、分页窗口、访客草稿、响应式导航、本地收藏、演示登录、作品发布、吸底音源、控制台/网络错误与布局位移预算；本机可用 `CHROME_PATH` 覆盖 Chrome / Chromium 路径。像素基线存放在 `tests/visual/mobile/`，平台不一致时自动跳过比对（中文字形回退不同），差异截图会作为 CI 产物上传；因此 CI 里真正把关的是 `npm run audit:layout`——它比对 6 条路由 × 320/390/820/821/1280 的布局约定（横向溢出、断点一致性、固定层遮挡、栅格列数、控件与字号下限），与字形度量无关。审计仍不覆盖真实后端或跨浏览器矩阵。
 
 ### 本地演示 / mock 模式
 
