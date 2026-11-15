@@ -34,9 +34,15 @@
               <AppIcon :name="saved ? 'check' : 'bookmark'" :size="17" />
               {{ saved ? "已收入诗卷" : "收入诗卷" }}
             </button>
-            <button class="gallery-action" type="button" @click="speakPoem">
-              <AppIcon name="volume" :size="17" />
-              朗读
+            <button
+              class="gallery-action"
+              type="button"
+              :aria-pressed="isSpeaking"
+              :aria-label="isSpeaking ? '停止朗读' : '朗读这首诗'"
+              @click="speakPoem"
+            >
+              <AppIcon :name="isSpeaking ? 'pause' : 'volume'" :size="17" />
+              {{ isSpeaking ? "停止" : "朗读" }}
             </button>
             <router-link class="gallery-action" :to="{ name: 'poem', params: { id: poem.id } }">
               展开笺注
@@ -155,6 +161,7 @@ const featured = getFeaturedPoems();
 const page = ref(dayIndex % featured.length);
 const excerptCardRef = ref(null);
 const isSwitching = ref(false);
+const isSpeaking = ref(false);
 const savePulse = ref(false);
 let switchTimer;
 let saveTimer;
@@ -183,6 +190,10 @@ const saved = computed(() => isSaved(poem.value.id));
 
 const nextPoem = () => {
   if (isSwitching.value) return;
+  if (isSpeaking.value) {
+    window.speechSynthesis?.cancel();
+    isSpeaking.value = false;
+  }
   const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
   isSwitching.value = true;
   window.clearTimeout(switchTimer);
@@ -214,17 +225,28 @@ const speakPoem = () => {
     return;
   }
   window.speechSynthesis.cancel();
+  if (isSpeaking.value) {
+    isSpeaking.value = false;
+    return;
+  }
   const utterance = new SpeechSynthesisUtterance(
     `${poem.value.title}。${poem.value.author}。${poemLines.value.join("。")}`,
   );
   utterance.lang = "zh-CN";
   utterance.rate = 0.86;
+  utterance.onend = () => { isSpeaking.value = false; };
+  utterance.onerror = () => { isSpeaking.value = false; };
+  isSpeaking.value = true;
   window.speechSynthesis.speak(utterance);
 };
 
 onBeforeUnmount(() => {
   window.clearTimeout(switchTimer);
   window.clearTimeout(saveTimer);
+  if (isSpeaking.value) {
+    window.speechSynthesis?.cancel();
+    isSpeaking.value = false;
+  }
 });
 </script>
 
