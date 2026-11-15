@@ -23,9 +23,15 @@
               <AppIcon :name="saved ? 'check' : 'bookmark'" :size="19" />
               <span>{{ saved ? "已收入" : "收入诗卷" }}</span>
             </button>
-            <button class="icon-action" type="button" aria-label="朗读这首诗" @click="speakPoem">
-              <AppIcon name="volume" :size="19" />
-              <span>朗读</span>
+            <button
+              class="icon-action"
+              type="button"
+              :aria-label="isSpeaking ? '停止朗读' : '朗读这首诗'"
+              :aria-pressed="isSpeaking"
+              @click="speakPoem"
+            >
+              <AppIcon :name="isSpeaking ? 'pause' : 'volume'" :size="19" />
+              <span>{{ isSpeaking ? "停止" : "朗读" }}</span>
             </button>
             <button class="icon-action" type="button" aria-label="复制这首诗的链接" @click="copyLink">
               <AppIcon name="copy" :size="19" />
@@ -122,7 +128,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import AppIcon from "../components/AppIcon.vue";
 import EmptyState from "../components/EmptyState.vue";
@@ -196,17 +202,26 @@ const copyLink = async () => {
   }
 };
 
+const isSpeaking = ref(false);
+
 const speakPoem = () => {
   if (!("speechSynthesis" in window) || !poem.value) {
     notify("当前浏览器不支持朗读", "warning");
     return;
   }
   window.speechSynthesis.cancel();
+  if (isSpeaking.value) {
+    isSpeaking.value = false;
+    return;
+  }
   const utterance = new SpeechSynthesisUtterance(
     `${poem.value.title}。${poem.value.author}。${poemLines.value.join("。")}`,
   );
   utterance.lang = "zh-CN";
   utterance.rate = 0.86;
+  utterance.onend = () => { isSpeaking.value = false; };
+  utterance.onerror = () => { isSpeaking.value = false; };
+  isSpeaking.value = true;
   window.speechSynthesis.speak(utterance);
 };
 
@@ -219,6 +234,12 @@ watch(
 );
 
 onMounted(loadCatalog);
+
+onBeforeUnmount(() => {
+  if (!isSpeaking.value) return;
+  window.speechSynthesis?.cancel();
+  isSpeaking.value = false;
+});
 
 </script>
 
