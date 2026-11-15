@@ -31,10 +31,16 @@
 
     <div class="mobile-filter-bar">
       <div class="shell mobile-filter-bar__inner">
-        <button type="button" :aria-expanded="filtersOpen" aria-controls="mobile-filter-panel" @click="filtersOpen = !filtersOpen">
+        <button
+          type="button"
+          :aria-expanded="filtersOpen"
+          :aria-label="hasFilters ? `筛选，已选 ${activeFilterCount} 项条件` : '筛选'"
+          aria-controls="mobile-filter-panel"
+          @click="filtersOpen = !filtersOpen"
+        >
           <AppIcon name="filter" :size="16" />
           筛选
-          <span v-if="hasFilters">{{ activeFilterCount }}</span>
+          <span v-if="hasFilters" aria-hidden="true">{{ activeFilterCount }}</span>
         </button>
         <p>{{ resultSummary }}</p>
       </div>
@@ -103,54 +109,60 @@
           </header>
 
           <div class="filter-wall__body">
-          <section class="facet">
-            <div class="facet__head">
-              <p class="eyebrow">朝代 / DYNASTY</p>
-              <button v-if="dynasty !== '全部'" type="button" @click="resetFacet('dynasty')">重置</button>
-            </div>
-            <div class="facet__list" role="group" aria-label="按朝代筛选">
-              <button
-                v-for="item in dynasties"
-                :key="item.name"
-                type="button"
-                :class="{ 'is-active': dynasty === item.name }"
-                :aria-pressed="dynasty === item.name"
-                @click="selectFacet('dynasty', item.name)"
-              >
-                <span>{{ item.name }}</span>
-                <em>{{ item.count.toLocaleString("zh-CN") }}</em>
-              </button>
-            </div>
-          </section>
+            <section class="facet">
+              <div class="facet__head">
+                <p class="eyebrow">朝代 / DYNASTY</p>
+                <button v-if="dynasty !== '全部'" type="button" @click="resetFacet('dynasty')">重置</button>
+              </div>
+              <div class="facet__list" role="group" aria-label="按朝代筛选">
+                <button
+                  v-for="item in dynasties"
+                  :key="item.name"
+                  type="button"
+                  :class="{ 'is-active': dynasty === item.name }"
+                  :aria-pressed="dynasty === item.name"
+                  @click="selectFacet('dynasty', item.name)"
+                >
+                  <span>{{ item.name }}</span>
+                  <em>{{ item.count.toLocaleString("zh-CN") }}</em>
+                </button>
+              </div>
+            </section>
 
-          <section class="facet">
-            <div class="facet__head">
-              <p class="eyebrow">体裁 / FORM</p>
-              <button v-if="genre !== '全部'" type="button" @click="resetFacet('genre')">重置</button>
-            </div>
-            <div class="facet__list" role="group" aria-label="按体裁筛选">
-              <button
-                v-for="item in genres"
-                :key="item.name"
-                type="button"
-                :class="{ 'is-active': genre === item.name }"
-                :aria-pressed="genre === item.name"
-                @click="selectFacet('genre', item.name)"
-              >
-                <span>{{ item.name }}</span>
-                <em>{{ item.count.toLocaleString("zh-CN") }}</em>
-              </button>
-            </div>
-          </section>
+            <section class="facet">
+              <div class="facet__head">
+                <p class="eyebrow">体裁 / FORM</p>
+                <button v-if="genre !== '全部'" type="button" @click="resetFacet('genre')">重置</button>
+              </div>
+              <div class="facet__list" role="group" aria-label="按体裁筛选">
+                <button
+                  v-for="item in genres"
+                  :key="item.name"
+                  type="button"
+                  :class="{ 'is-active': genre === item.name }"
+                  :aria-pressed="genre === item.name"
+                  @click="selectFacet('genre', item.name)"
+                >
+                  <span>{{ item.name }}</span>
+                  <em>{{ item.count.toLocaleString("zh-CN") }}</em>
+                </button>
+              </div>
+            </section>
 
-          <p class="filter-note">
-            数量为全馆计数；两轴筛选会缩小当前结果。馆藏是阅读选段，不是校勘定本。
-          </p>
+            <p class="filter-note">
+              数量为全馆计数；两轴筛选会缩小当前结果。馆藏是阅读选段，不是校勘定本。
+            </p>
           </div>
 
           <footer class="filter-wall__foot">
             <button type="button" class="filter-wall__reset" :disabled="!hasFilters" @click="resetFilters">清除条件</button>
-            <button type="button" class="filter-wall__apply" @click="filtersOpen = false">
+            <button
+              type="button"
+              class="filter-wall__apply"
+              aria-live="polite"
+              aria-atomic="true"
+              @click="filtersOpen = false"
+            >
               查看 {{ result.total.toLocaleString("zh-CN") }} 篇
             </button>
           </footer>
@@ -163,7 +175,7 @@
               <h2 id="result-heading">{{ resultHeading }}</h2>
             </div>
             <div class="result-head__right">
-              <span>{{ resultSummary }}</span>
+              <span class="result-head__summary" aria-live="polite" aria-atomic="true">{{ resultSummary }}</span>
               <button v-if="hasFilters" type="button" @click="resetFilters">清除条件</button>
             </div>
           </header>
