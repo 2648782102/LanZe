@@ -936,6 +936,12 @@ const main = async () => {
   if (!mobileLayout.audioPaused) {
     throw new Error("Mobile audio dock should start silently");
   }
+  const mobileSearchSize = await evaluate(
+    "parseFloat(getComputedStyle(document.querySelector('#global-search')).fontSize)",
+  );
+  if (mobileSearchSize < 16) {
+    throw new Error(`Mobile search input is ${mobileSearchSize}px; iOS would zoom on focus`);
+  }
   await evaluate("window.scrollTo({ top: 700, behavior: 'instant' })");
   await waitUntil("mobile filter bar pinned", () => evaluate(`(() => {
     const bar = document.querySelector('.mobile-filter-bar');
@@ -1068,6 +1074,20 @@ const main = async () => {
   }
   if (composeTypography.loginHeight < 40) {
     throw new Error("Compose login link is below the minimum touch target");
+  }
+  const mobileFieldSizes = await evaluate(`(() => {
+    const fields = [...document.querySelectorAll('#poem-title, #poem-author, #poem-category, #poem-content, #poem-note')];
+    const search = document.querySelector('#global-search');
+    return {
+      checked: fields.length,
+      undersized: fields
+        .map((field) => parseFloat(getComputedStyle(field).fontSize))
+        .filter((size) => size < 16).length,
+      searchSize: search ? parseFloat(getComputedStyle(search).fontSize) : null,
+    };
+  })()`);
+  if (mobileFieldSizes.checked !== 5 || mobileFieldSizes.undersized > 0) {
+    throw new Error(`Mobile form fields must be at least 16px to avoid iOS focus zoom: ${JSON.stringify(mobileFieldSizes)}`);
   }
   if (composeTypography.fixedLayerSpace < 88) {
     throw new Error("Narrow screens do not reserve space for fixed layers");
