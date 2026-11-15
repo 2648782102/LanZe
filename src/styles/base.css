@@ -101,6 +101,11 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+html.is-drawer-open,
+html.is-drawer-open body {
+  overflow: hidden;
+}
+
 button,
 input,
 textarea,

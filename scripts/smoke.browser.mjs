@@ -912,9 +912,36 @@ const main = async () => {
     expanded: document.querySelector('.mobile-filter-bar button')?.getAttribute('aria-expanded'),
     scrollWidth: document.documentElement.scrollWidth,
     viewportWidth: document.documentElement.clientWidth,
-  }))()`).then((value) => value.panel !== "none" && value.expanded === "true" ? value : null));
+    bottom: Math.round(document.querySelector('.filter-wall').getBoundingClientRect().bottom),
+    viewportHeight: window.innerHeight,
+    bodyLocked: getComputedStyle(document.documentElement).overflow === 'hidden',
+    dockCovered: (() => {
+      const foot = document.querySelector('.filter-wall__foot');
+      const dock = document.querySelector('.mobile-dock');
+      if (!foot || !dock) return false;
+      const f = foot.getBoundingClientRect();
+      const d = dock.getBoundingClientRect();
+      const overlap = Math.min(f.bottom, d.bottom) - Math.max(f.top, d.top);
+      return overlap > 2 && Number(getComputedStyle(dock).zIndex) >= Number(getComputedStyle(document.querySelector('.filter-wall')).zIndex);
+    })(),
+  }))()`).then((value) => (
+    value.panel !== "none"
+    && value.expanded === "true"
+    && Math.abs(value.bottom - value.viewportHeight) <= 2
+      ? value
+      : null
+  )));
   if (mobileFilters.scrollWidth > mobileFilters.viewportWidth + 1) {
     throw new Error("Open mobile filter panel overflows horizontally");
+  }
+  if (Math.abs(mobileFilters.bottom - mobileFilters.viewportHeight) > 2) {
+    throw new Error(`Mobile filter drawer is not anchored to the viewport bottom: ${mobileFilters.bottom}/${mobileFilters.viewportHeight}`);
+  }
+  if (!mobileFilters.bodyLocked) {
+    throw new Error("Mobile filter drawer should lock background scrolling");
+  }
+  if (mobileFilters.dockCovered) {
+    throw new Error("Mobile filter drawer footer is covered by the mobile dock");
   }
   if (!await evaluate(`(() => {
     const button = document.querySelector('.mobile-filter-bar button');
@@ -922,6 +949,14 @@ const main = async () => {
     button.click();
     return true;
   })()`)) throw new Error("Mobile filter button was not found after opening");
+  const mobileFiltersClosed = await waitUntil("mobile filter panel closed", () => evaluate(`(() => ({
+    panel: getComputedStyle(document.querySelector('.filter-wall')).display,
+    expanded: document.querySelector('.mobile-filter-bar button')?.getAttribute('aria-expanded'),
+    bodyLocked: getComputedStyle(document.documentElement).overflow === 'hidden',
+  }))()`).then((value) => value.panel === "none" && value.expanded === "false" ? value : null));
+  if (mobileFiltersClosed.bodyLocked) {
+    throw new Error("Mobile filter drawer did not release the scroll lock on close");
+  }
   if (!await setInput("#global-search", "春晓")) throw new Error("Mobile search input was not found");
   currentStep = "mobile search";
   await evaluate("document.querySelector('#global-search').closest('form').requestSubmit()");

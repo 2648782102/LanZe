@@ -51,6 +51,10 @@ const isBare = computed(() => Boolean(route.meta.bare));
   z-index: 1;
 }
 
+html.is-drawer-open .route-stage {
+  z-index: 86;
+}
+
 .app-frame:not(.is-bare) .route-stage {
   min-height: calc(100dvh - var(--header-height));
 }

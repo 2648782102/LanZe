@@ -1,5 +1,5 @@
 <template>
-  <main class="index-page">
+  <main class="index-page" :class="{ 'is-drawer-open': filtersOpen }">
     <section class="index-banner">
       <div class="shell index-banner__inner">
         <div class="index-label">
@@ -80,7 +80,29 @@
 
     <section class="index-content">
       <div class="shell index-grid">
-        <aside id="mobile-filter-panel" class="filter-wall" :class="{ 'is-open': filtersOpen }" aria-label="馆藏筛选">
+        <button
+          v-if="filtersOpen"
+          class="filter-wall__scrim"
+          type="button"
+          aria-label="关闭筛选"
+          tabindex="-1"
+          @click="filtersOpen = false"
+        />
+        <aside
+          id="mobile-filter-panel"
+          class="filter-wall"
+          :class="{ 'is-open': filtersOpen }"
+          aria-label="馆藏筛选"
+        >
+          <span class="filter-wall__grip" aria-hidden="true" />
+          <header class="filter-wall__head">
+            <p>馆藏筛选</p>
+            <button type="button" aria-label="关闭筛选" @click="filtersOpen = false">
+              <AppIcon name="close" :size="16" />
+            </button>
+          </header>
+
+          <div class="filter-wall__body">
           <section class="facet">
             <div class="facet__head">
               <p class="eyebrow">朝代 / DYNASTY</p>
@@ -124,6 +146,14 @@
           <p class="filter-note">
             数量为全馆计数；两轴筛选会缩小当前结果。馆藏是阅读选段，不是校勘定本。
           </p>
+          </div>
+
+          <footer class="filter-wall__foot">
+            <button type="button" class="filter-wall__reset" :disabled="!hasFilters" @click="resetFilters">清除条件</button>
+            <button type="button" class="filter-wall__apply" @click="filtersOpen = false">
+              查看 {{ result.total.toLocaleString("zh-CN") }} 篇
+            </button>
+          </footer>
         </aside>
 
         <section class="result-room" aria-labelledby="result-heading">
@@ -322,8 +352,24 @@ onMounted(() => {
   };
   desktopQuery.addEventListener("change", syncFilters);
   onBeforeUnmount(() => desktopQuery.removeEventListener("change", syncFilters));
+  const onKeydown = (event) => {
+    if (event.key === "Escape" && filtersOpen.value) filtersOpen.value = false;
+  };
+  window.addEventListener("keydown", onKeydown);
+  onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
   loadCatalog();
 });
+
+watch(filtersOpen, (open) => {
+  document.documentElement.classList.toggle("is-drawer-open", open);
+  if (open) {
+    window.requestAnimationFrame(() => {
+      document.querySelector(".filter-wall.is-open .filter-wall__head button")?.focus({ preventScroll: true });
+    });
+  }
+});
+
+onBeforeUnmount(() => document.documentElement.classList.remove("is-drawer-open"));
 
 const resetFacet = (key) => selectFacet(key, "全部");
 
@@ -374,6 +420,10 @@ watch([dynasty, genre], () => {
 .index-page {
   min-height: 80dvh;
   background: var(--porcelain);
+}
+
+.index-page.is-drawer-open {
+  z-index: 86;
 }
 
 .index-banner {
@@ -645,6 +695,13 @@ watch([dynasty, genre], () => {
   position: sticky;
   top: 106px;
   min-width: 0;
+}
+
+.filter-wall__scrim,
+.filter-wall__grip,
+.filter-wall__head,
+.filter-wall__foot {
+  display: none;
 }
 
 .facet + .facet {
@@ -974,19 +1031,123 @@ watch([dynasty, genre], () => {
 
   .filter-wall {
     display: none;
-    position: static;
+    position: fixed;
+    z-index: 90;
+    inset: auto 0 0;
     min-width: 0;
-    padding: 22px 0;
-    border-bottom: 1px solid var(--line-strong);
+    max-height: min(84dvh, 640px);
+    padding: 0;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    border-top: 1px solid var(--line-strong);
+    border-radius: 20px 20px 0 0;
+    background: var(--porcelain-panel);
+    box-shadow: 0 -26px 60px -32px rgba(28, 38, 36, 0.42);
+    overflow: hidden;
   }
 
   .filter-wall.is-open {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    animation: drawer-rise 260ms cubic-bezier(0.22, 0.61, 0.24, 1);
+  }
+
+  @keyframes drawer-rise {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+  }
+
+  .filter-wall__scrim {
+    display: block;
+    position: fixed;
+    z-index: 85;
+    inset: 0;
+    border: 0;
+    background: rgba(24, 33, 31, 0.36);
+  }
+
+  .filter-wall__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 24px 18px 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .filter-wall__grip {
+    display: block;
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    width: 38px;
+    height: 4px;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: var(--line-strong);
+  }
+
+  .filter-wall__head p {
+    margin: 0;
+    color: var(--ink);
+    font-family: var(--font-poem);
+    font-size: 17px;
+    letter-spacing: 0.08em;
+  }
+
+  .filter-wall__head button {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    margin-right: -8px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink-faint);
+  }
+
+  .filter-wall__head button:hover {
+    background: var(--porcelain-deep);
+    color: var(--ink);
+  }
+
+  .filter-wall__body {
+    display: grid;
     gap: 20px;
-    max-height: min(360px, 60dvh);
+    min-height: 0;
+    padding: 18px;
     overflow-y: auto;
     overscroll-behavior: contain;
+  }
+
+  .filter-wall__foot {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 10px;
+    padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--line);
+    background: var(--porcelain-panel);
+  }
+
+  .filter-wall__foot button {
+    min-height: 46px;
+    border: 1px solid var(--line-strong);
+    border-radius: 2px;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: var(--text-note);
+    letter-spacing: 0.06em;
+  }
+
+  .filter-wall__foot .filter-wall__apply {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--porcelain-panel);
+  }
+
+  .filter-wall__foot button:disabled {
+    opacity: 0.42;
   }
 
   .facet__list button.is-active::before {
@@ -1000,12 +1161,10 @@ watch([dynasty, genre], () => {
   .facet__list {
     display: flex;
     min-width: 0;
-    max-height: 132px;
     flex-wrap: wrap;
     align-content: start;
     gap: 8px;
-    overflow-x: auto;
-    overflow-y: auto;
+    overflow: visible;
     border-top: 0;
     overscroll-behavior: contain;
   }
@@ -1103,19 +1262,9 @@ watch([dynasty, genre], () => {
     font-size: 19px;
   }
 
-  .filter-wall {
-    grid-template-columns: 1fr;
-  }
-
-  .filter-wall.is-open {
-    grid-template-columns: 1fr;
-  }
-
   .facet__list {
-    max-height: 116px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
+    flex-wrap: wrap;
+    overflow: visible;
   }
 
   .result-head {
@@ -1182,10 +1331,6 @@ watch([dynasty, genre], () => {
 
   .mobile-filter-bar p {
     max-width: 52%;
-  }
-
-  .filter-wall.is-open {
-    grid-template-columns: 1fr;
   }
 
   .result-head h2 {
