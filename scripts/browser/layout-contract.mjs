@@ -19,12 +19,12 @@ const update = process.argv.includes("--update");
 const port = Number(process.env.CONTRACT_PORT || 4379);
 
 const routes = [
-  { name: "read", path: "/#/" },
-  { name: "explore", path: "/#/explore" },
-  { name: "poem", path: "/#/poem/demo-shuidiaoge" },
-  { name: "collection", path: "/#/collection" },
-  { name: "compose", path: "/#/compose" },
-  { name: "login", path: "/#/login" },
+  { name: "read", path: "/" },
+  { name: "explore", path: "/explore" },
+  { name: "poem", path: "/poem/demo-shuidiaoge" },
+  { name: "collection", path: "/collection" },
+  { name: "compose", path: "/compose" },
+  { name: "login", path: "/login" },
 ];
 
 // 320 / 390 phone, 820 phone-shell edge, 821 desktop-shell edge, 1280 desktop.

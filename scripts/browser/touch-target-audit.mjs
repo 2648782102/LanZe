@@ -5,7 +5,7 @@ const MIN = Number(process.env.TOUCH_MIN || 40);
 // Linux headless rounds layout edges down by a fraction of a pixel; keep a
 // tolerance so a 40px target does not fail at 39.99.
 const TOLERANCE = Number(process.env.TOUCH_TOLERANCE || 0.6);
-const routes = ["/#/", "/#/explore", "/#/collection", "/#/compose", "/#/login", "/#/poem/demo-chunxiao"];
+const routes = ["/", "/explore", "/collection", "/compose", "/login", "/poem/demo-chunxiao"];
 
 const main = async () => {
   const preview = await startPreview({ port });

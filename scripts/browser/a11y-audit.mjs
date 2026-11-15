@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { gotoStable, openBrowser, startPreview } from "./lab.mjs";
 
 const port = Number(process.env.A11Y_PORT || 4371);
-const routes = ["/#/", "/#/explore", "/#/collection", "/#/compose", "/#/login"];
+const routes = ["/", "/explore", "/collection", "/compose", "/login"];
 const viewports = [
   { name: "desktop", width: 1280, height: 900 },
   { name: "mobile", width: 390, height: 844 },

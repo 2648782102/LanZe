@@ -236,7 +236,7 @@ const main = async () => {
       deviceScaleFactor: 1,
       mobile: false,
     });
-    await sessionSend("Page.navigate", { url: `${origin}/#/` });
+    await sessionSend("Page.navigate", { url: `${origin}/` });
     await waitUntil("cold start reading view", () => sessionEvaluate(
       "Boolean(document.querySelector('.poem-plinth'))",
     ), 60);
@@ -320,7 +320,7 @@ const main = async () => {
   if (!coldStart.plinthVisible || !coldStart.actionsVisible) {
     throw new Error("Cold start reading plinth or actions are missing");
   }
-  await send("Page.navigate", { url: `${origin}/#/` });
+  await send("Page.navigate", { url: `${origin}/` });
   await waitUntil("today's reading view", () => evaluate("Boolean(document.querySelector('.poem-plinth'))"));
   await waitUntil("excerpt source settled", () => evaluate(
     `(() => {
@@ -664,7 +664,7 @@ const main = async () => {
   }
 
   currentStep = "desktop pagination";
-  await send("Page.navigate", { url: `${origin}/#/explore?page=6` });
+  await send("Page.navigate", { url: `${origin}/explore?page=6` });
   await waitUntil("pagination window", () => evaluate(
     "document.querySelectorAll('.pagination__pages button').length > 0",
   ));
@@ -691,7 +691,7 @@ const main = async () => {
   }
   await evaluate("document.querySelector('.pagination__pages button[aria-label=\"第 7 页\"]').click()");
   const paginationAfter = await waitUntil("pagination page 7", () => evaluate(`(() => ({
-    href: location.hash,
+    href: location.pathname + location.search,
     current: document.querySelector('.pagination__pages .is-current')?.textContent?.trim() || '',
   }))()`).then((value) => value.current === "7" ? value : null));
   if (!paginationAfter.href.includes("page=7")) {
@@ -704,7 +704,7 @@ const main = async () => {
     deviceScaleFactor: 1,
     mobile: true,
   });
-  await send("Page.navigate", { url: `${origin}/#/explore` });
+  await send("Page.navigate", { url: `${origin}/explore` });
   currentStep = "mobile layout";
   await waitUntil("mobile search input", () => evaluate("Boolean(document.querySelector('#global-search'))"));
   const mobileLayout = await evaluate(`(() => ({
@@ -757,7 +757,7 @@ const main = async () => {
   if (!rowMeta || rowMeta.duplicated) {
     throw new Error(`Poem row meta repeats a facet: ${JSON.stringify(rowMeta)}`);
   }
-  await send("Page.navigate", { url: `${origin}/#/` });
+  await send("Page.navigate", { url: `${origin}/` });
   await waitUntil("mobile excerpt card", () => evaluate("Boolean(document.querySelector('.legacy-card'))"));
   await evaluate("document.querySelector('.legacy-card').scrollIntoView({ block: 'center' })");
   await delay(400);
@@ -797,7 +797,7 @@ const main = async () => {
   if (!swipeActive || !afterSwipe) {
     throw new Error("Touch swipe did not drag and turn the excerpt card on mobile");
   }
-  await send("Page.navigate", { url: `${origin}/#/explore` });
+  await send("Page.navigate", { url: `${origin}/explore` });
   await waitUntil("mobile explore after swipe", () => evaluate(
     "Boolean(document.querySelector('.mobile-filter-bar button'))",
   ));
@@ -917,7 +917,7 @@ const main = async () => {
   ));
   if (!mobileSearch) throw new Error("Mobile search did not return the expected poem");
 
-  await send("Page.navigate", { url: `${origin}/#/collection` });
+  await send("Page.navigate", { url: `${origin}/collection` });
   await waitUntil("mobile collection", () => evaluate(
     "Boolean(document.querySelector('.collection-tabs') && document.querySelector('.account-panel.is-guest'))",
   ));
@@ -971,10 +971,10 @@ const main = async () => {
     };
   })()`).then((value) => (value && value.height > 0 && value.height < 200 ? value : null))));
 
-  await send("Page.navigate", { url: `${origin}/#/compose` });
+  await send("Page.navigate", { url: `${origin}/compose` });
   await waitUntil("guest compose form", () => evaluate("Boolean(document.querySelector('#poem-title'))"));
   const guestCompose = await evaluate(`(() => ({
-    route: location.hash,
+    route: location.pathname + location.search,
     note: document.querySelector('.compose-login-note')?.innerText || '',
     action: document.querySelector('.form-actions .button--solid')?.innerText.trim() || '',
     preview: document.querySelector('.preview-panel')?.innerText || '',
@@ -1048,7 +1048,7 @@ const main = async () => {
     return {
       text: notice.innerText.replace(/\\s+/g, ' ').trim(),
       focused: document.activeElement?.id || '',
-      hash: location.hash,
+      hash: location.pathname + location.search,
     };
   })()`).then((value) => (value && value.text.includes("不能为空") ? value : null)));
   if (!["poem-title", "poem-content"].includes(emptySubmit.focused) || !emptySubmit.hash.includes("compose")) {
@@ -1081,7 +1081,7 @@ const main = async () => {
     deviceScaleFactor: 1,
     mobile: true,
   });
-  await send("Page.navigate", { url: `${origin}/#/explore` });
+  await send("Page.navigate", { url: `${origin}/explore` });
   await waitUntil("narrow search input", () => evaluate("Boolean(document.querySelector('#global-search'))"));
   const narrowLayout = await evaluate(`(() => ({
     scrollWidth: document.documentElement.scrollWidth,
@@ -1099,7 +1099,7 @@ const main = async () => {
   if (narrowLayout.audioElements !== 0) {
     throw new Error("Audio player should be fully removed at 320px");
   }
-  await send("Page.navigate", { url: `${origin}/#/explore?page=200` });
+  await send("Page.navigate", { url: `${origin}/explore?page=200` });
   await waitUntil("narrow pagination", () => evaluate(
     "Boolean(document.querySelector('.pagination__pages .is-current'))",
   ));
@@ -1137,7 +1137,7 @@ const main = async () => {
   }
 
   currentStep = "narrow poem actions";
-  await send("Page.navigate", { url: `${origin}/#/poem/demo-shuidiaoge` });
+  await send("Page.navigate", { url: `${origin}/poem/demo-shuidiaoge` });
   await waitUntil("narrow poem sheet", () => evaluate(
     "Boolean(document.querySelector('.poem-side__actions .icon-action'))",
   ));
@@ -1204,7 +1204,7 @@ const main = async () => {
     await sessionSend("Runtime.enable");
     await sessionSend("Fetch.enable", { patterns: [{ urlPattern: "*", requestStage: "Request" }] });
     await sessionSend("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
-    await sessionSend("Page.navigate", { url: `${origin}/#/explore` });
+    await sessionSend("Page.navigate", { url: `${origin}/explore` });
     let catalogFailure = null;
     for (let attempt = 0; attempt < 60 && !catalogFailure; attempt += 1) {
       await delay(250);
@@ -1239,7 +1239,7 @@ const main = async () => {
     deviceScaleFactor: 1,
     mobile: false,
   });
-  await send("Page.navigate", { url: `${origin}/#/login` });
+  await send("Page.navigate", { url: `${origin}/login` });
   currentStep = "login";
   await waitUntil("login form", () => evaluate(`(() => {
     return Boolean(document.querySelector('input[aria-label="登录账号"]'))
@@ -1286,7 +1286,7 @@ const main = async () => {
     `document.cookie.includes('lanze_user') && location.href.includes('collection')`,
   ));
 
-  await send("Page.navigate", { url: `${origin}/#/compose` });
+  await send("Page.navigate", { url: `${origin}/compose` });
   currentStep = "compose";
   await waitUntil("compose form", () => evaluate("Boolean(document.querySelector('#poem-title'))"));
   const work = createDemoBrowserWork();

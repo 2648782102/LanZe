@@ -3,10 +3,12 @@ import { join } from "node:path";
 
 const escapeAttribute = (value) => String(value).replaceAll('"', "&quot;");
 
-export const preloadRouteAssets = (root) => ({
+export const preloadRouteAssets = (root, base = "/") => ({
   name: "lanze-preload-route-assets",
   apply: "build",
   async closeBundle() {
+    // history 路由下深链会把相对路径解析成 /poem/assets/...，必须拼上 base。
+    const prefix = (base || "/").replace(/\/?$/, "/");
     const manifestPath = join(root, "dist", ".vite", "manifest.json");
     const indexPath = join(root, "dist", "index.html");
     let manifest;
@@ -20,9 +22,9 @@ export const preloadRouteAssets = (root) => ({
     );
     if (!route) return;
     const tags = [
-      `<link rel="modulepreload" crossorigin href="./${escapeAttribute(route.file)}">`,
+      `<link rel="modulepreload" crossorigin href="${prefix}${escapeAttribute(route.file)}">`,
       ...(route.css || []).map((file) =>
-        `<link rel="preload" as="style" crossorigin href="./${escapeAttribute(file)}">`,
+        `<link rel="preload" as="style" crossorigin href="${prefix}${escapeAttribute(file)}">`,
       ),
     ];
     const html = await readFile(indexPath, "utf8");

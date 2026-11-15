@@ -19,10 +19,10 @@ const maxRatio = Number(process.env.VISUAL_MAX_DIFF || 0.012);
 const strict = process.env.VISUAL_STRICT !== "0";
 
 const routes = [
-  { name: "explore", path: "/#/explore" },
-  { name: "read", path: "/#/" },
-  { name: "poem", path: "/#/poem/demo-shuidiaoge" },
-  { name: "collection", path: "/#/collection" },
+  { name: "explore", path: "/explore" },
+  { name: "read", path: "/" },
+  { name: "poem", path: "/poem/demo-shuidiaoge" },
+  { name: "collection", path: "/collection" },
 ];
 const widths = [320, 390, 430];
 

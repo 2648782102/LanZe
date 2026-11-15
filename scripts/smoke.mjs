@@ -35,9 +35,10 @@ async function expectOk(path) {
 
 function localAssetPaths(html) {
   return [...new Set(
-    [...html.matchAll(/(?:src|href)="(\.\/[^"?#]+)"/g)]
+    // 构建改成绝对 base（history 路由要求），因此同时接受 / 与 ./ 前缀。
+    [...html.matchAll(/(?:src|href)="((?:\.\/|\/)[^"?#]+)"/g)]
       .map((match) => match[1])
-      .filter((asset) => asset.startsWith("./assets/") || asset === "./favicon.ico"),
+      .filter((asset) => /^(\.\/|\/)assets\//.test(asset) || /^(\.\/|\/)favicon\.ico$/.test(asset)),
   )];
 }
 
@@ -77,14 +78,16 @@ try {
   );
   const fontAssets = [...new Set(
     cssText.flatMap((text) =>
-      [...text.matchAll(/url\(\.\/([^)'"?#]+\.(?:woff2?|ttf|eot|svg))\)/g)].map((match) => `./assets/${match[1]}`),
+      // 绝对 base 下字体是 /assets/xxx.woff2；旧版是 ./xxx.woff2。
+      [...text.matchAll(/url\((?:\.\/|\/assets\/)([^)'"?#]+\.(?:woff2?|ttf|eot|svg))\)/g)]
+        .map((match) => `./assets/${match[1]}`),
     ),
   )];
   const uniqueAssets = [...new Set([...localAssets, ...fontAssets])];
   if (fontAssets.length === 0) throw new Error("No local font assets found in built CSS");
 
   await expectOk("/");
-  for (const asset of uniqueAssets) await expectOk(`/${asset.replace(/^\.\//, "")}`);
+  for (const asset of uniqueAssets) await expectOk(`/${asset.replace(/^\.\//, "").replace(/^\//, "")}`);
   console.log(`Smoke passed: ${uniqueAssets.length + corpusAssets.length} local assets returned 200.`);
 } catch (error) {
   console.error(error instanceof Error ? error.message : error);

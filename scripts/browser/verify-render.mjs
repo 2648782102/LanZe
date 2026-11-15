@@ -15,7 +15,7 @@ import {
 const outDir = process.env.RENDER_LAB_DIR || "/tmp/lanze-render-lab";
 const compareOnline = process.env.RENDER_COMPARE === "online";
 const onlineUrl = `https://2648782102.github.io/LanZe/?render=${Date.now()}#/`;
-const routes = ["/#/", "/#/explore", "/#/login", "/#/compose", "/#/collection"];
+const routes = ["/", "/explore", "/login", "/compose", "/collection"];
 
 const main = async () => {
   await mkdir(outDir, { recursive: true });
@@ -35,7 +35,7 @@ const main = async () => {
 
   try {
     for (const route of routes) {
-      const name = route === "/#/" ? "today" : route.replace("/#/", "").replace(/\W+/g, "-");
+      const name = route === "/" ? "today" : route.replace("/", "").replace(/\W+/g, "-");
       await gotoStable(page, `${preview.origin}${route}`);
       const localShot = join(outDir, `local-${name}.png`);
       await captureViewport(page, localShot);
@@ -49,10 +49,10 @@ const main = async () => {
       });
     }
 
-    await gotoStable(page, `${preview.origin}/#/`);
+    await gotoStable(page, `${preview.origin}/`);
 
     const localBrand = join(outDir, "local-brand.png");
-    await gotoStable(page, `${preview.origin}/#/`);
+    await gotoStable(page, `${preview.origin}/`);
     await captureElement(page, ".brand", localBrand, { padding: 8 });
 
     if (compareOnline) {
@@ -74,7 +74,7 @@ const main = async () => {
     }
     report.local.brand = localBrand;
 
-    await gotoStable(page, `${preview.origin}/#/`);
+    await gotoStable(page, `${preview.origin}/`);
     await page.locator(".legacy-card").scrollIntoViewIfNeeded();
     await realDrag(page, ".legacy-card", { from: -10, to: 70, steps: 14 });
     await page.waitForTimeout(600);

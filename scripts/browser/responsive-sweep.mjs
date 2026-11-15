@@ -7,7 +7,7 @@ const port = Number(process.env.SWEEP_PORT || 4361);
 // 821/901 are the layout breakpoints; sweep both sides so a mismatch between
 // the phone shell and the explore grid cannot slip through.
 const widths = [320, 360, 390, 414, 480, 560, 640, 768, 820, 821, 900, 901, 1024, 1280, 1440, 1920];
-const routes = ["/#/", "/#/explore", "/#/collection", "/#/compose", "/#/login"];
+const routes = ["/", "/explore", "/collection", "/compose", "/login"];
 
 const main = async () => {
   await mkdir(outDir, { recursive: true });
@@ -76,7 +76,7 @@ const main = async () => {
               .map((node) => `${node.tagName.toLowerCase()}.${[...node.classList].join('.')} clip${node.scrollWidth - Math.round(node.getBoundingClientRect().width)}px`),
           };
         });
-        const shot = join(outDir, `${route.replace('/#/', '').replace(/\W+/g, '-') || 'today'}-${width}.png`);
+        const shot = join(outDir, `${route.replace('/', '').replace(/\W+/g, '-') || 'today'}-${width}.png`);
         await page.screenshot({ path: shot, fullPage: false });
         report.push({ route, ...row, shot });
       }

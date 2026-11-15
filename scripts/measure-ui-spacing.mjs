@@ -112,11 +112,11 @@ const probe = `(() => {
 })()`;
 
 const routes = [
-  ["today", "/#/"],
-  ["login", "/#/login"],
-  ["compose", "/#/compose"],
-  ["collection", "/#/collection"],
-  ["explore", "/#/explore"],
+  ["today", "/"],
+  ["login", "/login"],
+  ["compose", "/compose"],
+  ["collection", "/collection"],
+  ["explore", "/explore"],
 ];
 
 for (const [name, width, height] of [["desktop", 1280, 800], ["mobile", 390, 844]]) {

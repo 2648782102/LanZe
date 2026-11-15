@@ -45,7 +45,7 @@ const evaluate = async (expression) => (await send("Runtime.evaluate", { express
 await send("Page.enable");
 await send("Runtime.enable");
 await send("Emulation.setDeviceMetricsOverride", { width: 1280, height: 800, deviceScaleFactor: 2, mobile: false });
-await send("Page.navigate", { url: `http://127.0.0.1:${port}/#/` });
+await send("Page.navigate", { url: `http://127.0.0.1:${port}/` });
 await delay(1200);
 const rect = await evaluate(`(() => {
   const node = document.querySelector('.brand');

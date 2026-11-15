@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
   {
@@ -74,8 +74,25 @@ const routes = [
   { path: "/:pathMatch(.*)*", redirect: "/" },
 ];
 
+const baseUrl = import.meta.env.BASE_URL || "/";
+
+/*
+ * 旧链接兼容必须先于路由创建执行：既往分享的 /#/poem/xxx 仍要能打开。
+ * 把 hash 改写成等价 path（保留 query），history 路由随后直接命中目标页。
+ */
+if (typeof window !== "undefined" && window.location.hash.startsWith("#/")) {
+  const migrated = window.location.hash.slice(1);
+  const normalizedBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+  const path = migrated.replace(/^\//, "");
+  window.history.replaceState(null, "", `${normalizedBase}${path}${window.location.search}`);
+}
+
+/*
+ * 真实路径（非 hash）是能被搜索引擎收录的前提：/poem/demo-jingyesi 是一个
+ * 独立 URL，而 hash 版本 /#/poem/... 抓取时会被当成首页。
+ */
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(baseUrl),
   routes,
   scrollBehavior() {
     return { top: 0 };

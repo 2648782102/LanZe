@@ -67,7 +67,7 @@ const auditRuntime = async () => {
       page.on("request", (request) => {
         if (request.resourceType() === "script") scripts.push(request.url());
       });
-      await gotoStable(page, `${preview.origin}/#/explore`, { settle: 500 });
+      await gotoStable(page, `${preview.origin}/explore`, { settle: 500 });
       const base = scripts.length;
       await page.locator(".mobile-filter-bar button").click();
       await page.waitForTimeout(700);

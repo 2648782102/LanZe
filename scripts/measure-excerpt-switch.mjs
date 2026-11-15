@@ -134,7 +134,7 @@ const main = async () => {
     deviceScaleFactor: 1,
     mobile: false,
   });
-  await send("Page.navigate", { url: `${origin}/#/` });
+  await send("Page.navigate", { url: `${origin}/` });
   await waitUntil("excerpt card", () => evaluate("Boolean(document.querySelector('.legacy-card'))"), 60);
   await delay(600);
 

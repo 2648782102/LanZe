@@ -43,7 +43,7 @@ const send = (method, params = {}) => new Promise((resolve) => {
 await send("Page.enable");
 await send("Runtime.enable");
 await send("Emulation.setDeviceMetricsOverride", { width: 1280, height: 800, deviceScaleFactor: 2, mobile: false });
-await send("Page.navigate", { url: `http://127.0.0.1:${port}/#/` });
+await send("Page.navigate", { url: `http://127.0.0.1:${port}/` });
 await delay(1600);
 const boxResult = await send("Runtime.evaluate", {
   expression: `(() => {

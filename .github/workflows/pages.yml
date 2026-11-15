@@ -38,6 +38,9 @@ jobs:
         run: npm ci
 
       - name: Build
+        env:
+          # 项目站点发布在 /<repo>/ 子路径下；history 路由需要绝对 base。
+          VITE_BASE: /${{ github.event.repository.name }}/
         run: npm run build
 
       - name: Verify build output

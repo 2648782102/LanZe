@@ -2,15 +2,15 @@
   "platform": "darwin",
   "deviceScaleFactor": 2,
   "routes": [
-    "/#/explore",
-    "/#/",
-    "/#/poem/demo-shuidiaoge",
-    "/#/collection"
+    "/explore",
+    "/",
+    "/poem/demo-shuidiaoge",
+    "/collection"
   ],
   "widths": [
     320,
     390,
     430
   ],
-  "updatedAt": "2026-11-15T15:36:54.225Z"
+  "updatedAt": "2026-11-15T16:24:51.794Z"
 }

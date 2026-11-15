@@ -15,7 +15,8 @@ const budgets = {
 const measureBundle = async () => {
   const assetsDir = join(process.cwd(), "dist", "assets");
   const html = await readFile(join(process.cwd(), "dist", "index.html"), "utf8");
-  const referenced = [...html.matchAll(/(?:src|href)="\.\/(assets\/[^"]+\.(?:js|css))"/g)].map((m) => m[1]);
+  // 绝对 base 下资源写作 /assets/xxx；兼容旧的 ./assets/xxx。
+  const referenced = [...html.matchAll(/(?:src|href)="(?:\.\/|\/)(assets\/[^"]+\.(?:js|css))"/g)].map((m) => m[1]);
   const rows = [];
   for (const relative of referenced) {
     const path = join(process.cwd(), "dist", relative);
@@ -50,7 +51,7 @@ const main = async () => {
         }
       }).observe({ type: "layout-shift", buffered: true });
     });
-    await gotoStable(page, `${preview.origin}/#/`, { settle: 1200 });
+    await gotoStable(page, `${preview.origin}/`, { settle: 1200 });
     metrics = await page.evaluate(() => ({
       lcp: Math.round(window.__lcp),
       cls: Number(window.__cls.toFixed(4)),
