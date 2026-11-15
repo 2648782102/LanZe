@@ -508,10 +508,18 @@ onBeforeUnmount(() => {
 @media (max-width: 940px) {
   .compose-grid {
     grid-template-columns: 1fr;
+    justify-items: center;
   }
 
   .preview-panel {
     display: none;
+  }
+
+  /* 单列时别让正文拉到整屏宽，否则行长过长、且越过 940px 会突然减半。 */
+  .compose-form,
+  .compose-head__row,
+  .form-actions {
+    width: min(100%, 620px);
   }
 
   .preview-sheet {
