@@ -194,12 +194,32 @@ const toggleSave = () => {
 };
 
 const copyLink = async () => {
+  const url = window.location.href;
   try {
-    await navigator.clipboard.writeText(window.location.href);
+    await navigator.clipboard.writeText(url);
     notify("链接已复制", "success");
+    return;
   } catch {
-    notify("浏览器不允许自动复制，请从地址栏复制", "warning");
+    // 非安全上下文（如局域网 http）没有 Clipboard API，退回旧接口。
   }
+  const field = document.createElement("textarea");
+  field.value = url;
+  field.setAttribute("readonly", "");
+  field.style.position = "fixed";
+  field.style.top = "-1000px";
+  document.body.appendChild(field);
+  field.select();
+  let copied = false;
+  try {
+    copied = document.execCommand("copy");
+  } catch {
+    copied = false;
+  }
+  document.body.removeChild(field);
+  notify(
+    copied ? "链接已复制" : "浏览器不允许自动复制，请从地址栏复制",
+    copied ? "success" : "warning",
+  );
 };
 
 const isSpeaking = ref(false);
