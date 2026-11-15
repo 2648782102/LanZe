@@ -37,7 +37,8 @@
 | 前端构建 | Vue 3 + Vue Router 4（hash 模式）+ 自有组件 + Vite 6（ESM 配置） |
 | 静态预览 | GitHub Pages 项目站点已启用并验证入口资源；仅发布前端，不承诺托管后端、账号服务或正式线上 Demo |
 | 后端/账号 | 仓库不附带完整后端；默认使用本地演示数据，配置 `VITE_API_BASE_URL` 后可连接自建 API |
-| 测试 | `npm run test` 含 39 个 `node --test` 单测；Node 20/22 CI 与独立 Browser E2E workflow 覆盖构建与主要演示链路 |
+| 测试 | `npm run test` 含 43 个 `node --test` 单测；Node 20/22 CI 与独立 Browser E2E workflow 覆盖构建与主要演示链路 |
+| 质量门禁 | Browser E2E 同时跑 axe-core 无障碍审计（0 违规）、LCP/CLS/首屏资源预算、40px 移动端触控下限，以及 320/390/430 三档移动端像素基线 |
 | 许可 | [MIT](LICENSE)，`Copyright (c) 2022-2026 LanZe contributors` |
 | 发布 | `v0.2.0` / `v0.3.0` 是历史 Release；`v0.4.0` 说明见 `RELEASE_NOTES.md` 与 `ANNOUNCEMENT.md` |
 | 设计契约 | [青瓷数字诗馆](docs/DESIGN_SYSTEM.md)：冷白瓷面、青灰线框、铜金索引色与「一首诗一展厅」的信息架构 |
@@ -95,14 +96,18 @@ npm run dev
 
 ```bash
 npm run build        # 生成 dist/
-npm run test         # 39 个 node --test 单测
+npm run test         # 43 个 node --test 单测
 npm run lint         # 静态检查：失效后端地址、硬编码服务与脆弱引用
 npm run preview      # 预览 dist/
 npm run smoke        # 预览服务与入口静态资源 HTTP 冒烟
 npm run smoke:browser # Chrome / Chromium 桌面、窄屏、登录与发布冒烟
+npm run audit:a11y   # axe-core 无障碍审计（WCAG 2.1 A/AA）
+npm run audit:perf   # LCP / CLS / 首屏资源预算
+npm run audit:touch  # 移动端 40px 触控下限
+npm run audit:visual # 移动端像素基线比对
 ```
 
-CI workflow 在 Node 20/22 执行 `npm ci && npm run build && npm run test --if-present && npm run smoke`，Documentation checks 另执行 `npm run lint`；独立的 Browser E2E workflow 在 Ubuntu 安装 Chromium 后执行 `npm run smoke:browser`。该 CDP 冒烟用独立临时 profile 验证今日展厅、单张摘录卡、桌面/390px/320px 搜索与布局、窄屏筛选折叠、访客草稿、响应式导航、本地收藏、演示登录、作品发布、吸底音源、控制台/网络错误与布局位移预算；本机可用 `CHROME_PATH` 覆盖 Chrome / Chromium 路径。它不覆盖真实后端、跨浏览器矩阵或视觉截图回归。
+CI workflow 在 Node 20/22 执行 `npm ci && npm run build && npm run test --if-present && npm run smoke`，Documentation checks 另执行 `npm run lint`；独立的 Browser E2E workflow 在 Ubuntu 安装 Chromium 后执行 `npm run smoke:browser`，并追加 a11y、性能、触控与移动端视觉基线四项审计。该 CDP 冒烟用独立临时 profile 验证今日展厅、单张摘录卡、桌面/390px/320px 搜索与布局、移动端筛选抽屉、吸附筛选栏、分页窗口、访客草稿、响应式导航、本地收藏、演示登录、作品发布、吸底音源、控制台/网络错误与布局位移预算；本机可用 `CHROME_PATH` 覆盖 Chrome / Chromium 路径。视觉基线存放在 `tests/visual/mobile/`，平台不一致时自动跳过比对（中文字形回退不同），差异截图会作为 CI 产物上传。审计仍不覆盖真实后端或跨浏览器矩阵。
 
 ### 本地演示 / mock 模式
 

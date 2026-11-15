@@ -34,7 +34,7 @@
 
 ### 测试与 lint 怎么运行？
 
-`npm run test` 执行 39 个 `node --test` 单测，`npm run lint` 执行静态扫描。Node 20/22 build job 使用 `npm run test --if-present` 以兼容外部旧流程，Documentation checks job 执行 `npm run lint`；独立 Browser E2E workflow 安装 Chromium 并运行 `npm run smoke:browser`。
+`npm run test` 执行 43 个 `node --test` 单测，`npm run lint` 执行静态扫描。Node 20/22 build job 使用 `npm run test --if-present` 以兼容外部旧流程，Documentation checks job 执行 `npm run lint`；独立 Browser E2E workflow 安装 Chromium 并运行 `npm run smoke:browser`。
 
 ### 首次启动遇到 esbuild 二进制错误？
 

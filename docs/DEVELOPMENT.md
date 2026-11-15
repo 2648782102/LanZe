@@ -34,11 +34,15 @@ npm run dev
 ```bash
 npm run dev                  # 开发服务器
 npm run build                # 生产构建，输出到 dist/
-npm run test                 # 39 个 node --test 单测
+npm run test                 # 43 个 node --test 单测
 npm run lint                 # 静态扫描失效后端地址、硬编码服务与脆弱引用
 npm run preview              # 预览构建产物
 npm run smoke                # 启动预览服务并检查首页与入口静态资源
 npm run smoke:browser        # Chrome / Chromium 桌面、窄屏、登录与发布冒烟
+npm run audit:a11y           # axe-core：5 条路由 × 桌面/移动，WCAG 2.1 A/AA
+npm run audit:perf           # LCP / CLS / 首屏 JS-CSS / 传输量预算
+npm run audit:touch          # 6 条路由 × 390px 触控目标下限 40px
+npm run audit:visual         # 4 条路由 × 320/390/430 移动端像素基线
 ```
 
 CI 的等价步骤是：
@@ -50,9 +54,15 @@ npm run test
 npm run lint
 npm run smoke
 npm run smoke:browser
+npm run audit:a11y
+npm run audit:perf
+npm run audit:touch
+npm run audit:visual
 ```
 
-`npm run smoke:browser` 使用临时 Chrome / Chromium profile 与 CDP，在 1280×800、390×844 和 320×720 下验证今日展厅、单张历史摘录卡及竖排/扇舟图/收藏/换句、本地诗目收藏与吸底音源、桌面/窄屏搜索、窄屏筛选折叠、访客草稿、窄屏导航与 320px 无横向溢出，再完成演示登录、作品发布与诗卷回读；脚本要求控制台错误、未捕获异常、意外失败请求为 0，并统计非用户输入引起的 CLS（预算 0.05），结束后清理临时 Cookie 和 `localStorage` 演示数据。独立的 `.github/workflows/browser-e2e.yml` 在 Ubuntu 用 `browser-actions/setup-chrome@v2` 安装 Chromium，并通过 action 的 `chrome-path` 输出设置 `CHROME_PATH` 后运行同一脚本。本机也可用 `CHROME_PATH`、`BROWSER_SMOKE_PORT`、`BROWSER_SMOKE_DEBUG_PORT` 覆盖；脚本仍不覆盖真实后端、跨浏览器矩阵或视觉截图回归。
+`npm run smoke:browser` 使用临时 Chrome / Chromium profile 与 CDP，在 1280×800、390×844 和 320×720 下验证今日展厅、单张历史摘录卡及竖排/扇舟图/收藏/换句、本地诗目收藏与吸底音源、桌面/窄屏搜索、移动端筛选抽屉（贴底、滚动锁定、关闭释放）、吸附式筛选栏、分页窗口与翻页定位、诗页工具栏不裁切、访客草稿、窄屏导航与 320px 无横向溢出，再完成演示登录、作品发布与诗卷回读；脚本要求控制台错误、未捕获异常、意外失败请求为 0，并统计非用户输入引起的 CLS（预算 0.05），结束后清理临时 Cookie 和 `localStorage` 演示数据。独立的 `.github/workflows/browser-e2e.yml` 在 Ubuntu 用 `browser-actions/setup-chrome@v2` 安装 Chromium，并通过 action 的 `chrome-path` 输出设置 `CHROME_PATH` 后运行同一脚本（含 a11y / 性能 / 触控 / 视觉四项审计）。本机也可用 `CHROME_PATH`、`BROWSER_SMOKE_PORT`、`BROWSER_SMOKE_DEBUG_PORT` 覆盖；脚本仍不覆盖真实后端或跨浏览器矩阵。
+
+视觉基线存放在 `tests/visual/mobile/`，`manifest.json` 记录采集平台。中文字形回退在 macOS 与 Linux 间不同，因此平台不一致时脚本默认跳过比对（`VISUAL_STRICT=1` 可强制比对）。确认改动符合预期后，用 `npm run audit:visual:update` 主动刷新基线；失败时的实际截图与 diff 留在 `tests/visual/.actual/`，CI 会把它作为构建产物上传。
 
 CI 的 Node 20/22 build job 使用 `npm run test --if-present` 以兼容外部旧流程，Documentation checks job 执行 `npm run lint`；Browser E2E job 执行构建与 `npm run smoke:browser`。本地开发建议直接运行上述全部命令。
 
@@ -128,12 +138,15 @@ VITE_USE_MOCK=true
 - [ ] `npm run build`、`npm run test`、`npm run lint` 成功。
 - [ ] 修改构建配置后，`npm run smoke` 成功。
 - [ ] 修改首页/摘录卡片/导航/播放器/登录/发布链路/路由后 `npm run smoke:browser` 成功。
+- [ ] 改动可见 UI 后跑 `npm run audit:a11y`、`npm run audit:perf`、`npm run audit:touch` 全部通过。
+- [ ] 改动移动端布局后跑 `npm run audit:visual`；确认差异符合预期再用 `npm run audit:visual:update` 刷新基线，并把基线图片一并提交。
 - [ ] `dist/` 未被提交；`.env*` 未出现在 diff 中。
 
 ### 页面路径
 
 - [ ] `/#/` 今日展厅展示整首诗、词牌长题分行与单张历史样式余韵摘录卡；换诗、摘录收藏/换句、朗读可操作。
 - [ ] `/#/explore` 关键词检索、体裁筛选、URL 查询同步与空状态。
+- [ ] `/#/explore` 在 ≤900px 下点「筛选」应弹出贴底抽屉：背景滚动锁定、Esc 与遮罩可关闭、底部按钮不被导航栏遮挡。
 - [ ] `/#/poem/demo-jingyesi` 诗笺、标签、相关诗目与复制链接。
 - [ ] `/#/collection` 收藏、最近阅读、作品、资料编辑与退出登录。
 - [ ] `/#/compose` 草稿自动保存、实时预览、校验与发布链路。
