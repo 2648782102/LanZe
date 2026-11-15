@@ -66,7 +66,7 @@
             placeholder="从第一句开始；换行或标点会保留为诗句边界。"
             required
           />
-          <span class="field-hint">{{ contentLength }} 字 · 草稿自动保存在当前浏览器</span>
+          <span class="field-hint">{{ contentLength }} 字</span>
         </label>
 
         <p class="draft-status" role="status" aria-live="polite">
@@ -151,7 +151,7 @@ const draftStatusLabel = computed(() => {
   if (draftSaving.value) return "正在保存草稿";
   if (submitting.value) return "正在收入诗卷";
   if (draftSavedAt.value) return `草稿已保存 · ${draftSavedAt.value}`;
-  return "草稿会保存在当前浏览器";
+  return "草稿只留在这台设备上，随时可以清空";
 });
 const previewLines = computed(() => {
   const lines = form.content

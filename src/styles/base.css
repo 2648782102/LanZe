@@ -261,6 +261,14 @@ img {
     box-shadow var(--motion-fast) var(--ease-standard);
 }
 
+/* iOS zooms the viewport when a focused field is under 16px. */
+@media (max-width: 820px) {
+  .field,
+  .index-search input {
+    font-size: 16px;
+  }
+}
+
 .field::placeholder {
   color: var(--ink-faint);
 }
