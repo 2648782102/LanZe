@@ -416,12 +416,8 @@ const main = async () => {
   if (!excerptCards.artLoaded || excerptCards.artWidth !== "720" || excerptCards.artHeight !== "412") {
     throw new Error("Historical artwork did not render with stable dimensions");
   }
-  // 插画已换成仓库自绘的原创位图，不再依赖 AVIF 编码；校验尺寸与加载状态。
-  if (!excerptCards.artLoaded || !excerptCards.artCurrentSrc.includes('landscape-720')) {
+  if (!excerptCards.artCurrentSrc.includes("fanzou-720")) {
     throw new Error(`Historical artwork did not load: ${JSON.stringify(excerptCards)}`);
-  }
-  if (excerptCards.artWidth !== '720' || excerptCards.artHeight !== '412') {
-    throw new Error(`Historical artwork lost its intrinsic size: ${JSON.stringify(excerptCards)}`);
   }
   if (excerptCards.boxBackground !== "rgb(255, 255, 255)" || excerptCards.boxOverflow !== "hidden") {
     throw new Error("Historical card surface did not render");

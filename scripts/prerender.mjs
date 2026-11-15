@@ -10,6 +10,7 @@
 import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { curatedPoems } from "../src/data/poetryCatalog.js";
+import { getPoemNote } from "../src/data/poemNotes.js";
 
 const dist = join(process.cwd(), "dist");
 const template = await readFile(join(dist, "index.html"), "utf8");
@@ -57,14 +58,21 @@ const writePage = async (routePath, html) => {
 };
 
 // 现代爬虫会执行 JS，但静态 HTML 里的正文仍是最可靠的信号。
-const poemBody = (poem) => `
+const poemBody = (poem) => {
+  const note = getPoemNote(poem.id);
+  return `
     <main>
       <article>
         <h1>${escapeHtml(poem.title)}</h1>
         <p>${escapeHtml(poem.author)} · ${escapeHtml(poem.dynasty)} · ${escapeHtml(poem.category)}</p>
         ${poem.paragraphs.map((line) => `<p>${escapeHtml(line)}</p>`).join("")}
+        ${note?.translation?.length
+    ? `<h2>译文</h2>${note.translation.map((line) => `<p>${escapeHtml(line)}</p>`).join("")}`
+    : ""}
+        ${note?.note ? `<h2>简注</h2><p>${escapeHtml(note.note)}</p>` : ""}
       </article>
     </main>`;
+};
 
 const pages = [];
 

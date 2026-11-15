@@ -13,7 +13,6 @@ const chromePath = process.env.CHROME_PATH
 
 const jobs = [
   { src: "src/assets/originals/moon-blossom.svg", out: "src/assets/exhibit/poem-768.jpg", width: 672, height: 768, type: "jpeg", quality: 78 },
-  { src: "src/assets/originals/ink-landscape.svg", out: "src/assets/excerpt/landscape-720.jpg", width: 720, height: 412, type: "jpeg", quality: 78 },
   { src: "src/assets/originals/night-study.svg", out: "src/assets/exhibit/auth-960.jpg", width: 960, height: 600, type: "jpeg", quality: 78 },
 ];
 

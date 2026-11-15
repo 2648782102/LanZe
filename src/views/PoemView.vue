@@ -61,6 +61,12 @@
             <span v-for="tag in poem.tags" :key="tag" class="tag">{{ tag }}</span>
           </div>
 
+          <section v-if="translation.length" class="translation" aria-labelledby="translation-heading">
+            <h2 id="translation-heading">译文</h2>
+            <p v-for="(line, index) in translation" :key="index">{{ line }}</p>
+            <p class="translation__caveat">白话释义，仅供理解文意，不作逐字对译。</p>
+          </section>
+
           <section v-if="annotation.length" class="annotation" aria-labelledby="annotation-heading">
             <h2 id="annotation-heading">笺注</h2>
             <p v-for="(note, index) in annotation" :key="index">{{ note }}</p>
@@ -137,6 +143,7 @@ import { loadCatalog, relatedLibraryPoems, useCatalogVersion, useLibrary } from 
 import { getAdjacentLibraryPoems } from "../data/poetryCatalog.js";
 import { notify } from "../composables/useNotices.js";
 import { normalizeDetails, parseJsonObject } from "../utils/poemQuery.js";
+import { getPoemNote } from "../data/poemNotes.js";
 
 const route = useRoute();
 const { getPoem, isSaved, toggleSaved, recordRecent } = useLibrary();
@@ -166,10 +173,17 @@ const sourceLabel = computed(() =>
   [poem.value?.dynasty, poem.value?.collection || poem.value?.source].filter(Boolean).join(" · ") || "馆藏",
 );
 const annotation = computed(() => {
+  const notes = [];
+  // 释义优先：它是针对这首诗写的内容，比馆藏的通用说明更有信息量。
+  const curatedNote = getPoemNote(poem.value?.id);
+  if (curatedNote?.note) notes.push(curatedNote.note);
   const value = poem.value?.titleNote;
-  if (Array.isArray(value)) return value;
-  return value ? [String(value)] : [];
+  if (Array.isArray(value)) notes.push(...value);
+  else if (value) notes.push(String(value));
+  return notes;
 });
+
+const translation = computed(() => getPoemNote(poem.value?.id)?.translation || []);
 const titleParts = computed(() => {
   const title = String(poem.value?.title || "");
   const separator = title.indexOf("·");
@@ -453,6 +467,36 @@ onBeforeUnmount(() => {
   border-top: 1px solid var(--line);
 }
 
+/* 译文与笺注同宽同节奏，但用左侧细线区分「释义」与「考据」。 */
+.translation {
+  max-width: 680px;
+  margin: 46px auto 0;
+  padding-left: 18px;
+  border-left: 2px solid var(--line-strong);
+}
+
+.translation h2 {
+  margin: 0 0 12px;
+  font-family: var(--font-poem);
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+}
+
+.translation p {
+  margin: 0 0 10px;
+  color: var(--ink);
+  font-size: var(--text-body);
+  line-height: var(--leading-copy);
+  text-wrap: pretty;
+}
+
+.translation .translation__caveat {
+  margin-top: 12px;
+  color: var(--ink-faint);
+  font-size: var(--text-meta);
+}
+
 .annotation h2 {
   margin: 0 0 12px;
   font-family: var(--font-poem);
@@ -695,6 +739,11 @@ onBeforeUnmount(() => {
   .annotation {
     margin-top: 36px;
     padding-top: 20px;
+  }
+
+  .translation {
+    margin-top: 32px;
+    padding-left: 14px;
   }
 
   .poem-disclaimer {
