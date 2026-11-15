@@ -95,7 +95,18 @@
             <AppIcon name="feather" :size="17" />
             {{ submitting ? "正在收入诗卷" : isLoggedIn ? "发布到我的诗卷" : "登录后发布" }}
           </button>
-          <button class="button" type="button" :disabled="submitting" @click="clearDraft">清空草稿</button>
+          <button
+            class="button"
+            type="button"
+            :disabled="submitting"
+            :aria-describedby="confirmClear ? 'clear-draft-warning' : undefined"
+            @click="requestClearDraft"
+          >
+            {{ confirmClear ? "确认清空" : "清空草稿" }}
+          </button>
+          <p v-if="confirmClear" id="clear-draft-warning" class="form-clear-warning" role="status">
+            清空后无法恢复，再点一次确认。
+          </p>
         </div>
       </form>
 
@@ -161,7 +172,15 @@ const previewLines = computed(() => {
   return lines.length ? lines : ["诗句会在这里排成一首。"];
 });
 
+let suppressDraftPersist = false;
+
 const persistDraft = () => {
+  if (suppressDraftPersist) return;
+  if (!form.title.trim() && !form.content.trim() && !form.note.trim() && !form.category.trim()) {
+    removeStore(DRAFT_KEY);
+    draftSavedAt.value = "";
+    return;
+  }
   writeStore(DRAFT_KEY, {
     title: form.title,
     author: form.author,
@@ -181,7 +200,23 @@ const persistDraft = () => {
   }, 260);
 };
 
+const confirmClear = ref(false);
+let confirmTimer = 0;
+
+const requestClearDraft = () => {
+  if (!confirmClear.value) {
+    confirmClear.value = true;
+    window.clearTimeout(confirmTimer);
+    confirmTimer = window.setTimeout(() => { confirmClear.value = false; }, 5000);
+    return;
+  }
+  window.clearTimeout(confirmTimer);
+  confirmClear.value = false;
+  clearDraft();
+};
+
 const clearDraft = () => {
+  suppressDraftPersist = true;
   form.title = "";
   form.author = profile.value.user_name || "";
   form.category = "";
@@ -191,6 +226,7 @@ const clearDraft = () => {
   draftSavedAt.value = "";
   draftSaving.value = false;
   window.clearTimeout(draftTimer);
+  window.requestAnimationFrame(() => { suppressDraftPersist = false; });
   notify("草稿已清空", "info");
 };
 
@@ -394,6 +430,14 @@ onBeforeUnmount(() => {
 
 .form-actions.is-submitting {
   opacity: 0.7;
+}
+
+.form-clear-warning {
+  flex: 1 0 100%;
+  margin: 2px 0 0;
+  color: var(--brass-text);
+  font-size: var(--text-meta);
+  line-height: var(--leading-copy);
 }
 
 .compose-login-note {
