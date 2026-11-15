@@ -1065,6 +1065,31 @@ const main = async () => {
   if (mobileFiltersClosed.bodyLocked) {
     throw new Error("Mobile filter drawer did not release the scroll lock on close");
   }
+  await evaluate(`(() => {
+    const facet = [...document.querySelectorAll('.facet__list button')]
+      .find((button) => button.textContent.trim().startsWith('宋'));
+    facet?.click();
+  })()`);
+  await delay(250);
+  await evaluate("document.querySelector('.filter-wall__apply').click()");
+  const appliedFilter = await waitUntil("filter applied to results", () => evaluate(`(() => {
+    const panel = document.querySelector('.filter-wall');
+    const room = document.querySelector('.result-room');
+    if (!panel || !room || panel.classList.contains('is-open')) return null;
+    const top = Math.round(room.getBoundingClientRect().top);
+    if (top < 0 || top > 200) return null;
+    return { top, heading: document.querySelector('#result-heading')?.textContent?.trim() || '' };
+  })()`));
+  if (appliedFilter.heading !== "宋") {
+    throw new Error(`Applying a facet did not update the results heading: ${JSON.stringify(appliedFilter)}`);
+  }
+  await evaluate(`(() => {
+    const reset = document.querySelector('.result-head__right button');
+    reset?.click();
+  })()`);
+  await waitUntil("filters reset", () => evaluate(
+    "!document.querySelector('.active-filters')",
+  ));
   await evaluate("document.querySelector('.mobile-filter-bar button').focus()");
   await evaluate("document.querySelector('.mobile-filter-bar button').click()");
   await waitUntil("mobile filter drawer reopened", () => evaluate(

@@ -161,7 +161,7 @@
               class="filter-wall__apply"
               aria-live="polite"
               aria-atomic="true"
-              @click="filtersOpen = false"
+              @click="applyFilters"
             >
               查看 {{ result.total.toLocaleString("zh-CN") }} 篇
             </button>
@@ -458,6 +458,22 @@ onBeforeUnmount(() => document.documentElement.classList.remove("is-drawer-open"
 
 const resetFacet = (key) => selectFacet(key, "全部");
 
+const scrollToResults = () => {
+  window.requestAnimationFrame(() => {
+    const room = document.querySelector(".result-room");
+    if (!room) return;
+    const header = getComputedStyle(document.documentElement).getPropertyValue("--header-height").trim();
+    const offset = Number.parseInt(header, 10) || 72;
+    const top = room.getBoundingClientRect().top + window.scrollY - offset - 12;
+    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+  });
+};
+
+const applyFilters = () => {
+  filtersOpen.value = false;
+  scrollToResults();
+};
+
 const resetFilters = () => {
   draftQuery.value = "";
   query.value = "";
@@ -473,15 +489,11 @@ const goToPage = (nextPage) => {
   if (target === page.value) return;
   page.value = target;
   syncRoute();
+  scrollToResults();
   window.requestAnimationFrame(() => {
     const room = document.querySelector(".result-room");
-    if (!room) return;
-    const header = getComputedStyle(document.documentElement).getPropertyValue("--header-height").trim();
-    const offset = Number.parseInt(header, 10) || 72;
-    const top = room.getBoundingClientRect().top + window.scrollY - offset - 12;
-    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
-    room.setAttribute("tabindex", "-1");
-    room.focus({ preventScroll: true });
+    room?.setAttribute("tabindex", "-1");
+    room?.focus({ preventScroll: true });
   });
 };
 
