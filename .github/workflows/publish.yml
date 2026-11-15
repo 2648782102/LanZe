@@ -47,10 +47,12 @@ jobs:
               --notes-file RELEASE_NOTES.md \
               --verify-tag
           fi
-          # tag 刚重建时 GitHub 可能先用 tag 名作标题，这里再收敛一次。
-          gh release edit "$TAG_NAME" \
-            --title "$RELEASE_TITLE" \
-            --notes-file RELEASE_NOTES.md
+          # gh release edit --title 在「tag 刚重建 / Release 刚由 create 生成」时
+          # 可能不写入标题（实测仍显示 tag 名），改用 REST PATCH 显式设置。
+          release_id="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG_NAME" --jq .id)"
+          jq -n --arg name "$RELEASE_TITLE" --rawfile body RELEASE_NOTES.md \
+            '{name: $name, body: $body}' \
+            | gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/$release_id" --input -
           # 回读确认标题与正文都已落到线上，避免「工作流成功但页面没变」。
           actual_title="$(gh release view "$TAG_NAME" --json name --jq .name)"
           if [ "$actual_title" != "$RELEASE_TITLE" ]; then
