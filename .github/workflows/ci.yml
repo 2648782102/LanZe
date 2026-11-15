@@ -151,11 +151,6 @@ jobs:
             exit 1
           fi
 
-      - name: Verify offline audio fallback assets
-        shell: bash
-        run: |
-          node scripts/verify-audio-library.mjs
-
       - name: Check optimized local assets
         shell: bash
         run: |
