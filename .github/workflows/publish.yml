@@ -30,6 +30,7 @@ jobs:
           TAG_NAME: ${{ github.ref_name }}
         shell: bash
         run: |
+          set -euo pipefail
           # RELEASE_NOTES.md 的首行就是 Release 标题，避免每次发版改 workflow。
           RELEASE_TITLE="$(head -n 1 RELEASE_NOTES.md | sed 's/^# *//')"
           if [ -z "$RELEASE_TITLE" ]; then
