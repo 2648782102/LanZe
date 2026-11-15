@@ -180,7 +180,12 @@
             </div>
           </header>
 
-          <p v-if="catalogError" class="catalog-notice" role="status">{{ catalogError }}</p>
+          <div v-if="catalogError" class="catalog-notice" role="status">
+            <p>{{ catalogError }}</p>
+            <button type="button" :disabled="catalogLoading" @click="retryCatalog">
+              {{ catalogLoading ? "重新读取中…" : "重新读取馆藏" }}
+            </button>
+          </div>
 
           <div v-if="hasFilters" class="active-filters">
             <button v-if="query" type="button" @click="clearSearch">
@@ -279,7 +284,7 @@ import { notify } from "../composables/useNotices.js";
 
 const route = useRoute();
 const router = useRouter();
-const { isSaved, toggleSaved, catalogError } = useLibrary();
+const { isSaved, toggleSaved, catalogError, loading: catalogLoading } = useLibrary();
 const catalogVersion = useCatalogVersion();
 const hints = ["月亮", "李白", "宋词", "春天", "关雎"];
 const poemPaths = [
@@ -453,6 +458,11 @@ const goToPage = (nextPage) => {
     room.setAttribute("tabindex", "-1");
     room.focus({ preventScroll: true });
   });
+};
+
+const retryCatalog = () => {
+  if (catalogLoading.value) return;
+  loadCatalog({ force: true });
 };
 
 const savePoem = (poem) => {
@@ -922,12 +932,49 @@ watch([dynasty, genre], () => {
 }
 
 .catalog-notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin: 18px 0 0;
   padding: 10px 14px;
   border-left: 2px solid var(--brass);
   background: var(--porcelain-deep);
   color: var(--ink-soft);
   font-size: var(--text-meta);
+}
+
+@media (max-width: 820px) {
+  /* 出错时用户往往还在首屏，让提示贴住标题栏而不是埋在列表上方。 */
+  .catalog-notice {
+    position: sticky;
+    z-index: 5;
+    top: calc(var(--header-height) + 56px);
+    margin-top: 12px;
+    box-shadow: 0 10px 24px -18px rgba(16, 40, 39, 0.5);
+  }
+}
+
+.catalog-notice p {
+  margin: 0;
+  min-width: 0;
+  flex: 1 1 240px;
+  line-height: var(--leading-copy);
+}
+
+.catalog-notice button {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--text-meta);
+}
+
+.catalog-notice button:disabled {
+  opacity: 0.5;
 }
 
 .active-filters button {

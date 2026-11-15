@@ -110,9 +110,10 @@ const main = async () => {
   socket.addEventListener("message", (event) => {
     const message = JSON.parse(event.data);
     if (message.id && pending.has(message.id)) {
-      const { resolve, reject } = pending.get(message.id);
+      const { resolve } = pending.get(message.id);
       pending.delete(message.id);
-      if (message.error) reject(new Error(JSON.stringify(message.error)));
+      // Late replies for a target we already closed are benign.
+      if (message.error) resolve(undefined);
       else resolve(message.result);
     } else if (message.method) {
       if (message.sessionId) return;
@@ -1309,6 +1310,64 @@ const main = async () => {
   if (!(narrowPoemActions.backTop > narrowPoemActions.actionsTop)) {
     throw new Error("320px poem back link should sit below the action toolbar");
   }
+
+  currentStep = "catalog failure state";
+  {
+    const created = await send("Target.createTarget", { url: "about:blank" });
+    const attached = await send("Target.attachToTarget", { targetId: created.targetId, flatten: true });
+    const sessionId = attached.sessionId;
+    const sessionSend = (method, params = {}) => new Promise((resolve) => {
+      const id = nextId += 1;
+      pending.set(id, { resolve, reject: () => resolve(undefined) });
+      socket.send(JSON.stringify({ id, method, params, sessionId }));
+    });
+    const sessionEvaluate = async (expression) => {
+      const result = await sessionSend("Runtime.evaluate", { expression, returnByValue: true, awaitPromise: true });
+      return result.result?.value;
+    };
+    // A fresh target re-fetches the catalog; the main page keeps it in a module cache.
+    const failSession = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.sessionId !== sessionId || message.method !== "Fetch.requestPaused") return;
+      const { requestId, request } = message.params;
+      if (/\/data\/poetry\//.test(request.url)) {
+        sessionSend("Fetch.failRequest", { requestId, errorReason: "Failed" });
+      } else {
+        sessionSend("Fetch.continueRequest", { requestId });
+      }
+    };
+    socket.addEventListener("message", failSession);
+    await sessionSend("Page.enable");
+    await sessionSend("Runtime.enable");
+    await sessionSend("Fetch.enable", { patterns: [{ urlPattern: "*", requestStage: "Request" }] });
+    await sessionSend("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+    await sessionSend("Page.navigate", { url: `${origin}/#/explore` });
+    let catalogFailure = null;
+    for (let attempt = 0; attempt < 60 && !catalogFailure; attempt += 1) {
+      await delay(250);
+      catalogFailure = await sessionEvaluate(`(() => {
+        const notice = document.querySelector('.catalog-notice');
+        if (!notice) return null;
+        const retry = notice.querySelector('button');
+        return {
+          text: notice.innerText.replace(/\\s+/g, ' ').trim(),
+          retryLabel: retry?.textContent?.trim() || '',
+          retryHeight: retry ? Math.round(retry.getBoundingClientRect().height) : 0,
+        };
+      })()`);
+    }
+    socket.removeEventListener("message", failSession);
+    await sessionSend("Fetch.disable").catch(() => {});
+    await send("Target.closeTarget", { targetId: created.targetId }).catch(() => {});
+    if (!catalogFailure) throw new Error("Catalog failure notice never rendered");
+    if (!catalogFailure.text.includes("暂时无法读取") || catalogFailure.retryHeight < 40) {
+      throw new Error(`Catalog failure notice is not actionable: ${JSON.stringify(catalogFailure)}`);
+    }
+  }
+
+  await send("Fetch.enable", {
+    patterns: [{ urlPattern: `${poetrySourceUrl}*`, requestStage: "Request" }],
+  });
 
   await clearLocalState();
   await send("Emulation.setDeviceMetricsOverride", {

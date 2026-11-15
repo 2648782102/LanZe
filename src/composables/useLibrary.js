@@ -35,7 +35,7 @@ export const loadCatalog = async ({ force = false } = {}) => {
     catalogVersion.value += 1;
   } catch {
     if (generation !== catalogGeneration) return catalog.value;
-    catalogError.value = "馆藏分卷暂时无法读取，当前只显示精校短章。可刷新页面重试。";
+    catalogError.value = "馆藏分卷暂时无法读取，当前只显示精校短章。";
     catalog.value = getLibraryPage({ page: 1, pageSize: 24 }).items;
     catalogVersion.value += 1;
   } finally {
