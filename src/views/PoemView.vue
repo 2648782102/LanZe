@@ -61,7 +61,7 @@
           </section>
 
           <p class="poem-disclaimer">
-            馆内文本供阅读与检索。引用、出版或教学使用前，请核对底本与点校。
+            异文、编年与作者归属可能因底本而异；正式引用请以点校本为准。
           </p>
 
           <nav v-if="adjacent.previous || adjacent.next" class="reading-continuation" aria-label="连续阅读">
