@@ -18,6 +18,15 @@ const siteName = "兰泽";
 // Pages 项目站点部署在 /<repo>/ 下，绝对路径必须带 base。
 const base = (process.env.VITE_BASE || "/").replace(/\/?$/, "/");
 const asset = (path) => `${base}${String(path).replace(/^\//, "")}`;
+// sitemap 的 <loc> 与 canonical 必须是绝对 URL，否则爬虫无法解析。
+// 默认取线上 Pages 站点；部署到别处时用 VITE_SITE_ORIGIN 覆盖。
+// 站点根含项目子路径（Pages 项目站点是 /<repo>/），因此 origin 默认就带 /LanZe。
+const siteOrigin = (process.env.VITE_SITE_ORIGIN || "https://2648782102.github.io/LanZe").replace(/\/?$/, "/");
+// 目录式页面在 Pages 上会 301 到带尾斜杠的地址，直接输出最终形态。
+const absolute = (path) => {
+  const clean = String(path).replace(/^\//, "").replace(/\/$/, "");
+  return clean ? `${siteOrigin}${clean}/` : siteOrigin;
+};
 
 const escapeHtml = (value) => String(value ?? "")
   .replace(/&/g, "&amp;")
@@ -44,7 +53,7 @@ const setMeta = (html, { title, description, path, image, jsonLd }) => {
     .replace(/<meta property="og:image" content="[^"]*">/, `<meta property="og:image" content="${escapeHtml(asset(image))}">`);
 
   const head = [
-    `<link rel="canonical" href="${escapeHtml(asset(path))}">`,
+    `<link rel="canonical" href="${escapeHtml(absolute(path))}">`,
     jsonLd ? `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>` : "",
   ].filter(Boolean).join("\n  ");
   out = out.replace("</head>", `  ${head}\n</head>`);
@@ -123,7 +132,7 @@ for (const page of pages) await writePage(page.route.path, page.html);
 // 3) 站点地图：只收录实际预渲染的页面。
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${pages.map((page) => `  <url><loc>${asset(page.route.path)}</loc></url>`).join("\n")}
+${pages.map((page) => `  <url><loc>${absolute(page.route.path)}</loc></url>`).join("\n")}
 </urlset>
 `;
 await writeFile(join(dist, "sitemap.xml"), sitemap);
