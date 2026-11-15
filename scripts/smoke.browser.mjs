@@ -936,15 +936,6 @@ const main = async () => {
   if (!mobileLayout.audioPaused) {
     throw new Error("Mobile audio dock should start silently");
   }
-  const rowMeta = await evaluate(`(() => {
-    const meta = document.querySelector('.poem-row__title p');
-    if (!meta) return null;
-    const parts = meta.textContent.split('·').map((part) => part.trim()).filter(Boolean);
-    return { parts, duplicated: new Set(parts).size !== parts.length };
-  })()`);
-  if (!rowMeta || rowMeta.duplicated) {
-    throw new Error(`Poem row meta repeats a facet: ${JSON.stringify(rowMeta)}`);
-  }
   const mobileSearchSize = await evaluate(
     "parseFloat(getComputedStyle(document.querySelector('#global-search')).fontSize)",
   );
@@ -963,6 +954,59 @@ const main = async () => {
   await evaluate("window.scrollTo({ top: 0, behavior: 'instant' })");
   await waitUntil("mobile filter bar released", () => evaluate(
     "window.scrollY === 0 && document.querySelector('.mobile-filter-bar').getBoundingClientRect().top > 100",
+  ));
+  const rowMeta = await evaluate(`(() => {
+    const meta = document.querySelector('.poem-row__title p');
+    if (!meta) return null;
+    const parts = meta.textContent.split('·').map((part) => part.trim()).filter(Boolean);
+    return { parts, duplicated: new Set(parts).size !== parts.length };
+  })()`);
+  if (!rowMeta || rowMeta.duplicated) {
+    throw new Error(`Poem row meta repeats a facet: ${JSON.stringify(rowMeta)}`);
+  }
+  await send("Page.navigate", { url: `${origin}/#/` });
+  await waitUntil("mobile excerpt card", () => evaluate("Boolean(document.querySelector('.legacy-card'))"));
+  await evaluate("document.querySelector('.legacy-card').scrollIntoView({ block: 'center' })");
+  await delay(400);
+  const touchSwipe = await evaluate(`(() => {
+    const card = document.querySelector('.legacy-card');
+    const verse = card?.querySelector('.legacy-card__verse');
+    const box = card?.getBoundingClientRect();
+    if (!box) return null;
+    return {
+      verse: verse?.textContent?.trim() || '',
+      x: Math.round(box.left + box.width / 2),
+      y: Math.round(box.top + Math.min(box.height / 3, 140)),
+      onScreen: box.top > 0 && box.bottom < innerHeight,
+    };
+  })()`);
+  if (!touchSwipe?.onScreen) {
+    throw new Error(`Mobile excerpt card is not fully on screen for a touch swipe: ${JSON.stringify(touchSwipe)}`);
+  }
+  const touchPoint = (x, y) => [{ x, y, id: 1, radiusX: 2, radiusY: 2, force: 1 }];
+  await send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: touchPoint(touchSwipe.x, touchSwipe.y) });
+  let swipeActive = false;
+  for (let step = 1; step <= 10; step += 1) {
+    await send("Input.dispatchTouchEvent", {
+      type: "touchMove",
+      touchPoints: touchPoint(touchSwipe.x - step * 14, touchSwipe.y),
+    });
+    await delay(16);
+    if (!swipeActive && await evaluate("document.querySelector('.legacy-card')?.classList.contains('is-swiping')")) {
+      swipeActive = true;
+    }
+  }
+  await send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+  const afterSwipe = await waitUntil("touch swipe turn", () => evaluate(`(() => {
+    const verse = document.querySelector('.legacy-card__verse')?.textContent?.trim() || '';
+    return verse && verse !== ${JSON.stringify(touchSwipe.verse)} ? verse : null;
+  })()`));
+  if (!swipeActive || !afterSwipe) {
+    throw new Error("Touch swipe did not drag and turn the excerpt card on mobile");
+  }
+  await send("Page.navigate", { url: `${origin}/#/explore` });
+  await waitUntil("mobile explore after swipe", () => evaluate(
+    "Boolean(document.querySelector('.mobile-filter-bar button'))",
   ));
   if (!await evaluate(`(() => {
     const button = document.querySelector('.mobile-filter-bar button');
