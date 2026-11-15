@@ -221,6 +221,16 @@ const tabCount = (id) => {
 const setTab = (id) => {
   activeTab.value = id;
   router.replace({ name: "collection", query: { tab: id } });
+  if (window.matchMedia?.("(max-width: 980px)").matches) {
+    window.requestAnimationFrame(() => {
+      const tabs = document.querySelector(".collection-tabs");
+      if (!tabs) return;
+      const header = getComputedStyle(document.documentElement).getPropertyValue("--header-height").trim();
+      const offset = Number.parseInt(header, 10) || 68;
+      const top = tabs.getBoundingClientRect().top + window.scrollY - offset - 8;
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    });
+  }
 };
 
 const removeSaved = (poem) => {
