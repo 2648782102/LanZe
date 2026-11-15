@@ -8,6 +8,8 @@
 开源中文古诗词诗馆：9,350 篇离线馆藏、可检索的真实 URL、42 项单测与八类 CI 审计。Vue 3 + Vite，MIT。
 ```
 
+**待确认的 v0.5.0 Release 标题**：tag 与正文均正确，但页面标题仍显示为 `v0.5.0`。`publish.yml` 已改为创建后用 REST `PATCH` 显式写入 `name` 并回读校验；若下次发版仍不生效，请在 Release 页面手动改为「兰泽诗词 v0.5.0 · 可被检索的诗馆」。
+
 > **状态：GitHub About、Website、Pages、社交预览图与在线 Discussion #1 已回读确认；外部投稿仍未执行。** `v0.2.0` / `v0.3.0` 为历史 Release，`v0.4.0` 已发布；`RELEASE_NOTES.md` 是发布时快照，`ANNOUNCEMENT.md` 是欢迎帖源文案（仅修正链接等展示错误），`SOCIAL_POSTS.md` 是未外发草稿，已发布 Release 正文不回写后续展示变更。2026-11-08 15:45–16:10 CST 公开 API 回读 About 描述为 39 项单测、9,350 篇离线馆藏，Website 为 `https://2648782102.github.io/LanZe/` 且 `has_pages=true`；Pages 首页、JS/CSS 入口、馆藏清单均返回 200；`public/og-image.png` 已上传为 Social preview，公开 `og:image` 指向 `repository-images.githubusercontent.com`；Discussion #1 已按 `ANNOUNCEMENT.md` 更新并在链接修正后回读 `updated_at=2026-11-08T08:10:29Z`，正文不再含旧「14 个单测」口径，安全政策链接指向 `blob/main/SECURITY.md`。该站点是静态前端预览，不代表线上账号、托管后端或维护者承诺的完整线上 Demo。社交平台短帖、外部社区投稿和付费推广仍未执行。最后整理：2026-11-08。
 
 ## 1. 推荐仓库定位
