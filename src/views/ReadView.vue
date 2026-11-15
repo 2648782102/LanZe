@@ -888,7 +888,7 @@ onBeforeUnmount(() => {
   .legacy-gallery {
     grid-template-columns: 1fr;
     gap: 44px;
-    padding-block: 40px 108px;
+    padding-block: 40px 48px;
   }
 
   .legacy-gallery__card {
