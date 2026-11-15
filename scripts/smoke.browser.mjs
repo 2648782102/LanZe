@@ -1197,6 +1197,19 @@ const main = async () => {
   if (mobileFieldSizes.checked !== 5 || mobileFieldSizes.undersized > 0) {
     throw new Error(`Mobile form fields must be at least 16px to avoid iOS focus zoom: ${JSON.stringify(mobileFieldSizes)}`);
   }
+  await evaluate("document.querySelector('.form-actions .button--solid').click()");
+  const emptySubmit = await waitUntil("compose empty submit feedback", () => evaluate(`(() => {
+    const notice = document.querySelector('.notice');
+    if (!notice) return null;
+    return {
+      text: notice.innerText.replace(/\\s+/g, ' ').trim(),
+      focused: document.activeElement?.id || '',
+      hash: location.hash,
+    };
+  })()`).then((value) => (value && value.text.includes("不能为空") ? value : null)));
+  if (!["poem-title", "poem-content"].includes(emptySubmit.focused) || !emptySubmit.hash.includes("compose")) {
+    throw new Error(`Empty compose submit should stay put and focus the title: ${JSON.stringify(emptySubmit)}`);
+  }
   if (composeTypography.fixedLayerSpace < 88) {
     throw new Error("Narrow screens do not reserve space for fixed layers");
   }

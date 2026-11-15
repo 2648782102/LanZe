@@ -17,7 +17,7 @@
     </div>
 
     <div class="shell compose-grid">
-      <form class="compose-form" @submit.prevent="publish">
+      <form class="compose-form" novalidate @submit.prevent="publish">
         <div class="form-row form-row--two">
           <label class="field-label" for="poem-title">
             题目
@@ -195,15 +195,20 @@ const clearDraft = () => {
 };
 
 const publish = async () => {
+  if (!form.title.trim() || !form.content.trim()) {
+    notify("题目和正文不能为空", "warning");
+    const target = !form.title.trim()
+      ? document.querySelector("#poem-title")
+      : document.querySelector("#poem-content");
+    target?.focus();
+    target?.scrollIntoView({ block: "center", behavior: "smooth" });
+    return;
+  }
   if (!isLoggedIn.value) {
     persistDraft();
     await new Promise((resolve) => window.setTimeout(resolve, 280));
     notify("草稿已收好，登录后可以继续", "info");
     router.push({ path: "/login", query: { next: "/compose" } });
-    return;
-  }
-  if (!form.title.trim() || !form.content.trim()) {
-    notify("题目和正文不能为空", "warning");
     return;
   }
 
