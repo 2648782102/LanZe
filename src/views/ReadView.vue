@@ -608,9 +608,7 @@ onBeforeUnmount(() => {
   position: relative;
   z-index: 1;
   border-top: 1px solid var(--line);
-  /* 延伸到 main 的固定层安全区，避免余韵区与页脚之间露出一条瓷白 padding。 */
-  margin-bottom: calc(-1 * var(--fixed-layer-space));
-  padding-bottom: calc(64px + var(--fixed-layer-space));
+  padding-bottom: 0;
   background: rgba(232, 236, 229, 0.56);
 }
 
@@ -619,7 +617,8 @@ onBeforeUnmount(() => {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
   gap: clamp(64px, 10vw, 160px);
-  padding-block: 62px 72px;
+  /* 唯一的区块收尾留白；strips 不再另加 padding，避免叠加成大片空白。 */
+  padding-block: 56px 64px;
 }
 
 .legacy-gallery__card {
@@ -812,7 +811,7 @@ onBeforeUnmount(() => {
     .legacy-gallery {
       grid-template-columns: 1fr;
       gap: 44px;
-      padding-block: 44px 108px;
+      padding-block: 44px 56px;
     }
 
     .legacy-gallery__card,

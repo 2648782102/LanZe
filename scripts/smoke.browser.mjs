@@ -363,6 +363,23 @@ const main = async () => {
     navCount: document.querySelectorAll('.main-nav a').length,
   }))()`);
   if (!home.text.includes("余韵 · 一则")) throw new Error("Today's reading page did not render");
+
+  const homeTail = await evaluate(`(() => {
+    const strips = document.querySelector('.gallery__strips')?.getBoundingClientRect();
+    const footer = document.querySelector('.museum-footer')?.getBoundingClientRect();
+    const button = document.querySelector('.strip-actions .button')?.getBoundingClientRect();
+    if (!strips || !footer || !button) return null;
+    return {
+      band: Math.round(footer.top - strips.bottom),
+      trailingGap: Math.round(footer.top - button.bottom),
+    };
+  })()`);
+  if (!homeTail || Math.abs(homeTail.band) > 2) {
+    throw new Error(`余韵区与页脚之间出现空白色带: ${JSON.stringify(homeTail)}`);
+  }
+  if (homeTail.trailingGap > 360) {
+    throw new Error(`余韵区尾部留白过大: ${JSON.stringify(homeTail)}`);
+  }
   if (home.audioDocks !== 1) throw new Error("Expected one native local audio dock");
   if (!home.audioTitle.includes("少年不凡")) throw new Error("Legacy soundscape was not selected");
   if (home.audioStateRole !== "status" || !["试听", "播放中"].includes(home.audioState)) {
@@ -1271,11 +1288,20 @@ const main = async () => {
     throw new Error("Narrow screens do not reserve space for fixed layers");
   }
   const consistency = await evaluate(`(() => ({
-    fixedLayerSpace: parseFloat(getComputedStyle(document.querySelector("main")).paddingBottom),
+    fixedLayerSpace: (() => {
+      const probe = document.createElement("div");
+      probe.style.height = "var(--fixed-layer-space)";
+      document.body.appendChild(probe);
+      const value = probe.getBoundingClientRect().height;
+      probe.remove();
+      return value;
+    })(),
     footerPadding: parseFloat(getComputedStyle(document.querySelector('.museum-footer')).paddingBottom),
     noticeBottom: parseFloat(getComputedStyle(document.querySelector('.notice-host')).bottom),
   }))()`);
-  if (consistency.footerPadding < consistency.fixedLayerSpace || consistency.noticeBottom < 200) {
+  if (Number.isNaN(consistency.fixedLayerSpace)
+    || consistency.footerPadding < consistency.fixedLayerSpace
+    || consistency.noticeBottom < 200) {
     throw new Error("Fixed layers do not share the narrow-screen safe area");
   }
 

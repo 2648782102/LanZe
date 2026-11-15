@@ -69,9 +69,11 @@ const pageTransition = computed(() => (direction.value === "none" ? "page" : `pa
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-.app-frame:not(.is-bare) .route-stage > main {
-  padding-bottom: var(--fixed-layer-space);
-}
+/*
+ * 固定层避让由 .museum-footer 的 padding-bottom 统一承担，各页面自己的
+ * padding-bottom 也按 --fixed-layer-space 留白。这里再给 main 加一份会
+ * 变成双份安全区，在余韵区与页脚之间留下大片无内容空白。
+ */
 
 .route-stage {
   position: relative;
