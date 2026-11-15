@@ -62,15 +62,25 @@ jobs:
         run: npm run audit:perf
 
       - name: Touch target audit (mobile)
-        run: npm run audit:touch
+        run: npm run audit:touch | tee touch-audit.json
+
+      - name: Upload touch audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: touch-audit
+          path: touch-audit.json
+          retention-days: 7
+          if-no-files-found: ignore
 
       - name: Mobile visual regression
         run: npm run audit:visual
 
       - name: Upload visual diffs
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: visual-diffs
           path: tests/visual/.actual
           retention-days: 7
+          if-no-files-found: ignore
