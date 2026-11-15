@@ -598,7 +598,12 @@ watch([dynasty, genre], () => {
 
 .index-search:focus-within {
   border-color: var(--celadon-deep);
-  box-shadow: 0 0 0 3px rgba(81, 122, 112, 0.12);
+  box-shadow: 0 0 0 3px rgba(81, 122, 112, 0.22);
+}
+
+.index-search:has(input:focus-visible) {
+  outline: 2px solid var(--celadon-deep);
+  outline-offset: 2px;
 }
 
 .index-search input {
