@@ -1,6 +1,6 @@
 # 第三方素材与外链清单
 
-> **状态：来源整理，授权未核验。** 本文件只记录当前仓库可观察到的素材类别、路径与外链，不把「已下载」「能访问」写成「已获得 MIT 或其他再分发许可」。截至 2026-11-07，除仓库贡献者提供的代码/文档外，以下项目仍需逐项核查来源、许可、署名要求与商用边界。WOFF2 子集、压缩展品图与旧原图来自同一历史素材，压缩或子集化不等于取得新授权。
+> **状态：图片与图标已替换为原创；字体仍待核验。** 2026-11-16 起，原先来源不明的三张插画（展品图、摘录扇舟图、登录插画）与历史 favicon 已全部移除，改为本仓库用 SVG 绘制的原创资产（`src/assets/originals/`，经 `npm run render:originals` 生成位图），可明确由 MIT 覆盖。至今仍未核验的是三个 WOFF2 字体子集，见下表。本文件只记录当前仓库可观察到的素材类别、路径与外链，不把「已下载」「能访问」写成「已获得许可」。子集化或缩放不改变原素材授权。
 
 ## 核对方法
 
@@ -18,10 +18,10 @@ find src/assets public -type f -print
 | 类别 | 当前位置 | 可观察来源 | 授权状态 | 后续动作 |
 | --- | --- | --- | --- | --- |
 | 当前使用字体 | `src/assets/fonts/LanZeSong-subset.woff2` | 由 Git 历史中的 `src/assets/ZiTi/FangZhengSong.ttf` 按仓库可见字符生成的 WOFF2 子集；`src/styles/base.css` 只引用该文件 | 未核验；子集化不改变原字体授权 | 核对字体厂商、授权书、Web 嵌入与再分发条款；无法确认时替换为授权明确的字体 |
-| 当前使用图片 | `src/assets/exhibit/songci300-768.jpg`、`auth-cover-960.jpg`、`src/assets/excerpt/fanzou-720.png` | 前两者由 Git 历史中的 `src/assets/beijing/songci300.jpg` 与 `src/assets/LunBo/1.webp` 缩放压缩；后者由历史 `src/assets/beijing/fanzou.png` 等比缩放，用于还原旧版摘录卡 | 未核验；缩放不改变原图授权 | 按原图查找原始出处、许可与人物/美术权利；无法确认时替换 |
+| 当前使用图片 | `src/assets/exhibit/poem-768.jpg`、`auth-960.jpg`、`src/assets/excerpt/landscape-720.jpg` | 由仓库自绘 SVG（`src/assets/originals/*.svg`）经 `scripts/render-originals.mjs` 渲染 | **已明确**：原创资产，MIT 覆盖 | 无（如需改图，修改 SVG 后重跑 `npm run render:originals`） |
 | 历史摘录卡字体 | `src/assets/excerpt/piaoYiSong-excerpt.woff2`、`hongLei-excerpt.woff2` | 由历史 `src/assets/ZiTi/piaoYiSong.ttf` 与 `hongLei.ttf` 按摘录卡可见字符生成的 WOFF2 子集 | 未核验；子集化不改变原字体授权 | 核对字体厂商、Web 嵌入与再分发条款；无法确认时替换为授权明确的字体 |
 | 已移除的历史素材 | `src/assets/ZiTi/*.ttf`、`src/assets/beijing/**`、`src/assets/LunBo/**`、`src/assets/hoad/**`、`src/assets/logo.png` | 2022–2024 年历史提交；原始文件仍可从 Git 历史追溯，当前仅按可见字符或展示尺寸重新派生所需子集 | 未核验 | 如需追溯来源或验证授权，先查阅历史提交；不要把原始大文件原样重新引入构建产物 |
-| OG / favicon | `public/og-image.svg`、`public/og-image.png`、`public/favicon.ico` | SVG 与 1200×630 PNG 为 2026-11-07 按当前青瓷展厅视觉绘制的展示素材；favicon 来自历史提交 | SVG/PNG 由仓库贡献者提供；favicon 未核验 | PNG 已上传为 GitHub Social preview 并回读公开 `og:image`；确认 favicon 来源，后续替换按 `docs/PROMOTION.md` 执行 |
+| OG / favicon | `public/og-image.svg`、`public/og-image.png`、`public/favicon.svg` | OG 图为 2026-11-07 按当前青瓷视觉绘制；favicon 为 2026-11-16 依品牌三柱标记重绘的 SVG | **已明确**：仓库贡献者原创，MIT 覆盖 | 无 |
 | 精校短章 | `src/data/poems.js` | 2022–2024 年历史内容与 2026 年演示数据 | 未核验 | 标注公版依据、底本与校勘来源；现代作品必须取得作者许可 |
 | 离线馆藏分卷 | `public/data/poetry/*.json` | `chinese-poetry/chinese-poetry@b8594f81a89752241442f2ce267d6f66f96704ee` 的 16 个选段，共 9,328 篇；许可证见 `public/data/poetry/LICENSE.chinese-poetry.txt` | 上游仓库 MIT；诗词底本/校勘与作品公版状态按用途另行核对 | 保留上游版权与许可证；繁简、异体、断句及长篇截取按上游形态标注 |
 
@@ -42,31 +42,26 @@ find src/assets public -type f -print
 
 ## 当前二进制 SHA-256
 
-以下哈希记录当前工作树文件的字节身份，便于素材替换、审计与回归核对；哈希不是许可证明，也不改变上表的「授权未核验」状态。
+以下哈希记录当前工作树文件的字节身份，便于素材替换、审计与回归核对；哈希不是许可证明。
 
-| 文件 | SHA-256 |
-| --- | --- |
-| `src/assets/fonts/LanZeSong-subset.woff2` | `dfb124c02a09fe03bcd0f8d4d3125c50637758b716a7b81b9f0eb00516e6acd8` |
-| `src/assets/exhibit/auth-cover-960.jpg` | `a865b2b2efc4d0bffc279f32b6d1ea9caa2d6b92d244a1b62b0cbb71414d0709` |
-| `src/assets/exhibit/songci300-768.jpg` | `842d925768d917352d63b21b9b30a6764c33998148361d0a2a25ced84a793588` |
-| `src/assets/excerpt/fanzou-720.png` | `4263cece79f59c55b7287151ff718638221e74056d15e8c49aca1adb5a4d9316` |
-| `src/assets/excerpt/hongLei-excerpt.woff2` | `a79c5335d19afac98f4f2caae7e7b9c2ec38f70b2965dd5978c053c7a75fbe21` |
-| `src/assets/excerpt/piaoYiSong-excerpt.woff2` | `f12990c619ed3431193fa804dc6f703bf1a648526cdb3760bf2f306a8a4cbb39` |
-| `public/media/lanze-qingshan.wav` | `882d62323454a600cd93f057e1a96989fc97959e7d1be8ee0e2df8656bbd46d0` |
-| `public/media/lanze-qingshan-cover.svg` | `b21a04a303f2e4014ebfcdfb02713442caea9f37b7889a63eb189c4681e70a46` |
-| `public/media/lanze-yuese.wav` | `14ca7693c83aa1985973d3da466a69bad28889fac87c5780bbb87da81a8c5752` |
-| `public/media/lanze-yuese-cover.svg` | `1706484bf5eadec140047c6866d7fc5c2853a0e7319fe4731ea4399fca3485bc` |
-| `public/media/lanze-wanzhou.wav` | `47dfd5afee68bdcb12faa75ecb04b171872056c8ff6783d76d646cb795b927d2` |
-| `public/media/lanze-wanzhou-cover.svg` | `d27f58df3acb6412ae0c4e69bedbb05050426f2a64a0e7ddca494172ba093534` |
-| `public/og-image.png` | `34acbf01d0fbc94a5db478dcc99c7358921eaac5c413f0dbb8151b0349bfce4c` |
-| `public/og-image.svg` | `f3f1d2dc1af474ed3af7d2c513e6c688b296386da285f3c28d1551a870eeda04` |
-| `public/favicon.ico` | `44a67fa9fa240e75a263991a80936224e047603dd7a0b7189813b4938218fe0a` |
+| 文件 | SHA-256 | 授权 |
+| --- | --- | --- |
+| `src/assets/exhibit/poem-768.jpg` | `566f6ab22d1dfc74ffab8a16e628394e1f895226c5c186a31a73ca953c3a293b` | 原创，MIT |
+| `src/assets/exhibit/auth-960.jpg` | `8611d5588634fac705b02e87522d54dab74e7237d0ab927b0a3d467d132c60d1` | 原创，MIT |
+| `src/assets/excerpt/landscape-720.jpg` | `94524cbba3b27b5b83b34800be3941d739c91ad4ff0d039fa424d08f422a76b6` | 原创，MIT |
+| `public/favicon.svg` | `d378eae969adceba00fa9a22bc2133f135094c5c9b878af93b72d7f783d085fb` | 原创，MIT |
+| `public/og-image.svg` | `f3f1d2dc1af474ed3af7d2c513e6c688b296386da285f3c28d1551a870eeda04` | 原创，MIT |
+| `public/og-image.png` | `34acbf01d0fbc94a5db478dcc99c7358921eaac5c413f0dbb8151b0349bfce4c` | 原创，MIT |
+| `src/assets/fonts/LanZeSong-subset.woff2` | `dfb124c02a09fe03bcd0f8d4d3125c50637758b716a7b81b9f0eb00516e6acd8` | **未核验** |
+| `src/assets/excerpt/piaoYiSong-excerpt.woff2` | `f12990c619ed3431193fa804dc6f703bf1a648526cdb3760bf2f306a8a4cbb39` | **未核验** |
+| `src/assets/excerpt/hongLei-excerpt.woff2` | `a79c5335d19afac98f4f2caae7e7b9c2ec38f70b2965dd5978c053c7a75fbe21` | **未核验** |
 
 离线馆藏分卷的 SHA-256、条目数与上游固定提交记录在 `public/data/poetry/manifest.json`、`SHA256SUMS.txt` 和各分卷 JSON；`scripts/download-poetry-corpus.mjs` 使用固定 commit 重建目录、manifest、分卷与校验清单，`scripts/verify-poetry-corpus.mjs` 由 CI、静态冒烟和单测复用。上游 MIT 许可证原文随 `public/data/poetry/LICENSE.chinese-poetry.txt` 分发；这些记录只说明字节身份、文件清单与许可证，不代替诗词底本的校勘核验。
 
 ## 待办
 
-- [ ] 为每类素材补「来源 URL / 作者 / License / 下载日期 / 文件哈希 / 是否允许再分发」字段。
+- [x] 图片、OG 图与 favicon 已替换为原创资产，并补齐哈希与授权状态。
+- [ ] 为字体补「来源 URL / 作者 / License / 下载日期 / 是否允许 Web 嵌入与再分发」字段，或替换为授权明确的开源中文字体。
 - [ ] 核查当前 WOFF2 子集对应的历史宋体是否允许 Web 嵌入、子集化与仓库再分发。
 - [ ] 核查今日展厅与登录封面压缩图对应的历史原图来源、许可与美术权利；无法确认时替换。
 - [x] 已从当前工作树移除未被源码引用的历史字体、图片与头像文件；原始文件仍可由 Git 历史追溯。

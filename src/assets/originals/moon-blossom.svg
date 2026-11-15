@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 672 768" width="672" height="768">
+  <!-- 原创：月夜花枝。多层山影 + 月晕 + 折枝花瓣，全部为路径绘制。 -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0%" stop-color="#40564f"/>
+      <stop offset="42%" stop-color="#4c6760"/>
+      <stop offset="100%" stop-color="#334841"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="70%" cy="24%" r="34%">
+      <stop offset="0%" stop-color="#f7faef" stop-opacity="0.68"/>
+      <stop offset="42%" stop-color="#dfe9dc" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#dfe9dc" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ridgeFar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5e7a73" stop-opacity="0.82"/>
+      <stop offset="100%" stop-color="#4a625c" stop-opacity="0.14"/>
+    </linearGradient>
+    <linearGradient id="ridgeNear" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2c403b" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#22322e" stop-opacity="0.45"/>
+    </linearGradient>
+    <filter id="blur8"><feGaussianBlur stdDeviation="8"/></filter>
+    <filter id="blur3"><feGaussianBlur stdDeviation="3"/></filter>
+    <filter id="blur1"><feGaussianBlur stdDeviation="1.1"/></filter>
+  </defs>
+
+  <rect width="672" height="768" fill="url(#sky)"/>
+  <rect width="672" height="768" fill="url(#halo)"/>
+
+  <!-- 远山 -->
+  <path d="M0 486 C 52 452, 92 470, 142 444 C 194 416, 238 452, 292 430
+           C 344 408, 392 446, 446 424 C 500 402, 548 440, 600 418
+           C 638 402, 660 424, 672 414 L 672 768 L 0 768 Z"
+        fill="url(#ridgeFar)" filter="url(#blur3)" opacity="0.85"/>
+
+  <!-- 近山 -->
+  <path d="M0 606 C 46 574, 84 596, 130 572 C 178 546, 220 582, 272 562
+           C 324 542, 368 578, 420 556 C 472 534, 516 570, 566 550
+           C 608 532, 646 558, 672 544 L 672 768 L 0 768 Z"
+        fill="url(#ridgeNear)" filter="url(#blur1)"/>
+
+  <!-- 月 -->
+  <g>
+    <circle cx="470" cy="186" r="118" fill="#eef4e6" opacity="0.1" filter="url(#blur8)"/>
+    <circle cx="470" cy="186" r="78" fill="#f7f9ee" opacity="0.96"/>
+    <circle cx="470" cy="186" r="78" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="1.2"/>
+    <circle cx="444" cy="164" r="16" fill="#e6ebdd" opacity="0.55" filter="url(#blur3)"/>
+  </g>
+
+  <!-- 折枝：主枝从右侧入画 -->
+  <g fill="none" stroke="#243430" stroke-opacity="0.85" stroke-linecap="round">
+    <path d="M672 300 C 596 336, 540 384, 486 448" stroke-width="3.4"/>
+    <path d="M580 358 C 556 342, 532 336, 506 340" stroke-width="1.8"/>
+    <path d="M540 396 C 520 414, 505 436, 498 462" stroke-width="1.6"/>
+    <path d="M620 326 C 604 306, 590 296, 574 292" stroke-width="1.4"/>
+  </g>
+
+  <!-- 花簇：三层叠加，远处虚、近处实 -->
+  <g fill="#f3f7ea">
+    <g filter="url(#blur3)" opacity="0.45">
+      <ellipse cx="500" cy="352" rx="26" ry="20"/><ellipse cx="536" cy="392" rx="30" ry="22"/>
+      <ellipse cx="494" cy="446" rx="24" ry="19"/><ellipse cx="572" cy="300" rx="20" ry="15"/>
+    </g>
+    <g opacity="0.92" filter="url(#blur1)">
+      <path d="M496 344 q14 -16 30 -4 q-4 18 -30 4 Z"/>
+      <path d="M528 384 q18 -18 36 -2 q-6 20 -36 2 Z"/>
+      <path d="M486 438 q14 -16 30 -3 q-5 18 -30 3 Z"/>
+      <path d="M566 292 q12 -13 25 -2 q-4 15 -25 2 Z"/>
+    </g>
+    <g fill="#fbfdf4" opacity="0.85">
+      <circle cx="508" cy="342" r="4.4"/><circle cx="522" cy="348" r="3.2"/>
+      <circle cx="544" cy="382" r="5"/><circle cx="558" cy="390" r="3.4"/>
+      <circle cx="500" cy="436" r="4"/><circle cx="514" cy="442" r="3"/>
+      <circle cx="576" cy="290" r="3.4"/>
+    </g>
+  </g>
+
+  <!-- 飘落花瓣 -->
+  <g fill="#eef3e4" opacity="0.6">
+    <ellipse cx="404" cy="520" rx="5" ry="3" transform="rotate(-24 404 520)"/>
+    <ellipse cx="336" cy="588" rx="4" ry="2.4" transform="rotate(12 336 588)"/>
+    <ellipse cx="452" cy="636" rx="4.6" ry="2.6" transform="rotate(-8 452 636)"/>
+    <ellipse cx="286" cy="678" rx="3.6" ry="2.2" transform="rotate(20 286 678)"/>
+  </g>
+</svg>

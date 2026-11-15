@@ -53,17 +53,14 @@
 
         <div class="exhibit-card" aria-label="今日诗意图">
           <div class="exhibit-card__frame">
-            <picture>
-              <source :srcset="exhibitAvif" type="image/avif" />
-              <img
-                :src="exhibitImage"
-                alt="月色与白花构成的青灰色诗意图"
-                width="672"
-                height="768"
-                decoding="async"
-                fetchpriority="high"
-              />
-            </picture>
+            <img
+              :src="exhibitImage"
+              alt="月色与花枝构成的青灰色诗意图"
+              width="672"
+              height="768"
+              decoding="async"
+              fetchpriority="high"
+            />
             <span class="exhibit-card__seal">兰泽馆藏</span>
           </div>
           <div class="exhibit-card__caption">
@@ -122,8 +119,7 @@ import { useLibrary } from "../composables/useLibrary.js";
 import { useExcerptDeck } from "../composables/useExcerptDeck.js";
 import { notify } from "../composables/useNotices.js";
 import { curatedPoems, getDailyLibraryPoem, asLibraryPoem } from "../data/poetryCatalog.js";
-import exhibitImage from "../assets/exhibit/songci300-768.jpg";
-import exhibitAvif from "../assets/exhibit/songci300-768.avif";
+import exhibitImage from "../assets/exhibit/poem-768.jpg";
 
 const { isSaved, toggleSaved } = useLibrary();
 const {
@@ -521,10 +517,6 @@ onBeforeUnmount(() => {
   inset: 5px;
   border: 1px solid rgba(168, 130, 69, 0.28);
   content: "";
-}
-
-.exhibit-card__frame > picture {
-  display: contents;
 }
 
 .exhibit-card__frame img {

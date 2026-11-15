@@ -1,10 +1,7 @@
 <template>
   <main class="auth-page">
     <section class="auth-art" aria-hidden="true">
-      <picture>
-        <source :srcset="authAvif" type="image/avif" />
-        <img :src="authImage" alt="" width="960" height="600" decoding="async" fetchpriority="low" />
-      </picture>
+      <img :src="authImage" alt="" width="960" height="600" decoding="async" fetchpriority="low" />
       <div class="auth-art__veil" />
       <router-link class="auth-brand" to="/" tabindex="-1">
         <span>兰</span>
@@ -131,8 +128,7 @@ import AppIcon from "../components/AppIcon.vue";
 import { userLogin, userReg } from "../apis/api/login.js";
 import { useSession } from "../composables/useSession.js";
 import { notify } from "../composables/useNotices.js";
-import authImage from "../assets/exhibit/auth-cover-960.jpg";
-import authAvif from "../assets/exhibit/auth-cover-960.avif";
+import authImage from "../assets/exhibit/auth-960.jpg";
 
 const route = useRoute();
 const router = useRouter();
@@ -236,11 +232,7 @@ watch(
   color: var(--porcelain-panel);
 }
 
-.auth-art > picture {
-  display: contents;
-}
-
-.auth-art > picture > img {
+.auth-art > img {
   position: absolute;
   inset: 0;
   width: 100%;

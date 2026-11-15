@@ -23,7 +23,8 @@
     "audit:layout": "node scripts/browser/layout-contract.mjs",
     "audit:layout:update": "node scripts/browser/layout-contract.mjs --update",
     "audit:motion": "node scripts/browser/motion-audit.mjs",
-    "audit:touch": "node scripts/browser/touch-target-audit.mjs"
+    "audit:touch": "node scripts/browser/touch-target-audit.mjs",
+    "render:originals": "node scripts/render-originals.mjs"
   },
   "engines": {
     "node": ">=20",

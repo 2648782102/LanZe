@@ -19,26 +19,22 @@
     </component>
     <p class="legacy-card__verse" :class="verseDensity">{{ excerpt.content }}</p>
     <h5 class="legacy-card__author">— {{ excerpt.author }}</h5>
-    <picture>
-      <source :srcset="fanzouAvif" type="image/avif" />
-      <img
-        class="legacy-card__art"
-        :src="fanzouImage"
-        alt=""
-        width="720"
-        height="412"
-        draggable="false"
-        decoding="async"
-        fetchpriority="low"
-      />
-    </picture>
+    <img
+      class="legacy-card__art"
+      :src="fanzouImage"
+      alt=""
+      width="720"
+      height="412"
+      draggable="false"
+      decoding="async"
+      fetchpriority="low"
+    />
   </div>
 </template>
 
 <script setup>
 import { computed } from "vue";
-import fanzouImage from "../assets/excerpt/fanzou-720.png";
-import fanzouAvif from "../assets/excerpt/fanzou-720.avif";
+import fanzouImage from "../assets/excerpt/landscape-720.jpg";
 
 const props = defineProps({
   excerpt: { type: Object, required: true },
@@ -64,10 +60,6 @@ const handleSave = () => {
 </script>
 
 <style>
-picture {
-  display: contents;
-}
-
 .legacy-card__box {
   position: relative;
   width: 100%;

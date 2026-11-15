@@ -36,7 +36,10 @@ const setMeta = (html, { title, description, path, image, jsonLd }) => {
       /<meta property="og:description" content="[^"]*">/,
       `<meta property="og:description" content="${escapeHtml(description)}">`,
     )
-    .replace(/<link rel="icon" href="[^"]*">/, `<link rel="icon" href="${escapeHtml(asset("favicon.ico"))}">`)
+    .replace(
+      /<link rel="icon"[^>]*>/,
+      `<link rel="icon" type="image/svg+xml" href="${escapeHtml(asset("favicon.svg"))}">`,
+    )
     .replace(/<meta property="og:image" content="[^"]*">/, `<meta property="og:image" content="${escapeHtml(asset(image))}">`);
 
   const head = [

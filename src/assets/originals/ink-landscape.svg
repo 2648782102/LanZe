@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 412" width="720" height="412">
+  <!-- 原创：水墨远山。不规则山脊 + 雾气晕染 + 孤舟，全部为路径绘制。 -->
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fcfdfa"/>
+      <stop offset="62%" stop-color="#f5f7f1"/>
+      <stop offset="100%" stop-color="#eef2ea"/>
+    </linearGradient>
+    <linearGradient id="ridgeA" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a9bdb6" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#a9bdb6" stop-opacity="0.08"/>
+    </linearGradient>
+    <linearGradient id="ridgeB" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6f8b83" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#6f8b83" stop-opacity="0.18"/>
+    </linearGradient>
+    <linearGradient id="ridgeC" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3f5751" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#3f5751" stop-opacity="0.25"/>
+    </linearGradient>
+    <filter id="mist"><feGaussianBlur stdDeviation="7"/></filter>
+    <filter id="soft"><feGaussianBlur stdDeviation="2.2"/></filter>
+  </defs>
+
+  <rect width="720" height="412" fill="url(#paper)"/>
+
+  <!-- 最远层：淡雾山影 -->
+  <path d="M0 250 C 60 214, 104 236, 148 208 C 196 178, 236 214, 282 196
+           C 330 176, 366 210, 412 190 C 462 168, 506 206, 552 188
+           C 604 168, 650 206, 700 186 L 720 190 L 720 412 L 0 412 Z"
+        fill="url(#ridgeA)" filter="url(#mist)" opacity="0.7"/>
+
+  <!-- 中层 -->
+  <path d="M0 300 C 48 262, 92 292, 138 262 C 186 230, 224 268, 268 250
+           C 310 232, 352 268, 396 246 C 442 224, 486 262, 530 242
+           C 578 220, 626 258, 668 238 L 720 246 L 720 412 L 0 412 Z"
+        fill="url(#ridgeB)" filter="url(#soft)" opacity="0.85"/>
+
+  <!-- 近层：实一些 -->
+  <path d="M0 344 C 40 318, 78 344, 118 322 C 156 300, 196 330, 238 312
+           C 282 292, 320 328, 362 308 C 404 288, 446 320, 488 302
+           C 532 282, 574 314, 616 296 C 656 278, 690 306, 720 296
+           L 720 412 L 0 412 Z"
+        fill="url(#ridgeC)" opacity="0.8"/>
+
+  <!-- 山脊苔点 -->
+  <g fill="#2f403b" opacity="0.5">
+    <circle cx="146" cy="258" r="2.2"/><circle cx="160" cy="266" r="1.6"/>
+    <circle cx="274" cy="248" r="2"/><circle cx="402" cy="244" r="1.8"/>
+    <circle cx="536" cy="240" r="1.8"/><circle cx="246" cy="310" r="1.6"/>
+    <circle cx="498" cy="300" r="1.6"/>
+  </g>
+
+  <!-- 日 -->
+  <circle cx="188" cy="126" r="23" fill="#b9613f" opacity="0.85"/>
+
+  <!-- 飞鸟 -->
+  <g stroke="#40564f" stroke-opacity="0.55" fill="none" stroke-width="1.3" stroke-linecap="round">
+    <path d="M96 118 q7 -7 14 0"/><path d="M120 108 q6 -6 12 0"/>
+    <path d="M142 122 q6 -6 12 0"/><path d="M110 134 q5 -5 10 0"/>
+  </g>
+
+  <!-- 孤舟 -->
+  <g stroke="#26372f" stroke-opacity="0.8" fill="none" stroke-linecap="round">
+    <path d="M300 330 q34 15 70 0" stroke-width="1.8"/>
+    <path d="M334 330 v-16" stroke-width="1.4"/>
+    <path d="M328 316 q11 -9 22 -2" stroke-width="1.3"/>
+  </g>
+  <g stroke="#26372f" stroke-opacity="0.28" fill="none" stroke-width="1">
+    <path d="M284 344 q50 13 104 0"/>
+    <path d="M296 356 q42 11 82 0"/>
+  </g>
+</svg>

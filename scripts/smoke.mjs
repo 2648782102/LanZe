@@ -38,7 +38,7 @@ function localAssetPaths(html) {
     // 构建改成绝对 base（history 路由要求），因此同时接受 / 与 ./ 前缀。
     [...html.matchAll(/(?:src|href)="((?:\.\/|\/)[^"?#]+)"/g)]
       .map((match) => match[1])
-      .filter((asset) => /^(\.\/|\/)assets\//.test(asset) || /^(\.\/|\/)favicon\.ico$/.test(asset)),
+      .filter((asset) => /^(\.\/|\/)assets\//.test(asset) || /^(\.\/|\/)favicon\.svg$/.test(asset)),
   )];
 }
 

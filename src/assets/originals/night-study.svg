@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="960" height="600">
+  <!-- 原创：夜读场景。深青天空、远山、窗光与摊开的书页；纯路径绘制。 -->
+  <defs>
+    <linearGradient id="night" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0%" stop-color="#1d2e2a"/>
+      <stop offset="55%" stop-color="#27403a"/>
+      <stop offset="100%" stop-color="#16231f"/>
+    </linearGradient>
+    <radialGradient id="lamp" cx="62%" cy="62%" r="30%">
+      <stop offset="0%" stop-color="#e8d3a8" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#e8d3a8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="960" height="600" fill="url(#night)"/>
+  <rect width="960" height="600" fill="url(#lamp)"/>
+
+  <!-- 远山剪影 -->
+  <path d="M0 442 C 70 402, 120 424, 176 396 C 232 368, 276 404, 328 382
+           C 380 360, 424 400, 476 378 C 528 356, 572 396, 624 374
+           C 676 352, 720 392, 772 370 C 828 348, 878 388, 960 366
+           L 960 600 L 0 600 Z"
+        fill="#12201c" opacity="0.5"/>
+
+  <!-- 窗格 -->
+  <g stroke="#8fa79c" stroke-opacity="0.35" fill="none" stroke-width="2">
+    <rect x="612" y="150" width="210" height="250"/>
+    <path d="M717 150 V400 M612 275 H822"/>
+  </g>
+  <rect x="612" y="150" width="210" height="250" fill="#e6efe4" opacity="0.12"/>
+
+  <!-- 案几与书页 -->
+  <g fill="none" stroke="#c9b48a" stroke-opacity="0.85" stroke-width="2.4" stroke-linecap="round">
+    <path d="M300 470 q70 -18 140 0"/>
+    <path d="M310 470 q0 -26 -6 -40"/>
+    <path d="M430 470 q0 -26 6 -40"/>
+    <path d="M356 456 q22 -10 44 0"/>
+  </g>
+  <g fill="#eae2cf" opacity="0.9">
+    <path d="M330 442 q26 -8 52 0 q-26 8 -52 0 Z"/>
+    <path d="M382 442 q26 -8 52 0 q-26 8 -52 0 Z"/>
+  </g>
+
+  <!-- 灯 -->
+  <g>
+    <circle cx="560" cy="404" r="30" fill="#e9d4a6" opacity="0.28"/>
+    <circle cx="560" cy="404" r="12" fill="#f0dcae" opacity="0.95"/>
+    <path d="M560 416 v34" stroke="#c9b48a" stroke-opacity="0.7" stroke-width="2"/>
+  </g>
+
+  <!-- 星点 -->
+  <g fill="#dfe8de" opacity="0.55">
+    <circle cx="140" cy="120" r="2"/><circle cx="230" cy="86" r="1.6"/>
+    <circle cx="330" cy="150" r="1.8"/><circle cx="450" cy="96" r="1.4"/>
+    <circle cx="560" cy="140" r="1.6"/><circle cx="880" cy="110" r="1.8"/>
+  </g>
+</svg>
