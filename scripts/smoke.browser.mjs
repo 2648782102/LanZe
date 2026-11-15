@@ -1019,6 +1019,41 @@ const main = async () => {
   ));
   if (!mobileSearch) throw new Error("Mobile search did not return the expected poem");
 
+  await send("Page.navigate", { url: `${origin}/#/collection` });
+  await waitUntil("mobile collection", () => evaluate(
+    "Boolean(document.querySelector('.collection-tabs') && document.querySelector('.account-panel.is-guest'))",
+  ));
+  const mobileCollection = await evaluate(`(() => {
+    const main = document.querySelector('.collection-main');
+    const panel = document.querySelector('.account-panel.is-guest');
+    const tabs = document.querySelector('.collection-tabs');
+    const guestLink = panel.querySelector('a, button');
+    return {
+      mainTop: Math.round(main.getBoundingClientRect().top),
+      panelTop: Math.round(panel.getBoundingClientRect().top),
+      tabsTop: Math.round(tabs.getBoundingClientRect().top),
+      guestLinkVisible: guestLink ? guestLink.getBoundingClientRect().height > 0 : false,
+      demoNoteHidden: (() => {
+        const note = panel.querySelector('.demo-note');
+        return !note || getComputedStyle(note).display === 'none';
+      })(),
+      scrollWidth: document.documentElement.scrollWidth,
+      viewportWidth: document.documentElement.clientWidth,
+    };
+  })()`);
+  if (mobileCollection.panelTop <= mobileCollection.mainTop) {
+    throw new Error("Mobile collection should show saved content before the guest login panel");
+  }
+  if (mobileCollection.tabsTop >= mobileCollection.panelTop) {
+    throw new Error("Mobile collection tabs should come before the login panel");
+  }
+  if (!mobileCollection.guestLinkVisible || !mobileCollection.demoNoteHidden) {
+    throw new Error(`Mobile guest panel is not condensed: ${JSON.stringify(mobileCollection)}`);
+  }
+  if (mobileCollection.scrollWidth > mobileCollection.viewportWidth + 1) {
+    throw new Error("Mobile collection page overflows horizontally");
+  }
+
   await send("Page.navigate", { url: `${origin}/#/compose` });
   await waitUntil("guest compose form", () => evaluate("Boolean(document.querySelector('#poem-title'))"));
   const guestCompose = await evaluate(`(() => ({

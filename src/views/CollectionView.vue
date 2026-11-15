@@ -578,8 +578,9 @@ onMounted(async () => {
   }
 
   .account-panel.is-guest {
-    order: -1;
-    padding: 20px;
+    order: 1;
+    margin-bottom: calc(24px + env(safe-area-inset-bottom));
+    padding: 16px 18px 20px;
   }
 
   .account-panel.is-guest .account-mark {
@@ -587,12 +588,24 @@ onMounted(async () => {
   }
 
   .account-panel.is-guest > h2 {
-    font-size: var(--text-heading);
+    font-size: 18px;
+  }
+
+  .account-panel.is-guest > p:not(.demo-note) {
+    font-size: var(--text-note);
+    line-height: 1.65;
+  }
+
+  .account-panel.is-guest .button {
+    max-width: 100%;
+  }
+
+  .account-panel.is-guest .demo-note {
+    display: none;
   }
 
   .account-panel.is-guest .local-note {
-    margin-top: 14px;
-    padding-top: 12px;
+    display: none;
   }
 
   .account-panel {
