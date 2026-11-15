@@ -202,16 +202,40 @@
           </EmptyState>
 
           <nav v-if="result.totalPages > 1" class="pagination" aria-label="检索结果分页">
-            <button type="button" :disabled="result.page <= 1" aria-label="上一页" @click="goToPage(result.page - 1)">
-              <AppIcon name="arrow-left" :size="16" />
-            </button>
-            <span>第 {{ result.page }} / {{ result.totalPages }} 页</span>
             <button
+              class="pagination__step"
+              type="button"
+              :disabled="result.page <= 1"
+              aria-label="上一页"
+              @click="goToPage(result.page - 1)"
+            >
+              <AppIcon name="arrow-left" :size="16" />
+              <span>上一页</span>
+            </button>
+            <div class="pagination__pages">
+              <template v-for="(entry, index) in pageWindow" :key="`${entry}-${index}`">
+                <span v-if="entry === '…'" class="pagination__gap" aria-hidden="true">…</span>
+                <button
+                  v-else
+                  type="button"
+                  :class="{ 'is-current': entry === result.page }"
+                  :aria-current="entry === result.page ? 'page' : undefined"
+                  :aria-label="`第 ${entry} 页`"
+                  @click="goToPage(entry)"
+                >
+                  {{ entry }}
+                </button>
+              </template>
+            </div>
+            <p class="pagination__status">第 {{ result.page }} / {{ result.totalPages }} 页</p>
+            <button
+              class="pagination__step"
               type="button"
               :disabled="result.page >= result.totalPages"
               aria-label="下一页"
               @click="goToPage(result.page + 1)"
             >
+              <span>下一页</span>
               <AppIcon name="arrow-right" :size="16" />
             </button>
           </nav>
@@ -293,6 +317,21 @@ const resultSummary = computed(() =>
 
 const rowNumber = (index) =>
   String((result.value.page - 1) * result.value.pageSize + index + 1).padStart(2, "0");
+
+const pageWindow = computed(() => {
+  const total = result.value.totalPages;
+  const current = result.value.page;
+  if (total <= 7) return Array.from({ length: total }, (_, index) => index + 1);
+  const pages = new Set([1, total, current, current - 1, current + 1]);
+  if (current <= 3) [2, 3, 4].forEach((page) => pages.add(page));
+  if (current >= total - 2) [total - 3, total - 2, total - 1].forEach((page) => pages.add(page));
+  const sorted = [...pages].filter((page) => page >= 1 && page <= total).sort((a, b) => a - b);
+  return sorted.reduce((list, page, index) => {
+    if (index && page - sorted[index - 1] > 1) list.push("…");
+    list.push(page);
+    return list;
+  }, []);
+});
 
 const syncRoute = ({ resetPage = false } = {}) => {
   const nextQuery = {};
@@ -388,10 +427,20 @@ const resetFilters = () => {
 };
 
 const goToPage = (nextPage) => {
-  page.value = Math.max(1, Math.min(result.value.totalPages, nextPage));
+  const target = Math.max(1, Math.min(result.value.totalPages, nextPage));
+  if (target === page.value) return;
+  page.value = target;
   syncRoute();
-  const top = document.querySelector(".result-room")?.getBoundingClientRect().top;
-  if (typeof top === "number" && top < 0) window.scrollTo({ top: window.scrollY + top - 96, behavior: "smooth" });
+  window.requestAnimationFrame(() => {
+    const room = document.querySelector(".result-room");
+    if (!room) return;
+    const header = getComputedStyle(document.documentElement).getPropertyValue("--header-height").trim();
+    const offset = Number.parseInt(header, 10) || 72;
+    const top = room.getBoundingClientRect().top + window.scrollY - offset - 12;
+    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    room.setAttribute("tabindex", "-1");
+    room.focus({ preventScroll: true });
+  });
 };
 
 const savePoem = (poem) => {
@@ -890,20 +939,23 @@ watch([dynasty, genre], () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 18px;
-  min-height: 76px;
+  gap: 14px;
+  min-height: 88px;
   color: var(--ink-faint);
   font-size: var(--text-meta);
 }
 
 .pagination button {
   display: grid;
-  width: 42px;
+  min-width: 42px;
   height: 42px;
   place-items: center;
   border: 1px solid var(--line);
   background: transparent;
   color: var(--ink-soft);
+  font-family: var(--font-number);
+  font-size: var(--text-note);
+  transition: border-color var(--motion-fast) var(--ease-standard), color var(--motion-fast) var(--ease-standard);
 }
 
 .pagination button:disabled {
@@ -913,6 +965,88 @@ watch([dynasty, genre], () => {
 .pagination button:not(:disabled):hover {
   border-color: var(--celadon-deep);
   color: var(--celadon-deep);
+}
+
+.pagination__step {
+  grid-auto-flow: column;
+  gap: 6px;
+  padding-inline: 12px;
+  white-space: nowrap;
+}
+
+.pagination__pages {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pagination__pages button {
+  min-width: 38px;
+  padding-inline: 4px;
+}
+
+.pagination__pages button.is-current {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--porcelain-panel);
+}
+
+.pagination__gap {
+  color: var(--ink-faint);
+  letter-spacing: 0.1em;
+}
+
+.pagination__status {
+  margin: 0;
+  min-width: 84px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .pagination {
+    gap: 8px;
+    min-height: 72px;
+  }
+
+  .pagination__step {
+    min-width: 44px;
+    padding-inline: 0;
+  }
+
+  .pagination__step span,
+  .pagination__status {
+    display: none;
+  }
+
+  .pagination__pages {
+    gap: 4px;
+  }
+
+  .pagination__pages button {
+    min-width: 40px;
+    height: 40px;
+    padding-inline: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .pagination {
+    gap: 4px;
+  }
+
+  .pagination__step {
+    min-width: 40px;
+    padding-inline: 0;
+  }
+
+  .pagination__pages {
+    gap: 0;
+  }
+
+  .pagination__pages button {
+    min-width: 40px;
+  }
 }
 
 .corpus-note {

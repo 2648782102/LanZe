@@ -859,6 +859,41 @@ const main = async () => {
     throw new Error("Explore supporting text fell below the 11px readability floor");
   }
 
+  currentStep = "desktop pagination";
+  await send("Page.navigate", { url: `${origin}/#/explore?page=6` });
+  await waitUntil("pagination window", () => evaluate(
+    "document.querySelectorAll('.pagination__pages button').length > 0",
+  ));
+  const paginationBefore = await evaluate(`(() => {
+    const nav = document.querySelector('.pagination');
+    const current = document.querySelector('.pagination__pages .is-current');
+    return {
+      buttons: nav.querySelectorAll('button').length,
+      current: current?.textContent?.trim() || '',
+      ariaCurrent: current?.getAttribute('aria-current') || '',
+      gap: nav.querySelectorAll('.pagination__gap').length,
+      width: Math.round(nav.getBoundingClientRect().width),
+      viewport: document.documentElement.clientWidth,
+    };
+  })()`);
+  if (paginationBefore.current !== "6" || paginationBefore.ariaCurrent !== "page") {
+    throw new Error(`Pagination current page marker is wrong: ${JSON.stringify(paginationBefore)}`);
+  }
+  if (paginationBefore.buttons < 6 || paginationBefore.gap !== 2) {
+    throw new Error(`Pagination window is not condensed: ${JSON.stringify(paginationBefore)}`);
+  }
+  if (paginationBefore.width > paginationBefore.viewport) {
+    throw new Error("Desktop pagination overflows its viewport");
+  }
+  await evaluate("document.querySelector('.pagination__pages button[aria-label=\"第 7 页\"]').click()");
+  const paginationAfter = await waitUntil("pagination page 7", () => evaluate(`(() => ({
+    href: location.hash,
+    current: document.querySelector('.pagination__pages .is-current')?.textContent?.trim() || '',
+  }))()`).then((value) => value.current === "7" ? value : null));
+  if (!paginationAfter.href.includes("page=7")) {
+    throw new Error("Pagination did not sync the page into the route");
+  }
+
   await send("Emulation.setDeviceMetricsOverride", {
     width: 390,
     height: 844,
@@ -1061,6 +1096,28 @@ const main = async () => {
   }
   if (!narrowLayout.audioPaused) {
     throw new Error("320px audio dock did not start silently");
+  }
+  await send("Page.navigate", { url: `${origin}/#/explore?page=200` });
+  await waitUntil("narrow pagination", () => evaluate(
+    "Boolean(document.querySelector('.pagination__pages .is-current'))",
+  ));
+  const narrowPagination = await evaluate(`(() => {
+    const nav = document.querySelector('.pagination');
+    const current = document.querySelector('.pagination__pages .is-current');
+    return {
+      width: Math.round(nav.getBoundingClientRect().width),
+      viewport: document.documentElement.clientWidth,
+      current: current?.textContent?.trim() || '',
+      smallTargets: [...nav.querySelectorAll('button')]
+        .map((button) => button.getBoundingClientRect())
+        .filter((box) => box.width < 40 || box.height < 40).length,
+    };
+  })()`);
+  if (narrowPagination.current !== "200" || narrowPagination.width > narrowPagination.viewport) {
+    throw new Error(`320px pagination window is broken: ${JSON.stringify(narrowPagination)}`);
+  }
+  if (narrowPagination.smallTargets > 0) {
+    throw new Error("320px pagination has touch targets below 40px");
   }
   await evaluate("window.scrollTo({ top: 600, behavior: 'instant' })");
   await waitUntil("320px page scroll", () => evaluate("scrollY > 300"));
