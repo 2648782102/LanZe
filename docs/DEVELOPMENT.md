@@ -34,7 +34,7 @@ npm run dev
 ```bash
 npm run dev                  # 开发服务器
 npm run build                # 生产构建，输出到 dist/
-npm run test                 # 43 个 node --test 单测
+npm run test                 # 45 个 node --test 单测
 npm run lint                 # 静态扫描失效后端地址、硬编码服务与脆弱引用
 npm run preview              # 预览构建产物
 npm run smoke                # 启动预览服务并检查首页与入口静态资源

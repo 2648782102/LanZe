@@ -38,12 +38,17 @@ const firstLine = computed(() =>
   props.poem.paragraph || props.poem.paragraphs?.[0] || props.poem.content || "正文待补",
 );
 
-// 朝代与体裁常来自同一字段，重复出现时只保留一次。
+// 朝代与体裁常来自同一字段，重复出现时只保留一次；体裁本身含时代信息时
+// 也不再补一个「未编年」。
 const metaLine = computed(() => {
-  const parts = [props.poem.dynasty || "未编年", props.poem.author, props.poem.category]
-    .map((part) => (part || "").trim())
-    .filter(Boolean);
-  return [...new Set(parts)].join(" · ");
+  const dynasty = (props.poem.dynasty || "").trim();
+  const category = (props.poem.category || "").trim();
+  const author = (props.poem.author || "").trim();
+  const inferred = /^(唐|宋|元|明|清|先秦|汉|魏|晋|南北朝|五代|隋)/.test(category);
+  const era = dynasty && dynasty !== "未编年"
+    ? dynasty
+    : inferred ? "" : "未编年";
+  return [...new Set([era, author, category].filter(Boolean))].join(" · ");
 });
 </script>
 
