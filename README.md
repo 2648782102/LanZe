@@ -10,7 +10,7 @@
   <a href="https://github.com/2648782102/LanZe/actions/workflows/browser-e2e.yml"><img alt="Browser E2E" src="https://github.com/2648782102/LanZe/actions/workflows/browser-e2e.yml/badge.svg" /></a>
   <a href="https://vuejs.org/"><img alt="Vue 3" src="https://img.shields.io/badge/Vue-3-42b883.svg" /></a>
   <a href="CHANGELOG.md"><img alt="Changelog" src="https://img.shields.io/badge/changelog-keep%20a%20changelog-orange.svg" /></a>
-  <a href="https://github.com/2648782102/LanZe/releases/tag/v0.4.0"><img alt="Release v0.4.0" src="https://img.shields.io/badge/release-v0.4.0-2f6f62.svg" /></a>
+  <a href="https://github.com/2648782102/LanZe/releases/tag/v0.5.0"><img alt="Release v0.5.0" src="https://img.shields.io/badge/release-v0.5.0-2f6f62.svg" /></a>
 </p>
 
 > **English summary:** LanZe is a community-maintained Vue 3 frontend for reading, browsing and sharing classical Chinese poetry. It runs locally with built-in demo data, includes documentation, CI and tests, and does not promise a verified public demo or hosted account backend.
@@ -40,7 +40,7 @@
 | 测试 | `npm run test` 含 48 个 `node --test` 单测；Node 20/22 CI 与独立 Browser E2E workflow 覆盖构建与主要演示链路 |
 | 质量门禁 | Browser E2E 同时跑 axe-core 无障碍审计（0 违规）、LCP/CLS/首屏资源预算、40px 移动端触控下限，以及 320/390/430 三档移动端像素基线 |
 | 许可 | [MIT](LICENSE)，`Copyright (c) 2022-2026 LanZe contributors` |
-| 发布 | `v0.2.0` / `v0.3.0` 是历史 Release；`v0.4.0` 说明见 `RELEASE_NOTES.md` 与 `ANNOUNCEMENT.md` |
+| 发布 | `v0.2.0` / `v0.3.0` / `v0.4.0` 是历史 Release；`v0.5.0` 说明见 `RELEASE_NOTES.md` |
 | 设计契约 | [青瓷数字诗馆](docs/DESIGN_SYSTEM.md)：冷白瓷面、青灰线框、铜金索引色与「一首诗一展厅」的信息架构 |
 
 ## 主要特性

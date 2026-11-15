@@ -155,11 +155,12 @@ jobs:
         shell: bash
         run: |
           test -f src/assets/fonts/LanZeSong-subset.woff2
-          test -f src/assets/exhibit/songci300-768.jpg
-          test -f src/assets/exhibit/auth-cover-960.jpg
+          test -f src/assets/exhibit/poem-768.jpg
+          test -f src/assets/exhibit/auth-960.jpg
+          test -f src/assets/excerpt/fanzou-720.png
           test "$(wc -c < src/assets/fonts/LanZeSong-subset.woff2)" -lt 250000
-          test "$(wc -c < src/assets/exhibit/songci300-768.jpg)" -lt 100000
-          test "$(wc -c < src/assets/exhibit/auth-cover-960.jpg)" -lt 180000
+          test "$(wc -c < src/assets/exhibit/poem-768.jpg)" -lt 100000
+          test "$(wc -c < src/assets/exhibit/auth-960.jpg)" -lt 180000
 
       - name: Check offline poetry corpus
         shell: bash

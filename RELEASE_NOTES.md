@@ -1,70 +1,43 @@
-# 兰泽诗词 v0.4.0 · 离线馆藏与声景曲库
+# 兰泽诗词 v0.5.0 · 可被检索的诗馆
 
-> 发布文案只描述已合并到 `main`、经本地与 CI 验证的内容。`v0.2.0` 与 `v0.3.0` 是独立历史 Release，不被本说明覆盖。
+> 只描述已合并到 `main`、经本地与 CI 验证的内容。`v0.2.0` / `v0.3.0` / `v0.4.0` 是独立历史 Release，`v0.4.0` 的说明保留在 `CHANGELOG.md`。
 
-> 当前状态补充：背景音乐播放器及其外链音源、示例音频与相关配置已从项目中移除。下方历史记录中的音频说明仅描述当时的发布状态，不代表当前版本。
-
-`v0.4.0` 继续延续「青瓷数字诗馆」的设计契约：把内容、阅读体验和默认媒体都收回仓库内，让 `npm ci && npm run dev` 不依赖外部诗词接口、第三方音乐平台或线上账号服务。它仍不是线上社区上线公告。
+`v0.5.0` 解决的是「诗馆建好了，但没人找得到」：全站从 hash 路由换成真实路径并在构建期预渲染，搜索引擎终于能读到每一首诗的标题与正文。同时清理了一处真实的合规风险——三张来源不明的插画换成了仓库自绘的原创资产。
 
 ### Highlights
 
-- 📚 **离线馆藏**：用固定上游提交的 MIT 授权选段重建业务诗库，16 个静态分卷、9,328 篇语料与 22 首精校短章合计 9,350 篇；按朝代/体裁双轴筛选、关键词检索、分页和来源标注。分卷按需加载，首包 JS 从约 4.6 MB 降至 35 KB。
-- 📜 **本地摘录**：首页单张历史白色摘录卡保留原有构图，默认交替使用内置摘录与精校馆藏短句；只有显式设置 `VITE_POETRY_SOURCE=remote` 才请求可选随机句接口，失败时回退并标注来源。
-- 📱 **移动端走查**：在 320–1440px 复核六类页面；窄屏筛选面板可折叠，写作台支持访客预览与本机草稿，吸底播放器默认收起并与底部导航分层。固定层避让、焦点态、安全区与 `dvh` 视口规则同步收敛，浏览器冒烟断言零横向溢出与 CLS 预算。
-- 🎵 **三段声景曲库**：`npm run audio:generate` 确定性生成「空山 · 松风」「月色 · 瓷盏」「晚舟 · 水纹」三段 24 秒 PCM WAV、原创 SVG 封面、清单与 SHA-256；`npm run audio:verify` 校验格式、时长和哈希。播放器提供封面、播放列表、切轨、自动续播、进度拖动、音量/静音、错误重试与本机偏好记忆。
-- 🔒 **默认离线**：业务诗库、摘录卡与默认播放器都不请求第三方服务；自定义音源和远程诗句源必须显式启用，授权、可用性与隐私边界由配置者负责。
-- 🧪 **39 项单测**：覆盖离线馆藏、曲库校验、演示 API 边界、诗句源配置/回退、运行时配置与响应归一化；Node 20/22 CI、静态冒烟与独立 Chromium Browser E2E 共同验证主要演示链路。
-- 🧰 **工程约束**：`package.json` 明确 Node `>=20` / npm `>=10`，CI 拒绝旧 UI 套件、旧演示音文件、第三方音乐域和过期发布措辞回归。
-- 📝 **文档与展示**：README、架构/开发/部署/设计/FAQ/路线图、发布说明、欢迎帖与宣发草稿按当前实现同步；素材哈希继续作为身份证据，不冒充授权证明。
+- 🔎 **真实 URL 与预渲染**：`/#/poem/demo-jingyesi` 变成 `/poem/demo-jingyesi`。构建期生成 26 个静态页面，每页都有独立标题、描述、`<h1>` 正文与 `BlogPosting` 结构化数据，并输出 `sitemap.xml`；旧 hash 链接自动迁移，不会失效。
+- 🧭 **深链可用**：GitHub Pages 是纯静态托管，`404.html` 兜底让任意深链直接打开都能正确渲染。已线上验证 `/poem/demo-jingyesi/` 返回 200 且标题正确。
+- 📖 **译文与简注**：12 首常读诗目新增白话译文与短注，诗页以「译文」区块独立呈现，与「笺注」的考据内容区分；预渲染 HTML 同样带有这些文本。
+- 🎨 **原创素材**：展品图、登录插画与 favicon 改为仓库内 SVG 绘制（`src/assets/originals/`），授权明确为 MIT。文件体积从 120–432KB 降到 10–14KB。
+- 🎬 **统一的动效语言**：四档时长 + 三条语义曲线，列表错位入场，路由按层级方向过渡；抽屉弹簧按需加载，`prefers-reduced-motion` 下不加载动效库。
+- 🧹 **移除音乐播放器**：背景音乐不提供核心价值，且默认外链存在授权与可用性风险。现在站点不发起任何音频请求；朗读（Web Speech API）作为独立的无障碍能力保留。
+- ⚡ **性能**：首屏 JS 61KB / CSS 9KB（预算 95/12），LCP 约 220ms，CLS 0，全部路由 0 长任务。诗词检索的统计与匹配改为单次遍历 + 结果缓存。
 
-### 本地运行
+### 质量门禁
+
+42 项 `node --test` 单测，加上八类 CI 自动检查：Chromium 浏览器 E2E、axe 无障碍（0 违规）、性能预算、40px 触控下限、跨平台可比的布局约定、动效 token 审计、移动端像素基线、80 项响应式扫描。
+
+### 快速开始
 
 ```bash
-git clone https://github.com/2648782102/LanZe.git
-cd LanZe
 npm ci
-npm run dev
+npm run dev      # http://127.0.0.1:5173/
 ```
 
-建议 Node.js 20 或 22、npm 10 或更高。默认无需配置即可使用离线馆藏和演示数据；演示账号为 `demo / lanze2026`。演示账号、收藏、作品与播放器偏好只保存在当前浏览器 `localStorage` / Cookie，不是真实账号服务。
-
-```bash
-npm run build
-npm run test
-npm run lint
-npm run audio:verify
-npm run smoke
-npm run smoke:browser
-```
-
-`npm run smoke:browser` 需要本机 Chrome / Chromium；CI 的 Browser E2E workflow 会自动安装。Linux 或自定义安装路径可设置 `CHROME_PATH`。
-
-### 环境变量
-
-所有 `VITE_` 变量都会进入浏览器产物，只能放公开配置：
-
-- `VITE_API_BASE_URL` / `VITE_USE_MOCK`：可选自建业务 API 与演示数据开关。
-- `VITE_POETRY_SOURCE` / `VITE_POETRY_SOURCE_URL`：默认 `local`，显式设为 `remote` 才会请求可选随机句接口。
-- `VITE_AUDIO_SOURCE` / `VITE_AUDIO_TRACKS`：默认使用仓库内三段声景；只有 `custom` 且 JSON 有效时才加载配置者提供的音轨。
-
-完整表格见 `README.md`、`.env.example` 与 `docs/DEPLOYMENT.md`。
-
-### 文档入口
-
-- README：https://github.com/2648782102/LanZe/blob/main/README.md
-- 设计系统：https://github.com/2648782102/LanZe/blob/main/docs/DESIGN_SYSTEM.md
-- 开发与部署：https://github.com/2648782102/LanZe/tree/main/docs
-- 素材清单：https://github.com/2648782102/LanZe/blob/main/docs/THIRD_PARTY_ASSETS.md
-- 变更日志：https://github.com/2648782102/LanZe/blob/main/CHANGELOG.md
+演示账号 `demo / lanze2026`；收藏、作品与草稿只保存在当前浏览器。
 
 ### 已知限制
 
-- 当前不提供经维护者验证的线上 Demo、托管后端或账号服务；静态部署只发布前端。
-- 演示状态仅保存在当前浏览器，不提供真实密码安全、跨设备同步或内容审核。
-- Browser E2E 当前覆盖 Chromium 的关键演示链路；跨浏览器矩阵与真实后端契约仍属后续事项。无障碍审计、性能预算、触控下限与移动端像素基线已随 E2E 运行，像素基线目前只在采集平台上比对。
-- 历史字体、图片、favicon、诗词底本/校勘与可选第三方内容服务的来源和授权仍需逐项核验；MIT 不自动覆盖第三方素材，`docs/THIRD_PARTY_ASSETS.md` 中的 SHA-256 不是许可证明。
-- GitHub 展示中的 Pages、社交预览与在线 Discussion #1 正文仍按实际写权限核对；本说明不把它们写成部署或同步事实。
+- 没有经维护者验证的线上后端：账号、收藏、作品都是当前浏览器内的演示实现。
+- Browser E2E 只覆盖 Chromium；跨浏览器矩阵与真实后端契约仍未建立。
+- 像素基线只在采集平台（macOS）上比对，CI 里实际把关的是与字体无关的布局约定。
+- 三个 WOFF2 字体子集（正文宋体与摘录卡两枚书法体）来源与再分发条款仍未核验；这是 `docs/THIRD_PARTY_ASSETS.md` 中唯一遗留的风险项。
+- 摘录卡扇舟图按维护者决定保留历史原图，授权状态如实标注为未核验。
+- 预渲染覆盖 26 个页面（主要路由 + 22 首精校短章）；9,350 篇全量馆藏仍由前端渲染，通过站点地图之外的深链访问。
 
-### 致谢
+### 链接
 
-感谢 2022–2024 年原作者与早期贡献者留下的界面、素材和 Git 历史，感谢 Vue / Vite / Axios 与 `chinese-poetry` 上游项目，以及参与文档、CI、视觉与本地验证的人。第三方诗词、字体、图片与可选内容服务不构成对本项目的背书。
+- 静态预览：https://2648782102.github.io/LanZe/
+- 素材清单：https://github.com/2648782102/LanZe/blob/main/docs/THIRD_PARTY_ASSETS.md
+- 变更日志：https://github.com/2648782102/LanZe/blob/main/CHANGELOG.md

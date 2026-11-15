@@ -4,7 +4,13 @@
 
 ## [Unreleased]
 
-> 记录 `v0.4.0` 之后、尚未发布的改动。
+> `v0.5.0` 的改动。该版本已完成并发版，见 `RELEASE_NOTES.md`。
+
+### Added
+
+- **真实 URL 与构建期预渲染**：全站改用 `createWebHistory`，`/poem/:id` 成为独立地址；构建时生成 26 个静态页面（主要路由 + 22 首精校短章），每页带独立标题、描述、`<h1>` 正文与 `BlogPosting` JSON-LD，并输出 `sitemap.xml`。旧 `/#/...` 链接在路由创建前自动迁移为等价 path。`404.html` 兜底让 GitHub Pages 的深链直接可开；已线上验证 `/poem/demo-jingyesi/` 返回 200。
+- **译文与简注**：新增 `src/data/poemNotes.js`，为 12 首常读诗目提供原创白话译文与短注；诗页以独立「译文」区块呈现，预渲染 HTML 同样包含，并补 3 项单测保证 id 对齐与内容非空。
+- **动效规范层**：四档时长 + 三条语义曲线；列表按序错位入场（只动 `transform`，避免 `opacity` 中途降低对比度）；路由按层级方向过渡；筛选抽屉的弹簧动效按需加载 `motion`，`prefers-reduced-motion` 下不加载。新增 `npm run audit:motion` 并接入 CI。
 
 ### Changed
 
