@@ -17,11 +17,11 @@
 
 **简体中文**｜[English summary](#english-summary-1)
 
-> **30 秒阅读**：[快速开始](#快速开始) · [当前状态](#当前状态-2026-11-07) · [环境变量](#环境变量) · [贡献](#贡献)。本地运行只需 `npm ci && npm run dev`；默认使用演示数据，GitHub Pages 仅提供静态前端预览，不承诺账号后端或完整线上 Demo。
+> **30 秒阅读**：[快速开始](#快速开始) · [当前状态](#当前状态-2026-11-15) · [环境变量](#环境变量) · [贡献](#贡献)。本地运行只需 `npm ci && npm run dev`；默认使用演示数据，GitHub Pages 仅提供静态前端预览，不承诺账号后端或完整线上 Demo。
 
 ## 项目定位
 
-兰泽诗词始于 2022 年，最初是一个以 Vue 3 + Vite 构建的古诗词学习与交流界面：今日读诗、诗词索引、搜索、收藏、创作与本地演示音源。2026 年重新整理后，本仓库的定位是：
+兰泽诗词始于 2022 年，最初是一个以 Vue 3 + Vite 构建的古诗词学习与交流界面：今日读诗、诗词索引、搜索、收藏、创作与本地演示数据。2026 年重新整理后，本仓库的定位是：
 
 1. **可本地运行的开源前端**：`npm ci` → `npm run dev`，无需依赖历史托管平台即可查看界面。
 2. **可替换的数据适配层**：`VITE_API_BASE_URL` 优先连接自建 API；未配置或失败时自动降级到仓库内演示数据。
@@ -29,16 +29,16 @@
 
 这不是一个已经上线运营的诗词社区，也不提供线上账号服务、数据库或正式内容审核。仓库 Website 当前指向已验证的 [GitHub Pages 静态预览](https://2648782102.github.io/LanZe/)；该页面只发布前端，不代表托管后端或完整线上 Demo。旧 README 中的 MemFire Cloud 展示地址和 README/代码里的若干 Vercel 地址均属**历史链接**，请不要把它们当作当前可用服务。没有后端时，页面使用本地演示数据；演示账号与作品仅保存在当前浏览器 `localStorage`。
 
-## 当前状态（2026-11-07）
+## 当前状态（2026-11-15）
 
 | 项目 | 状态 |
 | --- | --- |
 | 历史基线 | 原 `main` 停在 `b4ea7f4`（2024-08-18）；2026-11-06 起进行现代化维护 |
-| 前端构建 | Vue 3 + Vue Router 4（hash 模式）+ 自有组件 + Vite 6（ESM 配置） |
+| 前端构建 | Vue 3 + Vue Router 4（history 路由）+ 自有组件 + Vite 6（ESM 配置），构建期预渲染 26 页 |
 | 静态预览 | GitHub Pages 项目站点已启用并验证入口资源；仅发布前端，不承诺托管后端、账号服务或正式线上 Demo |
 | 后端/账号 | 仓库不附带完整后端；默认使用本地演示数据，配置 `VITE_API_BASE_URL` 后可连接自建 API |
-| 测试 | `npm run test` 含 48 个 `node --test` 单测；Node 20/22 CI 与独立 Browser E2E workflow 覆盖构建与主要演示链路 |
-| 质量门禁 | Browser E2E 同时跑 axe-core 无障碍审计（0 违规）、LCP/CLS/首屏资源预算、40px 移动端触控下限，以及 320/390/430 三档移动端像素基线 |
+| 测试 | `npm run test` 含 45 个 `node --test` 单测；Node 20/22 CI 与独立 Browser E2E workflow 覆盖构建与主要演示链路 |
+| 质量门禁 | Browser E2E 同时跑 axe-core 无障碍审计（0 违规）、LCP/CLS/首屏资源预算、40px 移动端触控下限、跨平台布局约定、动效 token 审计，以及 320/390/430 三档移动端像素基线 |
 | 许可 | [MIT](LICENSE)，`Copyright (c) 2022-2026 LanZe contributors` |
 | 发布 | `v0.2.0` / `v0.3.0` / `v0.4.0` 是历史 Release；`v0.5.0` 说明见 `RELEASE_NOTES.md` |
 | 设计契约 | [青瓷数字诗馆](docs/DESIGN_SYSTEM.md)：冷白瓷面、青灰线框、铜金索引色与「一首诗一展厅」的信息架构 |
@@ -46,8 +46,9 @@
 ## 主要特性
 
 - 📜 **今日展厅**：整首读诗、词牌长题分行、换诗、收藏态、朗读、按旧版样式等比还原的单张余韵摘录卡与详情页入口。
+- 🔍 **可被检索**：真实 URL + 构建期预渲染 26 个页面，每页带独立标题、描述与结构化数据，并有 `sitemap.xml`；旧 hash 链接自动迁移。
 - 🏛 **诗词索引**：9,350 篇离线馆藏，按朝代、体裁、诗名、作者或字句检索；分卷按需加载，结果分页。
-- 🔎 **读诗详情**：居中诗笺、标签、笺注、相关诗目与朗读/复制链接。
+- 🔎 **读诗详情**：居中诗笺、标签、译文与笺注、相关诗目与朗读/复制链接；12 首常读诗目附原创白话译文。
 - ✍️ **写作台**：本地草稿、实时预览、资料编辑与作品发布；登录状态由浏览器本地存储支持。
 - 👤 **我的诗卷**：收藏、最近读过与本机作品三类内容，空状态给出下一步。
 - 📱 **响应式布局**：覆盖桌面与 320px 起移动宽度。筛选改为贴底抽屉（锁滚动、Esc/遮罩可关）、分页收敛为页码窗口、表单控件保持 16px 以避免 iOS 聚焦缩放；320/390/430 三档截图纳入像素回归，无障碍、性能与 40px 触控下限在 CI 内自动校验。
@@ -60,11 +61,11 @@
 
 | 层次 | 当前实现 |
 | --- | --- |
-| 视图 | Vue 3、Vue Router 4（当前 hash history）、仓库自有 Vue 组件 |
-| 构建 | Vite 6 + `@vitejs/plugin-vue`，`package.json` 使用 `"type": "module"`，`base: './'` |
+| 视图 | Vue 3、Vue Router 4（history 路由，含旧 hash 链接迁移）、仓库自有 Vue 组件 |
+| 构建 | Vite 6 + `@vitejs/plugin-vue`，`package.json` 使用 `"type": "module"`，`base` 为绝对路径并可用 `VITE_BASE` 覆盖 |
 | 语言 | JavaScript / Vue SFC；npm 脚本使用 `node --test` 与 ESM |
 | 数据 | `src/data/poetryCatalog.js` 统一离线馆藏读取，`public/data/poetry/` 提供 16 个静态分卷；`src/apis/request.js` 仍用于可选自建 API |
-| 动效与媒体 | 浏览器原生音频、CSS/SVG 图标与 五首旧版外链曲目/第三方封面（不随仓库分发音频文件） |
+| 动效与媒体 | `motion` 按需加载的弹簧动效、CSS/SVG 图标；不含音乐播放器，朗读走 Web Speech API |
 | 样式 | `src/styles/base.css` 设计 token、组件内 CSS 与 `src/components/` 自有组件 |
 | 字体与素材 | WOFF2 字体子集与压缩展品图；派生来源与授权审查见 `docs/THIRD_PARTY_ASSETS.md` |
 | 设计系统 | `src/styles/base.css` 与 `docs/DESIGN_SYSTEM.md`；组件、状态与响应式规则集中定义 |
@@ -108,7 +109,7 @@ npm run audit:layout # 移动端布局约定（跨平台可比，CI 实际把关
 npm run audit:motion # 动效 token 与 reduced-motion 降级
 ```
 
-CI workflow 在 Node 20/22 执行 `npm ci && npm run build && npm run test --if-present && npm run smoke`，Documentation checks 另执行 `npm run lint`；独立的 Browser E2E workflow 在 Ubuntu 安装 Chromium 后执行 `npm run smoke:browser`，并追加 a11y、性能、触控、移动端像素基线、布局约定与动效六项审计。该 CDP 冒烟用独立临时 profile 验证今日展厅、单张摘录卡、桌面/390px/320px 搜索与布局、移动端筛选抽屉、吸附筛选栏、分页窗口、访客草稿、响应式导航、本地收藏、演示登录、作品发布、吸底音源、控制台/网络错误与布局位移预算；本机可用 `CHROME_PATH` 覆盖 Chrome / Chromium 路径。像素基线存放在 `tests/visual/mobile/`，平台不一致时自动跳过比对（中文字形回退不同），差异截图会作为 CI 产物上传；因此 CI 里真正把关的是 `npm run audit:layout`——它比对 6 条路由 × 320/390/820/821/1280 的布局约定（横向溢出、断点一致性、固定层遮挡、栅格列数、控件与字号下限），与字形度量无关。动效统一走四档时长与三条语义曲线，抽屉弹簧按需加载 `motion` 且遵循 `prefers-reduced-motion`，由 `npm run audit:motion` 把关。审计仍不覆盖真实后端或跨浏览器矩阵。
+CI workflow 在 Node 20/22 执行 `npm ci && npm run build && npm run test --if-present && npm run smoke`，Documentation checks 另执行 `npm run lint`；独立的 Browser E2E workflow 在 Ubuntu 安装 Chromium 后执行 `npm run smoke:browser`，并追加 a11y、性能、触控、移动端像素基线、布局约定与动效六项审计。该 CDP 冒烟用独立临时 profile 验证今日展厅、单张摘录卡、桌面/390px/320px 搜索与布局、移动端筛选抽屉、吸附筛选栏、分页窗口、访客草稿、响应式导航、本地收藏、演示登录、作品发布、控制台/网络错误与布局位移预算；本机可用 `CHROME_PATH` 覆盖 Chrome / Chromium 路径。像素基线存放在 `tests/visual/mobile/`，平台不一致时自动跳过比对（中文字形回退不同），差异截图会作为 CI 产物上传；因此 CI 里真正把关的是 `npm run audit:layout`——它比对 6 条路由 × 320/390/820/821/1280 的布局约定（横向溢出、断点一致性、固定层遮挡、栅格列数、控件与字号下限），与字形度量无关。动效统一走四档时长与三条语义曲线，抽屉弹簧按需加载 `motion` 且遵循 `prefers-reduced-motion`，由 `npm run audit:motion` 把关。审计仍不覆盖真实后端或跨浏览器矩阵。
 
 ### 本地演示 / mock 模式
 
@@ -151,7 +152,7 @@ VITE_USE_MOCK=true
 LanZe/
 ├── .github/                 # CI、Browser E2E、Pages、发布 workflow 与模板
 ├── docs/                    # 架构、开发、部署、路线图、FAQ、素材、宣发与巡检
-├── public/                  # favicon、展示素材与离线备用古筝节选/封面
+├── public/                  # favicon、展示素材与离线馆藏数据
 ├── src/
 │   ├── apis/                # 原生 fetch 请求封装与业务 API 列表
 │   ├── assets/              # WOFF2 字体子集与压缩展品图
@@ -160,7 +161,7 @@ LanZe/
 │   ├── config/              # 运行时环境变量解析
 │   ├── data/                # 精校短章、馆藏索引与演示用户
 │   ├── public/data/poetry/  # 离线馆藏分卷、目录、校验清单与上游 MIT 许可证
-│   ├── router/              # 三段式路由与旧 URL 重定向
+│   ├── router/              # history 路由与旧 URL/hash 兼容重定向
 │   ├── services/            # 演示数据 API 与浏览器存储
 │   ├── styles/              # 设计 token、全局基础样式
 │   ├── utils/               # 响应归一化、查询解析、lint 与单测
@@ -200,11 +201,11 @@ GitHub Pages 静态预览可作为当前构建的页面入口，但不要写成�
 
 ## 部署
 
-`npm run build` 产出静态文件 `dist/`。当前项目使用 hash history，因此不需要为每条子路由配置 history fallback；若未来切换到 history 模式，托管平台必须把未知路径回退到 `index.html`。
+`npm run build` 产出静态文件 `dist/`，并预渲染 26 个页面、生成 `sitemap.xml` 与 `404.html`。项目使用 history 路由，GitHub Pages 依靠 `404.html` 兜底深链；部署到其它平台时，需要把未知路径回退到 `index.html`。
 
 | 平台 | 构建命令 | 发布目录 | 关键配置 |
 | --- | --- | --- | --- |
-| GitHub Pages | `npm ci && npm run build` | `dist` | 使用 `.github/workflows/pages.yml`，`main` push 自动部署并保留手动 workflow；GitHub Actions 来源已启用，`base: './'` 与静态资源路径已实测，不部署到历史失效域名 |
+| GitHub Pages | `npm ci && npm run build` | `dist` | 使用 `.github/workflows/pages.yml`，`main` push 自动部署并保留手动 workflow；GitHub Actions 来源已启用，`VITE_BASE=/<repo>/` 与静态资源路径已实测，不部署到历史失效域名 |
 | Vercel | `npm run build` | `dist` | Framework: Vite；用环境变量或 rewrites 配置 `/api/`；不要沿用历史 Vercel 函数域名 |
 | Netlify | `npm run build` | `dist` | Publish directory `dist`；用 redirects/proxy 指向自建 API；设置公开 `VITE_` 变量 |
 | 任意静态服务器 | `npm run build` | `dist` | 用 HTTPS 托管静态文件；后端同源代理或显式配置 CORS |
@@ -217,8 +218,9 @@ GitHub Pages 静态预览可作为当前构建的页面入口，但不要写成�
 
 - **v0.2.0（已发布）**：Vite 6、本地演示数据、23 项单测、lint、README/许可证/治理文档、CI、模板、发布与宣发文案。
 - **v0.3.0（已发布）**：按「青瓷数字诗馆」目标模式完全重构信息架构与视图层；移除旧 UI 套件，保留单张历史样式摘录卡，收敛静态素材与布局位移，加入 27 项单测、CI Browser E2E 和音源不可达状态。
-- **v0.4.0（当前版本）**：9,350 篇离线馆藏、移动端走查与旧版五首外链曲目恢复；45 项单测，以及浏览器 E2E、无障碍、性能、触控与移动端像素基线共同覆盖主要演示链路。
-- **v0.4.x（后续）**：跨浏览器/视觉回归、素材授权核验、演示录屏、可选后端契约与内容版本依据。
+- **v0.4.0（已发布）**：9,350 篇离线馆藏与移动端走查；浏览器 E2E、无障碍、性能、触控与像素基线覆盖主要演示链路。
+- **v0.5.0（当前版本）**：真实 URL 与构建期预渲染、12 首译文简注、原创素材替换、移除音乐播放器；45 项单测与八类 CI 审计。
+- **v0.6.0（后续）**：跨浏览器矩阵、字体授权核验、演示录屏与可选后端契约。
 - **后续（社区化）**：按真实贡献推进 i18n、内容版本依据与社区讨论，不预设交付期限。
 
 路线图是公开计划，不是交付期限或商业承诺。
@@ -260,4 +262,4 @@ npm run lint
 npm run smoke
 ```
 
-The app is now organised as a compact digital poetry museum: a daily reading room, a searchable offline collection of 9,350 poems, poem sheets, a personal collection, a writing desk and a local demo login. It uses Vite 6, 39 unit tests, an independent Vue component system, three reproducible local soundscapes, a Chromium CDP smoke in CI and a configurable API layer: `VITE_API_BASE_URL` takes priority when configured, with automatic fallback to demo data. A verified GitHub Pages site provides a static frontend preview, but no hosted backend, account service or commercial support is promised; historical MemFire/Vercel links should be treated as migration context only. The code is MIT-licensed to `2022-2026 LanZe contributors`; third-party assets may have separate terms. See `docs/DESIGN_SYSTEM.md`, `CONTRIBUTING.md`, `docs/DEVELOPMENT.md` and `docs/ROADMAP.md` before opening a PR.
+The app is now organised as a compact digital poetry museum: a daily reading room, a searchable offline collection of 9,350 poems, poem sheets, a personal collection, a writing desk and a local demo login. It uses Vite 6, history routing with 26 prerendered pages, 45 unit tests, an independent Vue component system, a Chromium CDP smoke in CI and a configurable API layer: `VITE_API_BASE_URL` takes priority when configured, with automatic fallback to demo data. A verified GitHub Pages site provides a static frontend preview, but no hosted backend, account service or commercial support is promised; historical MemFire/Vercel links should be treated as migration context only. The code is MIT-licensed to `2022-2026 LanZe contributors`; third-party assets may have separate terms. See `docs/DESIGN_SYSTEM.md`, `CONTRIBUTING.md`, `docs/DEVELOPMENT.md` and `docs/ROADMAP.md` before opening a PR.
