@@ -1,7 +1,7 @@
 # 兰泽诗词 · LanZe
 
 <p align="center">
-  <img src="public/og-image.svg" alt="兰泽诗词：一间读诗、寻句、收卷的数字诗馆" width="720" />
+  <img src="docs/preview-home.jpg" alt="兰泽首页的今日展厅：李清照《如梦令》与右侧配图" width="880" />
 </p>
 
 <p align="center">
@@ -237,6 +237,15 @@ GitHub Pages 静态预览可作为当前构建的页面入口，但不要写成�
 - [架构文档](docs/ARCHITECTURE.md)：边界、数据流与迁移方向
 
 最简单的一次贡献：修正一处文档与源码不一致的地方，并在 `CHANGELOG.md` 的 `Unreleased` 区留下一行。
+
+## 支持这个项目
+
+如果兰泽对你有用：
+
+- **Star 一下**：这是让更多读诗的人找到它的最直接方式；
+- 发现错字、断行、史实或译文问题，欢迎按 `ISSUE_TEMPLATE` 里的「内容勘误」开 issue；
+- 想聊读诗体验、移动端排版、离线馆藏的用法，去 [Discussions](https://github.com/2648782102/LanZe/discussions) 留言；
+- 本地跑起来后有改进，直接开 PR，贡献流程见 `CONTRIBUTING.md`。
 
 ## 许可证
 
