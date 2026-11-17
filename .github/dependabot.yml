@@ -1,0 +1,37 @@
+version: 2
+
+updates:
+  # 运行时代码走 Vite 构建，但 lockfile 仍决定 CI 与部署时安装的具体版本。
+  # 每周检查一次 minor/patch，major 单独开 PR，避免一次性涌入大量变更。
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Shanghai
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+      include: scope
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
+
+  # actions/checkout、setup-node 这类版本升级由 Dependabot 直接提交，
+  # 与 npm 依赖分开，便于单独回滚。
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "ci(deps)"
