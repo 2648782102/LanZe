@@ -14,6 +14,8 @@
 
 ### Changed
 
+- **社交卡片与兜底页元数据**：`index.html` 补 `og:type`/`og:site_name`/`og:locale`/`og:url`/`og:image:width|height|alt` 与 `twitter:card|title|description|image`；`scripts/prerender.mjs` 把 `og:image`、`twitter:image` 输出为绝对 URL（抓取器不解析站内相对路径，原先 26 个预渲染页输出的是 `/LanZe/og-image.png`）；`scripts/copy-404.mjs` 由纯复制改为注入 `<meta name="robots" content="noindex, follow">` 并移除 `canonical`，避免 GitHub Pages 的 SPA 兜底页被搜索引擎当作大量重复内容收录。复测：`VITE_BASE=/LanZe/ npm run build` 后首页与诗页的图片地址均为 `https://2648782102.github.io/LanZe/og-image.png`（线上 200），`dist/404.html` 含 noindex 且无 canonical。
+
 - **移除音乐播放器**：删除 `AudioDock.vue`、`src/config/audio.js`、音频生成/校验/私人音源脚本、`public/media/` 下的示例音轨与封面、`docs/PRIVATE_AUDIO.md`，以及 `VITE_AUDIO_SOURCE` / `VITE_AUDIO_TRACKS` 配置与全部相关 E2E 断言。背景音乐播放器不提供核心价值，且默认外链存在授权与可用性风险，清理后站点不再发起任何音频请求；朗读功能基于 Web Speech API，与播放器无关，继续保留。
 
 - 移动端触控与详情页：新增 `npm run audit:touch`（6 路由 × 移动端，检测 <40px 触控目标）并接入 CI；修复页脚 GitHub/索引导航宽度不足，补 `min-width: 44px`。详情页 ≤820px 隐藏与正文重复的侧栏分类/作者、压缩侧栏内边距、actions 与返回同排并隐藏滚动条；登录页「一键填入」由下划线改为描边按钮，避免被误读为输入框边框。
