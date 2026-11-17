@@ -10,6 +10,8 @@
 
 - **登录态单测**：新增 `src/composables/useSession.test.js`（5 项），覆盖未登录回落、字符串与对象两种 `setSession` 负载、`updateProfile` 的字段沿用、`clearSession` 清空。`node:test` 环境没有 DOM，测试内装了最小 cookie jar 模拟 `document.cookie`，并在导入 Vue 之后再注入，避免 `@vue/runtime-dom` 走浏览器分支。单测 45 → 50，README 与 `docs/` 里的计数同步更新。
 
+- **摘录卡单测**：新增 `src/composables/useExcerptDeck.test.js`（3 项），覆盖无远程源时的本地队列填充（`depth` 填到 6）、首次加载完成前 `turn()` 不切页不消耗队列、`toggleSavedExcerpt` 的写入与反向移除。`onMounted` 在 `node:test` 里只产生 Vue 警告不阻塞。单测 50 → 53，README 与 `docs/` 的计数同步更新。
+
 - **真实 URL 与构建期预渲染**：全站改用 `createWebHistory`，`/poem/:id` 成为独立地址；构建时生成 26 个静态页面（主要路由 + 22 首精校短章），每页带独立标题、描述、`<h1>` 正文与 `BlogPosting` JSON-LD，并输出 `sitemap.xml`。旧 `/#/...` 链接在路由创建前自动迁移为等价 path。`404.html` 兜底让 GitHub Pages 的深链直接可开；已线上验证 `/poem/demo-jingyesi/` 返回 200。
 - **译文与简注**：新增 `src/data/poemNotes.js`，为 12 首常读诗目提供原创白话译文与短注；诗页以独立「译文」区块呈现，预渲染 HTML 同样包含，并补 3 项单测保证 id 对齐与内容非空。
 - **动效规范层**：四档时长 + 三条语义曲线；列表按序错位入场（只动 `transform`，避免 `opacity` 中途降低对比度）；路由按层级方向过渡；筛选抽屉的弹簧动效按需加载 `motion`，`prefers-reduced-motion` 下不加载。新增 `npm run audit:motion` 并接入 CI。
