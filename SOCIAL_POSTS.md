@@ -1,99 +1,108 @@
-# 宣发短帖（中英文）
+# 宣发文案（v0.5.0 口径，中英文）
 
-> 本文件是仓库内可复核的文案素材，当前不代表已经向外部平台发布。人工发布时请附真实仓库、Release 或 Discussion 链接，不写 star 数、用户数、性能百分比、线上 Demo 或付费推广；外部发布均需人工确认。
+> 本文件是仓库内可复核的文案素材，**不代表已经向外部平台发布**。人工发布时请附真实仓库或 Release 链接；不写 star 数、用户数、性能百分比或「线上 Demo」；外部发布均需人工确认。
 
 ## 使用约定
 
-- 核心信息：开源、古诗词、本地可运行、Vue 3 + Vite 6、自有组件、9,350 篇离线馆藏、三段可复现本地声景、39 项单测、CI Browser E2E、MIT、中文文档、欢迎贡献；可附已验证的 GitHub Pages 静态预览链接。
-- 不写「正式上线 / 生产可用 / 后端已恢复 / 官方线上 Demo」；GitHub Pages 只称静态前端预览，旧展示地址一律不用。
-- 不写具体 star 数、增长数据、性能百分比或未经录制的演示效果。
-- 配图优先用仓库内 `public/og-image.png`，或真实本地录屏；不要使用来源不明的截图。
-- 每条都可以按平台语气微调；同一天不要把所有短帖一次性刷到同一社区。
+- 当前口径：开源中文古诗词前端、本地可运行、Vue 3 + Vite 6、自有组件、9,350 篇离线馆藏、**26 个构建期预渲染页面**、**56 项单测**、CI 与独立 Browser E2E、MIT、中文文档。
+- 已移除：背景音乐播放器与全部音频（v0.5.0）。任何旧文案里的「声景」「音轨」「播放器」都不要再用。
+- 不写「正式上线 / 生产可用 / 后端已恢复 / 官方线上 Demo」；GitHub Pages 只能称**静态前端预览**。
+- 配图用 `docs/preview-home.jpg`（真实首屏截图）或 `public/og-image.png`（社交预览），不要用来源不明的图。
+- 同一天不要把同一段文案刷到多个社区；每个平台按自己的语气微调。
 
 ---
 
-## 1. GitHub / X 风格：离线诗馆
+## 1. X / 即刻（短帖，可直接发）
 
 **中文**
 
-> 把 2022 年留下的「兰泽诗词」整理成一间青瓷数字诗馆：Vue 3 自有组件、今日展厅、诗词索引、读诗详情、我的诗卷与写作台，先安静读完一首诗，再决定去哪里。\
-> 这轮把业务诗库换成 9,350 篇可校验的离线馆藏，保留单张历史白色摘录卡，并把单段演示音升级为三段可复现生成的本地声景曲库；39 项单测与 CI Browser E2E 覆盖主要演示链路。本地 `npm ci && npm run dev` 即可，也可查看 GitHub Pages 静态前端预览，不承诺托管后端或完整线上 Demo。\
-> #开源 #Vue3 #古诗词
+> 把 2022 年烂尾的「兰泽诗词」重做成一间青瓷数字诗馆：今日展厅先安静读完一首，再去 9,350 篇离线馆藏里寻诗、收进自己的诗卷。\\\
+> Vue 3 + Vite 6，自有组件，构建期预渲染 26 个页面，56 项单测，axe 无障碍 0 违规。本地 `npm ci && npm run dev` 就能跑，不依赖任何后端。\\\
+> 欢迎来读，也欢迎来挑错字。 #开源 #Vue3 #古诗词
 
 **English**
 
-> LanZe, a 2022 Chinese poetry frontend, is now a “Celadon Poetry Room”: independent Vue 3 components, a daily reading room, searchable index, poem sheets, a personal collection and a writing desk. One poem comes first.\
-> This round adds a verifiable offline collection of 9,350 poems, preserves one historical excerpt card, and replaces the single demo sound with three reproducible local soundscapes. 39 unit tests and Chromium CI E2E cover the main demo flow. Run it locally with `npm ci && npm run dev`—no hosted demo or backend is promised.\
-> #opensource #Vue3 #ChinesePoetry
+> Rebuilt a 2022 side project into a "celadon poetry room": read today's poem first, then search 9,350 offline poems and keep your own scroll.\\\
+> Vue 3 + Vite 6, hand-written components, 26 prerendered pages, 56 unit tests, zero axe violations. `npm ci && npm run dev` works without any backend.\\\
+> Typos and word breaks are welcome as issues. #opensource #Vue3 #ChinesePoetry
 
-## 2. 微博 / 即刻风格：中文项目与新人友好
+## 2. V2EX「分享创造」（中文，可直接发）
 
-**中文**
+**标题**：分享一个离线的中文古诗词阅读器，Vue 3 + Vite，9,350 篇馆藏
 
-> 一个适合慢慢读、也适合第一次参与开源的中文项目：兰泽诗词。它用 Vue 3 写成一间「青瓷数字诗馆」：先读今日的一首诗，再去离线馆藏里寻诗、收进诗卷，或到写作台起草自己的作品。\
-> 项目不依赖「先看线上 demo」：Node 20/22 本地安装即可运行，未配置后端也能用 9,350 篇离线馆藏和演示数据体验主要界面。README、MIT、贡献指南、FAQ、路线图、39 项单测和 CI 浏览器回归都写清楚了。不会写代码也能从文档勘误、素材授权、移动端检查开始。
+**正文**：
 
-**English**
+> 断断续续做了几年，最近把仓库整个重做了一遍，想拿出来求点批评。
+>
+> **它是什么**：一间读诗的地方。首页是「今日展厅」，一次只推一首，先读完再决定去哪；之后是 9,350 篇离线馆藏的索引（朝代、体裁、诗名、作者、字句都能查），读诗详情页，收藏与最近读过，以及一个只存在浏览器 localStorage 里的本地草稿台。
+>
+> **技术上值得说的**：
+> - Vue 3 + Vite 6，没有 UI 框架，组件自己写；
+> - 全站改成 history 路由，构建期预渲染 26 个页面，每页独立 title / description / BlogPosting JSON-LD，附 sitemap.xml；GitHub Pages 的深链用 404 兜底，兜底页带 `noindex`；
+> - 质量门禁是照真项目做的：56 项 `node --test` 单测、axe-core 无障碍（桌面/移动各 5 条路由，0 违规）、LCP/CLS 与首屏体积预算、移动端 40px 触控下限、320/390/430 三档像素基线、CodeQL 静态扫描、Dependabot；
+> - 不依赖后端：没配 `VITE_API_BASE_URL` 就用仓库内离线馆藏和演示数据。
+>
+> **边界也说清楚**：GitHub Pages 只是静态前端预览，没有托管后端、没有账号服务、没有内容审核；第三方字体与图片的授权还在逐项核验。
+>
+> 想找两类反馈：一是读诗体验（字号、行距、翻页节奏、移动端），二是工程上哪里还能更省（首屏体积、预渲染范围）。
+>
+> 仓库：https://github.com/2648782102/LanZe ｜ 静态预览：https://2648782102.github.io/LanZe/
 
-> LanZe is a Chinese-language open-source frontend for classical poetry—a quiet reading room, offline searchable collection, personal library and writing desk built with Vue 3. The README, MIT license, contribution/security docs, FAQ, roadmap, 39 unit tests and Chromium CI smoke are all in the repository.\
-> No public demo is required to try the frontend: install with Node 20/22 and run it locally; 9,350 offline poems and built-in demo data work without a backend. Docs, licensing checks and mobile QA are good first contributions.
+## 3. 掘金长文（技术向，1500 字左右）
 
-## 3. 小红书风格：轻介绍（不夸大）
+**标题**：把一个烂尾两年的古诗词前端重做完：预渲染、无障碍与质量门禁怎么落地
 
-**中文**
+**摘要**：一个不起眼的个人项目，从「能跑」到「可复现、可验证」，中间做了哪些取舍。
 
-> 📜 发现一个中文古诗词开源前端：兰泽诗词\
-> · Vue 3 + Vite 6，今日展厅 / 离线馆藏 / 我的诗卷 / 写作台\
-> · 冷白瓷面、青灰线框与铜金索引色；每次先安静读完一首诗\
-> · 9,350 篇可校验馆藏，朝代与体裁双轴筛选；保留一张按旧版等比还原的白色竖排摘录卡\
-> · 三段自制本地声景可切轨、拖进度、调音量；窄屏下播放器与底部导航自动避让\
-> · 本地 `npm run dev` 可看，39 项单测与 CI 浏览器回归，MIT 开源，不承诺线上账号服务\
-> 想练手的话，文档校对、素材授权、跨浏览器/视觉回归都很适合作为第一个 PR。把旧项目一点点修好，也挺浪漫的。🌿
+**正文**
 
-**English**
+一、先决定它不是什么
 
-> 📜 LanZe: an open-source Chinese poetry frontend\
-> · Vue 3 + Vite 6: a daily reading room, offline collection, personal library and writing desk\
-> · Cool porcelain surfaces, celadon rules and brass index marks; one poem at a time\
-> · 9,350 verifiable offline poems, dynasty/form facets, and one restored vertical excerpt card\
-> · Three self-generated local soundscapes with a playlist, seek bar and volume controls\
-> · Runs locally with `npm run dev`; 39 unit tests, Chromium CI smoke, MIT-licensed, with no hosted account promise\
-> Good first PRs: docs, asset licensing, cross-browser and visual regression. Quietly restoring an old project can be lovely. 🌿
+2022 年我做过一个诗词界面，停更两年。重做时最难的取舍是砍功能：不做诗词社区、不做后端、不做内容审核，只做一件事——**把一首诗安静地读完，并且能查到其他诗**。砍完之后，剩下的部分才谈得上做扎实。
 
-## 4. 技术社区风格：离线优先与回归
+二、真实 URL 比动效重要
 
-**中文**
+原来的页面是 hash 路由，`/#/poem/xxx` 这类地址搜索引擎读不到内容，分享出去也没法预览。这轮改成 `createWebHistory`，并在构建期预渲染 26 个页面（六类主路由 + 22 首精校短章）。每页有独立标题、描述、`BlogPosting` 结构化数据，另出 `sitemap.xml`。
 
-> 旧前端项目的维护不只是换个皮肤。兰泽诗词把 36 个旧页面收敛到六类主任务，移除 Element Plus / Bootstrap / Lottie / APlayer / 滑块验证码，改用 Vue 3 自有组件；旧 URL 保留兼容重定向，历史白色摘录卡作为明确视觉例外单独还原。\
-> 工程侧：9,350 篇离线馆藏按 16 个分卷按需加载，三段本地声景由脚本确定性生成并按 SHA-256 校验；39 项单测、lint、Node 20/22 构建、静态资源冒烟再加独立 Browser E2E。CDP 冒烟覆盖桌面/320px 窄屏、馆藏筛选、搜索、收藏、播放器、登录、发布、控制台/网络错误与 CLS。\
-> 仍诚实保留边界：GitHub Pages 只是静态前端预览，不提供托管后端或账号服务；第三方素材授权未核验，CI 浏览器回归只覆盖 Chromium 关键路径。欢迎可验证的小 PR。
+GitHub Pages 是纯静态托管，深链会 404，所以构建时把 `index.html` 复制成 `404.html` 做兜底，前端路由再按 pathname 渲染。这里踩了个坑：兜底页会原样带上首页的 `canonical`，等于告诉搜索引擎「所有不存在的地址都指向首页」，结果是一堆重复页面被收录。修法是兜底页移除 `canonical`、注入 `noindex, follow`，并把标题改成「页面走失了」。
 
-**English**
+第三个坑更隐蔽：`og:image` 原来写的是站内相对路径 `/og-image.png`，部署在项目子路径下就成了 `https://<user>.github.io/og-image.png`，实测 404。社交抓取器不解析相对路径，所以必须输出绝对 URL——这个改动我顺手加进了 smoke 测试，防止回退。
 
-> Maintaining a legacy frontend is more than a new skin. LanZe replaces 36 legacy pages with six main tasks and independent Vue 3 components, removes Element Plus / Bootstrap / Lottie / APlayer / slider CAPTCHA, keeps legacy URL redirects, and restores one historical excerpt card as an explicit visual exception.\
-> Engineering: 9,350 offline poems load from 16 split volumes, three local soundscapes are deterministically generated and verified by SHA-256, and 39 unit tests, lint, Node 20/22 builds, static-asset smoke and a separate Browser E2E workflow guard the main flow. CDP smoke covers desktop/320px mobile, facets, search, saving, the player, login, publishing, console/network errors and CLS.\
-> Boundaries remain explicit: GitHub Pages is a static frontend preview only, with no hosted backend or account service; third-party asset licensing is not verified, and CI browser coverage is Chromium only. Small, verifiable PRs welcome.
+三、质量门禁不是装饰
 
-## 5. Release / Discussion 联动风格
+单测从 45 项补到 56 项，重点补的是以前完全没有覆盖的状态层：`useSession`（登录态 cookie 读写、资料合并）、`useExcerptDeck`（摘录队列、翻页、收藏）、`useLibrary`（收藏、最近读过、12 条上限）。`node:test` 没有 DOM，所以 cookie jar 和 `window.setTimeout` 都在测试里做了替身；还有个细节——必须**先 `import "vue"` 再注入假 `document`**，否则 `@vue/runtime-dom` 在模块加载时探测到 document，就会走浏览器分支，报 `doc.createElement is not a function`。
 
-**中文**
+无障碍用 axe-core 跑 5 条路由 × 桌面/移动，从 12 组违规降到 0。真实改动很朴素：`--ink-faint` 从 `#809793` 调到 `#586965`，正文金色全部换成 `--brass-text`，移动端底部导航文字透明度 0.5 → 0.62。
 
-> `v0.4.0` 聚焦「离线馆藏与声景曲库」：9,350 篇可校验馆藏、朝代/体裁双轴筛选、移动端走查、三段可复现本地声景、39 项单测与 CI Browser E2E。默认运行不依赖外部诗词接口、第三方音乐平台或线上账号，仍不是「诗词社区正式上线」的公告。\
-> 当前最需要的是跨浏览器/视觉回归、素材授权核验、可选后端契约与内容版本依据。路线图与 FAQ 都写清了已知限制；如果没有后端，请用本地演示理解界面。仓库见链接 👇
+性能只做预算不做玄学：LCP、CLS、首屏 JS/CSS 的 gzip 体积都设上限，进 CI。实测 LCP 296ms、CLS 0，首屏 JS 64KB——对一个自带 9,350 篇诗词数据的站点，靠的是分卷按需加载。
 
-**English**
+四、把「可复现」当产品特性
 
-> LanZe `v0.4.0` focuses on an offline collection and a local soundscape library: 9,350 verifiable poems, dynasty/form facets, a mobile walkthrough, three reproducible local soundscapes, 39 unit tests and Chromium CI E2E. The default run does not depend on an external poetry API, third-party music platform or hosted account—and this is not a launch notice for a hosted poetry community.\
-> Most useful next: cross-browser/visual regression, asset licensing, optional backend contracts and content provenance. Known limits are in the roadmap and FAQ; built-in demo data works when no backend is configured. Repo in the link 👇
+现在合并一个改动，跑的是：Node 20/22 构建、56 项单测、lint、静态资源冒烟、独立 Browser E2E（含 axe、性能预算、40px 触控、三档移动端像素基线）、CodeQL。听起来重，但它是这个项目敢继续改的前提——很多个人项目不是写不下去，是改不动。
 
----
+五、还差什么
+
+没有托管后端，没有账号服务，第三方素材授权逐项核验中，浏览器回归只覆盖 Chromium。这些都在 README 和 FAQ 里写死了，不打算用「即将支持」糊过去。
+
+如果只想要一句话：**先决定砍掉什么，再谈把它做扎实。**
+
+仓库：https://github.com/2648782102/LanZe
+
+## 4. 小红书 / 朋友圈（轻介绍）
+
+> 📜 一个中文古诗词开源前端：兰泽诗词\\\
+> · Vue 3 + Vite 6，今日展厅 / 9,350 篇离线馆藏 / 我的诗卷 / 写作台\\\
+> · 冷白瓷面、青灰线框、铜金索引色；一次只读一首，读完再去寻诗\\\
+> · 构建期预渲染 26 个页面，每首诗都有自己的地址；56 项单测、无障碍 0 违规\\\
+> · 本地 `npm ci && npm run dev` 就能跑，不需要后端，MIT 开源\\\
+> 想练手的话，错字勘误、断行校对、移动端排版都很适合当第一个 issue。把旧项目一点点修好，挺浪漫的。🌿
 
 ## 发布前核对
 
-- [ ] 仓库链接指向 `https://github.com/2648782102/LanZe`；若附 Release/Discussion，链接已实际创建并验证。
-- [ ] 没有附历史 MemFire / Vercel 演示地址，没有写「官网 / 官方线上 Demo / 正式上线」；GitHub Pages 可称静态前端预览。
-- [ ] `v0.4.0` tag/Release 已存在；如附链接，先回读 `https://github.com/2648782102/LanZe/releases/tag/v0.4.0`。
-- [ ] 若提到演示数据，说明它仅保存在当前浏览器 `localStorage`，不是账号服务。
-- [ ] 配图来自 `public/og-image.png` 或真实本地录屏；画面不含密钥、真实账号或私人路径。
-- [ ] 没有 star、fork、用户数、增长或性能数字；没有购买推广/刷互动。
-- [ ] 发布后把可执行的反馈整理成 issue，并同步修正文档；不要把讨论只留在评论区。
+- [ ] 仓库链接指向 `https://github.com/2648782102/LanZe`；附带的 Release / Discussion 链接已实际创建并回读。
+- [ ] 没有附历史 MemFire / Vercel 地址，没有写「官网 / 官方线上 Demo / 正式上线」；GitHub Pages 只称静态前端预览。
+- [ ] 没有出现「声景 / 音轨 / 播放器」（v0.5.0 已移除音频）。
+- [ ] 单测数写 56，预渲染页数写 26，与 README 一致。
+- [ ] 配图用 `docs/preview-home.jpg` 或 `public/og-image.png`，画面不含密钥、真实账号、私人路径。
+- [ ] 没有任何 star / fork / 用户数 / 增长 / 性能百分比数字；没有购买推广或互 star。
+- [ ] 发布后把可执行反馈整理成 issue，并同步修正文档。
