@@ -14,6 +14,12 @@ const dist = join(process.cwd(), "dist");
 const html = await readFile(join(dist, "index.html"), "utf8");
 
 const withNoindex = html
+  // 兜底页沿用首页标题会被当成重复页面，改成一个明确表示「这里没有这个地址」的标题
+  .replace(/<title>[\s\S]*?<\/title>/, "<title>页面走失了 · 兰泽</title>")
+  .replace(
+    /<meta property="og:title" content="[^"]*">/,
+    '<meta property="og:title" content="页面走失了 · 兰泽">',
+  )
   .replace(/^\s*<link rel="canonical"[^>]*>\n/gm, "")
   .replace("</head>", '  <meta name="robots" content="noindex, follow">\n</head>');
 
