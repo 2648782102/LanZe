@@ -53,6 +53,19 @@ try {
     if (html.includes(host)) throw new Error(`dist/index.html still references ${host}`);
   }
 
+  // 元数据回归检查：社交抓取器只认绝对 URL；SPA 兜底页不该被搜索引擎当成内容页收录。
+  for (const meta of ['og:image', 'twitter:image']) {
+    const pattern = new RegExp(`<meta (?:property|name)="${meta}" content="https?://[^"]+">`);
+    if (!pattern.test(html)) throw new Error(`dist/index.html 的 ${meta} 必须是绝对 URL`);
+  }
+  const notFoundHtml = await readFile("dist/404.html", "utf8");
+  if (!/<meta name="robots" content="noindex/.test(notFoundHtml)) {
+    throw new Error("dist/404.html 缺少 noindex，SPA 兜底页会被搜索引擎收录");
+  }
+  if (/<link rel="canonical"/.test(notFoundHtml)) {
+    throw new Error("dist/404.html 不应带 canonical，未知路径不该指回首页");
+  }
+
   const builtJs = (await readdir("dist/assets")).filter((name) => name.endsWith(".js"));
   const builtJsText = await Promise.all(
     builtJs.map((name) => readFile(`dist/assets/${name}`, "utf8")),
