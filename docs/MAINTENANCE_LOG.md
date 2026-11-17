@@ -392,3 +392,11 @@
 
 - 用户追问「不能提前加载吗」。上一版虽已让切换不等待网络，但仍只在准备未来一句时发请求。本轮把 `ReadView` 改为有深度的预载队列：首屏同步生成 6 句本地摘录，`onMounted` 立即发起远程源的 4 路并行预取；`turn` 只读队首，`finishExcerptTurn` 消费后补齐本地槽位并把后台远程结果追加到未来队列。远程请求只在挂载时发生，后续点击、轻拂、按钮和键盘都不会触发新的诗句请求。
 - Browser E2E 通过 `data-excerpt-queue-depth` 检查交互前队列深度，记录轻拂前后的 `Network.requestWillBeSent` 数量并断言不增长；`VITE_POETRY_SOURCE=remote` + 2.5 秒响应延迟下完整流程通过。默认构建与全量质量门通过后提交。
+
+## 元数据、测试与依赖治理巡检 — 2026-11-18 01:30 CST
+
+- 社交卡片与兜底页：`og:image`/`twitter:image` 改为绝对 URL（原先 26 个预渲染页输出 `/LanZe/og-image.png`，社交抓取器不解析站内相对路径）；`index.html` 补 `og:type`/`og:site_name`/`og:locale`/`og:url`/图片尺寸与 `twitter:card` 系列；`copy-404.mjs` 注入 `noindex, follow` 并移除 `canonical`，避免 GitHub Pages 的 SPA 兜底页被当成大量重复页面收录；404 标题改为「页面走失了 · 兰泽」。`scripts/smoke.mjs` 增加三项断言（绝对 URL、noindex、无 canonical）防回归。
+- 测试覆盖：新增 `src/composables/useSession.test.js`（5 项）与 `useExcerptDeck.test.js`（3 项），单测 45 → 53，README 与 `docs/` 计数同步。`node:test` 没有 DOM：cookie jar 与 `window.setTimeout` 都在测试内替身化，且必须先 `import "vue"` 再注入假 document，否则 `@vue/runtime-dom` 会走浏览器分支。
+- 渐进增强：`index.html` 补 `noscript` 提示（内联样式 + 相对路径回首页），禁用 JavaScript 或脚本被拦截时不再是整页空白；`copy-404` 复制首页模板，兜底页同样获得该提示。
+- 工程治理：加 `.github/dependabot.yml`（npm 每周一 minor/patch 分组、semver-major 忽略；actions 每月）、`.github/workflows/codeql.yml`（`security-and-quality`，push/PR/周一定时/手动），`package.json` 版本从脚手架遗留的 `0.0.0` 对齐到已发布的 `v0.5.0`。
+- 验证：`npm run build`（26 页预渲染 + sitemap + 404）、`npm test` 53 项、`npm run smoke` 28 个本地资源 200、`npm run lint` 通过。未执行外部宣发或付费推广。
