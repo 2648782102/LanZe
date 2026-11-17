@@ -50,7 +50,15 @@ const setMeta = (html, { title, description, path, image, jsonLd }) => {
       /<link rel="icon"[^>]*>/,
       `<link rel="icon" type="image/svg+xml" href="${escapeHtml(asset("favicon.svg"))}">`,
     )
-    .replace(/<meta property="og:image" content="[^"]*">/, `<meta property="og:image" content="${escapeHtml(asset(image))}">`);
+    // 社交卡片抓取器不会解析站内相对路径，og:image / twitter:image 必须是绝对 URL。
+    .replace(
+      /<meta property="og:image" content="[^"]*">/,
+      `<meta property="og:image" content="${escapeHtml(`${siteOrigin}${String(image).replace(/^\//, "")}`)}">`,
+    )
+    .replace(
+      /<meta name="twitter:image" content="[^"]*">/,
+      `<meta name="twitter:image" content="${escapeHtml(`${siteOrigin}${String(image).replace(/^\//, "")}`)}">`,
+    );
 
   const head = [
     `<link rel="canonical" href="${escapeHtml(absolute(path))}">`,
