@@ -400,3 +400,10 @@
 - 渐进增强：`index.html` 补 `noscript` 提示（内联样式 + 相对路径回首页），禁用 JavaScript 或脚本被拦截时不再是整页空白；`copy-404` 复制首页模板，兜底页同样获得该提示。
 - 工程治理：加 `.github/dependabot.yml`（npm 每周一 minor/patch 分组、semver-major 忽略；actions 每月）、`.github/workflows/codeql.yml`（`security-and-quality`，push/PR/周一定时/手动），`package.json` 版本从脚手架遗留的 `0.0.0` 对齐到已发布的 `v0.5.0`。
 - 验证：`npm run build`（26 页预渲染 + sitemap + 404）、`npm test` 53 项、`npm run smoke` 28 个本地资源 200、`npm run lint` 通过。未执行外部宣发或付费推广。
+
+## 掘金首发与外部曝光 — 2026-11-18 21:50 CST
+
+- 在掘金发布长文《把一个烂尾两年的古诗词前端重做完：预渲染、无障碍与质量门禁怎么落地》（<https://juejin.cn/post/7708963436194250786>），分类「前端」，标签 Vue.js、Vite。
+- 19 小时后数据：阅读 18、点赞 0、评论 0；创作者中心同期展现 17。结论：掘金新号首发不进入推荐池，冷启动阶段没有自然流量。文章口径与仓库实现一致（56 项单测、26 页预渲染、404 `noindex`、`og:image` 绝对 URL），不需要修正。
+- 未发布平台：V2EX（注册需手机验证，且站点的 Cloudflare 校验会拦截自动化发布）。
+- 下一步：先做站外分发（即刻 / X / 前端社群），再观察 48 小时内在掘金的推荐表现。
